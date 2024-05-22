@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
 export type UserDocument = User & Document;
 
@@ -12,10 +13,65 @@ export class User {
   lastName: string;
 
   @Prop({ required: true, unique: true })
-  username: string; // Using email as the username
+  username: string;
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ required: false })
+  phoneNumber: string;
+
+  @Prop({ required: false })
+  gender: string;
+
+  @Prop({ required: false })
+  address: string;
+
+  @Prop({ required: false })
+  city: string;
+
+  @Prop({ required: false })
+  state: string;
+
+  @Prop({ required: false })
+  pinCode: string;
+
+  @Prop({ required: false })
+  country: string;
+
+  @Prop()
+  picture: string;
+
+  @Prop()
+  linkedIn: string;
+
+  @Prop()
+  organizationName: string;
+
+  @Prop()
+  sector: string;
+
+  @Prop()
+  workAddress: string;
+
+  @Prop()
+  designation: string;
+
+  @Prop()
+  billingAddress: string;
+
+  async validatePassword(password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre<UserDocument>('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
