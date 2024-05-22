@@ -1,18 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/users/user.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private userService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findByUsername(username);
-    if (user && (await bcrypt.compare(password, user.password))) {
+  async validateUser(username: string, password: string) {
+    const user = await this.userService.findByUsername(username);
+    console.log('user', user);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('isPasswordValid', isPasswordValid);
+    if (user && isPasswordValid) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
@@ -20,10 +24,17 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, password: user.password };
+  async login(user: User) {
+    const payload = {
+      username: user.username,
+      sub: {
+        name: user.firstName,
+      },
+    };
+
     return {
-      access_token: this.jwtService.sign(payload),
+      ...user,
+      accessToken: this.jwtService.sign(payload),
     };
   }
 }

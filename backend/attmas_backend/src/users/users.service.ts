@@ -19,7 +19,15 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    return this.userModel.findOne({ username }).exec();
+  // async create(createUserDto: CreateUserDto): Promise<User> {
+  //   const createdUser = new this.userModel(createUserDto);
+  //   return createdUser.save();
+  // }
+
+  async findByUsername(username: string): Promise<User> {
+    console.log('username-', username);
+    const tmpData = await this.userModel.findOne({ username }).exec();
+    console.log('tmpData-', tmpData);
+    return tmpData;
   }
 }
