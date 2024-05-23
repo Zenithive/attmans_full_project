@@ -9,13 +9,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User, UserSchema } from 'src/users/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { SessionSerializer } from './session.serializer';
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule.register({ session: true }),
     TypeOrmModule.forRoot({
       type: 'mongodb',
-      host: 'localhost',
+      host: '0.0.0.0',
       port: 27017,
       database: 'attmas',
       useUnifiedTopology: true,
@@ -24,22 +26,28 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     TypeOrmModule.forFeature([User]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.registerAsync({
-      //imports: [ConfigModule],
+      imports: [ConfigModule],
 
       useFactory: async (configService: ConfigService) => {
         const secret = configService.get<string>('JWT_SECRET');
         // const secret = 'djkdkseudiwsa3';
         console.log('JWT_SECRET:', secret); // Debug line to verify the secret
         return {
-          secret,
-          signOptions: { expiresIn: '1h' },
+          secret: configService.get<string>('JWT_SECRET'),
+          signOptions: { expiresIn: '60m' },
         };
       },
       inject: [ConfigService],
     }),
-    ConfigModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtService, LocalStrategy, UsersService],
+  providers: [
+    AuthService,
+    JwtService,
+    LocalStrategy,
+    UsersService,
+    JwtStrategy,
+    SessionSerializer,
+  ],
 })
 export class AuthModule {}

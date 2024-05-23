@@ -44,7 +44,7 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
     const password = data.get('password');
 
     try {
-      const response = await axios.post('http://localhost:3000/auth/login', { username: email, password });
+      const response = await axios.post('http://localhost:3000/users/login', { username: email, password });
       setSuccess('Successfully signed in!');
       setError(null);
     } catch (error) {

@@ -13,13 +13,10 @@ export class AuthService {
 
   async validateUser(username: string, password: string) {
     const user = await this.userService.findByUsername(username);
-    console.log('user', user);
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log('isPasswordValid', isPasswordValid);
     if (user && isPasswordValid) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      const { username, firstName, lastName } = user;
+      return { username, firstName, lastName };
     }
     return null;
   }
@@ -27,14 +24,11 @@ export class AuthService {
   async login(user: User) {
     const payload = {
       username: user.username,
-      sub: {
-        name: user.firstName,
-      },
+      sub: user.username,
     };
 
     return {
-      ...user,
-      accessToken: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload),
     };
   }
 }
