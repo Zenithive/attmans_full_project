@@ -6,6 +6,7 @@
 # Node artifact files
 node_modules/
 dist/
+frontend/attmas_frontend/.next/
 
 # Compiled Java class files
 *.class
