@@ -8,6 +8,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User, UserSchema } from 'src/users/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -22,10 +23,21 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     TypeOrmModule.forFeature([User]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    JwtModule.register({
-      secret: 'swtsdfhuvbwjwkhv3243235',
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      //imports: [ConfigModule],
+
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        // const secret = 'djkdkseudiwsa3';
+        console.log('JWT_SECRET:', secret); // Debug line to verify the secret
+        return {
+          secret,
+          signOptions: { expiresIn: '1h' },
+        };
+      },
+      inject: [ConfigService],
     }),
+    ConfigModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtService, LocalStrategy, UsersService],

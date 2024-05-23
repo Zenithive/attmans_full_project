@@ -38,16 +38,63 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
+  const [formValues, setFormValues] = React.useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
+  const [emailError, setEmailError] = React.useState<string | null>(null);
+  const [passwordError, setPasswordError] = React.useState<string | null>(null);
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    return password.length >= 6;
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+
+    if (name === 'email') {
+      if (!validateEmail(value)) {
+        setEmailError('Invalid email address');
+      } else {
+        setEmailError(null);
+      }
+    }
+
+    if (name === 'password') {
+      if (!validatePassword(value)) {
+        setPasswordError('Password must be at least 6 characters');
+      } else {
+        setPasswordError(null);
+      }
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const firstName = data.get('firstName');
-    const lastName = data.get('lastName');
-    const email = data.get('email');
-    const password = data.get('password');
+    const { firstName, lastName, email, password } = formValues;
+
+    if (!validateEmail(email)) {
+      setEmailError('Invalid email address');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
+    }
 
     try {
       const response = await axios.post('http://localhost:3000/users', {
@@ -58,9 +105,15 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
       });
       setSuccess('Successfully signed up!');
       setError(null);
+      // Reset form values
+      setFormValues({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+      });
     } catch (error) {
       console.log("error", error);
-      
       setError('Failed to sign up. Please try again.');
       setSuccess(null);
     }
@@ -95,6 +148,8 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   id="firstName"
                   label="First Name"
                   autoFocus
+                  value={formValues.firstName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -105,6 +160,8 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
+                  value={formValues.lastName}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -115,6 +172,10 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  value={formValues.email}
+                  onChange={handleChange}
+                  error={!!emailError}
+                  helperText={emailError}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -126,6 +187,10 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  value={formValues.password}
+                  onChange={handleChange}
+                  error={!!passwordError}
+                  helperText={passwordError}
                 />
               </Grid>
               <Grid item xs={12}>
