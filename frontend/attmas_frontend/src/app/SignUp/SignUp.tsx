@@ -13,10 +13,12 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface SignInProps {
-  toggleForm: () => void;
-}
+
+
+
 
 interface SignUpProps {
   toggleForm: () => void;
@@ -35,28 +37,65 @@ function Copyright(props: any) {
   );
 }
 
-const defaultTheme = createTheme();
+// const defaultTheme = createTheme();
 
-const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
+// Create a custom theme with more rounded input borders
+const customTheme = createTheme({
+  shape: {
+    borderRadius: 20, // Change this value to make the borders more or less rounded
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 12, 
+            },
+          },
+        },
+      },
+    },
+  },
+});
+
+const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
+  const router = useRouter();
   const [formValues, setFormValues] = React.useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
+    mobileNumber: '',
   });
-  const [error, setError] = React.useState<string | null>(null);
-  const [success, setSuccess] = React.useState<string | null>(null);
-  const [emailError, setEmailError] = React.useState<string | null>(null);
-  const [passwordError, setPasswordError] = React.useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  // const [emailError, setEmailError] = useState<string | null>(null);
+  // const [passwordError, setPasswordError] = useState<string | null>(null);
+  // const [mobileNumberError, setMobileNumberError] = useState<string | null>(null);
+  // const [firstNameError, setFirstNameError] = useState<string | null>(null);
+  // const [lastNameError, setLastNameError] = useState<string | null>(null);
+  // const router = useRouter();
+  
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
-  const validatePassword = (password: string) => {
-    return password.length >= 6;
-  };
+  // const validateEmail = (email: string) => {
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   return emailRegex.test(email);
+  // };
+
+  // const validatePassword = (password: string) => {
+  //   return password.length >= 6;
+  // };
+
+  // const validateMobileNumber = (mobileNumber: string) => {
+  //   const mobileNumberRegex = /^\d{10}$/;
+  //   return mobileNumberRegex.test(mobileNumber);
+  // };
+
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password: string) => password.length >= 6;
+  const validateMobileNumber = (mobileNumber: string) => /^\d{10}$/.test(mobileNumber);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -65,34 +104,78 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
       [name]: value,
     }));
 
-    if (name === 'email') {
-      if (!validateEmail(value)) {
-        setEmailError('Invalid email address');
-      } else {
-        setEmailError(null);
-      }
-    }
+    // if (name === 'email') {
+    //   if (!validateEmail(value)) {
+    //     setEmailError('Invalid email address');
+    //   } else {
+    //     setEmailError(null);
+    //   }
+    // }
 
-    if (name === 'password') {
-      if (!validatePassword(value)) {
-        setPasswordError('Password must be at least 6 characters');
-      } else {
-        setPasswordError(null);
-      }
-    }
+    // if (name === 'password') {
+    //   if (!validatePassword(value)) {
+    //     setPasswordError('Password must be at least 6 characters');
+    //   } else {
+    //     setPasswordError(null);
+    //   }
+    // }
+
+    // if (name === 'mobileNumber') {
+    //   if (!validateMobileNumber(value)) {
+    //     setMobileNumberError('Mobile number must be exactly 10 digits');
+    //   } else {
+    //     setMobileNumberError(null);
+    //   }
+    // }
+
+    // if (name === 'firstName') {
+    //   if (!value.trim()) {
+    //     setFirstNameError('First name is required');
+    //   } else {
+    //     setFirstNameError(null);
+    //   }
+    // }
+
+    // if (name === 'lastName') {
+    //   if (!value.trim()) {
+    //     setLastNameError('Last name is required');
+    //   } else {
+    //     setLastNameError(null);
+    //   }
+    // }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { firstName, lastName, email, password } = formValues;
+    const { firstName, lastName, email, password, mobileNumber } = formValues;
 
-    if (!validateEmail(email)) {
-      setEmailError('Invalid email address');
-      return;
-    }
+    // if (!firstName.trim()) {
+    //   setFirstNameError('First name is required');
+    //   return;
+    // }
 
-    if (!validatePassword(password)) {
-      setPasswordError('Password must be at least 6 characters');
+    // if (!lastName.trim()) {
+    //   setLastNameError('Last name is required');
+    //   return;
+    // }
+
+    // if (!validateEmail(email)) {
+    //   setEmailError('Invalid email address');
+    //   return;
+    // }
+
+    // if (!validatePassword(password)) {
+    //   setPasswordError('Password must be at least 6 characters');
+    //   return;
+    // }
+
+    // if (!validateMobileNumber(mobileNumber)) {
+    //   setMobileNumberError('Mobile number must be exactly 10 digits');
+    //   return;
+    // }
+
+    if (!firstName.trim() || !lastName.trim() || !validateEmail(email) || !validatePassword(password) || !validateMobileNumber(mobileNumber)) {
+      setError('Please fill all fields correctly.');
       return;
     }
 
@@ -102,6 +185,7 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
         lastName,
         username: email,
         password,
+        mobileNumber,
       });
       setSuccess('Successfully signed up!');
       setError(null);
@@ -111,7 +195,9 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
         lastName: '',
         email: '',
         password: '',
+        mobileNumber: '',
       });
+      // router.push('/homepage');
     } catch (error) {
       console.log("error", error);
       setError('Failed to sign up. Please try again.');
@@ -120,7 +206,7 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={customTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -150,6 +236,8 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   autoFocus
                   value={formValues.firstName}
                   onChange={handleChange}
+                  // error={!!firstNameError}
+                  // helperText={firstNameError}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -162,6 +250,8 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   autoComplete="family-name"
                   value={formValues.lastName}
                   onChange={handleChange}
+                  // error={!!lastNameError}
+                  // helperText={lastNameError}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -174,8 +264,8 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   autoComplete="email"
                   value={formValues.email}
                   onChange={handleChange}
-                  error={!!emailError}
-                  helperText={emailError}
+                  // error={!!emailError}
+                  // helperText={emailError}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -189,8 +279,23 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
                   autoComplete="new-password"
                   value={formValues.password}
                   onChange={handleChange}
-                  error={!!passwordError}
-                  helperText={passwordError}
+                  // error={!!passwordError}
+                  // helperText={passwordError}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="mobileNumber"
+                  label="Mobile Number"
+                  type="tel"
+                  id="mobileNumber"
+                  autoComplete="tel"
+                  value={formValues.mobileNumber}
+                  onChange={handleChange}
+                  // error={!!mobileNumberError}
+                  // helperText={mobileNumberError}
                 />
               </Grid>
               <Grid item xs={12}>

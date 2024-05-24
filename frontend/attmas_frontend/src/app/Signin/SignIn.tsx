@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SignInProps {
   toggleForm: () => void;
@@ -31,11 +33,40 @@ function Copyright(props: any) {
   );
 }
 
-const defaultTheme = createTheme();
+// const defaultTheme = createTheme();
+// Create a custom theme with more rounded input borders
+const customTheme = createTheme({
+  shape: {
+    borderRadius: 20, 
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 20, 
+            },
+          },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 20, 
+          textTransform: 'none', 
+        },
+      },
+    },
+  },
+});
 
 const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
-  const [error, setError] = React.useState<string | null>(null);
-  const [success, setSuccess] = React.useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -47,14 +78,19 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
       const response = await axios.post('http://localhost:3000/users/login', { username: email, password });
       setSuccess('Successfully signed in!');
       setError(null);
+      setIsSignedIn(true);
+      router.push("/homepage");
     } catch (error) {
       setError('Failed to sign in. Please check your credentials and try again.');
       setSuccess(null);
     }
   };
 
+  
+
   return (
-    <ThemeProvider theme={defaultTheme}>
+    // <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={customTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -100,7 +136,10 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2,
+              borderRadius: 20, // Match the border radius
+              // textTransform: 'none', // Match the text transformation
+            }}
             >
               Sign In
             </Button>

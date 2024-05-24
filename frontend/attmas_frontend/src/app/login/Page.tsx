@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
+// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import SignIn from '../Signin/SignIn';
+import SignUp from '../SignUp/SignUp';
+
 
 const Page = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,5 +17,7 @@ const Page = () => {
     </div>
   );
 };
+
+
 
 export default Page;

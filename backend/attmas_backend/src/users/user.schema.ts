@@ -19,7 +19,7 @@ export class User {
   password: string;
 
   @Prop({ required: false })
-  phoneNumber: string;
+  mobileNumber: string;
 
   @Prop({ required: false })
   gender: string;
