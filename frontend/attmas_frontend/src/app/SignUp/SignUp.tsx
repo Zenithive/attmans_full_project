@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { APIS } from '../constants/api.constant';
 
 
 
@@ -146,7 +147,7 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault();debugger;
     const { firstName, lastName, email, password, mobileNumber } = formValues;
 
     // if (!firstName.trim()) {
@@ -180,7 +181,7 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/users', {
+      const response = await axios.post(APIS.SIGNUP, {
         firstName,
         lastName,
         username: email,

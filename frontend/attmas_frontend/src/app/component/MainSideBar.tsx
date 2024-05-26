@@ -15,23 +15,57 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import GroupIcon from '@mui/icons-material/Group';
 import WorkIcon from '@mui/icons-material/Work';
 import BusinessIcon from '@mui/icons-material/Business';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 
-const drawerWidth = 240;
+export const drawerWidth = 240;
 
 export default function MainSideBar() {
   const router = useRouter();
-
+  const pathName = usePathname();
+  console.log("pathName", pathName)
   const handleNavigation = (path: string) => {
     router.push(path);
   }
+
+  const SIDEBAR_LIST_NAVS = [
+    {
+      path: '/dashboard',
+      icon: () => (
+        <DashboardCustomizeIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Dashboard"
+    },
+    {
+      path: '/innovators',
+      icon: () => (
+        <GroupIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Innovators"
+    },
+    {
+      path: '/freelancers',
+      icon: () => (
+        <WorkIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Freelancers"
+    },
+    {
+      path: '/industries',
+      icon: () => (
+        <BusinessIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Industries"
+    }
+  ];
+
+
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
+    <Box  component="nav"
+    sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+    aria-label="mailbox folders">
       <Drawer
         sx={{
-          width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
@@ -44,11 +78,20 @@ export default function MainSideBar() {
         anchor="left"
       >
         <Toolbar sx={{background:''}}>
-          {/* <img src="https://zenithive.com/wp-content/uploads/2023/11/Zenithithive-Logo-Black-PNG-.png" alt="Logo" style={{ height: 40, margin: '0 auto' }} /> */}
         </Toolbar>
         <Divider />
         <List>
-          <ListItem disablePadding onClick={() => handleNavigation('/dashboard')}>
+          {SIDEBAR_LIST_NAVS.map((navItem, index)=>(
+            <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
+              <ListItemButton selected={pathName === navItem.path }>
+                <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
+                  {navItem.icon()}
+                </ListItemIcon>
+                <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+          {/* <ListItem disablePadding onClick={() => handleNavigation('/dashboard')}>
             <ListItemButton>
               <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
                 <DashboardCustomizeIcon sx={{ fontSize: 22 }} />
@@ -79,7 +122,7 @@ export default function MainSideBar() {
               </ListItemIcon>
               <ListItemText primary="Industries" primaryTypographyProps={{ fontSize: '1.15rem' }} />
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
         </List>
         {/* <Divider /> */}
       </Drawer>
