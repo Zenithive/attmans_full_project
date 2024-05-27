@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { APIS } from '../constants/api.constant';
 
 interface SignInProps {
   toggleForm: () => void;
@@ -75,11 +76,11 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
     const password = data.get('password');
 
     try {
-      const response = await axios.post('http://localhost:3000/users/login', { username: email, password });
+      const response = await axios.post(APIS.LOGIN, { username: email, password });
       setSuccess('Successfully signed in!');
       setError(null);
       setIsSignedIn(true);
-      router.push("/homepage");
+      router.push("/dashboard");
     } catch (error) {
       setError('Failed to sign in. Please check your credentials and try again.');
       setSuccess(null);

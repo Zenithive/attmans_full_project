@@ -148,7 +148,7 @@ export default function MainNavBar() {
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit"
-          
+
         >
           <AccountCircle />
         </IconButton>
@@ -161,35 +161,10 @@ export default function MainNavBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', backgroundColor: 'rgb(31,64,175)' }}>
         <Toolbar>
-          {/* <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton> */}
-          {/* <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
-            MUI
-          </Typography> */}
-          {/* <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search> */}
+
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            
+
             <IconButton
               size="large"
               edge="end"
