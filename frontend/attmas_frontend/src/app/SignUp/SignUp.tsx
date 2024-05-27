@@ -1,5 +1,5 @@
+"use client";
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -8,18 +8,14 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../constants/api.constant';
-
-
-
-
 
 interface SignUpProps {
   toggleForm: () => void;
@@ -38,12 +34,9 @@ function Copyright(props: any) {
   );
 }
 
-// const defaultTheme = createTheme();
-
-// Create a custom theme with more rounded input borders
 const customTheme = createTheme({
   shape: {
-    borderRadius: 20, // Change this value to make the borders more or less rounded
+    borderRadius: 20, 
   },
   components: {
     MuiTextField: {
@@ -60,151 +53,39 @@ const customTheme = createTheme({
   },
 });
 
-const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
+const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
   const router = useRouter();
-  const [formValues, setFormValues] = React.useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    mobileNumber: '',
+  const formik = useFormik({
+    initialValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      mobileNumber: '',
+    },
+    validationSchema: Yup.object({
+      firstName: Yup.string().required('First name is required'),
+      lastName: Yup.string().required('Last name is required'),
+      email: Yup.string().email('Invalid email address').required('Email is required'),
+      password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+      mobileNumber: Yup.string().matches(/^\d{10}$/, 'Mobile number must be exactly 10 digits').required('Mobile number is required'),
+    }),
+    onSubmit: async (values, { setStatus }) => {
+      try {
+        await axios.post(APIS.SIGNUP, {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          username: values.email,
+          password: values.password,
+          mobileNumber: values.mobileNumber,
+        });
+        setStatus({ success: 'Successfully signed up!' });
+        router.push('/');
+      } catch (error) {
+        setStatus({ error: 'Failed to sign up. Please try again.' });
+      }
+    },
   });
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  // const [emailError, setEmailError] = useState<string | null>(null);
-  // const [passwordError, setPasswordError] = useState<string | null>(null);
-  // const [mobileNumberError, setMobileNumberError] = useState<string | null>(null);
-  // const [firstNameError, setFirstNameError] = useState<string | null>(null);
-  // const [lastNameError, setLastNameError] = useState<string | null>(null);
-  // const router = useRouter();
-  
-
-
-  // const validateEmail = (email: string) => {
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   return emailRegex.test(email);
-  // };
-
-  // const validatePassword = (password: string) => {
-  //   return password.length >= 6;
-  // };
-
-  // const validateMobileNumber = (mobileNumber: string) => {
-  //   const mobileNumberRegex = /^\d{10}$/;
-  //   return mobileNumberRegex.test(mobileNumber);
-  // };
-
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePassword = (password: string) => password.length >= 6;
-  const validateMobileNumber = (mobileNumber: string) => /^\d{10}$/.test(mobileNumber);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
-
-    // if (name === 'email') {
-    //   if (!validateEmail(value)) {
-    //     setEmailError('Invalid email address');
-    //   } else {
-    //     setEmailError(null);
-    //   }
-    // }
-
-    // if (name === 'password') {
-    //   if (!validatePassword(value)) {
-    //     setPasswordError('Password must be at least 6 characters');
-    //   } else {
-    //     setPasswordError(null);
-    //   }
-    // }
-
-    // if (name === 'mobileNumber') {
-    //   if (!validateMobileNumber(value)) {
-    //     setMobileNumberError('Mobile number must be exactly 10 digits');
-    //   } else {
-    //     setMobileNumberError(null);
-    //   }
-    // }
-
-    // if (name === 'firstName') {
-    //   if (!value.trim()) {
-    //     setFirstNameError('First name is required');
-    //   } else {
-    //     setFirstNameError(null);
-    //   }
-    // }
-
-    // if (name === 'lastName') {
-    //   if (!value.trim()) {
-    //     setLastNameError('Last name is required');
-    //   } else {
-    //     setLastNameError(null);
-    //   }
-    // }
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();debugger;
-    const { firstName, lastName, email, password, mobileNumber } = formValues;
-
-    // if (!firstName.trim()) {
-    //   setFirstNameError('First name is required');
-    //   return;
-    // }
-
-    // if (!lastName.trim()) {
-    //   setLastNameError('Last name is required');
-    //   return;
-    // }
-
-    // if (!validateEmail(email)) {
-    //   setEmailError('Invalid email address');
-    //   return;
-    // }
-
-    // if (!validatePassword(password)) {
-    //   setPasswordError('Password must be at least 6 characters');
-    //   return;
-    // }
-
-    // if (!validateMobileNumber(mobileNumber)) {
-    //   setMobileNumberError('Mobile number must be exactly 10 digits');
-    //   return;
-    // }
-
-    if (!firstName.trim() || !lastName.trim() || !validateEmail(email) || !validatePassword(password) || !validateMobileNumber(mobileNumber)) {
-      setError('Please fill all fields correctly.');
-      return;
-    }
-
-    try {
-      const response = await axios.post(APIS.SIGNUP, {
-        firstName,
-        lastName,
-        username: email,
-        password,
-        mobileNumber,
-      });
-      setSuccess('Successfully signed up!');
-      setError(null);
-      // Reset form values
-      setFormValues({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        mobileNumber: '',
-      });
-      // router.push('/homepage');
-    } catch (error) {
-      console.log("error", error);
-      setError('Failed to sign up. Please try again.');
-      setSuccess(null);
-    }
-  };
 
   return (
     <ThemeProvider theme={customTheme}>
@@ -218,13 +99,11 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
+          
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -235,10 +114,11 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
                   id="firstName"
                   label="First Name"
                   autoFocus
-                  value={formValues.firstName}
-                  onChange={handleChange}
-                  // error={!!firstNameError}
-                  // helperText={firstNameError}
+                  value={formik.values.firstName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                  helperText={formik.touched.firstName && formik.errors.firstName}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -249,10 +129,11 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
-                  value={formValues.lastName}
-                  onChange={handleChange}
-                  // error={!!lastNameError}
-                  // helperText={lastNameError}
+                  value={formik.values.lastName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                  helperText={formik.touched.lastName && formik.errors.lastName}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -263,10 +144,11 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                  value={formValues.email}
-                  onChange={handleChange}
-                  // error={!!emailError}
-                  // helperText={emailError}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -278,10 +160,11 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                  value={formValues.password}
-                  onChange={handleChange}
-                  // error={!!passwordError}
-                  // helperText={passwordError}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.password && Boolean(formik.errors.password)}
+                  helperText={formik.touched.password && formik.errors.password}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -293,10 +176,11 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
                   type="tel"
                   id="mobileNumber"
                   autoComplete="tel"
-                  value={formValues.mobileNumber}
-                  onChange={handleChange}
-                  // error={!!mobileNumberError}
-                  // helperText={mobileNumberError}
+                  value={formik.values.mobileNumber}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.mobileNumber && Boolean(formik.errors.mobileNumber)}
+                  helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -314,14 +198,14 @@ const SignUp: React.FC<SignUpProps> = ({toggleForm}) => {
             >
               Sign Up
             </Button>
-            {error && (
+            {formik.status && formik.status.error && (
               <Typography variant="body2" color="error" align="center">
-                {error}
+                {formik.status.error}
               </Typography>
             )}
-            {success && (
+            {formik.status && formik.status.success && (
               <Typography variant="body2" color="success" align="center">
-                {success}
+                {formik.status.success}
               </Typography>
             )}
             <Grid container justifyContent="flex-end">
