@@ -78,6 +78,7 @@ const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
           username: values.email,
           password: values.password,
           mobileNumber: values.mobileNumber,
+          userType: ""
         });
         setStatus({ success: 'Successfully signed up!' });
         router.push('/');

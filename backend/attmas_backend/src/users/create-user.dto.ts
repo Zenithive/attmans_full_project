@@ -20,4 +20,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   mobileNumber: string;
+
+  @IsString()
+  userType: string | '';
 }

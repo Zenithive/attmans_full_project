@@ -16,7 +16,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../constants/api.constant';
-// import { useAuth } from '../context/AuthContext';
+import Cookies from 'js-cookie';
 
 interface SignInProps {
   toggleForm: () => void;
@@ -64,7 +64,6 @@ const customTheme = createTheme({
 
 const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
   const router = useRouter();
-  // const { setEmail } = useAuth(); // Use AuthContext
 
   const formik = useFormik({
     initialValues: {
@@ -76,10 +75,11 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
       password: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      // setLoading(true);
       try {
-        await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
-        // setEmail(values.email); // Store email in AuthContext
+        const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
+        console.log("response.data.access_token", response.data.access_token);
+
+        Cookies.set("access_token", response.data.access_token, { expires: 1 })
         formik.setStatus({ success: 'Successfully signed in!' });
         router.push("/dashboard");
       } catch (error) {
@@ -143,11 +143,10 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              // disabled={loading}
+            // disabled={loading}
             >
-              {/* {loading ? <CircularProgress size={24} /> :  */}
-              'Sign In'
-              
+              Sign In
+
 
             </Button>
             {formik.status && formik.status.error && (
