@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { usePathname, useRouter } from "next/navigation";
 import Layout from "./component/Layout/layout";
+import { config } from "@/middleware";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,11 +17,12 @@ export default function RootLayout({
 
   const router = useRouter();
   const pathName = usePathname();
+  const isValidPage = config.matcher.includes(pathName);
 
   return (
     <html lang="en">
       <body className={inter.className} style={{width: '100%', height: "100%"}}>
-        {pathName.replaceAll("/", "").length > 0 ? <Layout>{children}</Layout> : children}
+        {isValidPage ? <Layout>{children}</Layout> : children}
                 
       </body>
     </html>

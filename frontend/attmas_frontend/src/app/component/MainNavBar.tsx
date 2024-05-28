@@ -125,7 +125,7 @@ export default function MainNavBar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', backgroundColor: 'rgb(31,64,175)' }}>
+      <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)' }}>
         <Toolbar>
 
           <Box sx={{ flexGrow: 1 }} />

@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Allow the request to proceed if the user is authenticated
-  return NextResponse.next();
+  //return NextResponse.next();
 }
 
 function checkAuth(request: NextRequest): boolean {
@@ -27,5 +27,5 @@ function checkAuth(request: NextRequest): boolean {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/dashboard', '/freelancers', '/innovators', '/industries'],
+  matcher: ['/dashboard', '/freelancers', '/innovators', '/industries', '/exhibition'],
 };

@@ -13,17 +13,16 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import GroupIcon from '@mui/icons-material/Group';
+import Diversity1Icon from '@mui/icons-material/Diversity1';
 import WorkIcon from '@mui/icons-material/Work';
 import BusinessIcon from '@mui/icons-material/Business';
 import { usePathname, useRouter } from 'next/navigation';
-
 
 export const drawerWidth = 240;
 
 export default function MainSideBar() {
   const router = useRouter();
   const pathName = usePathname();
-  console.log("pathName", pathName)
   const handleNavigation = (path: string) => {
     router.push(path);
   }
@@ -56,6 +55,13 @@ export default function MainSideBar() {
         <BusinessIcon sx={{ fontSize: 22 }} />
       ),
       Name: "Industries"
+    },
+    {
+      path: '/exhibition',
+      icon: () => (
+        <Diversity1Icon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Exhibition"
     }
   ];
 
@@ -70,7 +76,7 @@ export default function MainSideBar() {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: 'rgb(31,64,175)', // Set the background color to blue
+            backgroundColor: "primary.main",
             color: 'white', // Set the text color to white for better contrast
           },
         }}
@@ -83,7 +89,7 @@ export default function MainSideBar() {
         <List>
           {SIDEBAR_LIST_NAVS.map((navItem, index)=>(
             <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
-              <ListItemButton selected={pathName === navItem.path }>
+              <ListItemButton selected={pathName === navItem.path } sx={{borderRadius: 3 , "&.Mui-selected":  { backgroundColor: '#2c407f' }, "&.Mui-focusVisible": { backgroundColor: "#2c407f" }, ":hover": { backgroundColor: "#2c407f" }}}>
                 <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
                   {navItem.icon()}
                 </ListItemIcon>
@@ -91,40 +97,8 @@ export default function MainSideBar() {
               </ListItemButton>
             </ListItem>
           ))}
-          {/* <ListItem disablePadding onClick={() => handleNavigation('/dashboard')}>
-            <ListItemButton>
-              <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
-                <DashboardCustomizeIcon sx={{ fontSize: 22 }} />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" primaryTypographyProps={{ fontSize: '1.15rem' }} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding onClick={() => handleNavigation('/innovators')}>
-            <ListItemButton>
-              <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
-                <GroupIcon sx={{ fontSize: 22 }} />
-              </ListItemIcon>
-              <ListItemText primary="Innovators" primaryTypographyProps={{ fontSize: '1.15rem' }} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding onClick={() => handleNavigation('/freelancers')}>
-            <ListItemButton>
-              <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
-                <WorkIcon sx={{ fontSize: 22 }} />
-              </ListItemIcon>
-              <ListItemText primary="Freelancers" primaryTypographyProps={{ fontSize: '1.15rem' }} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding onClick={() => handleNavigation('/industries')}>
-            <ListItemButton>
-              <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
-                <BusinessIcon sx={{ fontSize: 22 }} />
-              </ListItemIcon>
-              <ListItemText primary="Industries" primaryTypographyProps={{ fontSize: '1.15rem' }} />
-            </ListItemButton>
-          </ListItem> */}
+          
         </List>
-        {/* <Divider /> */}
       </Drawer>
     </Box>
   );

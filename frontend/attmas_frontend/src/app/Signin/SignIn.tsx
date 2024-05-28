@@ -16,7 +16,6 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../constants/api.constant';
-import Cookies from 'js-cookie';
 
 interface SignInProps {
   toggleForm: () => void;
@@ -79,7 +78,7 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
         console.log("response.data.access_token", response.data.access_token);
 
-        Cookies.set("access_token", response.data.access_token, { expires: 1 })
+        document.cookie  = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
         router.push("/dashboard");
       } catch (error) {
