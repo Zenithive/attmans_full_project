@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -14,12 +14,28 @@ export class AuthService {
 
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.findByUsername(username);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    return null;
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new NotFoundException('Invalid credentials');
+    }
+
+    if (user.userType === '') {
+      return {
+        requiresProfileCompletion: true,
+        username: user.firstName,
+        firstname: user.firstName,
+        lastname: user.lastName,
+        mobilenumber: user.mobileNumber,
+        usertype: user.userType,
+      }; // Custom response indicating profile completion is required
+    }
+
+    const { password: _, ...result } = user;
+    return result;
   }
 
   async login(user: any) {
