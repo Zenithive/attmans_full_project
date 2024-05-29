@@ -1,5 +1,5 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
+"use client";
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -8,11 +8,14 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useRouter } from 'next/navigation';
+import { APIS } from '../constants/api.constant';
 
 interface SignInProps {
   toggleForm: () => void;
@@ -31,30 +34,61 @@ function Copyright(props: any) {
   );
 }
 
-const defaultTheme = createTheme();
+const customTheme = createTheme({
+  shape: {
+    borderRadius: 20,
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 20,
+            },
+          },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 20,
+          textTransform: 'none',
+        },
+      },
+    },
+  },
+});
 
 const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
-  const [error, setError] = React.useState<string | null>(null);
-  const [success, setSuccess] = React.useState<string | null>(null);
+  const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: Yup.object({
+      email: Yup.string().email('Invalid email address').required('Required'),
+      password: Yup.string().required('Required'),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
+        console.log("response.data.access_token", response.data.access_token);
 
-    try {
-      const response = await axios.post('http://localhost:3000/users/login', { username: email, password });
-      setSuccess('Successfully signed in!');
-      setError(null);
-    } catch (error) {
-      setError('Failed to sign in. Please check your credentials and try again.');
-      setSuccess(null);
+        document.cookie  = `access_token=${response.data.access_token}`;
+        formik.setStatus({ success: 'Successfully signed in!' });
+        router.push("/dashboard");
+      } catch (error) {
+        formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
+      }
     }
-  };
+  });
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={customTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -65,13 +99,10 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -81,6 +112,11 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
               name="email"
               autoComplete="email"
               autoFocus
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.email}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
             <TextField
               margin="normal"
@@ -91,6 +127,11 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
               type="password"
               id="password"
               autoComplete="current-password"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.password}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -101,17 +142,20 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+            // disabled={loading}
             >
               Sign In
+
+
             </Button>
-            {error && (
+            {formik.status && formik.status.error && (
               <Typography variant="body2" color="error" align="center">
-                {error}
+                {formik.status.error}
               </Typography>
             )}
-            {success && (
+            {formik.status && formik.status.success && (
               <Typography variant="body2" color="success" align="center">
-                {success}
+                {formik.status.success}
               </Typography>
             )}
             <Grid container>
