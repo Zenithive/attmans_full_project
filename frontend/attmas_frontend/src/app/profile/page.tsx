@@ -13,6 +13,9 @@ import {
     Typography,
     createTheme,
     ThemeProvider,
+    InputLabel,
+    Select,
+    FormHelperText
 } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useFormik } from 'formik';
@@ -89,6 +92,8 @@ const ProfileForm = () => {
             productType: '', // New field
             productPrice: '', // New field
         },
+
+
         validationSchema: Yup.object({
             gender: Yup.string().required('Required'),
             address: Yup.string().required('Required'),
@@ -106,6 +111,26 @@ const ProfileForm = () => {
             userType: Yup.string().required('Required'),
             productToMarket: Yup.string().when('userType', {
                 is: 'Freelancer',
+                then: Yup.string().required('Required'),
+                otherwise: Yup.string(),
+            }),
+            productName: Yup.string().when('productToMarket', {
+                is: 'Yes',
+                then: Yup.string().required('Required'),
+                otherwise: Yup.string(),
+            }),
+            productType: Yup.string().when('productToMarket', {
+                is: 'Yes',
+                then: Yup.string().required('Required'),
+                otherwise: Yup.string(),
+            }),
+            productPrice: Yup.string().when('productToMarket', {
+                is: 'Yes',
+                then: Yup.string().required('Required'),
+                otherwise: Yup.string(),
+            }),
+            productDescription: Yup.string().when('productToMarket', {
+                is: 'Yes',
                 then: Yup.string().required('Required'),
                 otherwise: Yup.string(),
             }),
@@ -130,6 +155,8 @@ const ProfileForm = () => {
         setShowProductDetails(event.target.value === 'Yes');
     };
 
+   
+
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="md">
@@ -148,12 +175,18 @@ const ProfileForm = () => {
                         boxShadow: 5,
                     }}
                 >
+
+
+
                     <Typography component="h1" variant="h5" align="center">
                         Profile Form
                     </Typography>
                     <Typography variant="body2" color="text.secondary" align="center" mb={4}>
                         View and Change your profile information here
                     </Typography>
+
+
+
                     <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
                         <input
                             accept="image/*"
@@ -189,6 +222,8 @@ const ProfileForm = () => {
                         </label>
 
                         <Grid container spacing={2}>
+
+
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
@@ -324,25 +359,35 @@ const ProfileForm = () => {
                                 />
                             </Grid>
 
+
+
+                            
+
+
+
+
                             <Grid item xs={12} sm={6}>
-                                <TextField
+                            <TextField
                                     fullWidth
-                                    style={{ background: "white", borderRadius: "25px" }}
                                     select
+                                    style={{ background: "white", borderRadius: "25px" }}
                                     id="userType"
                                     label="User Type"
                                     name="userType"
-                                    onChange={handleUserTypeChange}
-                                    onBlur={formik.handleBlur}
                                     value={formik.values.userType}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
                                     error={formik.touched.userType && Boolean(formik.errors.userType)}
-                                    helperText={formik.touched.userType && formik.errors.userType}
                                 >
                                     <MenuItem value="Freelancer">Freelancer</MenuItem>
-                                    <MenuItem value="Industry">Industry</MenuItem>
-                                    <MenuItem value="Innovators">Innovators</MenuItem>
+                                    <MenuItem value="Business">Business</MenuItem>
                                 </TextField>
+                                {formik.touched.userType && formik.errors.userType && (
+                                    <FormHelperText error>{formik.errors.userType}</FormHelperText>
+                                )}
                             </Grid>
+
+
 
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -364,42 +409,38 @@ const ProfileForm = () => {
                                 </TextField>
                             </Grid>
 
-                            {isFreelancer && (
+                            {formik.values.userType === 'Freelancer' && (
                                 <Grid item xs={12} sm={6}>
-                                    <TextField
+                                    <InputLabel>Do you have a product to market?</InputLabel>
+                                    <Select
                                         fullWidth
-                                        select
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productToMarket"
-                                        label="Do you have any Product to market?"
                                         name="productToMarket"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
                                         value={formik.values.productToMarket}
+                                        onChange={(e) => {
+                                            formik.handleChange(e);
+                                            setShowProductDetails(e.target.value === 'Yes');
+                                        }}
+                                        onBlur={formik.handleBlur}
                                         error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
-                                        helperText={formik.touched.productToMarket && formik.errors.productToMarket}
                                     >
+                                        {/* <MenuItem value="">Select</MenuItem> */}
                                         <MenuItem value="Yes">Yes</MenuItem>
                                         <MenuItem value="No">No</MenuItem>
-                                    </TextField>
+                                    </Select>
+                                    {formik.touched.productToMarket && formik.errors.productToMarket && (
+                                        <FormHelperText error>{formik.errors.productToMarket}</FormHelperText>
+                                    )}
                                 </Grid>
                             )}
 
-                            {isFreelancer && (
-                                <Grid item xs={12}>
-                                    <Box
-                                        sx={{
-                                            border: '1px solid #ccc',
-                                            borderRadius: 2,
-                                            padding: 2,
-                                            marginTop: 2,
-                                            backgroundColor: 'rgba(0, 23, 98, 0.1)', // Change as needed
-                                        }}
-                                    >
-                                        <Typography variant="h6">Product Details</Typography>
+                            {showProductDetails && (
+                                <>
+                                    <Grid item xs={12}>
                                         <TextField
                                             fullWidth
-                                            style={{ background: 'white', borderRadius: '25px' }}
+                                            style={{ background: "white", borderRadius: "25px" }}
                                             id="productName"
                                             label="Product Name"
                                             name="productName"
@@ -409,24 +450,11 @@ const ProfileForm = () => {
                                             error={formik.touched.productName && Boolean(formik.errors.productName)}
                                             helperText={formik.touched.productName && formik.errors.productName}
                                         />
-
-                                        <TextField 
-                                            fullWidth
-                                            style={{ background: 'white', borderRadius: '25px' }}
-                                            id="productPrice"
-                                            label="Product Price"
-                                            name="productPrice"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.productPrice}
-                                            error={formik.touched.productPrice && Boolean(formik.errors.productPrice)}
-                                            helperText={formik.touched.productPrice && formik.errors.productPrice}
-                                        />
-
-
+                                    </Grid>
+                                    <Grid item xs={12}>
                                         <TextField
                                             fullWidth
-                                            style={{ background: 'white', borderRadius: '25px' }}
+                                            style={{ background: "white", borderRadius: "25px" }}
                                             id="productDescription"
                                             label="Product Description"
                                             name="productDescription"
@@ -436,9 +464,11 @@ const ProfileForm = () => {
                                             error={formik.touched.productDescription && Boolean(formik.errors.productDescription)}
                                             helperText={formik.touched.productDescription && formik.errors.productDescription}
                                         />
+                                    </Grid>
+                                    <Grid item xs={12}>
                                         <TextField
                                             fullWidth
-                                            style={{ background: 'white', borderRadius: '25px' }}
+                                            style={{ background: "white", borderRadius: "25px" }}
                                             id="productType"
                                             label="Product Type"
                                             name="productType"
@@ -448,17 +478,31 @@ const ProfileForm = () => {
                                             error={formik.touched.productType && Boolean(formik.errors.productType)}
                                             helperText={formik.touched.productType && formik.errors.productType}
                                         />
-
-                                    </Box>
-                                </Grid>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            fullWidth
+                                            style={{ background: "white", borderRadius: "25px" }}
+                                            id="productPrice"
+                                            label="Product Price"
+                                            name="productPrice"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.productPrice}
+                                            error={formik.touched.productPrice && Boolean(formik.errors.productPrice)}
+                                            helperText={formik.touched.productPrice && formik.errors.productPrice}
+                                        />
+                                    </Grid>
+                                </>
                             )}
+
 
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="workAddress"
-                                    label="Work Address"
+                                    label="Work Address (If any)"
                                     name="workAddress"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -467,6 +511,7 @@ const ProfileForm = () => {
                                     helperText={formik.touched.workAddress && formik.errors.workAddress}
                                 />
                             </Grid>
+
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
@@ -482,6 +527,9 @@ const ProfileForm = () => {
                                 />
                             </Grid>
                         </Grid>
+
+                       
+
                         <Button
                             type="submit"
                             variant="contained"
@@ -495,6 +543,7 @@ const ProfileForm = () => {
             </Container>
         </ThemeProvider>
     );
+
 };
 
 export default ProfileForm;
