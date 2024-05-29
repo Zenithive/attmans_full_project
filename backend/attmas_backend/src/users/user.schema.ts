@@ -62,6 +62,9 @@ export class User {
 
   @Prop()
   userType: string;
+
+  @Prop()
+  _id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

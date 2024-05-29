@@ -16,6 +16,9 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../constants/api.constant';
+import { useAppDispatch } from '../reducers/hooks.redux';
+import { addUser } from '../reducers/userReducer';
+
 
 interface SignInProps {
   toggleForm: () => void;
@@ -33,6 +36,7 @@ function Copyright(props: any) {
     </Typography>
   );
 }
+
 
 const customTheme = createTheme({
   shape: {
@@ -63,6 +67,7 @@ const customTheme = createTheme({
 
 const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -77,6 +82,22 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
         console.log("response.data.access_token", response.data.access_token);
+        console.log("response",response.data.user);
+
+    const user = response.data.user;
+          console.log("user",user)
+    const userToDispatch = {
+      token :response.data.access_token,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      username: values.email, 
+      mobilenumber: user.mobilenumber,
+      _id:user._id,
+      picture:user.picture
+    };
+
+    dispatch(addUser(userToDispatch));
+       
 
         document.cookie  = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });

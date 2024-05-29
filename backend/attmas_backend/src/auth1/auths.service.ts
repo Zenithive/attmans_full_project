@@ -23,7 +23,9 @@ export class AuthService {
       throw new NotFoundException('Invalid credentials');
     }
 
+    console.log('user', user);
     if (user.userType === '') {
+      console.log('user_Id', user._id);
       return {
         requiresProfileCompletion: true,
         username: user.firstName,
@@ -31,9 +33,12 @@ export class AuthService {
         lastname: user.lastName,
         mobilenumber: user.mobileNumber,
         usertype: user.userType,
+        _id: user._id,
+        picture: user.picture,
       }; // Custom response indicating profile completion is required
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...result } = user;
     return result;
   }
