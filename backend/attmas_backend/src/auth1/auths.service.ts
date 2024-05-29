@@ -26,7 +26,7 @@ export class AuthService {
     if (user.userType === '') {
       return {
         requiresProfileCompletion: true,
-        username: user.firstName,
+        username: user.username,
         firstname: user.firstName,
         lastname: user.lastName,
         mobilenumber: user.mobileNumber,
