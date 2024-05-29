@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Page from './login/Page';
 
-export default function Home() {
+export default function DashBoard() {
 
 
   return (
-
     <>
-      <Page />
+    <h1>This is Dashboard</h1>
     </>
   );
 }
