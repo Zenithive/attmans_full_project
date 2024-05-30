@@ -16,7 +16,6 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../constants/api.constant';
-import Cookies from 'js-cookie';
 import { useAppDispatch } from '../reducers/hooks.redux';
 
 interface SignInProps {
@@ -118,7 +117,7 @@ const customTheme = createTheme({
 
 const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
   const router = useRouter();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -132,17 +131,12 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
-        console.log("response.data.requiresProfileCompletion", response.data.user.requiresProfileCompletion);
+        console.log("response.data.access_token", response.data.access_token);
+        console.log("response",response.data.user);
 
-        if (response.data.user.requiresProfileCompletion) {
-          // Redirect to profile completion page
-          router.push("/profile");
-        } else {
-          // Store the token and redirect to dashboard
-          Cookies.set("access_token", response.data.access_token, { expires: 1 });
-          formik.setStatus({ success: 'Successfully signed in!' });
-          router.push("/dashboard");
-        }
+        document.cookie  = `access_token=${response.data.access_token}`;
+        formik.setStatus({ success: 'Successfully signed in!' });
+        router.push("/dashboard");
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }

@@ -32,7 +32,7 @@ export default function MainNavBar() {
 
     const router = useRouter();
 
-    const userDetails:UserSchema = useAppSelector(selectUserSession)
+    // const userDetails:UserSchema = useAppSelector(selectUserSession)
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -88,7 +88,7 @@ export default function MainNavBar() {
     >
       <MenuItem onClick={handleMenuClose}>
       Signed in as <br/>
-      {userDetails.username}
+      {/* {userDetails.username} */}
        </MenuItem>
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={logOutHandle}>Log out</MenuItem>
