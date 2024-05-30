@@ -13,7 +13,7 @@
     "@emotion/styled": "^11.11.5",
     "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^5.15.18",
-    "@mui/material": "^5.15.18",
+    "@mui/material": "^5.15.19",
     "@types/yup": "^0.32.0",
     "axios": "^1.7.1",
     "dotenv": "^16.4.5",
@@ -23,6 +23,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^6.23.1",
+    "styled-components": "^6.1.11",
     "yup": "^1.4.0"
   },
   "devDependencies": {
