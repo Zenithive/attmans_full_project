@@ -34,9 +34,33 @@ function Copyright(props: any) {
   );
 }
 
+// const customTheme = createTheme({
+//   shape: {
+//     borderRadius: 20, 
+//   },
+//   components: {
+//     MuiTextField: {
+//       styleOverrides: {
+//         root: {
+//           '& .MuiOutlinedInput-root': {
+//             '& fieldset': {
+//               borderRadius: 12, 
+//             },
+//           },
+//         },
+//       },
+//     },
+//   },
+// });
+
 const customTheme = createTheme({
+  palette: {
+    primary: {
+      main: "rgb(0,23,98)",
+    },
+  },
   shape: {
-    borderRadius: 20, 
+    borderRadius: 20,
   },
   components: {
     MuiTextField: {
@@ -44,8 +68,37 @@ const customTheme = createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderRadius: 12, 
+              borderRadius: 12,
+              borderColor: "rgb(0,23,98)",
             },
+            '&:hover fieldset': {
+              borderColor: "rgb(0,23,98)",
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: "rgb(0,23,98)",
+            },
+          },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 20,
+          textTransform: 'none',
+          backgroundColor: "rgb(0,23,98)",
+          '&:hover': {
+            backgroundColor: "rgb(0,23,98)",
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: "rgb(0,23,98)",
+          '&:hover': {
+            color: "rgb(0,23,98)",
           },
         },
       },
