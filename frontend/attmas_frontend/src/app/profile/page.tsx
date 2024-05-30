@@ -21,6 +21,8 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
+
+
 const theme = createTheme({
     palette: {
         primary: {
@@ -109,31 +111,11 @@ const ProfileForm = () => {
             billingAddress: Yup.string(),
             password: Yup.string().required('Required'),
             userType: Yup.string().required('Required'),
-            productToMarket: Yup.string().when('userType', {
-                is: 'Freelancer',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productName: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productType: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productPrice: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productDescription: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
+            productToMarket: Yup.string(),
+            productName: Yup.string(),
+            productType: Yup.string(),
+            productPrice: Yup.string(),
+            productDescription: Yup.string(),
         }),
         onSubmit: async (values) => {
             console.log('Form values:', values);

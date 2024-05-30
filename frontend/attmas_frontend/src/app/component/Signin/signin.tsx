@@ -15,10 +15,10 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
-import { APIS } from '../constants/api.constant';
+import { APIS } from '../../constants/api.constant';
 
 interface SignInProps {
-  toggleForm: () => void;
+  toggleForm: CallableFunction;
 }
 
 function Copyright(props: any) {
@@ -114,7 +114,7 @@ const customTheme = createTheme({
   },
 });
 
-const SignIn = ({ toggleForm }:SignInProps) => {
+export const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
   // const dispatch = useAppDispatch();
 
@@ -220,7 +220,7 @@ const SignIn = ({ toggleForm }:SignInProps) => {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2" onClick={toggleForm}>
+                <Link href="#" variant="body2" onClick={()=>toggleForm()}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
@@ -233,4 +233,3 @@ const SignIn = ({ toggleForm }:SignInProps) => {
   );
 }
 
-export default SignIn;
