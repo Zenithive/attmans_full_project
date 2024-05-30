@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import SignIn from '../signin/SignIn';
-import SignUp from '../signup/SignUp';
+import SignIn from '../Signin/page';
+import SignUp from '../SignUp/page';
 
 
 const Page = () => {
