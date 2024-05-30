@@ -8,5 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
+  },
+  "dependencies": {
+    "js-cookie": "^3.0.5",
+    "next": "^14.2.3"
   }
 }
