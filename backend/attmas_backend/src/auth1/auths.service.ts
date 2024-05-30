@@ -28,7 +28,7 @@ export class AuthService {
       console.log('user_Id', user._id);
       return {
         requiresProfileCompletion: true,
-        username: user.firstName,
+        username: user.username,
         firstname: user.firstName,
         lastname: user.lastName,
         mobilenumber: user.mobileNumber,

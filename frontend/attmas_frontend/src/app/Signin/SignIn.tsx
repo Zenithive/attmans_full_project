@@ -16,9 +16,8 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../constants/api.constant';
+import Cookies from 'js-cookie';
 import { useAppDispatch } from '../reducers/hooks.redux';
-import { addUser } from '../reducers/userReducer';
-
 
 interface SignInProps {
   toggleForm: () => void;
@@ -37,8 +36,39 @@ function Copyright(props: any) {
   );
 }
 
+// const customTheme = createTheme({
+//   shape: {
+//     borderRadius: 20,
+//   },
+//   components: {
+//     MuiTextField: {
+//       styleOverrides: {
+//         root: {
+//           '& .MuiOutlinedInput-root': {
+//             '& fieldset': {
+//               borderRadius: 20,
+//             },
+//           },
+//         },
+//       },
+//     },
+//     MuiButton: {
+//       styleOverrides: {
+//         root: {
+//           borderRadius: 20,
+//           textTransform: 'none',
+//         },
+//       },
+//     },
+//   },
+// });
 
 const customTheme = createTheme({
+  palette: {
+    primary: {
+      main: "rgb(0,23,98)",
+    },
+  },
   shape: {
     borderRadius: 20,
   },
@@ -49,6 +79,13 @@ const customTheme = createTheme({
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderRadius: 20,
+              borderColor: "rgb(0,23,98)",
+            },
+            '&:hover fieldset': {
+              borderColor: "rgb(0,23,98)",
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: "rgb(0,23,98)",
             },
           },
         },
@@ -59,6 +96,20 @@ const customTheme = createTheme({
         root: {
           borderRadius: 20,
           textTransform: 'none',
+          backgroundColor: "rgb(0,23,98)",
+          '&:hover': {
+            backgroundColor: "rgb(0,23,98)",
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: "rgb(0,23,98)",
+          '&:hover': {
+            color: "rgb(0,23,98)",
+          },
         },
       },
     },
@@ -81,27 +132,17 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
-        console.log("response.data.access_token", response.data.access_token);
-        console.log("response",response.data.user);
+        console.log("response.data.requiresProfileCompletion", response.data.user.requiresProfileCompletion);
 
-    const user = response.data.user;
-          console.log("user",user)
-    const userToDispatch = {
-      token :response.data.access_token,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      username: values.email, 
-      mobilenumber: user.mobilenumber,
-      _id:user._id,
-      picture:user.picture
-    };
-
-    dispatch(addUser(userToDispatch));
-       
-
-        document.cookie  = `access_token=${response.data.access_token}`;
-        formik.setStatus({ success: 'Successfully signed in!' });
-        router.push("/dashboard");
+        if (response.data.user.requiresProfileCompletion) {
+          // Redirect to profile completion page
+          router.push("/profile");
+        } else {
+          // Store the token and redirect to dashboard
+          Cookies.set("access_token", response.data.access_token, { expires: 1 });
+          formik.setStatus({ success: 'Successfully signed in!' });
+          router.push("/dashboard");
+        }
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }
