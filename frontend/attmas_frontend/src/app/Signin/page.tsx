@@ -114,7 +114,7 @@ const customTheme = createTheme({
   },
 });
 
-const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
+const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
   // const dispatch = useAppDispatch();
 

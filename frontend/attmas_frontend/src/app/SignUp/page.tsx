@@ -106,7 +106,7 @@ const customTheme = createTheme({
   },
 });
 
-const SignUp: React.FC<SignUpProps> = ({ toggleForm }) => {
+const SignUp = ({ toggleForm }:SignUpProps) => {
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
