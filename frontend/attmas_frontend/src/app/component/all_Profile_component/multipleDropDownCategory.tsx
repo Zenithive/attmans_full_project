@@ -34,12 +34,13 @@ const theme = createTheme({
 });
 
 const StyledContainer = styled(MuiContainer)`
-  border: 2px solid black;
-  border-radius: 10px;
+  border: 1px solid #ccc;
+  border-radius: 40px;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); // Added box shadow
 `;
 
 const CategoriesWrapper = styled.div`
@@ -49,12 +50,12 @@ const CategoriesWrapper = styled.div`
   padding: 10px;
 `;
 
-
-
 const AdditionalFields = styled.div`
   background-color: #ccc;
   padding: 10px;
   margin-top: 20px;
+  border-radius: 20px; // Added border radius to match the theme
+  box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2),0px 5px 8px 0px rgba(0,0,0,0.14),0px 1px 14px 0px rgba(0,0,0,0.12); // Added box shadow
 `;
 
 const CategoryComponent: React.FC = () => {
@@ -80,48 +81,43 @@ const CategoryComponent: React.FC = () => {
       'Dispersion Chemistry',
       'Surface Science'
     ],
-    // Add other categories with their corresponding additional fields here
     'Agriculture':[
         'Plant Science',
         'Agricultural Engineering and Technology',
         'Organic agriculture',
     ],
     'Electronics':[
-        
-    
+        // Add fields here
     ],
     'Energy':[
-
-    
+        // Add fields here
     ],
     'Environmental and waste management':[
-
-    
+        // Add fields here
     ],
     'Food and beverage':[
-
-    
+        // Add fields here
     ],
     'Healthcare':[
-
-    
+      'Public Health', 'Public Safety', 'Occupational Health & Safety', 'Psychiatry'
     ],
     'Medical devices and equipment':[
-
-    
+      'Device Types',
+      'Technology & Engineering',
+      'Clinical Applications and Integration',
+      'Diagnostics & Monitoring',
+      'Therapeutic & Interventional',
+      'Assistive & Rehabilitation'
     ],
     'Mining and metals':[
-
-    
+        // Add fields here
     ],
     'Real estate and construction':[
-
-    
+        // Add fields here
     ],
     'Textiles':[
-
+        // Add fields here
     ]
-
   };
 
   return (
