@@ -55,6 +55,7 @@ const theme = createTheme({
                     borderRadius: 20,
                     textTransform: 'none',
                     backgroundColor: "rgb(0,23,98)",
+                    marginLeft:"93%",
                     '&:hover': {
                         backgroundColor: "rgb(0,23,98)",
                     },
@@ -64,27 +65,21 @@ const theme = createTheme({
     },
 });
 
-const ProfileForm2 = () => {
-    const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-    const [profilePhotoURL, setProfilePhotoURL] = useState<string | null>(null);
+interface ProfileForm2Props {
+    onNext: () => void;
+}
+
+const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext }) => {
+
     const [isFreelancer, setIsFreelancer] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false); // New state
 
     const formik = useFormik({
         initialValues: {
-            gender: '',
-            address: '',
-            city: '',
-            state: '',
-            pinCode: '',
-            country: '',
-            linkedIn: '',
             organization: '',
             sector: '',
             workAddress: '',
             designation: '',
-            billingAddress: '',
-            password: '',
             userType: '',
             productToMarket: '', // New field
             productName: '', // New field
@@ -94,57 +89,26 @@ const ProfileForm2 = () => {
         },
 
 
-        validationSchema: Yup.object({
-            gender: Yup.string().required('Required'),
-            address: Yup.string().required('Required'),
-            city: Yup.string().required('Required'),
-            state: Yup.string().required('Required'),
-            pinCode: Yup.string().required('Required'),
-            country: Yup.string().required('Required'),
-            linkedIn: Yup.string().url('Invalid URL'),
-            organization: Yup.string(),
-            sector: Yup.string(),
-            workAddress: Yup.string(),
-            designation: Yup.string(),
-            billingAddress: Yup.string(),
-            password: Yup.string().required('Required'),
-            userType: Yup.string().required('Required'),
-            productToMarket: Yup.string(),
-            // .when('userType', {
-                // is: 'Freelancer',
-                // then: Yup.string().required('Required'),
-                // otherwise: Yup.string(),
-            // }),
-            productName: Yup.string(),
-            // .when('productToMarket', {
-            //     is: 'Yes',
-            //     then: Yup.string().required('Required'),
-            //     otherwise: Yup.string(),
-            // }),
-            productType: Yup.string(),
-            // .when('productToMarket', {
-            //     is: 'Yes',
-            //     then: Yup.string().required('Required'),
-            //     otherwise: Yup.string(),
-            // }),
-            productPrice: Yup.string(),
-            // .when('productToMarket', {
-            //     is: 'Yes',
-            //     then: Yup.string().required('Required'),
-            //     otherwise: Yup.string(),
-            // }),
-            productDescription: Yup.string(),
-            // .when('productToMarket', {
-            //     is: 'Yes',
-            //     then: Yup.string().required('Required'),
-            //     otherwise: Yup.string(),
-            // }),
-        }),
+        // validationSchema: Yup.object({
+        //     organization: Yup.string(),
+        //     sector: Yup.string(),
+        //     workAddress: Yup.string(),
+        //     designation: Yup.string(),
+        //     userType: Yup.string().required('Required'),
+        //     productToMarket: Yup.string(),
+        //     productName: Yup.string(),
+        //     productType: Yup.string(),
+        //     productPrice: Yup.string(),
+        //     productDescription: Yup.string(),
+
+        // }),
 
 
-        
+
         onSubmit: async (values) => {
             console.log('Form values:', values);
+            onNext(); // Call onNext when the form is submitted
+
         },
     });
 
@@ -175,16 +139,13 @@ const ProfileForm2 = () => {
                         padding: 4,
                         border: '1px solid #ccc',
                         borderRadius: 2,
-                        // backgroundColor: 'rgb(245,245,245)',
                         width: '142.5%', // Increase the width of the box
                         position: 'relative',
                         right: '180px',
                         bottom: "60px",
                         boxShadow: 5,
                     }}
-                    r  >
-
-
+                >
 
                     <Typography component="h1" variant="h5" align="center">
                         Work Exprience
@@ -196,10 +157,7 @@ const ProfileForm2 = () => {
 
 
                     <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-
-
                         <Grid container spacing={2}>
-
 
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -214,58 +172,17 @@ const ProfileForm2 = () => {
                                     onBlur={formik.handleBlur}
                                     error={formik.touched.userType && Boolean(formik.errors.userType)}
                                 >
-                                    <MenuItem value="Freelancer">School</MenuItem>
-                                    <MenuItem value="Business">Senior Secondary</MenuItem>
-                                    <MenuItem value="Business">Bacherlors</MenuItem>
-                                    <MenuItem value="Business">Masters</MenuItem>
-                                    <MenuItem value="Business">PhD</MenuItem>
-                                    <MenuItem value="Business">PostDoc</MenuItem>
+                                    <MenuItem value="School">School</MenuItem>
+                                    <MenuItem value="Senior Secondary">Senior Secondary</MenuItem>
+                                    <MenuItem value="Bacherlors">Bacherlors</MenuItem>
+                                    <MenuItem value="Masters">Masters</MenuItem>
+                                    <MenuItem value="PhD">PhD</MenuItem>
+                                    <MenuItem value="PostDoc">PostDoc</MenuItem>
                                 </TextField>
                                 {formik.touched.userType && formik.errors.userType && (
                                     <FormHelperText error>{formik.errors.userType}</FormHelperText>
                                 )}
                             </Grid>
-
-
-
-
-
-
-                            {/* <Grid item xs={12} sm={3}>
-                                <TextField
-                                    fullWidth
-                                    style={{ background: "white", borderRadius: "25px" }}
-                                    id="organization"
-                                    label="10th Percentage"
-                                    name="10th Percentage"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.pr12}
-                                    error={formik.touched.pr12 && Boolean(formik.errors.pr12)}
-                                    helperText={formik.touched.pr12 && formik.errors.pr12}
-                                />
-                            </Grid> 
-                        <Grid item xs={12} sm={3}>
-                                <TextField
-                                    fullWidth
-                                    style={{ background: "white", borderRadius: "25px" }}
-                                    id="organization"
-                                    label="12th Percentage"
-                                    name="12th Percentage"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.organization}
-                                    error={formik.touched.organization && Boolean(formik.errors.organization)}
-                                    helperText={formik.touched.organization && formik.errors.organization}
-                                />
-                            </Grid>  */}
-
-
-
-
-
-
-
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -327,13 +244,6 @@ const ProfileForm2 = () => {
                                 />
                             </Grid>
 
-
-
-
-
-
-
-
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -354,13 +264,6 @@ const ProfileForm2 = () => {
                                     <FormHelperText error>{formik.errors.userType}</FormHelperText>
                                 )}
                             </Grid>
-
-
-
-
-
-
-
 
 
                             {formik.values.userType === 'Freelancer' && (
@@ -450,11 +353,18 @@ const ProfileForm2 = () => {
                                 </>
                             )}
 
-
-
                         </Grid>
 
 
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            size='small'
+                            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft:"0.1%", top:'65px' }} // Adjust padding as needed
+                            
+                        >
+                            Back
+                        </Button>
 
                         <Button
                             type="submit"
@@ -464,6 +374,7 @@ const ProfileForm2 = () => {
                         >
                             Next
                         </Button>
+
                     </Box>
                 </Box>
             </Container>

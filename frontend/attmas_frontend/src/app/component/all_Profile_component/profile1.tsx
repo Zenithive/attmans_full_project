@@ -52,6 +52,7 @@ const theme = createTheme({
                     borderRadius: 20,
                     textTransform: 'none',
                     backgroundColor: "rgb(0,23,98)",
+                    marginLeft:"93%",
                     '&:hover': {
                         backgroundColor: "rgb(0,23,98)",
                     },
@@ -61,7 +62,11 @@ const theme = createTheme({
     },
 });
 
-const ProfileForm1 = () => {
+interface ProfileForm1Props {
+    onNext: () => void;
+}
+
+const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
     const [profilePhotoURL, setProfilePhotoURL] = useState<string | null>(null);
 
@@ -79,22 +84,23 @@ const ProfileForm1 = () => {
         },
 
 
-        validationSchema: Yup.object({
-            gender: Yup.string().required('Required'),
-            address: Yup.string().required('Required'),
-            city: Yup.string().required('Required'),
-            state: Yup.string().required('Required'),
-            pinCode: Yup.string().required('Required'),
-            country: Yup.string().required('Required'),
-            linkedIn: Yup.string().url('Invalid URL'),
-            organization: Yup.string(),
-            workAddress: Yup.string(),
-            billingAddress: Yup.string(),
-        }),
+        // validationSchema: Yup.object({
+        //     gender: Yup.string().required('Required'),
+        //     address: Yup.string().required('Required'),
+        //     city: Yup.string().required('Required'),
+        //     state: Yup.string().required('Required'),
+        //     pinCode: Yup.string().required('Required'),
+        //     country: Yup.string().required('Required'),
+        //     linkedIn: Yup.string().url('Invalid URL'),
+        //     organization: Yup.string(),
+        //     workAddress: Yup.string(),
+        //     billingAddress: Yup.string(),
+        // }),
 
 
         onSubmit: async (values) => {
             console.log('Form values:', values);
+            onNext(); // Call onNext when the form is submitted
         },
     });
 
@@ -179,13 +185,13 @@ const ProfileForm1 = () => {
                                     helperText={formik.touched.address && formik.errors.address}
                                     InputProps={{
                                         style: {
-                                            height: '250px', // Adjust the height as needed
+                                            height: '150px', // Adjust the height as needed
                                             borderRadius: '25px',
                                         },
                                     }}
                                     inputProps={{
                                         style: {
-                                            padding: '20px', // Adjust the padding as needed
+                                            padding: '10px', // Adjust the padding as needed
                                         },
                                     }}
                                 />
@@ -302,6 +308,17 @@ const ProfileForm1 = () => {
                                     value={formik.values.billingAddress}
                                     error={formik.touched.billingAddress && Boolean(formik.errors.billingAddress)}
                                     helperText={formik.touched.billingAddress && formik.errors.billingAddress}
+                                    InputProps={{
+                                        style: {
+                                            height: '150px', // Adjust the height as needed
+                                            borderRadius: '25px',
+                                        },
+                                    }}
+                                    inputProps={{
+                                        style: {
+                                            padding: '10px', // Adjust the padding as needed
+                                        },
+                                    }}
                                 />
                             </Grid>
                         </Grid>

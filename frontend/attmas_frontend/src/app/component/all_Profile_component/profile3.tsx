@@ -64,7 +64,12 @@ const theme = createTheme({
     },
 });
 
-const ProfileForm3 = () => {
+interface ProfileForm3Props {
+    onNext: () => void;
+}
+
+// const ProfileForm3 = () => {
+const ProfileForm3: React.FC<ProfileForm3Props> = ({ onNext }) => {
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
     const [profilePhotoURL, setProfilePhotoURL] = useState<string | null>(null);
     const [isFreelancer, setIsFreelancer] = useState(false);
@@ -94,49 +99,51 @@ const ProfileForm3 = () => {
         },
 
 
-        validationSchema: Yup.object({
-            gender: Yup.string().required('Required'),
-            address: Yup.string().required('Required'),
-            city: Yup.string().required('Required'),
-            state: Yup.string().required('Required'),
-            pinCode: Yup.string().required('Required'),
-            country: Yup.string().required('Required'),
-            linkedIn: Yup.string().url('Invalid URL'),
-            organization: Yup.string(),
-            sector: Yup.string(),
-            workAddress: Yup.string(),
-            designation: Yup.string(),
-            billingAddress: Yup.string(),
-            password: Yup.string().required('Required'),
-            userType: Yup.string().required('Required'),
-            productToMarket: Yup.string().when('userType', {
-                is: 'Freelancer',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productName: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productType: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productPrice: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-            productDescription: Yup.string().when('productToMarket', {
-                is: 'Yes',
-                then: Yup.string().required('Required'),
-                otherwise: Yup.string(),
-            }),
-        }),
+        // validationSchema: Yup.object({
+        //     gender: Yup.string().required('Required'),
+        //     address: Yup.string().required('Required'),
+        //     city: Yup.string().required('Required'),
+        //     state: Yup.string().required('Required'),
+        //     pinCode: Yup.string().required('Required'),
+        //     country: Yup.string().required('Required'),
+        //     linkedIn: Yup.string().url('Invalid URL'),
+        //     organization: Yup.string(),
+        //     sector: Yup.string(),
+        //     workAddress: Yup.string(),
+        //     designation: Yup.string(),
+        //     billingAddress: Yup.string(),
+        //     password: Yup.string().required('Required'),
+        //     userType: Yup.string().required('Required'),
+        //     productToMarket: Yup.string().when('userType', {
+        //         is: 'Freelancer',
+        //         then: Yup.string().required('Required'),
+        //         otherwise: Yup.string(),
+        //     }),
+        //     productName: Yup.string().when('productToMarket', {
+        //         is: 'Yes',
+        //         then: Yup.string().required('Required'),
+        //         otherwise: Yup.string(),
+        //     }),
+        //     productType: Yup.string().when('productToMarket', {
+        //         is: 'Yes',
+        //         then: Yup.string().required('Required'),
+        //         otherwise: Yup.string(),
+        //     }),
+        //     productPrice: Yup.string().when('productToMarket', {
+        //         is: 'Yes',
+        //         then: Yup.string().required('Required'),
+        //         otherwise: Yup.string(),
+        //     }),
+        //     productDescription: Yup.string().when('productToMarket', {
+        //         is: 'Yes',
+        //         then: Yup.string().required('Required'),
+        //         otherwise: Yup.string(),
+        //     }),
+        // }),
         onSubmit: async (values) => {
             console.log('Form values:', values);
+            onNext(); // Call onNext when the form is submitted
+
         },
     });
 
@@ -388,13 +395,25 @@ const ProfileForm3 = () => {
                             
                         </Grid>
 
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            size='small'
+                            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft:"0.1%", top:'65px' }} // Adjust padding as needed
+                            
+                        >
+                            Back
+                        </Button>
+
                        
 
                         <Button
                             type="submit"
                             variant="contained"
                             size='small'
-                            sx={{ mt: 2, mb: 2, px: 3, py: 1 }} // Adjust padding as needed
+                            sx={{ mt: 2, mb: 2, px: 3, py: 1, 
+                                marginLeft:'93%' 
+                            }} // Adjust padding as needed
                         >
                             Next
                         </Button>
