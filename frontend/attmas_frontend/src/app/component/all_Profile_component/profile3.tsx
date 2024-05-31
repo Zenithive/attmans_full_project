@@ -65,11 +65,11 @@ const theme = createTheme({
 });
 
 interface ProfileForm3Props {
-    onNext: () => void;
+    onPrevious : () => void;
 }
 
 // const ProfileForm3 = () => {
-const ProfileForm3: React.FC<ProfileForm3Props> = ({ onNext }) => {
+const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious  }) => {
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
     const [profilePhotoURL, setProfilePhotoURL] = useState<string | null>(null);
     const [isFreelancer, setIsFreelancer] = useState(false);
@@ -142,7 +142,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onNext }) => {
         // }),
         onSubmit: async (values) => {
             console.log('Form values:', values);
-            onNext(); // Call onNext when the form is submitted
+            // onNext(); // Call onNext when the form is submitted
 
         },
     });
@@ -400,7 +400,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onNext }) => {
                             variant="contained"
                             size='small'
                             sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft:"0.1%", top:'65px' }} // Adjust padding as needed
-                            
+                            onClick={onPrevious}
                         >
                             Back
                         </Button>
@@ -415,7 +415,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onNext }) => {
                                 marginLeft:'93%' 
                             }} // Adjust padding as needed
                         >
-                            Next
+                            Save
                         </Button>
                     </Box>
                 </Box>

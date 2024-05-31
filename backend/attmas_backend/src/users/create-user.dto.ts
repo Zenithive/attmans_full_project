@@ -1,4 +1,16 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
+enum UserType {
+  ADMIN = 'admin',
+  USER = 'user',
+  GUEST = 'guest',
+}
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -21,6 +33,9 @@ export class CreateUserDto {
   @IsString()
   mobileNumber: string;
 
-  @IsString()
-  userType: string | '';
+  @IsOptional()
+  @IsEnum(UserType, {
+    message: 'userType must be one of the following values: admin, user, guest',
+  })
+  userType?: UserType;
 }
