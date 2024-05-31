@@ -52,7 +52,7 @@ const theme = createTheme({
                     borderRadius: 20,
                     textTransform: 'none',
                     backgroundColor: "rgb(0,23,98)",
-                    marginLeft:"93%",
+                    marginLeft: "93%",
                     '&:hover': {
                         backgroundColor: "rgb(0,23,98)",
                     },
@@ -171,7 +171,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                         <Grid container spacing={2}>
 
 
-                            <Grid item xs={12}>
+                            {/* <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     style={{ background: "white", borderRadius: "25px" }}
@@ -195,7 +195,36 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                         },
                                     }}
                                 />
+                            </Grid> */}
+
+
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={6} // Adjust the number of rows as needed
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="address"
+                                    label="Address"
+                                    name="address"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.address}
+                                    error={formik.touched.address && Boolean(formik.errors.address)}
+                                    helperText={formik.touched.address && formik.errors.address}
+                                    InputProps={{
+                                        style: {
+                                            borderRadius: '25px',
+                                        },
+                                    }}
+                                    inputProps={{
+                                        style: {
+                                            padding: '10px', // Adjust the padding as needed
+                                        },
+                                    }}
+                                />
                             </Grid>
+
 
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -294,9 +323,9 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                             </Grid>
 
 
-                           
 
-                            <Grid item xs={12}>
+
+                            {/* <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     style={{ background: "white", borderRadius: "25px" }}
@@ -320,7 +349,38 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                         },
                                     }}
                                 />
+                            </Grid> */}
+
+
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={6} // Adjust the number of rows as needed
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="billingAddress"
+                                    label="Billing Address"
+                                    name="billingAddress"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.billingAddress}
+                                    error={formik.touched.billingAddress && Boolean(formik.errors.billingAddress)}
+                                    helperText={formik.touched.billingAddress && formik.errors.billingAddress}
+                                    InputProps={{
+                                        style: {
+                                            borderRadius: '25px',
+                                        },
+                                    }}
+                                    inputProps={{
+                                        style: {
+                                            padding: '10px', // Adjust the padding as needed
+                                        },
+                                    }}
+                                />
                             </Grid>
+
+
+
                         </Grid>
 
                         <Button
@@ -329,7 +389,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                             size='small'
                             sx={{ mt: 2, mb: 2, px: 3, py: 1 }} // Adjust padding as needed
                         >
-                            Next
+                            Save & Next
                         </Button>
                     </Box>
                 </Box>

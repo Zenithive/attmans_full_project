@@ -67,9 +67,10 @@ const theme = createTheme({
 
 interface ProfileForm2Props {
     onNext: () => void;
+    onPrevious: () => void;
 }
 
-const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext }) => {
+const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext,onPrevious }) => {
 
     const [isFreelancer, setIsFreelancer] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false); // New state
@@ -361,6 +362,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext }) => {
                             variant="contained"
                             size='small'
                             sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft:"0.1%", top:'65px' }} // Adjust padding as needed
+                            onClick={onPrevious}
                             
                         >
                             Back
@@ -372,7 +374,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext }) => {
                             size='small'
                             sx={{ mt: 2, mb: 2, px: 3, py: 1 }} // Adjust padding as needed
                         >
-                            Next
+                            Save & Next
                         </Button>
 
                     </Box>

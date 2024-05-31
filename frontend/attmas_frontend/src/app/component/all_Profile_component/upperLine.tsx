@@ -8,7 +8,7 @@ const steps = [
   { label: 'Category', icon: <Flag /> },
 ];
 
-const CustomStepIcon = (props) => {
+const CustomStepIcon = (props: { active: any; completed: any; icon: any; }) => {
   const { active, completed, icon } = props;
 
   return (
@@ -29,14 +29,16 @@ const CustomStepIcon = (props) => {
   );
 };
 
-const HorizontalStepper = () => {
-  const [activeStep, setActiveStep] = React.useState(1); // Change to set active step
+interface HorizontalStepperProps {
+  currentStep: number;
+}
 
+const HorizontalStepper: React.FC<HorizontalStepperProps> = ({ currentStep }) => {
   return (
     <Box sx={{ width: '100%' }}>
-      <Stepper 
-        activeStep={activeStep} 
-        alternativeLabel 
+      <Stepper
+        activeStep={currentStep - 1}
+        alternativeLabel
         sx={{
           '& .MuiStep-root': {
             display: 'flex',
@@ -57,8 +59,14 @@ const HorizontalStepper = () => {
       >
         {steps.map((step, index) => (
           <Step key={step.label}>
-            <StepLabel StepIconComponent={() => <CustomStepIcon {...step} active={undefined} completed={undefined} />}>
-              <Typography variant="caption" color={activeStep === index ? 'primary' : 'textSecondary'}>
+            <StepLabel StepIconComponent={() => (
+              <CustomStepIcon
+                active={currentStep - 1 === index}
+                completed={currentStep - 1 > index}
+                icon={step.icon}
+              />
+            )}>
+              <Typography variant="caption" color={currentStep - 1 === index ? 'primary' : 'textSecondary'}>
                 {step.label}
               </Typography>
             </StepLabel>

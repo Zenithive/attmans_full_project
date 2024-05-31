@@ -25,7 +25,7 @@ export class AuthService {
 
     console.log('user', user);
     if (user.userType === '') {
-      console.log('user_Id', user._id);
+      // console.log('user_Id', user.);
       return {
         requiresProfileCompletion: true,
         username: user.username,
@@ -33,7 +33,7 @@ export class AuthService {
         lastname: user.lastName,
         mobilenumber: user.mobileNumber,
         usertype: user.userType,
-        _id: user._id,
+        // _id: user._id,
         picture: user.picture,
       }; // Custom response indicating profile completion is required
     }
