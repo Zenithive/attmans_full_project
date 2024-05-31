@@ -16,6 +16,11 @@ import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useContext } from 'react';
+import { useAppSelector } from '../reducers/hooks.redux';
+import { UserSchema,selectUserSession } from '../reducers/userReducer';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { APIS } from '../constants/api.constant';
 // import { useAuth } from '../context/AuthContext'; // Import AuthContext
 
 
@@ -24,6 +29,10 @@ export default function MainNavBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
+
+    const router = useRouter();
+
+    // const userDetails:UserSchema = useAppSelector(selectUserSession)
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -45,6 +54,21 @@ export default function MainNavBar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const logOutHandle = async () => {
+    try {
+      const response = await axios.post(APIS.LOGOUT, {}, {
+       withCredentials:true
+      });
+
+      if (response.status === 200) {
+        document.cookie = 'access_token=';
+        router.push('/login');
+      }
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -62,11 +86,12 @@ export default function MainNavBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Signed in as 
-      {/* {email} */}
+      <MenuItem onClick={handleMenuClose}>
+      Signed in as <br/>
+      {/* {userDetails.username} */}
        </MenuItem>
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
+      <MenuItem onClick={logOutHandle}>Log out</MenuItem>
     </Menu>
   );
 

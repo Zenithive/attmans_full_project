@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -15,11 +15,10 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
-import { APIS } from '../constants/api.constant';
-import Cookies from 'js-cookie';
+import { APIS } from '../../constants/api.constant';
 
 interface SignInProps {
-  toggleForm: () => void;
+  toggleForm: CallableFunction;
 }
 
 function Copyright(props: any) {
@@ -115,8 +114,9 @@ const customTheme = createTheme({
   },
 });
 
-const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
+export const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
+  // const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -130,17 +130,12 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
-        console.log("response.data.requiresProfileCompletion", response.data.user.requiresProfileCompletion);
+        console.log("response.data.access_token", response.data.access_token);
+        console.log("response",response.data.user);
 
-        if (response.data.user.requiresProfileCompletion) {
-          // Redirect to profile completion page
-          router.push("/profile");
-        } else {
-          // Store the token and redirect to dashboard
-          Cookies.set("access_token", response.data.access_token, { expires: 1 });
-          formik.setStatus({ success: 'Successfully signed in!' });
-          router.push("/dashboard");
-        }
+        document.cookie  = `access_token=${response.data.access_token}`;
+        formik.setStatus({ success: 'Successfully signed in!' });
+        router.push("/dashboard");
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }
@@ -225,7 +220,7 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2" onClick={toggleForm}>
+                <Link href="#" variant="body2" onClick={()=>toggleForm()}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
@@ -238,4 +233,3 @@ const SignIn: React.FC<SignInProps> = ({ toggleForm }) => {
   );
 }
 
-export default SignIn;

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
+import { SignIn } from '../component/Signin/signin';
+import { SignUp } from '../component/SignUp/signup';
 // import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import SignIn from '../signin/SignIn';
-import SignUp from '../signup/SignUp';
 
 
 const Page = () => {
   const [isLogin, setIsLogin] = useState(true);
 
-  const toggleForm = () => {
+  const toggleForm: CallableFunction = () => {
     setIsLogin(!isLogin);
   };
 
