@@ -139,7 +139,7 @@ const CategoryComponent: React.FC = () => {
         <MuiDivider sx={{ my: 2, borderColor: 'black' }} />
         {selectedCategory && additionalFields[selectedCategory] && (
           <AdditionalFields>
-            {additionalFields[selectedCategory].map((field, index) => (
+            {additionalFields[selectedCategory].map((field: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined, index: React.Key | null | undefined) => (
               <div key={index}>{field}</div>
             ))}
           </AdditionalFields>
