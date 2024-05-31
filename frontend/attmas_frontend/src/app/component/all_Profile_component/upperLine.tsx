@@ -8,7 +8,7 @@ const steps = [
   { label: 'Category', icon: <Flag /> },
 ];
 
-const CustomStepIcon = (props: { active: any; completed: any; icon: any; }) => {
+const CustomStepIcon = (props:any) => {
   const { active, completed, icon } = props;
 
   return (
