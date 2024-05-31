@@ -137,9 +137,9 @@ const CategoryComponent: React.FC = () => {
           </CategoriesWrapper>
         </RadioGroup>
         <MuiDivider sx={{ my: 2, borderColor: 'black' }} />
-        {selectedCategory && additionalFields[selectedCategory] && (
+        {selectedCategory && additionalFields[selectedCategory as keyof typeof additionalFields] && (
           <AdditionalFields>
-            {additionalFields[selectedCategory].map((field: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined, index: React.Key | null | undefined) => (
+            {additionalFields[selectedCategory as keyof typeof additionalFields].map((field: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined, index: React.Key | null | undefined) => (
               <div key={index}>{field}</div>
             ))}
           </AdditionalFields>
