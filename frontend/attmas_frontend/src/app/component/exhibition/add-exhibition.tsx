@@ -29,14 +29,15 @@ export const AddExhibition = () => {
     return (
         <>
             <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{ borderRadius: 3 }}>Create Exhibition</Button>
-            <Drawer sx={{'& .MuiDrawer-paper': {width: '700px', borderRadius: 3, px: 2}}} anchor="right" open={open} onClose={closeHandler}>
-                <Box component="div" sx={{display:"flex", justifyContent: "space-between"}}>
+            <Drawer sx={{'& .MuiDrawer-paper': {width: "50%", borderRadius: 3, pr: 10, mr: -8}}} anchor="right" open={open} onClose={closeHandler}>
+                <Box component="div" sx={{display:"flex", justifyContent: "space-between", pl: 4}}>
                     <h2>Create Exhibition</h2>
                     <IconButton aria-describedby="id" onClick={closeHandler} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
                 </Box>
                 <Divider sx={{ my: '$5' }} />
+                
             </Drawer>
         </>
     );

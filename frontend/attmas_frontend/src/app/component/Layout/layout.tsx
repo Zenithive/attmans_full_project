@@ -9,20 +9,11 @@ import { AppBar, Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, 
 interface LayoutProps {
   children: React.ReactNode
 }
-const mainDivStyle = { display: "flex" };
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#001762",
-    }
-  },
-});
 
 export default function Layout({ children }: LayoutProps) {
 
   return (
-    <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <MainNavBar />
@@ -35,7 +26,6 @@ export default function Layout({ children }: LayoutProps) {
         {children}
       </Box>
     </Box>
-    </ThemeProvider>
     // <h1>Main Page</h1>
   )
 }

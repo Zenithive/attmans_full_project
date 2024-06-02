@@ -16,6 +16,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
+import Image from 'next/image';
 
 interface SignUpProps {
   toggleForm: CallableFunction;
@@ -34,77 +35,6 @@ function Copyright(props: any) {
   );
 }
 
-// const customTheme = createTheme({
-//   shape: {
-//     borderRadius: 20, 
-//   },
-//   components: {
-//     MuiTextField: {
-//       styleOverrides: {
-//         root: {
-//           '& .MuiOutlinedInput-root': {
-//             '& fieldset': {
-//               borderRadius: 12, 
-//             },
-//           },
-//         },
-//       },
-//     },
-//   },
-// });
-
-const customTheme = createTheme({
-  palette: {
-    primary: {
-      main: "rgb(0,23,98)",
-    },
-  },
-  shape: {
-    borderRadius: 20,
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderRadius: 12,
-              borderColor: "rgb(0,23,98)",
-            },
-            '&:hover fieldset': {
-              borderColor: "rgb(0,23,98)",
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: "rgb(0,23,98)",
-            },
-          },
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 20,
-          textTransform: 'none',
-          backgroundColor: "rgb(0,23,98)",
-          '&:hover': {
-            backgroundColor: "rgb(0,23,98)",
-          },
-        },
-      },
-    },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          color: "rgb(0,23,98)",
-          '&:hover': {
-            color: "rgb(0,23,98)",
-          },
-        },
-      },
-    },
-  },
-});
 
 export const SignUp = ({ toggleForm }:SignUpProps) => {
   const router = useRouter();
@@ -142,7 +72,6 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
   });
 
   return (
-    <ThemeProvider theme={customTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -153,7 +82,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
             alignItems: 'center',
           }}
         >
-          
+          <Image src="/attmans (png)-01.png" alt="attmans logo" width={150} height={130} />
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
@@ -164,6 +93,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
                   autoComplete="given-name"
                   name="firstName"
                   required
+                  color='secondary'
                   fullWidth
                   id="firstName"
                   label="First Name"
@@ -179,6 +109,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
                 <TextField
                   required
                   fullWidth
+                  color='secondary'
                   id="lastName"
                   label="Last Name"
                   name="lastName"
@@ -193,6 +124,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
               <Grid item xs={12}>
                 <TextField
                   required
+                  color='secondary'
                   fullWidth
                   id="email"
                   label="Email Address"
@@ -209,6 +141,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
                 <TextField
                   required
                   fullWidth
+                  color='secondary'
                   name="password"
                   label="Password"
                   type="password"
@@ -225,6 +158,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
                 <TextField
                   required
                   fullWidth
+                  color='secondary'
                   name="mobileNumber"
                   label="Mobile Number"
                   type="tel"
@@ -239,7 +173,9 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
               </Grid>
               <Grid item xs={12}>
                 <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
+                  color='secondary'
+                  control={<Checkbox value="allowExtraEmails" />}
+                  sx={{color:'secondary'}}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
               </Grid>
@@ -248,6 +184,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
               type="submit"
               fullWidth
               variant="contained"
+              color='secondary'
               sx={{ mt: 3, mb: 2 }}
             >
               Sign Up
@@ -264,7 +201,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
             )}
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2" onClick={()=>toggleForm()}>
+                <Link href="#" color='secondary' onClick={()=>toggleForm()}>
                   Already have an account? Sign in
                 </Link>
               </Grid>
@@ -273,6 +210,5 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>
-    </ThemeProvider>
   );
 }

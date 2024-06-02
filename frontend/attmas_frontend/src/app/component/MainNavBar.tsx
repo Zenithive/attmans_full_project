@@ -21,18 +21,14 @@ import { UserSchema,selectUserSession } from '../reducers/userReducer';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { APIS } from '../constants/api.constant';
-// import { useAuth } from '../context/AuthContext'; // Import AuthContext
 
 
 export default function MainNavBar() {
-  // const { email } = useAuth(); // Use AuthContext
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
     const router = useRouter();
-
-    // const userDetails:UserSchema = useAppSelector(selectUserSession)
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
