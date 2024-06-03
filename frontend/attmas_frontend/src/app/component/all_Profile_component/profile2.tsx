@@ -17,7 +17,6 @@ import {
     Select,
     FormHelperText
 } from '@mui/material';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -230,7 +229,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext,onPrevious }) => {
                             </Grid>
 
 
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     style={{ background: "white", borderRadius: "25px" }}
@@ -244,6 +243,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext,onPrevious }) => {
                                     helperText={formik.touched.workAddress && formik.errors.workAddress}
                                 />
                             </Grid>
+
+                            
 
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -260,6 +261,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext,onPrevious }) => {
                                 >
                                     <MenuItem value="Freelancer">Freelancer</MenuItem>
                                     <MenuItem value="Business">Business</MenuItem>
+                                    <MenuItem value="Inovaters">Inovaters</MenuItem>
                                 </TextField>
                                 {formik.touched.userType && formik.errors.userType && (
                                     <FormHelperText error>{formik.errors.userType}</FormHelperText>
@@ -372,7 +374,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext,onPrevious }) => {
                             type="submit"
                             variant="contained"
                             size='small'
-                            sx={{ mt: 2, mb: 2, px: 3, py: 1 }} // Adjust padding as needed
+                            sx={{ mt: 2, mb: 2,ml:'90%', width:'10%', height:'40px' }} // Adjust padding as needed
+                            // sx={{ mt: 2, mb: 2, px: 3, py: 1 }} // Adjust padding as needed
                         >
                             Save & Next
                         </Button>

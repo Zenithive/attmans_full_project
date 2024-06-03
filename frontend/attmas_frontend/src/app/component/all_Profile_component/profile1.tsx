@@ -17,6 +17,7 @@ import {
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';  
 
 const theme = createTheme({
     palette: {
@@ -79,31 +80,29 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             pinCode: '',
             country: '',
             linkedIn: '',
-            workAddress: '',
+            // workAddress: '',
             billingAddress: '',
         },
-
-
-        // validationSchema: Yup.object({
-        //     gender: Yup.string().required('Required'),
-        //     address: Yup.string().required('Required'),
-        //     city: Yup.string().required('Required'),
-        //     state: Yup.string().required('Required'),
-        //     pinCode: Yup.string().required('Required'),
-        //     country: Yup.string().required('Required'),
-        //     linkedIn: Yup.string().url('Invalid URL'),
-        //     organization: Yup.string(),
-        //     workAddress: Yup.string(),
-        //     billingAddress: Yup.string(),
-        // }),
-
-
+        validationSchema: Yup.object({
+            gender: Yup.string().required('Required'),
+            address: Yup.string().required('Required'),
+            city: Yup.string().required('Required'),
+            state: Yup.string().required('Required'),
+            pinCode: Yup.string().required('Required'),
+            country: Yup.string().required('Required'),
+            linkedIn: Yup.string().url('Invalid URL').required('Required'),
+            // workAddress: Yup.string().required('Required'),
+            billingAddress: Yup.string(),
+        }),
         onSubmit: async (values) => {
-            console.log('Form values:', values);
-            onNext(); // Call onNext when the form is submitted
-        },
-    });
-
+            try {
+              await axios.post('http://localhost:3000/profile/form1', values);
+              onNext(); // Call onNext when the form is submitted
+            } catch (error) {
+              console.error('Error submitting form:', error);
+            }
+          },
+        });
 
     return (
         <ThemeProvider theme={theme}>
@@ -122,17 +121,12 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                         boxShadow: 5,
                     }}
                 >
-
-
-
                     <Typography component="h1" variant="h5" align="center">
                         Personal Details
                     </Typography>
                     <Typography variant="body2" color="text.secondary" align="center" mb={4}>
                         View and Change your personal details here
                     </Typography>
-
-
 
                     <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
                         <input
@@ -169,35 +163,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                         </label>
 
                         <Grid container spacing={2}>
-
-
-                            {/* <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    style={{ background: "white", borderRadius: "25px" }}
-                                    id="address"
-                                    label="Address"
-                                    name="address"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.address}
-                                    error={formik.touched.address && Boolean(formik.errors.address)}
-                                    helperText={formik.touched.address && formik.errors.address}
-                                    InputProps={{
-                                        style: {
-                                            height: '150px', // Adjust the height as needed
-                                            borderRadius: '25px',
-                                        },
-                                    }}
-                                    inputProps={{
-                                        style: {
-                                            padding: '10px', // Adjust the padding as needed
-                                        },
-                                    }}
-                                />
-                            </Grid> */}
-
-
                             <Grid item xs={12}>
                                 <TextField
                                     fullWidth
@@ -224,7 +189,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                     }}
                                 />
                             </Grid>
-
 
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -301,7 +265,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 />
                             </Grid>
 
-
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -322,35 +285,20 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 </TextField>
                             </Grid>
 
-
-
-
-                            {/* <Grid item xs={12}>
+                            {/* <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     style={{ background: "white", borderRadius: "25px" }}
-                                    id="billingAddress"
-                                    label="Billing Address"
-                                    name="billingAddress"
+                                    id="workAddress"
+                                    label="Work Address"
+                                    name="workAddress"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.billingAddress}
-                                    error={formik.touched.billingAddress && Boolean(formik.errors.billingAddress)}
-                                    helperText={formik.touched.billingAddress && formik.errors.billingAddress}
-                                    InputProps={{
-                                        style: {
-                                            height: '150px', // Adjust the height as needed
-                                            borderRadius: '25px',
-                                        },
-                                    }}
-                                    inputProps={{
-                                        style: {
-                                            padding: '10px', // Adjust the padding as needed
-                                        },
-                                    }}
+                                    value={formik.values.workAddress}
+                                    error={formik.touched.workAddress && Boolean(formik.errors.workAddress)}
+                                    helperText={formik.touched.workAddress && formik.errors.workAddress}
                                 />
                             </Grid> */}
-
 
                             <Grid item xs={12}>
                                 <TextField
@@ -378,16 +326,13 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                     }}
                                 />
                             </Grid>
-
-
-
                         </Grid>
 
                         <Button
                             type="submit"
                             variant="contained"
                             size='small'
-                            sx={{ mt: 2, mb: 2, px: 3, py: 1 }} // Adjust padding as needed
+                            sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }} // Adjust padding as needed
                         >
                             Save & Next
                         </Button>
@@ -396,7 +341,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             </Container>
         </ThemeProvider>
     );
-
 };
 
 export default ProfileForm1;
