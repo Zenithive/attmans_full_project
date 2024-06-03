@@ -17,6 +17,7 @@ import Diversity1Icon from '@mui/icons-material/Diversity1';
 import WorkIcon from '@mui/icons-material/Work';
 import BusinessIcon from '@mui/icons-material/Business';
 import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export const drawerWidth = 240;
 
@@ -83,14 +84,15 @@ export default function MainSideBar() {
         variant="permanent"
         anchor="left"
       >
-        <Toolbar sx={{background:''}}>
+        <Toolbar>
+          <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} />
         </Toolbar>
         <Divider />
         <List>
           {SIDEBAR_LIST_NAVS.map((navItem, index)=>(
             <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
-              <ListItemButton selected={pathName === navItem.path } sx={{borderRadius: 3 , "&.Mui-selected":  { backgroundColor: '#2c407f' }, "&.Mui-focusVisible": { backgroundColor: "#2c407f" }, ":hover": { backgroundColor: "#2c407f" }}}>
-                <ListItemIcon sx={{ minWidth: 40, color: 'white' }}>
+              <ListItemButton selected={pathName === navItem.path } sx={{borderRadius: 3}}>
+                <ListItemIcon sx={{ minWidth: 40,}}>
                   {navItem.icon()}
                 </ListItemIcon>
                 <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
