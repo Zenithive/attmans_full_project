@@ -18,6 +18,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     MongooseModule.forRoot(process.env.URI),
     UsersModule,
     AuthModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService],

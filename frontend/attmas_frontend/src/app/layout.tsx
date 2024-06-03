@@ -23,9 +23,13 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          '& label.Mui-focused': {
+            color: '#616161',
+          },
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderRadius: 20,
+
             },
           },
         },
@@ -39,8 +43,23 @@ const theme = createTheme({
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          '& label.Mui-focused': {
+            color: '#616161',
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 20,
+            },
+          },
+        },
+      },
+    },
   },
 });
+
 
 export default function RootLayout({
   children,
