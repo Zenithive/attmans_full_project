@@ -13,13 +13,38 @@ const inter = Inter({ subsets: ["latin"] });
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#001762",
+      main: "#f5f5f5",
     },
+    secondary: {
+      main: "#616161",
+    }
   },
   shape: {
     borderRadius: 20,
   },
+  
   components: {
+    MuiListItemButton: {
+      styleOverrides:{
+        root: {
+          color: '#616161',
+          '&.Mui-selected': {
+            color: 'white',
+            backgroundColor: '#616161',
+          },
+          '&.Mui-selected .MuiListItemIcon-root': {
+            color: 'white'
+          },
+          ':hover .MuiListItemIcon-root': {
+            color: 'white'
+          },
+          ':hover': {
+            color: 'white',
+            backgroundColor: '#616161',
+          }
+        },
+      }
+    },
     MuiTextField: {
       styleOverrides: {
         root: {

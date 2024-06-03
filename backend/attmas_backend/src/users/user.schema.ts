@@ -20,47 +20,47 @@ export class User {
   @Prop({ required: true })
   mobileNumber: string;
 
-  @Prop({ required: false })
-  gender: string;
-
-  @Prop({ required: false })
-  address: string;
-
-  @Prop({ required: false })
-  city: string;
-
-  @Prop({ required: false })
-  state: string;
-
-  @Prop({ required: false })
-  pinCode: string;
-
-  @Prop({ required: false })
-  country: string;
+  @Prop()
+  gender?: string;
 
   @Prop()
-  picture: string;
+  address?: string;
 
   @Prop()
-  linkedIn: string;
+  city?: string;
 
   @Prop()
-  organizationName: string;
+  state?: string;
 
   @Prop()
-  sector: string;
+  pinCode?: string;
 
   @Prop()
-  workAddress: string;
+  country?: string;
 
   @Prop()
-  designation: string;
+  picture?: string;
 
   @Prop()
-  billingAddress: string;
+  linkedIn?: string;
 
   @Prop()
-  userType: string;
+  organizationName?: string;
+
+  @Prop()
+  sector?: string;
+
+  @Prop()
+  workAddress?: string;
+
+  @Prop()
+  designation?: string;
+
+  @Prop()
+  billingAddress?: string;
+
+  @Prop()
+  userType?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

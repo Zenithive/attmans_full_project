@@ -16,6 +16,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
+import Image from 'next/image';
 
 interface SignInProps {
   toggleForm: CallableFunction;
@@ -33,86 +34,6 @@ function Copyright(props: any) {
     </Typography>
   );
 }
-
-// const customTheme = createTheme({
-//   shape: {
-//     borderRadius: 20,
-//   },
-//   components: {
-//     MuiTextField: {
-//       styleOverrides: {
-//         root: {
-//           '& .MuiOutlinedInput-root': {
-//             '& fieldset': {
-//               borderRadius: 20,
-//             },
-//           },
-//         },
-//       },
-//     },
-//     MuiButton: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 20,
-//           textTransform: 'none',
-//         },
-//       },
-//     },
-//   },
-// });
-
-const customTheme = createTheme({
-  palette: {
-    primary: {
-      main: "rgb(0,23,98)",
-    },
-  },
-  shape: {
-    borderRadius: 20,
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderRadius: 20,
-              borderColor: "rgb(0,23,98)",
-            },
-            '&:hover fieldset': {
-              borderColor: "rgb(0,23,98)",
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: "rgb(0,23,98)",
-            },
-          },
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 20,
-          textTransform: 'none',
-          backgroundColor: "rgb(0,23,98)",
-          '&:hover': {
-            backgroundColor: "rgb(0,23,98)",
-          },
-        },
-      },
-    },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          color: "rgb(0,23,98)",
-          '&:hover': {
-            color: "rgb(0,23,98)",
-          },
-        },
-      },
-    },
-  },
-});
 
 export const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
@@ -143,18 +64,18 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
   });
 
   return (
-    <ThemeProvider theme={customTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            marginTop: 3,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
           }}
         >
-          <Typography component="h1" variant="h5">
+          <Image src="/attmans (png)-01.png" alt="attmans logo" width={150} height={130} />
+          <Typography component="h1" variant="h5" sx={{mt: 2}}>
             Sign in
           </Typography>
           <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
@@ -163,6 +84,7 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
               required
               fullWidth
               id="email"
+              color='secondary'
               label="Email Address"
               name="email"
               autoComplete="email"
@@ -176,6 +98,7 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
             <TextField
               margin="normal"
               required
+              color='secondary'
               fullWidth
               name="password"
               label="Password"
@@ -189,20 +112,17 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
               helperText={formik.touched.password && formik.errors.password}
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value="remember" />}
+              color='secondary'
               label="Remember me"
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              color='secondary'
               sx={{ mt: 3, mb: 2 }}
-            // disabled={loading}
-            >
-              Sign In
-
-
-            </Button>
+            >Sign In</Button>
             {formik.status && formik.status.error && (
               <Typography variant="body2" color="error" align="center">
                 {formik.status.error}
@@ -215,12 +135,12 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
             )}
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link href="#" color='secondary'>
                   Forgot password?
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2" onClick={()=>toggleForm()}>
+                <Link href="#" color='secondary' onClick={()=>toggleForm()}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
@@ -229,7 +149,6 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
-    </ThemeProvider>
   );
 }
 
