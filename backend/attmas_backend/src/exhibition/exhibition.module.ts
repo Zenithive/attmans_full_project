@@ -12,5 +12,6 @@ import { Exhibition, ExhibitionSchema } from './exhibition.schema';
   ],
   controllers: [ExhibitionController],
   providers: [ExhibitionService],
+  exports: [ExhibitionService],
 })
 export class ExhibitionModule {}

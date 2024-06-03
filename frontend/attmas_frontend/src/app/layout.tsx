@@ -41,6 +41,9 @@ const theme = createTheme({
           ':hover': {
             color: 'white',
             backgroundColor: '#616161',
+          },
+          secondary: {
+            main: "#616161",
           }
         },
       }

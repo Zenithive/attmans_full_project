@@ -16,6 +16,9 @@ export class Exhibition {
 
   @Prop({ type: [String], required: true })
   subjects: string[];
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
 }
 
 export const ExhibitionSchema = SchemaFactory.createForClass(Exhibition);
