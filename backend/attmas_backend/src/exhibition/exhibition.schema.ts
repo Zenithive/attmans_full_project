@@ -5,6 +5,7 @@ export type ExhibitionDocument = Exhibition & Document;
 
 @Schema()
 export class Exhibition {
+  [x: string]: any;
   @Prop({ required: true })
   title: string;
 
@@ -16,6 +17,9 @@ export class Exhibition {
 
   @Prop({ type: [String], required: true })
   subjects: string[];
+
+  @Prop({ required: true, default: Date.now })
+  dateTime: Date;
 
   @Prop({ default: Date.now })
   createdAt: Date;

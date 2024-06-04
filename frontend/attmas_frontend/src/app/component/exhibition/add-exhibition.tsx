@@ -8,14 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MoreIcon from '@mui/icons-material/MoreVert';
-import { useContext } from 'react';
+import MenuItem from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, ListSubheader, ListSubheaderProps, OutlinedInput, Select, TextField, Autocomplete } from '@mui/material';
 import { title } from 'process';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,59 +16,38 @@ import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from 'dayjs';
+import pubsub from '@/app/services/pubsub.service';
+import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
-export const AddExhibition = ({onAddExhibition}) => {
+
+const validationSchema = Yup.object().shape({
+    title: Yup.string().required('Title is required'),
+    description: Yup.string().required('Description is required'),
+    dateTime: Yup.date().nullable('Date & Time is required'),
+    categoryforIndustries: Yup.array().of(Yup.string()),
+    subject: Yup.array().of(Yup.string())
+});
+
+export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit }) => {
     const [open, toggleDrawer] = React.useState(false);
-    const [title, setTitle] = React.useState('');
-    const [description, setDescription] = React.useState('');
-    const [dateTime, setDateTime] = React.useState(new Date());
-    const [categoryforIndustries, setCategoryforIndustries] = React.useState<string[]>([]);
-    const [subject, setSubject] = React.useState<string[]>([]);
 
-    const closeHandler = () => {
-        toggleDrawer(false);
+    const initialValues = {
+        title: '',
+        description: '',
+        dateTime: null,
+        categoryforIndustries: [],
+        subject: []
     };
 
-    const handleCategoryChangeforIndustries = (event: any, value: string[]) => {
-        setCategoryforIndustries(value);
-    };
-
-    const handleCategoryforSubject = (event: any, value: string[]) => {
-        setSubject(value);
-    };
-
-    const handleDeleteIndustry = (industryToDelete: string) => {
-        setCategoryforIndustries((industries) => industries.filter((industry) => industry !== industryToDelete));
-    };
-
-    const handleDeleteSubject = (subjectToDelete: string) => {
-        setSubject((subjects) => subjects.filter((subject) => subject !== subjectToDelete));
-    };
-
-    const handleCreateExhibition = async () => {
-        const exhibitionData = { title, description, industries: categoryforIndustries, subjects: subject };
-    
-        try {
-          const response = await axios.post(APIS.EXHIBITION, exhibitionData);
-          console.log('Exhibition Created:', response.data);
-          onAddExhibition(response.data);
-          setTitle('');
-          setDescription('');
-          setDateTime(new Date());
-          setCategoryforIndustries([]);
-          setSubject([]);
-        } catch (error) {
-          console.error('Error creating exhibition:', error);
+    React.useEffect(() => {
+        if (editingExhibition) {
+            toggleDrawer(true);
         }
-    
-        toggleDrawer(false);
-      };
-    
+    }, [editingExhibition]);
 
-    const handleCancelExhibition = () => {
-        toggleDrawer(false);
-    };
     const industries = [
         "Agriculture",
         "Chemicals",
@@ -225,112 +197,190 @@ export const AddExhibition = ({onAddExhibition}) => {
         },
     ];
 
-
     const allSubjectItems = subjects.flatMap(subject => subject.items.map(item => ({
         category: subject.category,
         label: item
     })));
 
+    const handleSubmit = async (values: { title: any; description: any; dateTime: { toISOString: () => any; }; categoryforIndustries: any; subject: any; }, { setSubmitting, resetForm }: any) => {
+        const exhibitionData = {
+            title: values.title,
+            description: values.description,
+            dateTime: values.dateTime.toISOString(),
+            industries: values.categoryforIndustries,
+            subjects: values.subject
+        };
+
+        try {
+            if (editingExhibition) {
+                await axios.put(`${APIS.EXHIBITION}/${editingExhibition._id}`, exhibitionData);
+                pubsub.publish('ExhibitionUpdated', { message: 'Exhibition updated' });
+            } else {
+                const response = await axios.post(APIS.EXHIBITION, exhibitionData);
+                onAddExhibition(response.data);
+                pubsub.publish('ExhibitionCreated', { message: 'A new exhibition Created' });
+            }
+            resetForm();
+            toggleDrawer(false);
+            onCancelEdit && onCancelEdit();
+        } catch (error) {
+            console.error('Error creating/updating exhibition:', error);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <>
-            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{ borderRadius: 3,background:"#616161",color:"white",'&:hover': {
-      background: "#757575"  
-    }}}>Create Exhibition</Button>
-            <Drawer sx={{'& .MuiDrawer-paper': {width: "50%", borderRadius: 3, pr: 10, mr: -8}}} anchor="right" open={open} onClose={closeHandler}>
-                <Box component="div" sx={{display:"flex", justifyContent: "space-between", pl: 4}}>
-                    <h2>Create Exhibition</h2>
-                    <IconButton aria-describedby="id" onClick={closeHandler} sx={{ p: 0, right: 0 }}>
+            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
+                borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
+                    background: "#757575"
+                }
+            }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+            <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
+                <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
+                    <h2> {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
+                    <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
                 </Box>
                 <Divider sx={{ my: '$5' }} />
-                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', p: 4, gap: 2 }}>
-                    <TextField
-                        label="Title"
-                        variant="outlined"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Description"
-                        variant="outlined"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        multiline
-                        rows={4}
-                        fullWidth
-                    />
-                     
-                    <Autocomplete
-                        multiple
-                        options={industries}
-                        value={categoryforIndustries}
-                        onChange={handleCategoryChangeforIndustries}
-                        renderTags={(value, getTagProps) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {value.map((option:string, index) => (
-                                    <Chip
-                                        key={option}
-                                        label={option}
-                                        variant="outlined"
-                                        onDelete={() => handleDeleteIndustry(option)}
-                                        {...getTagProps({ index })}
-                                    />
-                                ))}
+                <Formik
+                    initialValues={editingExhibition ? {
+                        title: editingExhibition.title || '',
+                        description: editingExhibition.description || '',
+                        dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
+                        categoryforIndustries: editingExhibition.industries || [],
+                        subject: editingExhibition.subjects || []
+                    } : initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ values, setFieldValue, handleChange, handleBlur, handleSubmit, isSubmitting, errors, touched }) => (
+                        <Form onSubmit={handleSubmit}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
+                                <TextField
+                                    label="Title"
+                                    name="title"
+                                    variant="outlined"
+                                    value={values.title}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    error={!!(errors.title && touched.title)}
+                                    helperText={<ErrorMessage name="title" />}
+                                />
+                                <TextField
+                                    label="Description"
+                                    name="description"
+                                    variant="outlined"
+                                    value={values.description}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    multiline
+                                    rows={4}
+                                    fullWidth
+                                    error={!!(errors.description && touched.description)}
+                                    helperText={<ErrorMessage name="description" />}
+                                />
+                                <Autocomplete
+                                    multiple
+                                    options={industries}
+                                    value={values.categoryforIndustries}
+                                    onChange={(event, value) => setFieldValue('categoryforIndustries', value)}
+                                    renderTags={(value, getTagProps) => (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {value.map((option: string, index) => (
+                                                <Chip
+                                                    label={option}
+                                                    variant="outlined"
+                                                    {...getTagProps({ index })}
+                                                    key={option}
+                                                    onDelete={() => setFieldValue('categoryforIndustries', values.categoryforIndustries.filter((ind: string) => ind !== option))}
+                                                />
+                                            ))}
+                                        </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            variant="outlined"
+                                            label="Preferred Industries"
+                                            placeholder="Select industries"
+                                            error={!!(errors.categoryforIndustries && touched.categoryforIndustries)}
+                                            helperText={
+                                                typeof errors.categoryforIndustries === 'string' && touched.categoryforIndustries
+                                                  ? errors.categoryforIndustries
+                                                  : undefined
+                                              }
+                                              
+                                        />
+                                    )}
+                                />
+                                <Autocomplete
+                                    multiple
+                                    options={allSubjectItems}
+                                    groupBy={(option) => option.category}
+                                    getOptionLabel={(option) => option.label}
+                                    value={values.subject.map((label: string) => allSubjectItems.find(item => item.label === label)!)}
+                                    onChange={(event, value) => setFieldValue('subject', value.map(item => item.label))}
+                                    renderTags={(value, getTagProps) => (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                            {value.map((option, index) => (
+                                                <Chip
+                                                    label={option.label}
+                                                    {...getTagProps({ index })}
+                                                    onDelete={() => setFieldValue('subject', values.subject.filter((sub: any) => sub !== option.label))}
+                                                    key={option.label}
+                                                />
+                                            ))}
+                                        </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            variant="outlined"
+                                            label="Subject matter expertise"
+                                            placeholder="Select subjects"
+                                            error={!!(errors.subject && touched.subject)}
+                                            helperText={
+                                                typeof errors.subject === 'string' && touched.subject
+                                                  ? errors.subject
+                                                  : undefined
+                                              }
+                                        />
+                                    )}
+                                    renderGroup={(params) => (
+                                        <li key={params.key}>
+                                            <span style={{ fontWeight: 'bold' }}>{params.group}</span>
+                                            {params.children}
+                                        </li>
+                                    )}
+                                />
+                               <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                    label="Date & Time"
+                                    value={values.dateTime}
+                                    onChange={(newValue) => setFieldValue('dateTime', newValue)}
+                                    renderInput={(params:any) => (
+                                        <TextField
+                                            {...params}
+                                            fullWidth
+                                            variant="outlined"
+                                            error={!!(errors.dateTime && touched.dateTime)}
+                                            helperText={<ErrorMessage name="dateTime" />}
+                                        />
+                                    )}
+                                />
+                            </LocalizationProvider>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                                    <Button variant="contained" color='primary' onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>{editingExhibition ? 'Edit' : 'Create'}</Button>
+                                </Box>
                             </Box>
-                        )}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="outlined"
-                                label="Preferred Industries"
-                                placeholder="Select industries"
-                            />
-                        )}
-                    />
-                    <Autocomplete
-                        multiple
-                        options={allSubjectItems}
-                        groupBy={(option) => option.category}
-                        getOptionLabel={(option) => option.label}
-                        value={subject.map(label => allSubjectItems.find(item => item.label === label)!)}
-                        onChange={(event, value) => handleCategoryforSubject(event, value.map(item => item.label))}
-                        renderTags={(value, getTagProps) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {value.map((option, index) => (
-                                    <Chip
-                                        key={option.label}
-                                        label={option.label}
-                                        onDelete={() => handleDeleteSubject(option.label)}
-                                        {...getTagProps({ index })}
-                                    />
-                                ))}
-                            </Box>
-                        )}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="outlined"
-                                label="Subject matter expertise"
-                                placeholder="Select subjects"
-                            />
-                        )}
-                        renderGroup={(params) => (
-                            <li key={params.key}>
-                                <span style={{fontWeight: 'bold'}}>{params.group}</span>
-                                {params.children}
-                            </li>
-                        )}
-                    />
-                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker />
-                        </LocalizationProvider>
-                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                        <Button variant="contained"  color='primary' onClick={handleCancelExhibition}>Cancel</Button>
-                        <Button variant="contained" style={{background:"#616161",color:"white"}} onClick={handleCreateExhibition}>Create</Button>
-                    </Box>
-                </Box>
+                        </Form>
+                    )}
+                </Formik>
             </Drawer>
         </>
     );

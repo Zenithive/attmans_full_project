@@ -1,14 +1,17 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { Box, Button, colors, Typography, Card, CardContent } from '@mui/material';
+import { Box, Button, colors, Typography, Card, CardContent, IconButton, Tooltip } from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
-
+import dayjs from 'dayjs';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import pubsub from '../services/pubsub.service';
 
 const Exhibition = () => {
   const [exhibitions, setExhibitions] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [editingExhibition, setEditingExhibition] = useState(null);
 
   const fetchExhibitions = async () => {
     try {
@@ -19,32 +22,98 @@ const Exhibition = () => {
     }
   };
 
+  const refetch = async () => {
+    try {
+      await fetchExhibitions();
+    } catch (error) {
+      console.error('Error refetching exhibitions:', error);
+    }
+  };
+
   useEffect(() => {
     fetchExhibitions();
   }, []);
 
-  const handleAddExhibition = async (newExhibition:any) => {
+  useEffect(() => {  
+    pubsub.subscribe('ExhibitionCreated', refetch);
+
+    // Clean up the subscription on component unmount
+    return () => {
+      pubsub.unsubscribe('ExhibitionCreated', () => {});
+    };
+  }, []);
+
+
+  useEffect(() => {  
+    pubsub.subscribe('ExhibitionUpdated', refetch);
+
+    // Clean up the subscription on component unmount
+    return () => {
+      pubsub.unsubscribe('ExhibitionUpdated', () => {});
+    };
+  }, []);
+
+  useEffect(() => {  
+    pubsub.subscribe('ExhibitionDeleted', refetch);
+
+    // Clean up the subscription on component unmount
+    return () => {
+      pubsub.unsubscribe('ExhibitionDeleted', () => {});
+    };
+  }, []);
+
+  const handleAddExhibition = async (newExhibition: any) => {
     try {
       await axios.post(APIS.EXHIBITION, newExhibition);
-      fetchExhibitions(); 
+      fetchExhibitions();
     } catch (error) {
       console.error('Error adding exhibition:', error);
     }
   };
 
+  const handleEditExhibition = (exhibition:any) => {
+    setEditingExhibition(exhibition);
+};
+
+const handleCancelEdit = () => {
+    setEditingExhibition(null);
+};
+
+const handleDeleteExhibition = async (editingExhibition:any) => {
+  try {
+      await axios.delete(`${APIS.EXHIBITION}/${editingExhibition._id}`);
+      setExhibitions(exhibitions.filter(editingExhibition => editingExhibition._id !== editingExhibition));
+      pubsub.publish('ExhibitionDeleted', { message: 'Exhibition Deleted' });
+  } catch (error) {
+      console.error('Error deleting exhibition:', error);
+  }
+};
   return (
-    <Box sx={{ borderRadius: 3, background: colors.grey[100], p: 2,borderRadius:"30px !important"}}>
+    <Box sx={{ borderRadius: 3, background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
-        <AddExhibition onAddExhibition={handleAddExhibition}/>
+        <AddExhibition onAddExhibition={handleAddExhibition} editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
       </Box>
       <Box sx={{ mt: 2 }}>
         {exhibitions.map((exhibition) => (
           <Card key={exhibition} sx={{ mb: 2 }}>
             <CardContent>
-              <Typography variant="h5">{exhibition.title},{exhibition.dateTime}</Typography>
+              <Typography variant="h5">
+                {exhibition.title}
+                <span style={{ fontSize: 'small' ,color:"#616161"}}>
+                  ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
+                </span>
+              </Typography>
               <Typography variant="body2">{exhibition.description}</Typography>
               <Typography variant="caption">{exhibition.industries.join(', ')},{exhibition.subjects.join(', ')}</Typography>
+              <Typography sx={{display:"flex",float:"right"}}>
+              <IconButton onClick={() => handleEditExhibition(exhibition)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton onClick={() => handleDeleteExhibition(exhibition)}>
+                <DeleteRoundedIcon />
+              </IconButton>
+              </Typography>
             </CardContent>
           </Card>
         ))}
