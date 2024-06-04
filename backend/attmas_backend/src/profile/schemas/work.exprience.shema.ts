@@ -2,33 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @Schema()
-export class Profile1 extends Document {
-  @Prop({ required: false })
-  gender: string;
-
-  @Prop({ required: false })
-  address: string;
-
-  @Prop({ required: false })
-  city: string;
-
-  @Prop({ required: false })
-  state: string;
-
-  @Prop({ required: false })
-  pinCode: string;
-
-  @Prop({ required: false })
-  country: string;
-
-  @Prop({ required: false })
-  linkedIn: string;
-
+export class WorkExprience extends Document {
   @Prop({ required: false })
   workAddress: string;
-
-  @Prop({ required: false })
-  billingAddress: string;
 
   @Prop({ required: false })
   qualification: string;
@@ -61,4 +37,4 @@ export class Profile1 extends Document {
   productPrice: string;
 }
 
-export const ProfileSchema = SchemaFactory.createForClass(Profile1);
+export const WorkSchema = SchemaFactory.createForClass(WorkExprience);

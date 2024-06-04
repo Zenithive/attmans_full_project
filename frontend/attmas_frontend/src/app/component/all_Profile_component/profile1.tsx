@@ -11,57 +11,14 @@ import {
     MenuItem,
     TextField,
     Typography,
-    createTheme,
-    ThemeProvider,
 } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';  
+import LoadingButton from '@mui/lab/LoadingButton';
 
-const theme = createTheme({
-    palette: {
-        primary: {
-            main: "rgb(0,23,98)",
-        },
-    },
-    shape: {
-        borderRadius: 20,
-    },
-    components: {
-        MuiTextField: {
-            styleOverrides: {
-                root: {
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                            borderRadius: 20,
-                            // borderColor: "rgb(0,23,98)",
-                        },
-                        '&:hover fieldset': {
-                            borderColor: "rgb(0,23,98)",
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: "rgb(0,23,98)",
-                        },
-                    },
-                },
-            },
-        },
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    borderRadius: 20,
-                    textTransform: 'none',
-                    backgroundColor: "rgb(0,23,98)",
-                    marginLeft: "93%",
-                    '&:hover': {
-                        backgroundColor: "rgb(0,23,98)",
-                    },
-                },
-            },
-        },
-    },
-});
+
 
 interface ProfileForm1Props {
     onNext: () => void;
@@ -70,6 +27,7 @@ interface ProfileForm1Props {
 const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
     const [profilePhotoURL, setProfilePhotoURL] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -80,7 +38,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             pinCode: '',
             country: '',
             linkedIn: '',
-            // workAddress: '',
             billingAddress: '',
         },
         validationSchema: Yup.object({
@@ -91,8 +48,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             pinCode: Yup.string().required('Required'),
             country: Yup.string().required('Required'),
             linkedIn: Yup.string().url('Invalid URL').required('Required'),
-            // workAddress: Yup.string().required('Required'),
-            billingAddress: Yup.string(),
+                billingAddress: Yup.string(),
         }),
         onSubmit: async (values) => {
             try {
@@ -105,7 +61,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
         });
 
     return (
-        <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="md">
                 <CssBaseline />
                 <Box
@@ -285,20 +240,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 </TextField>
                             </Grid>
 
-                            {/* <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    style={{ background: "white", borderRadius: "25px" }}
-                                    id="workAddress"
-                                    label="Work Address"
-                                    name="workAddress"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.workAddress}
-                                    error={formik.touched.workAddress && Boolean(formik.errors.workAddress)}
-                                    helperText={formik.touched.workAddress && formik.errors.workAddress}
-                                />
-                            </Grid> */}
+                           
 
                             <Grid item xs={12}>
                                 <TextField
@@ -328,18 +270,20 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                             </Grid>
                         </Grid>
 
-                        <Button
+                        {/* <Button */}
+                        <LoadingButton
                             type="submit"
                             variant="contained"
                             size='small'
                             sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }} // Adjust padding as needed
                         >
                             Save & Next
-                        </Button>
+                            {/* </Button> */}
+                            </LoadingButton>
                     </Box>
                 </Box>
             </Container>
-        </ThemeProvider>
+        // </ThemeProvider>
     );
 };
 
