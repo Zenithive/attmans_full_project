@@ -11,6 +11,10 @@ export class CreateExhibitionDto {
 
   @IsNotEmpty()
   @IsString()
+  status: string;
+
+  @IsNotEmpty()
+  @IsString()
   industries: string[];
 
   @IsNotEmpty()
@@ -20,6 +24,10 @@ export class CreateExhibitionDto {
   @IsNotEmpty()
   @IsString()
   dateTime: Date;
+
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 }
 
 export class UpdateExhibitionDto {
@@ -30,6 +38,10 @@ export class UpdateExhibitionDto {
   @IsNotEmpty()
   @IsString()
   description?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  status?: string;
 
   @IsNotEmpty()
   @IsString()

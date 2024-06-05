@@ -8,7 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material';
+import MenuItem, { CircularProgress } from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, ListSubheader, ListSubheaderProps, OutlinedInput, Select, TextField, Autocomplete } from '@mui/material';
 import { title } from 'process';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,22 +21,44 @@ import dayjs from 'dayjs';
 import pubsub from '@/app/services/pubsub.service';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { UserSchema, selectUserSession } from '../../reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
 
+interface Exhibition {
+    _id?: string;
+    title: string;
+    description: string;
+    status: string;
+    dateTime: string;
+    industries: string[];
+    subjects: string[];
+  }
+  
+  interface AddExhibitionProps {
+    onAddExhibition: (exhibition: Exhibition) => void;
+    editingExhibition?: Exhibition | null;
+    onCancelEdit?: () => void;
+  }
+  
 
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
+    status: Yup.string().required('status is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
 });
 
-export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit }) => {
+export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit }:AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
+    
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const initialValues = {
         title: '',
         description: '',
+        status:"",
         dateTime: null,
         categoryforIndustries: [],
         subject: []
@@ -202,13 +224,15 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
         label: item
     })));
 
-    const handleSubmit = async (values: { title: any; description: any; dateTime: { toISOString: () => any; }; categoryforIndustries: any; subject: any; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = async (values: { title: string; description: string; status:string;dateTime: { toISOString: () => string; }; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
+            status:values.status,
             dateTime: values.dateTime.toISOString(),
             industries: values.categoryforIndustries,
-            subjects: values.subject
+            subjects: values.subject,
+            userId:userDetails._id
         };
 
         try {
@@ -249,6 +273,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                     initialValues={editingExhibition ? {
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
+                        status:editingExhibition.status || "",
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
@@ -282,6 +307,17 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                     fullWidth
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
+                                />
+                                <TextField
+                                    label="Status"
+                                    name="status"
+                                    variant="outlined"
+                                    value={values.status}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    error={!!(errors.status && touched.status)}
+                                    helperText={<ErrorMessage name="status" />}
                                 />
                                 <Autocomplete
                                     multiple
@@ -375,7 +411,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                             </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                                     <Button variant="contained" color='primary' onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
-                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>{editingExhibition ? 'Edit' : 'Create'}</Button>
+                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>     {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>
                         </Form>

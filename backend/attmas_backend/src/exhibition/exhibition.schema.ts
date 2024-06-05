@@ -12,6 +12,9 @@ export class Exhibition {
   @Prop({ required: true })
   description: string;
 
+  @Prop({ required: true })
+  status: string;
+
   @Prop({ type: [String], required: true })
   industries: string[];
 
@@ -23,6 +26,9 @@ export class Exhibition {
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ required: true })
+  userId: string;
 }
 
 export const ExhibitionSchema = SchemaFactory.createForClass(Exhibition);

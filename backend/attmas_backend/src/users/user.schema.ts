@@ -61,6 +61,9 @@ export class User {
 
   @Prop()
   userType?: string;
+
+  @Prop({ required: true })
+  _id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

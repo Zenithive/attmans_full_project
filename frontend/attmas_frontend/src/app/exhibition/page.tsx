@@ -9,6 +9,16 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import pubsub from '../services/pubsub.service';
 
+interface Exhibition {
+  _id: string;
+  title: string;
+  dateTime: string;
+  status: string;
+  description: string;
+  industries: string[];
+  subjects: string[];
+}
+
 const Exhibition = () => {
   const [exhibitions, setExhibitions] = useState([]);
   const [editingExhibition, setEditingExhibition] = useState(null);
@@ -89,7 +99,7 @@ const handleDeleteExhibition = async (editingExhibition:any) => {
   }
 };
   return (
-    <Box sx={{ borderRadius: 3, background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
+    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
         <AddExhibition onAddExhibition={handleAddExhibition} editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
@@ -102,6 +112,9 @@ const handleDeleteExhibition = async (editingExhibition:any) => {
                 {exhibition.title}
                 <span style={{ fontSize: 'small' ,color:"#616161"}}>
                   ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
+                </span>
+                <span style={{ fontSize: 'small' ,color:"#616161"}}>
+                  ({exhibition.status})
                 </span>
               </Typography>
               <Typography variant="body2">{exhibition.description}</Typography>
