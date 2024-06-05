@@ -59,6 +59,9 @@ export class Profile1 extends Document {
 
   @Prop({ required: false })
   productPrice: string;
+
+  @Prop({ required: false })
+  profilePhoto: string;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile1);

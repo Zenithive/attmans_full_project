@@ -17,6 +17,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';  
 import LoadingButton from '@mui/lab/LoadingButton';
+import { APIS } from '@/app/constants/api.constant';
 
 
 
@@ -50,15 +51,26 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             linkedIn: Yup.string().url('Invalid URL').required('Required'),
                 billingAddress: Yup.string(),
         }),
+
         onSubmit: async (values) => {
             try {
-              await axios.post('http://localhost:3000/profile/form1', values);
-              onNext(); // Call onNext when the form is submitted
+                const formData = new FormData();
+                formData.append('profilePhoto', profilePhoto as Blob);
+                Object.keys(values).forEach(key => {
+                    formData.append(key, (values as any)[key]);
+                });
+
+                await axios.post(APIS.FORM1, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                onNext(); // Call onNext when the form is submitted
             } catch (error) {
-              console.error('Error submitting form:', error);
+                console.error('Error submitting form:', error);
             }
-          },
-        });
+        },
+    });
 
     return (
             <Container component="main" maxWidth="md">

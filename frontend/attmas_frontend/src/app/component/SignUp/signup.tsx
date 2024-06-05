@@ -10,7 +10,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -61,7 +60,8 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
           username: values.email,
           password: values.password,
           mobileNumber: values.mobileNumber,
-          userType: ""
+          userType: "",
+          isAllProfileCompleted: false // Add the flag here
         });
         setStatus({ success: 'Successfully signed up!' });
         router.push('/');

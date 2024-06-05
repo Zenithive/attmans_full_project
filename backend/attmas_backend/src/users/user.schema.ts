@@ -60,7 +60,13 @@ export class User {
   billingAddress?: string;
 
   @Prop()
-  userType?: string;
+  userType: string;
+
+  @Prop({ default: false }) // Add the flag here with a default value of false
+  isAllProfileCompleted: boolean;
+
+  // @Prop({ required: false })
+  // _id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

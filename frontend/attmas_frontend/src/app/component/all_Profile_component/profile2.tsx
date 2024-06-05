@@ -15,6 +15,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { APIS } from '@/app/constants/api.constant';
 
 
 interface ProfileForm2Props {
@@ -62,7 +63,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             setLoading(true);
 
             try {
-                const response = await axios.post('http://localhost:3000/profile/form2', values);
+                const response = await axios.post(APIS.FORM2, values);
                 console.log('Profile data saved:', response.data);
                 onNext();
             } catch (error) {

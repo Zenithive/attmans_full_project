@@ -1,34 +1,38 @@
 "use client"
-
-import React, { ReactElement } from 'react'
-import MainSideBar, { drawerWidth } from '../MainSideBar'
-import MainNavBar from '../MainNavBar'
-
-import { AppBar, Box, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ThemeProvider, Toolbar, Typography, createTheme } from '@mui/material'
+import React from 'react';
+import MainSideBar, { drawerWidth } from '../MainSideBar';
+import MainNavBar from '../MainNavBar';
+import { Box, CssBaseline, Toolbar } from '@mui/material';
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
+  displayMainSideBar: boolean; // Prop to indicate whether MainSideBar should be displayed
 }
 
-
-export default function Layout({ children }: LayoutProps) {
-
+const Layout: React.FC<LayoutProps> = ({ children, displayMainSideBar }) => {
   return (
-      <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <MainNavBar />
-      <MainSideBar />
+      {displayMainSideBar && <MainSideBar />} {/* Conditionally render MainSideBar */}
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ...(displayMainSideBar && { width: '100%' }), // Adjust width when sidebar is hidden
+        }}
       >
         <Toolbar />
         {children}
       </Box>
     </Box>
-    // <h1>Main Page</h1>
-  )
-}
+  );
+};
+
+export default Layout;
+
 
 
 

@@ -17,6 +17,8 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
+import { addUser } from '@/app/reducers/userReducer';
+import { useAppDispatch } from '@/app/reducers/hooks.redux';
 
 interface SignInProps {
   toggleForm: CallableFunction;
@@ -37,7 +39,7 @@ function Copyright(props: any) {
 
 export const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -53,6 +55,20 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
         console.log("response.data.access_token", response.data.access_token);
         console.log("response",response.data.user);
+
+        const res=response.data.user;
+        const user = {
+          token: response.data.access_token,
+          username: values.email,
+          firstname: res.firstname,
+          lastname: res.lastname,
+          mobilenumber: res.mobilenumber,
+          _id:res._id,
+          userType:res.userType
+        };
+        console.log("user",user)
+
+        dispatch(addUser(user))
 
         document.cookie  = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });

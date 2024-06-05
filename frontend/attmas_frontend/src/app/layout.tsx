@@ -3,10 +3,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Layout from "./component/Layout/layout";
 import { config } from "@/middleware";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Provider } from "react-redux";
+import { store } from "./reducers/store";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +24,10 @@ const theme = createTheme({
   shape: {
     borderRadius: 20,
   },
-  
+
   components: {
     MuiListItemButton: {
-      styleOverrides:{
+      styleOverrides: {
         root: {
           color: '#616161',
           '&.Mui-selected': {
@@ -72,15 +74,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   const pathName = usePathname();
   const isValidPage = config.matcher.includes(pathName);
+  const isProfilePage = pathName === '/profile'; // Adjust this according to your profile page route
 
   return (
     <html lang="en">
       <body className={inter.className} style={{ width: '100%', height: "100%" }}>
         <ThemeProvider theme={theme}>
-          {isValidPage ? <Layout>{children}</Layout> : children}
+          <Provider store={store}>
+          {isValidPage ? (
+            <Layout displayMainSideBar={!isProfilePage}>{children}</Layout>
+          ) : (
+            children
+          )}
+          </Provider>
         </ThemeProvider>
       </body>
     </html>

@@ -21,6 +21,8 @@ import { useFormik } from 'formik';
 import { categories, subcategories } from '@/app/constants/categories';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { APIS } from '@/app/constants/api.constant';
+import { useRouter } from 'next/navigation';  // Import the useRouter hook
 
 const customTheme = createTheme({
     palette: {
@@ -50,6 +52,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
+    const router = useRouter(); // Initialize the useRouter hook
 
     const formik = useFormik({
         initialValues: {
@@ -57,14 +60,15 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             subcategories: [] as string[],
         },
         onSubmit: async (values) => {
-        setLoading(true);
+            setLoading(true);
 
             console.log('Form values:', values);
 
             // Send data to MongoDB using Axios
             try {
-                const response = await axios.post('http://localhost:3000/profile/form3', values);
+                const response = await axios.post(APIS.FORM3, values);
                 console.log('API response:', response.data); // Handle successful response
+                router.push('/dashboard'); // Redirect to the dashboard page
             } catch (error) {
                 console.error('Error sending data:', error); // Handle errors
             } finally {
@@ -167,7 +171,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                                             </Box>
                                         )}
                                     >
-                                        {selectedCategories.flatMap(category => 
+                                        {selectedCategories.flatMap(category =>
                                             subcategories[category].map((subcategory) => (
                                                 <MenuItem key={subcategory} value={subcategory}>
                                                     <Checkbox checked={selectedSubcategories.indexOf(subcategory) > -1} />
@@ -193,6 +197,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                             type="submit"
                             variant="contained"
                             size="small"
+                            loading={loading}
                         >
                             Save
                         </LoadingButton>
