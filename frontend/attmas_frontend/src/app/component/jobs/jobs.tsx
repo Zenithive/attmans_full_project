@@ -8,7 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
-import { CircularProgress, MenuItem } from '@mui/material';
+import { CircularProgress, FilledTextFieldProps, MenuItem, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, ListSubheader, ListSubheaderProps, OutlinedInput, Select, TextField, Autocomplete } from '@mui/material';
 import { title } from 'process';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,20 +24,21 @@ import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 
-interface Exhibition {
+
+interface Jobs {
     _id?: string;
     title: string;
     description: string;
-    status: string;
-    videoUrl:string;
-    dateTime: string;
-    industries: string[];
-    subjects: string[];
+    Budget:number;
+    Expertiselevel: string;
+    TimeFrame: string | null;
+    Category: string[];
+    Subcategorys: string[];
   }
   
-  interface AddExhibitionProps {
-    onAddExhibition: (exhibition: Exhibition) => void;
-    editingExhibition?: Exhibition | null;
+  interface AddJobsProps {
+    onAddJobs: (jobs: Jobs) => void;
+    editingJobs?: Jobs | null;
     onCancelEdit?: () => void;
   }
   
@@ -45,35 +46,35 @@ interface Exhibition {
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
-    status: Yup.string(),
-    videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
-    dateTime: Yup.date().nullable('Date & Time is required'),
-    categoryforIndustries: Yup.array().of(Yup.string()),
-    subject: Yup.array().of(Yup.string())
+    Expertiselevel: Yup.string(),
+    Budget:Yup.number().required("Budget is required"),
+    TimeFrame: Yup.date().nullable('Date & Time is required'),
+    categoryforCategory: Yup.array().of(Yup.string()),
+    Subcategory: Yup.array().of(Yup.string())
 });
 
-export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit }:AddExhibitionProps) => {
+export const AddJobs = ({ onAddJobs, editingJobs, onCancelEdit }:AddJobsProps) => {
     const [open, toggleDrawer] = React.useState(false);
-    
-    const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+    
     const initialValues = {
         title: '',
         description: '',
-        status:'',
-        videoUrl: '',
-        dateTime: null as Dayjs | null,
-        categoryforIndustries: [],
-        subject: []
+        Expertiselevel:'',
+        Budget: 0,
+        TimeFrame: null as Dayjs | null,
+        categoryforCategory: [],
+        Subcategory: []
     };
 
     React.useEffect(() => {
-        if (editingExhibition) {
+        if (editingJobs) {
             toggleDrawer(true);
         }
-    }, [editingExhibition]);
+    }, [editingJobs]);
 
-    const industries = [
+    const Category = [
         "Agriculture",
         "Chemicals",
         "Electronics",
@@ -87,7 +88,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
         "Textiles"
     ];
 
-    const subjects = [
+    const Subcategorys = [
         {
             category: "Chemistry",
             items: [
@@ -222,37 +223,38 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
         },
     ];
 
-    const allSubjectItems = subjects.flatMap(subject => subject.items.map(item => ({
-        category: subject.category,
+    const allSubcategoryItems = Subcategorys.flatMap(Subcategory => Subcategory.items.map(item => ({
+        category: Subcategory.category,
         label: item
     })));
+ 
 
-    const handleSubmit = async (values: { title: string; description: string; status:string;videoUrl:string,dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
-        const exhibitionData = {
+    const handleSubmit = async (values: { title: string; description: string; Expertiselevel:string;Budget:number,TimeFrame:Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; }, { setSubmitting, resetForm }: any) => {
+        const jobsData = {
             title: values.title,
             description: values.description,
-            dateTime: values.dateTime ? values.dateTime.toISOString() : null,
-            status:values.status,
-            videoUrl:values.videoUrl,
-            industries: values.categoryforIndustries,
-            subjects: values.subject,
+            TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
+            Expertiselevel:values.Expertiselevel,
+            Budget:values.Budget,
+            Category: values.categoryforCategory,
+            Subcategorys: values.Subcategory,
             userId:userDetails._id
         };
 
         try {
-            if (editingExhibition) {
-                await axios.put(`${APIS.EXHIBITION}/${editingExhibition._id}`, exhibitionData);
-                pubsub.publish('ExhibitionUpdated', { message: 'Exhibition updated' });
+            if (editingJobs) {
+                await axios.put(`${APIS.JOBS}/${editingJobs._id}`, jobsData);
+                pubsub.publish('JobUpdated', { message: 'Jobs updated' });
             } else {
-                const response = await axios.post(APIS.EXHIBITION, exhibitionData);
-                onAddExhibition(response.data);
-                pubsub.publish('ExhibitionCreated', { message: 'A new exhibition Created' });
+                const response = await axios.post(APIS.JOBS, jobsData);
+                onAddJobs(response.data);
+                pubsub.publish('JobCreated', { message: 'A new Job Created' });
             }
             resetForm();
             toggleDrawer(false);
             onCancelEdit && onCancelEdit();
         } catch (error) {
-            console.error('Error creating/updating exhibition:', error);
+            console.error('Error creating/updating jobs:', error);
         } finally {
             setSubmitting(false);
         }
@@ -264,24 +266,24 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                 borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
                     background: "#757575"
                 }
-            }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+            }}>    {editingJobs ? 'Edit Jobs' : 'Create Jobs'}</Button>
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
-                    <h2> {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
+                    <h2> {editingJobs ? 'Edit Jobs' : 'Create Jobs'}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
                 </Box>
                 <Divider sx={{ my: '$5' }} />
                 <Formik
-                    initialValues={editingExhibition ? {
-                        title: editingExhibition.title || '',
-                        description: editingExhibition.description || '',
-                        status:editingExhibition.status || '',
-                        videoUrl:editingExhibition.videoUrl || "",
-                        dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
-                        categoryforIndustries: editingExhibition.industries || [],
-                        subject: editingExhibition.subjects || []
+                    initialValues={editingJobs ? {
+                        title: editingJobs.title || '',
+                        description: editingJobs.description || '',
+                        Expertiselevel:editingJobs.Expertiselevel || '',
+                        Budget:editingJobs.Budget || 0,
+                        TimeFrame: editingJobs.TimeFrame ? dayjs(editingJobs.TimeFrame) : null,
+                        categoryforCategory: editingJobs.Category || [],
+                        Subcategory: editingJobs.Subcategorys || []
                     } : initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
@@ -315,38 +317,38 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                 />
                                 <TextField
                                     fullWidth
-                                    name="videoUrl"
-                                    label="Video URL"
-                                    value={values.videoUrl}
+                                    name="Budget"
+                                    label="BUDGET"
+                                    type="number" 
+                                    value={values.Budget}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    error={touched.videoUrl && Boolean(errors.videoUrl)}
-                                    helperText={touched.videoUrl && errors.videoUrl}
+                                    error={touched.Budget && Boolean(errors.Budget)}
+                                    helperText={touched.Budget && errors.Budget}
                                     margin="normal"
                                 />
-                                {editingExhibition && (
                                  <FormControl fullWidth>
-                                    <InputLabel id="status-label">Status</InputLabel>
+                                    <InputLabel id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
-                                        labelId="status-label"
-                                        id="status"
-                                        name="status"
-                                        value={values.status}
+                                        labelId="Expertiselevel-label"
+                                        id="Expertiselevel"
+                                        name="Expertiselevel"
+                                        value={values.Expertiselevel}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        label="Status"
+                                        label="Expertise Level"
                                     >
-                                        <MenuItem value="cancel">cancel </MenuItem>
-                                        <MenuItem value="open">open</MenuItem>
-                                        <MenuItem value="close">close</MenuItem>
+                                        <MenuItem value="Beginner">Beginner </MenuItem>
+                                        <MenuItem value="Intermidiate">Intermidiate</MenuItem>
+                                        <MenuItem value="Expert">Expert</MenuItem>
+                                        <MenuItem value="Phd">Phd</MenuItem>
                                     </Select>
                                 </FormControl>
-                             )}
                                 <Autocomplete
                                     multiple
-                                    options={industries}
-                                    value={values.categoryforIndustries}
-                                    onChange={(event, value) => setFieldValue('categoryforIndustries', value)}
+                                    options={Category}
+                                    value={values.categoryforCategory}
+                                    onChange={(event, value) => setFieldValue('categoryforCategory', value)}
                                     renderTags={(value, getTagProps) => (
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                             {value.map((option: string, index) => (
@@ -355,7 +357,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                                     variant="outlined"
                                                     {...getTagProps({ index })}
                                                     key={option}
-                                                    onDelete={() => setFieldValue('categoryforIndustries', values.categoryforIndustries.filter((ind: string) => ind !== option))}
+                                                    onDelete={() => setFieldValue('categoryforCategory', values.categoryforCategory.filter((ind: string) => ind !== option))}
                                                 />
                                             ))}
                                         </Box>
@@ -364,12 +366,12 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            label="Preferred Industries"
-                                            placeholder="Select industries"
-                                            error={!!(errors.categoryforIndustries && touched.categoryforIndustries)}
+                                            label="Preferred Category"
+                                            placeholder="Select Category"
+                                            error={!!(errors.categoryforCategory && touched.categoryforCategory)}
                                             helperText={
-                                                typeof errors.categoryforIndustries === 'string' && touched.categoryforIndustries
-                                                  ? errors.categoryforIndustries
+                                                typeof errors.categoryforCategory === 'string' && touched.categoryforCategory
+                                                  ? errors.categoryforCategory
                                                   : undefined
                                               }
                                               
@@ -378,18 +380,18 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                 />
                                 <Autocomplete
                                     multiple
-                                    options={allSubjectItems}
+                                    options={allSubcategoryItems}
                                     groupBy={(option) => option.category}
                                     getOptionLabel={(option) => option.label}
-                                    value={values.subject.map((label: string) => allSubjectItems.find(item => item.label === label)!)}
-                                    onChange={(event, value) => setFieldValue('subject', value.map(item => item.label))}
+                                    value={values.Subcategory.map((label: string) => allSubcategoryItems.find(item => item.label === label)!)}
+                                    onChange={(event, value) => setFieldValue('Subcategory', value.map(item => item.label))}
                                     renderTags={(value, getTagProps) => (
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                             {value.map((option, index) => (
                                                 <Chip
                                                     label={option.label}
                                                     {...getTagProps({ index })}
-                                                    onDelete={() => setFieldValue('subject', values.subject.filter((sub: any) => sub !== option.label))}
+                                                    onDelete={() => setFieldValue('subject', values.Subcategory.filter((sub: any) => sub !== option.label))}
                                                     key={option.label}
                                                 />
                                             ))}
@@ -399,12 +401,12 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            label="Subject matter expertise"
-                                            placeholder="Select subjects"
-                                            error={!!(errors.subject && touched.subject)}
+                                            label="Subcategory matter expertise"
+                                            placeholder="Select Subcategorys"
+                                            error={!!(errors.Subcategory && touched.Subcategory)}
                                             helperText={
-                                                typeof errors.subject === 'string' && touched.subject
-                                                  ? errors.subject
+                                                typeof errors.Subcategory === 'string' && touched.Subcategory
+                                                  ? errors.Subcategory
                                                   : undefined
                                               }
                                         />
@@ -418,14 +420,15 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                 />
                                <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
-                                    label="Date & Time"
-                                    value={values.dateTime}
-                                    onChange={(newValue) => setFieldValue('dateTime', newValue)}
+                                    label="Time Frame"
+                                    value={values.TimeFrame}
+                                    onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
+                                    
                                 />
                             </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                                     <Button variant="contained" color='primary' onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
-                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>     {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
+                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>
                         </Form>

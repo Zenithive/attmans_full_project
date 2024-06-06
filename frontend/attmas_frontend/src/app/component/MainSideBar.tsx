@@ -63,7 +63,15 @@ export default function MainSideBar() {
         <Diversity1Icon sx={{ fontSize: 22 }} />
       ),
       Name: "Exhibition"
+    },
+    {
+      path: '/jobs',
+      icon: () => (
+        <WorkIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Jobs"
     }
+
   ];
 
 

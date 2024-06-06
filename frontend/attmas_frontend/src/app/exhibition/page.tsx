@@ -10,17 +10,20 @@ import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import pubsub from '../services/pubsub.service';
 
 interface Exhibition {
-  _id: string;
+  _id?: string;
   title: string;
-  dateTime: string;
-  status: string;
   description: string;
+  status: string;
+  videoUrl:string;
+  dateTime: string;
   industries: string[];
   subjects: string[];
 }
 
+
 const Exhibition = () => {
-  const [exhibitions, setExhibitions] = useState([]);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+
   const [editingExhibition, setEditingExhibition] = useState(null);
 
   const fetchExhibitions = async () => {
@@ -89,24 +92,24 @@ const handleCancelEdit = () => {
     setEditingExhibition(null);
 };
 
-const handleDeleteExhibition = async (editingExhibition:any) => {
+const handleDeleteExhibition = async (editingExhibition:Exhibition) => {
   try {
       await axios.delete(`${APIS.EXHIBITION}/${editingExhibition._id}`);
-      setExhibitions(exhibitions.filter(editingExhibition => editingExhibition._id !== editingExhibition));
+      setExhibitions(exhibitions.filter(exhibition => exhibition._id !== editingExhibition._id));
       pubsub.publish('ExhibitionDeleted', { message: 'Exhibition Deleted' });
   } catch (error) {
       console.error('Error deleting exhibition:', error);
   }
 };
   return (
-    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
+    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important"}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
         <AddExhibition onAddExhibition={handleAddExhibition} editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
       </Box>
       <Box sx={{ mt: 2 }}>
         {exhibitions.map((exhibition) => (
-          <Card key={exhibition} sx={{ mb: 2 }}>
+          <Card key={exhibition._id} sx={{ mb: 2 }}>
             <CardContent>
               <Typography variant="h5">
                 {exhibition.title}
