@@ -113,8 +113,8 @@ const handleDeleteExhibition = async (editingExhibition:any) => {
                 <span style={{ fontSize: 'small' ,color:"#616161"}}>
                   ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
                 </span>
-                <span style={{ fontSize: 'small' ,color:"#616161"}}>
-                  ({exhibition.status})
+                <span style={{ fontSize: 'small' ,fontWeight:"bolder",float:"right"}}>
+                  {exhibition.status}
                 </span>
               </Typography>
               <Typography variant="body2">{exhibition.description}</Typography>

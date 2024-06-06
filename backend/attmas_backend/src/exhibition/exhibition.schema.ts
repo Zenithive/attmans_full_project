@@ -1,18 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type ExhibitionDocument = Exhibition & Document;
 
 @Schema()
 export class Exhibition {
-  [x: string]: any;
   @Prop({ required: true })
   title: string;
 
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
+  @Prop({ nullable: true })
   status: string;
 
   @Prop({ type: [String], required: true })
@@ -28,7 +27,7 @@ export class Exhibition {
   createdAt: Date;
 
   @Prop({ required: true })
-  userId: string;
+  userId: Types.ObjectId;
 }
 
 export const ExhibitionSchema = SchemaFactory.createForClass(Exhibition);

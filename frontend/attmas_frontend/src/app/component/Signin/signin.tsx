@@ -19,6 +19,8 @@ import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
 import { addUser } from '@/app/reducers/userReducer';
 import { useAppDispatch } from '@/app/reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '../../reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
 
 interface SignInProps {
   toggleForm: CallableFunction;

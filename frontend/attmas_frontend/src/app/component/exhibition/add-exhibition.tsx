@@ -8,7 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
-import MenuItem, { CircularProgress } from '@mui/material';
+import { CircularProgress, MenuItem } from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, ListSubheader, ListSubheaderProps, OutlinedInput, Select, TextField, Autocomplete } from '@mui/material';
 import { title } from 'process';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -44,7 +44,7 @@ interface Exhibition {
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
-    status: Yup.string().required('status is required'),
+    status: Yup.string(),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
@@ -58,7 +58,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
     const initialValues = {
         title: '',
         description: '',
-        status:"",
+        status:'',
         dateTime: null,
         categoryforIndustries: [],
         subject: []
@@ -228,8 +228,8 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
         const exhibitionData = {
             title: values.title,
             description: values.description,
-            status:values.status,
             dateTime: values.dateTime.toISOString(),
+            status:values.status,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId:userDetails._id
@@ -273,7 +273,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                     initialValues={editingExhibition ? {
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
-                        status:editingExhibition.status || "",
+                        status:editingExhibition.status || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
@@ -308,17 +308,24 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
-                                <TextField
-                                    label="Status"
-                                    name="status"
-                                    variant="outlined"
-                                    value={values.status}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    fullWidth
-                                    error={!!(errors.status && touched.status)}
-                                    helperText={<ErrorMessage name="status" />}
-                                />
+                                {editingExhibition && (
+                                 <FormControl fullWidth>
+                                    <InputLabel id="status-label">Status</InputLabel>
+                                    <Select
+                                        labelId="status-label"
+                                        id="status"
+                                        name="status"
+                                        value={values.status}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        label="Status"
+                                    >
+                                        <MenuItem value="cancel">cancel </MenuItem>
+                                        <MenuItem value="open">open</MenuItem>
+                                        <MenuItem value="close">close</MenuItem>
+                                    </Select>
+                                </FormControl>
+                             )}
                                 <Autocomplete
                                     multiple
                                     options={industries}
