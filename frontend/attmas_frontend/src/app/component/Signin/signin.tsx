@@ -72,7 +72,7 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
 
         document.cookie  = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        router.push("/dashboard");
+        router.push("/profile");
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }

@@ -14,7 +14,8 @@ const Layout: React.FC<LayoutProps> = ({ children, displayMainSideBar }) => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <MainNavBar />
-      {displayMainSideBar && <MainSideBar />} {/* Conditionally render MainSideBar */}
+      {/* {displayMainSideBar && <MainSideBar />} Conditionally render MainSideBar */}
+      <MainSideBar />
       <Box
         component="main"
         sx={{

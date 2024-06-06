@@ -7,7 +7,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { Profile1 } from './schemas/profile.schema';
+import { PersonalProfile } from './schemas/personalProfile';
 import { WorkExprience } from './schemas/work.exprience.shema';
 import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -35,8 +35,8 @@ export class ProfileController {
   )
   async createForm1(
     @UploadedFile() profilePhoto: Express.Multer.File,
-    @Body() profileData: Profile1,
-  ): Promise<Profile1> {
+    @Body() profileData: PersonalProfile,
+  ): Promise<PersonalProfile> {
     if (profilePhoto) {
       profileData.profilePhoto = join('profilePhoto',profilePhoto.filename); // Assuming you have a field for the filename
     }
