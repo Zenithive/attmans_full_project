@@ -15,6 +15,7 @@ export class UsersService {
     const createdUser = new this.userModel({
       ...rest,
       password: hashedPassword,
+      isAllProfileCompleted: false,
     });
     return createdUser.save();
   }
@@ -23,12 +24,22 @@ export class UsersService {
     const tmpData = await this.userModel.findOne({ username }).exec();
     return tmpData;
   }
-  async updateUserType(username: string, userType: string): Promise<User> {
-    const user = await this.userModel.findOne({ username }).exec();
+
+  async updateUserTypes(username: string, userType: string): Promise<User> {
+    const user = await this.findByUsername(username);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with username ${username} not found`);
     }
     user.userType = userType;
+    return user.save();
+  }
+
+  async updateProfileCompletionStatus(username: string): Promise<User> {
+    const user = await this.findByUsername(username);
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+    user.isAllProfileCompleted = true;
     return user.save();
   }
 }

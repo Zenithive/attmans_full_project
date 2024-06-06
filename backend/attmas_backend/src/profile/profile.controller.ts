@@ -2,6 +2,7 @@
 import {
   Body,
   Controller,
+  // Patch,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -13,10 +14,11 @@ import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+// import { UpdateUserTypeDto } from 'src/users/update-user-type.dto';
 
 @Controller('profile')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(private readonly profileService: ProfileService) { }
 
   @Post('form1')
   @UseInterceptors(
@@ -38,7 +40,7 @@ export class ProfileController {
     @Body() profileData: PersonalProfile,
   ): Promise<PersonalProfile> {
     if (profilePhoto) {
-      profileData.profilePhoto = join('profilePhoto',profilePhoto.filename); // Assuming you have a field for the filename
+      profileData.profilePhoto = join('profilePhoto', profilePhoto.filename); // Assuming you have a field for the filename
     }
     return this.profileService.createForm1(profileData);
   }

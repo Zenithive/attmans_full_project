@@ -64,6 +64,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     const formik = useFormik({
         initialValues: {
             userId: userDetails._id,
+            username: userDetails.username,
             categories: [] as string[],
             subcategories: [] as string[],
         },
@@ -75,6 +76,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             // Send data to MongoDB using Axios
             try {
                 console.log('userDetails._id from 3rd', userDetails._id);
+                console.log('userDetails.username from 3rd', userDetails.username);
 
                 const response = await axios.post(APIS.FORM3, values);
                 console.log('API response:', response.data); // Handle successful response

@@ -61,6 +61,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productType: '',
             productPrice: '',
             userId: userDetails._id,
+            username: userDetails.username,
         },
 
 

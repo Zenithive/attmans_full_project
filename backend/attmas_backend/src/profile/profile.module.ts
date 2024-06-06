@@ -8,6 +8,7 @@ import {
 } from './schemas/personalProfile.schema';
 import { WorkExprience, WorkSchema } from './schemas/work.exprience.shema';
 import { Categories, CategorySchema } from './schemas/category.schema';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Categories, CategorySchema } from './schemas/category.schema';
       { name: WorkExprience.name, schema: WorkSchema },
       { name: Categories.name, schema: CategorySchema },
     ]),
+    UsersModule,
   ],
   controllers: [ProfileController],
   providers: [ProfileService],

@@ -11,6 +11,12 @@ export class Categories extends Document {
 
   @Prop({ required: false })
   userId: string;
+
+  @Prop({ required: false })
+  username: string;
+
+  @Prop({ default: false })
+  isComplete: boolean;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Categories);
