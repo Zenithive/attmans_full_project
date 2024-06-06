@@ -7,6 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import Layout from "./component/Layout/layout";
 import { config } from "@/middleware";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Provider } from "react-redux";
+import { store } from "./reducers/store";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,6 +43,9 @@ const theme = createTheme({
           ':hover': {
             color: 'white',
             backgroundColor: '#616161',
+          },
+          secondary: {
+            main: "#616161",
           }
         },
       }
@@ -48,9 +53,13 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
+          '& label.Mui-focused': {
+            color: '#616161',
+          },
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderRadius: 20,
+
             },
           },
         },
@@ -64,8 +73,24 @@ const theme = createTheme({
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          '& label.Mui-focused': {
+            color: '#616161',
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 20,
+            },
+          },
+        },
+      },
+    },
+    
   },
 });
+
 
 export default function RootLayout({
   children,
@@ -80,7 +105,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className} style={{ width: '100%', height: "100%" }}>
         <ThemeProvider theme={theme}>
+         <Provider store={store}>
           {isValidPage ? <Layout>{children}</Layout> : children}
+        </Provider>
         </ThemeProvider>
       </body>
     </html>

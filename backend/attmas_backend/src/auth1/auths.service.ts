@@ -32,6 +32,7 @@ export class AuthService {
         lastname: user.lastName,
         mobilenumber: user.mobileNumber,
         usertype: user.userType,
+        _id: user?._id,
       }; // Custom response indicating profile completion is required
     }
 
