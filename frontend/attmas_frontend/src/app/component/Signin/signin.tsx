@@ -19,6 +19,8 @@ import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
 import { addUser } from '@/app/reducers/userReducer';
 import { useAppDispatch } from '@/app/reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '../../reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
 
 interface SignInProps {
   toggleForm: CallableFunction;
@@ -41,6 +43,8 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  // const dispatch = useAppDispatch();
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -55,7 +59,7 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
         console.log("response.data.access_token", response.data.access_token);
         console.log("response",response.data.user);
-
+        
         const res=response.data.user;
         const user = {
           token: response.data.access_token,
@@ -63,13 +67,11 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
           firstname: res.firstname,
           lastname: res.lastname,
           mobilenumber: res.mobilenumber,
-          _id:res._id,
-          userType:res.userType
+          _id:res._id
         };
         console.log("user",user)
 
         dispatch(addUser(user))
-
         document.cookie  = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
         router.push("/profile");
