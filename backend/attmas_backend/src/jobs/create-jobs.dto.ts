@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Types } from 'mongoose';
 
-export class CreateExhibitionDto {
+export class CreateJobsDto {
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -11,26 +12,30 @@ export class CreateExhibitionDto {
 
   @IsNotEmpty()
   @IsString()
-  status: string;
+  Expertiselevel: string;
 
   @IsNotEmpty()
   @IsString()
-  industries: string[];
+  Category: string[];
 
   @IsNotEmpty()
   @IsString()
-  subjects: string[];
+  Subcategorys: string[];
 
   @IsNotEmpty()
   @IsString()
-  dateTime: Date;
+  TimeFrame: Date;
 
   @IsNotEmpty()
   @IsString()
-  videoUrl: string;
+  userId: Types.ObjectId;
+
+  @IsNotEmpty()
+  @IsString()
+  Budget: number;
 }
 
-export class UpdateExhibitionDto {
+export class UpdateJobsDto {
   @IsNotEmpty()
   @IsString()
   title?: string;
@@ -41,21 +46,21 @@ export class UpdateExhibitionDto {
 
   @IsNotEmpty()
   @IsString()
-  status?: string;
+  Expertiselevel?: string;
 
   @IsNotEmpty()
   @IsString()
-  industries?: string[];
+  Category?: string[];
 
   @IsNotEmpty()
   @IsString()
-  subjects?: string[];
+  Subcategorys?: string[];
 
   @IsNotEmpty()
   @IsString()
-  dateTime?: Date;
+  TimeFrame?: Date;
 
   @IsNotEmpty()
   @IsString()
-  videoUrl?: string;
+  Budget?: number;
 }
