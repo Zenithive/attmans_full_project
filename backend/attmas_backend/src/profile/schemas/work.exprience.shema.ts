@@ -35,6 +35,9 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   productPrice: string;
+
+  @Prop({ required: false })
+  userId: string;
 }
 
 export const WorkSchema = SchemaFactory.createForClass(WorkExprience);

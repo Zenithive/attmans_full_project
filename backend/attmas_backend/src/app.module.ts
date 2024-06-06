@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth1/auths.module';
 import { ConfigModule } from '@nestjs/config';
 import * as dotenv from 'dotenv';
+import { ProfileModule } from './profile/profile.module';
 import { ExhibitionModule } from './exhibition/exhibition.module';
 
 dotenv.config();
@@ -19,6 +20,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     MongooseModule.forRoot(process.env.URI),
     UsersModule,
     AuthModule,
+    ProfileModule,
     ExhibitionModule,
   ],
   controllers: [AppController],

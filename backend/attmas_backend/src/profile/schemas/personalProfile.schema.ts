@@ -62,6 +62,9 @@ export class PersonalProfile extends Document {
 
   @Prop({ required: false })
   profilePhoto: string;
+
+  @Prop({ required: false })
+  userId: string;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(PersonalProfile);

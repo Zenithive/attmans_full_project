@@ -16,6 +16,8 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { APIS } from '@/app/constants/api.constant';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 
 
 interface ProfileForm2Props {
@@ -27,6 +29,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [isFreelancer, setIsFreelancer] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+
 
     const validationSchema = Yup.object({
         qualification: Yup.string().required('Qualification is required'),
@@ -55,7 +60,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productDescription: '',
             productType: '',
             productPrice: '',
+            userId: userDetails._id,
         },
+
 
 
         validationSchema,
@@ -63,6 +70,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             setLoading(true);
 
             try {
+                console.log('userDetails._id from 2nd', userDetails._id);
+
                 const response = await axios.post(APIS.FORM2, values);
                 console.log('Profile data saved:', response.data);
                 onNext();

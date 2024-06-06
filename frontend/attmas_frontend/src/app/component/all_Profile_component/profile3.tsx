@@ -23,6 +23,8 @@ import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { APIS } from '@/app/constants/api.constant';
 import { useRouter } from 'next/navigation';  // Import the useRouter hook
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 
 const customTheme = createTheme({
     palette: {
@@ -34,6 +36,8 @@ const customTheme = createTheme({
         borderRadius: 20,
     },
 });
+
+
 
 function getStyles(name: string, selectedCategories: string[], theme: any) {
     return {
@@ -54,8 +58,12 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     const [loading, setLoading] = useState(false);
     const router = useRouter(); // Initialize the useRouter hook
 
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
     const formik = useFormik({
         initialValues: {
+            userId: userDetails._id,
             categories: [] as string[],
             subcategories: [] as string[],
         },
@@ -66,6 +74,8 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
 
             // Send data to MongoDB using Axios
             try {
+                console.log('userDetails._id from 3rd', userDetails._id);
+
                 const response = await axios.post(APIS.FORM3, values);
                 console.log('API response:', response.data); // Handle successful response
                 router.push('/dashboard'); // Redirect to the dashboard page
