@@ -62,9 +62,5 @@ export class UpdateJobsDto {
 
   @IsNotEmpty()
   @IsString()
-  userId: string;
-
-  @IsNotEmpty()
-  @IsString()
   Budget?: number;
 }
