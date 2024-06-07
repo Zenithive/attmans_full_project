@@ -18,28 +18,106 @@ export class ProfileService {
     private readonly usersService: UsersService,
   ) {}
 
-  async createForm1(
-    PersonalProfile: PersonalProfile,
+  // async createForm1(
+  //   PersonalProfile: PersonalProfile,
+  // ): Promise<PersonalProfile> {
+  //   const createdProfile = new this.profileModel(PersonalProfile);
+  //   return createdProfile.save();
+  // }
+
+  async createOrUpdateForm1(
+    personalProfile: PersonalProfile,
   ): Promise<PersonalProfile> {
-    const createdProfile = new this.profileModel(PersonalProfile);
-    return createdProfile.save();
+    const existingProfile = await this.profileModel.findOne({
+      username: personalProfile.username,
+    });
+    if (existingProfile) {
+      // Update the existing profile
+      Object.assign(existingProfile, personalProfile);
+      return existingProfile.save();
+    } else {
+      // Create a new profile
+      const createdProfile = new this.profileModel(personalProfile);
+      return createdProfile.save();
+    }
   }
 
-  async createForm2(WorkExprience: WorkExprience): Promise<WorkExprience> {
-    console.log('workExprience', WorkExprience);
-    const createdProfile = new this.workExprience(WorkExprience);
-    const Profiled = createdProfile.save();
-    await this.usersService.updateUserTypes(
-      WorkExprience.username,
-      WorkExprience.userType,
-    );
-    return Profiled;
+  // async createForm2(WorkExprience: WorkExprience): Promise<WorkExprience> {
+  //   console.log('workExprience', WorkExprience);
+  //   const createdProfile = new this.workExprience(WorkExprience);
+  //   const Profiled = createdProfile.save();
+  //   await this.usersService.updateUserTypes(
+  //     WorkExprience.username,
+  //     WorkExprience.userType,
+  //   );
+  //   return Profiled;
+  // }
+
+  async createOrUpdateForm2(
+    workExprience: WorkExprience,
+  ): Promise<WorkExprience> {
+    console.log('workExprience', workExprience);
+    const existingProfile = await this.workExprience.findOne({
+      username: workExprience.username,
+    });
+    if (existingProfile) {
+      // Update the existing profile
+      Object.assign(existingProfile, workExprience);
+      const updatedProfile = await existingProfile.save();
+      await this.usersService.updateUserTypes(
+        workExprience.username,
+        workExprience.userType,
+      );
+      return updatedProfile;
+    } else {
+      // Create a new profile
+      const createdProfile = new this.workExprience(workExprience);
+      const Profiled = await createdProfile.save();
+      await this.usersService.updateUserTypes(
+        workExprience.username,
+        workExprience.userType,
+      );
+      return Profiled;
+    }
   }
 
-  async createForm3(Categories: Categories): Promise<Categories> {
-    const createdProfile = new this.categories(Categories);
-    await this.usersService.updateProfileCompletionStatus(Categories.username);
-    return createdProfile.save();
+  // async createForm3(Categories: Categories): Promise<Categories> {
+  //   const createdProfile = new this.categories(Categories);
+  //   await this.usersService.updateProfileCompletionStatus(Categories.username);
+  //   return createdProfile.save();
+  // }
+
+  // async updateUserType(username: string, userType: string): Promise<void> {
+  //   await this.usersService.updateUserTypes(username, userType);
+  // }
+
+  //   private async checkAndUpdateProfileCompletion(
+  //     username: string,
+  //   ): Promise<void> {
+  //     await this.usersService.updateProfileCompletionStatus(username);
+  //   }
+  // }
+
+  async createOrUpdateForm3(categories: Categories): Promise<Categories> {
+    const existingProfile = await this.categories.findOne({
+      username: categories.username,
+    });
+    if (existingProfile) {
+      // Update the existing profile
+      Object.assign(existingProfile, categories);
+      const updatedProfile = await existingProfile.save();
+      await this.usersService.updateProfileCompletionStatus(
+        categories.username,
+      );
+      return updatedProfile;
+    } else {
+      // Create a new profile
+      const createdProfile = new this.categories(categories);
+      await this.usersService.updateProfileCompletionStatus(
+        categories.username,
+      );
+      return createdProfile.save();
+    }
   }
 
   async updateUserType(username: string, userType: string): Promise<void> {

@@ -16,6 +16,7 @@ import {
     Checkbox,
     ListItemText,
     SelectChangeEvent,
+    CircularProgress,
 } from '@mui/material';
 import { useFormik } from 'formik';
 import { categories, subcategories } from '@/app/constants/categories';
@@ -210,6 +211,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                             variant="contained"
                             size="small"
                             loading={loading}
+                            loadingIndicator={<CircularProgress size={24} />}
                         >
                             Save
                         </LoadingButton>

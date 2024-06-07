@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -64,7 +64,7 @@ export class User {
 
   @Prop()
   userType?: string;
-  _id: Types.ObjectId;
+  _id: string;
 
   @Prop({ default: false })
   isAllProfileCompleted: boolean;

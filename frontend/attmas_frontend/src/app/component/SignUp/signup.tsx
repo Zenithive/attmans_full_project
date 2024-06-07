@@ -5,7 +5,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,9 +15,9 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface SignUpProps {
-  toggleForm: CallableFunction;
 }
 
 function Copyright(props: any) {
@@ -35,7 +34,7 @@ function Copyright(props: any) {
 }
 
 
-export const SignUp = ({ toggleForm }:SignUpProps) => {
+export const SignUp = () => {
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -60,7 +59,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
           username: values.email,
           password: values.password,
           mobileNumber: values.mobileNumber,
-          userType: "",
+          userType: "non",
           isAllProfileCompleted: false // Add the flag here
         });
         setStatus({ success: 'Successfully signed up!' });
@@ -97,7 +96,6 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
                   fullWidth
                   id="firstName"
                   label="First Name"
-                  autoFocus
                   value={formik.values.firstName}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -201,7 +199,7 @@ export const SignUp = ({ toggleForm }:SignUpProps) => {
             )}
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" color='secondary' onClick={()=>toggleForm()}>
+                <Link href="./" color='secondary'>
                   Already have an account? Sign in
                 </Link>
               </Grid>
