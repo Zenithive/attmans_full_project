@@ -27,6 +27,10 @@ export class CreateExhibitionDto {
 
   @IsNotEmpty()
   @IsString()
+  userId: string;
+
+  @IsNotEmpty()
+  @IsString()
   videoUrl: string;
 }
 
