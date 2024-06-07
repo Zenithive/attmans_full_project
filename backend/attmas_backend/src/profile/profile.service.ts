@@ -49,6 +49,6 @@ export class ProfileService {
   private async checkAndUpdateProfileCompletion(
     username: string,
   ): Promise<void> {
-    await this.usersService.updateProfileCompletionStatus(username, true);
+    await this.usersService.updateProfileCompletionStatus(username);
   }
 }
