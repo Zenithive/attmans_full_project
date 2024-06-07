@@ -9,7 +9,8 @@ import {
     MenuItem,
     TextField,
     Typography,
-    FormHelperText
+    FormHelperText,
+    CircularProgress
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -346,6 +347,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                         type="submit"
                         variant="contained"
                         size="small"
+                        loading={loading}
+                        loadingIndicator={<CircularProgress size={24} />}
                         sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
                     >
                         Save & Next

@@ -14,7 +14,6 @@ import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-// import { UpdateUserTypeDto } from 'src/users/update-user-type.dto';
 
 @Controller('profile')
 export class ProfileController {
@@ -42,18 +41,18 @@ export class ProfileController {
     if (profilePhoto) {
       profileData.profilePhoto = join('profilePhoto', profilePhoto.filename); // Assuming you have a field for the filename
     }
-    return this.profileService.createForm1(profileData);
+    return this.profileService.createOrUpdateForm1(profileData);
   }
 
   @Post('form2')
   async createForm2(
     @Body() WorkExprience: WorkExprience,
   ): Promise<WorkExprience> {
-    return this.profileService.createForm2(WorkExprience);
+    return this.profileService.createOrUpdateForm2(WorkExprience);
   }
 
   @Post('form3')
   async createForm3(@Body() Categories: Categories): Promise<Categories> {
-    return this.profileService.createForm3(Categories);
+    return this.profileService.createOrUpdateForm3(Categories);
   }
 }

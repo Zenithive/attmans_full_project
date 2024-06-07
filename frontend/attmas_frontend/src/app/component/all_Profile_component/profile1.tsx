@@ -4,6 +4,7 @@ import {
     Avatar,
     Box,
     Button,
+    CircularProgress,
     Container,
     CssBaseline,
     Grid,
@@ -18,9 +19,8 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { APIS } from '@/app/constants/api.constant';
-import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 
 
 interface ProfileForm1Props {
@@ -45,6 +45,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             country: '',
             linkedIn: '',
             billingAddress: '',
+            username: userDetails.username,
         },
         validationSchema: Yup.object({
             gender: Yup.string().required('Required'),
@@ -59,16 +60,21 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
 
 
 
+
+
+
+
         onSubmit: async (values) => {
             setLoading(true);
             try {
+
                 const formData = new FormData();
                 formData.append('profilePhoto', profilePhoto as Blob);
                 Object.keys(values).forEach(key => {
                     formData.append(key, (values as any)[key]);
                 });
                 console.log("userDetails._id from 1st", userDetails._id);
-                
+
 
                 formData.append('userId', userDetails._id)
 
@@ -78,8 +84,11 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                     },
                 });
                 onNext(); // Call onNext when the form is submitted
+
             } catch (error) {
                 console.error('Error submitting form:', error);
+            } finally {
+                setLoading(false);
             }
         },
     });
@@ -294,20 +303,24 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                         </Grid>
                     </Grid>
 
-                    {/* <Button */}
                     <LoadingButton
                         type="submit"
                         variant="contained"
                         size='small'
+                        loading={loading}
+                        loadingIndicator={<CircularProgress size={24} />}
                         sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }} // Adjust padding as needed
                     >
                         Save & Next
-                        {/* </Button> */}
                     </LoadingButton>
                 </Box>
             </Box>
-        </Container>
+
+
+
+        </Container >
     );
-};
+}
+    ;
 
 export default ProfileForm1;

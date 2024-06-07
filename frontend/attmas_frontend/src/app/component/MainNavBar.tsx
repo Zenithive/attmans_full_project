@@ -5,29 +5,34 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import { useContext } from 'react';
-import { useAppSelector } from '../reducers/hooks.redux';
-import { UserSchema,selectUserSession } from '../reducers/userReducer';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 
+function clearCookies() {
+  const cookies = document.cookie.split(";");
+
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i];
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+  }
+}
 
 export default function MainNavBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
-    const router = useRouter();
+  const router = useRouter();
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -49,18 +54,21 @@ export default function MainNavBar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const logOutHandle = async () => {
+  const handleLogout = async () => {
     try {
-      const response = await axios.post(APIS.LOGOUT, {}, {
-       withCredentials:true
-      });
+      // Notify the server of the logout (if applicable)
+      // await axios.post(APIS.LOGOUT);
 
-      if (response.status === 200) {
-        document.cookie = 'access_token=';
-        router.push('/login');
-      }
+      // Clear local storage
+      localStorage.clear();
+
+      // Clear cookies
+      clearCookies();
+
+      // Redirect to homepage
+      router.push('/');
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error("Error during logout:", error);
     }
   };
 
@@ -82,11 +90,11 @@ export default function MainNavBar() {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>
-      Signed in as <br/>
-      {/* {userDetails.username} */}
-       </MenuItem>
+        Signed in as <br />
+        {/* {userDetails.username} */}
+      </MenuItem>
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={logOutHandle}>Log out</MenuItem>
+      <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   );
 
@@ -134,7 +142,6 @@ export default function MainNavBar() {
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
           color="inherit"
-
         >
           <AccountCircle />
         </IconButton>
@@ -147,10 +154,8 @@ export default function MainNavBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)' }}>
         <Toolbar>
-
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-
             <IconButton
               size="large"
               edge="end"

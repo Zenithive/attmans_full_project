@@ -16,6 +16,78 @@ export const categories: string[] = [
 
 export const subcategories: { [key: string]: string[] } = {
 
+    "Electronics": [
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+        "Electronics",
+
+    ],
+    "Textiles": [
+
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+        "Textiles",
+
+    ],
+    'Environmental and waste management': [
+        // Add fields here
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+        "Environmental and waste",
+    ],
+    'Mining and metals': [
+        // Add fields here
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+        "Mining",
+    ],
+
+
+    'Real estate and construction': [
+        // Add fields here
+        "Real estate",
+        "Real estate",
+        "Real estate",
+        "Real estate",
+        "Real estate",
+        "Real estate",
+        "Real estate",
+        "Real estate",
+    ],
+
     "Chemicals": [
         "Chemical Reagent Development",
         "Dewatering & Drying Technology",
@@ -110,6 +182,8 @@ export const subcategories: { [key: string]: string[] } = {
         "Adhesion Technology",
         "Applied Chemistry",
     ],
+
+    
 
 
     "Agriculture": [
@@ -284,9 +358,7 @@ export const subcategories: { [key: string]: string[] } = {
     ],
 
 
-    'Environmental and waste management': [
-        // Add fields here
-    ],
+    
 
 
     'Food and beverage': [
@@ -416,14 +488,7 @@ export const subcategories: { [key: string]: string[] } = {
     ],
 
 
-    'Mining and metals': [
-        // Add fields here
-    ],
-
-
-    'Real estate and construction': [
-        // Add fields here
-    ],
+    
 
 
     'Sustainability science': [
