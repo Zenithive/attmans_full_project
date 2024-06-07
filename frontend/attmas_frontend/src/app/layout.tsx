@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Layout from "./component/Layout/layout";
 import { config } from "@/middleware";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -24,10 +24,10 @@ const theme = createTheme({
   shape: {
     borderRadius: 20,
   },
-  
+
   components: {
     MuiListItemButton: {
-      styleOverrides:{
+      styleOverrides: {
         root: {
           color: '#616161',
           '&.Mui-selected': {
@@ -43,9 +43,6 @@ const theme = createTheme({
           ':hover': {
             color: 'white',
             backgroundColor: '#616161',
-          },
-          secondary: {
-            main: "#616161",
           }
         },
       }
@@ -53,13 +50,9 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& label.Mui-focused': {
-            color: '#616161',
-          },
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderRadius: 20,
-
             },
           },
         },
@@ -73,41 +66,29 @@ const theme = createTheme({
         },
       },
     },
-    MuiSelect: {
-      styleOverrides: {
-        root: {
-          '& label.Mui-focused': {
-            color: '#616161',
-          },
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderRadius: 20,
-            },
-          },
-        },
-      },
-    },
-    
   },
 });
-
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   const pathName = usePathname();
   const isValidPage = config.matcher.includes(pathName);
+  const isProfilePage = pathName === '/profile'; // Adjust this according to your profile page route
 
   return (
     <html lang="en">
       <body className={inter.className} style={{ width: '100%', height: "100%" }}>
         <ThemeProvider theme={theme}>
-         <Provider store={store}>
-          {isValidPage ? <Layout>{children}</Layout> : children}
-        </Provider>
+          <Provider store={store}>
+          {isValidPage ? (
+            <Layout displayMainSideBar={!isProfilePage}>{children}</Layout>
+          ) : (
+            children
+          )}
+          </Provider>
         </ThemeProvider>
       </body>
     </html>

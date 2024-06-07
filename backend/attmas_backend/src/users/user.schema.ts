@@ -5,6 +5,9 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
+  save(): User | PromiseLike<User> {
+    throw new Error('Method not implemented.');
+  }
   @Prop({ required: true })
   firstName: string;
 
@@ -61,8 +64,10 @@ export class User {
 
   @Prop()
   userType?: string;
-
   _id: Types.ObjectId;
+
+  @Prop({ default: false })
+  isAllProfileCompleted: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -41,9 +41,9 @@ function Copyright(props: any) {
 
 export const SignIn = ({ toggleForm }:SignInProps) => {
   const router = useRouter();
-  // const dispatch = useAppDispatch();
-
   const dispatch = useAppDispatch();
+
+  // const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -74,7 +74,7 @@ export const SignIn = ({ toggleForm }:SignInProps) => {
         dispatch(addUser(user))
         document.cookie  = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        router.push("/dashboard");
+        router.push("/profile");
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }

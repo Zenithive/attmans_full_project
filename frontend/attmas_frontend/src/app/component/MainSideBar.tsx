@@ -1,5 +1,4 @@
 "use client"
-
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -74,11 +73,10 @@ export default function MainSideBar() {
 
   ];
 
-
   return (
-    <Box  component="nav"
-    sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-    aria-label="mailbox folders">
+    <Box component="nav"
+      sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+      aria-label="mailbox folders">
       <Drawer
         sx={{
           flexShrink: 0,
@@ -96,19 +94,20 @@ export default function MainSideBar() {
           <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} />
         </Toolbar>
         <Divider />
-        <List>
-          {SIDEBAR_LIST_NAVS.map((navItem, index)=>(
-            <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
-              <ListItemButton selected={pathName === navItem.path } sx={{borderRadius: 3}}>
-                <ListItemIcon sx={{ minWidth: 40,}}>
-                  {navItem.icon()}
-                </ListItemIcon>
-                <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          
-        </List>
+        {pathName !== '/profile' && (
+          <List>
+            {SIDEBAR_LIST_NAVS.map((navItem, index) => (
+              <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
+                <ListItemButton selected={pathName === navItem.path} sx={{ borderRadius: 3 }}>
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    {navItem.icon()}
+                  </ListItemIcon>
+                  <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Drawer>
     </Box>
   );
