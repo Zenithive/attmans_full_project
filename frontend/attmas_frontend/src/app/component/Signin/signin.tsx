@@ -58,12 +58,6 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
         console.log("response.data.access_token", response.data.access_token);
         console.log("response", response.data.user);
-        console.log("response.ds", response.data.user._doc.isAllProfileCompleted
-        )
-        console.log("response.usertype", response.data.user._doc.userType
-        )
-
-
 
         const res = response.data.user;
         const user = {
@@ -79,8 +73,8 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
         dispatch(addUser(user))
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        if (response.data.user._doc.isAllProfileCompleted ||
-          ["innoveters", "freelancer", "business"].includes(response.data.user._doc.userType)) {
+        if (response.data.user.isAllProfileCompleted ||
+          ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
           router.push("/dashboard");
         }
         else {
