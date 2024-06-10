@@ -61,7 +61,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productDescription: '',
             productType: '',
             productPrice: '',
-            userId: userDetails._id,
+            // userId: userDetails._id,
             username: userDetails.username,
         },
 
@@ -72,7 +72,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             setLoading(true);
 
             try {
-                console.log('userDetails._id from 2nd', userDetails._id);
+                // console.log('userDetails._id from 2nd', userDetails._id);
 
                 const response = await axios.post(APIS.FORM2, values);
                 console.log('Profile data saved:', response.data);

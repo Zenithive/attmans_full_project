@@ -37,7 +37,6 @@ interface Jobs {
   }
   
   interface AddJobsProps {
-    onAddJobs: (jobs: Jobs) => void;
     editingJobs?: Jobs | null;
     onCancelEdit?: () => void;
   }
@@ -53,7 +52,7 @@ const validationSchema = Yup.object().shape({
     Subcategory: Yup.array().of(Yup.string())
 });
 
-export const AddJobs = ({ onAddJobs, editingJobs, onCancelEdit }:AddJobsProps) => {
+export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
     const [open, toggleDrawer] = React.useState(false);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -65,7 +64,9 @@ export const AddJobs = ({ onAddJobs, editingJobs, onCancelEdit }:AddJobsProps) =
         Budget: 0,
         TimeFrame: null as Dayjs | null,
         categoryforCategory: [],
-        Subcategory: []
+        Subcategory: [],
+        // username: userDetails.username
+
     };
 
     React.useEffect(() => {
@@ -238,7 +239,7 @@ export const AddJobs = ({ onAddJobs, editingJobs, onCancelEdit }:AddJobsProps) =
             Budget:values.Budget,
             Category: values.categoryforCategory,
             Subcategorys: values.Subcategory,
-            userId:userDetails._id
+            username:userDetails.username
         };
 
         try {
@@ -247,7 +248,7 @@ export const AddJobs = ({ onAddJobs, editingJobs, onCancelEdit }:AddJobsProps) =
                 pubsub.publish('JobUpdated', { message: 'Jobs updated' });
             } else {
                 const response = await axios.post(APIS.JOBS, jobsData);
-                onAddJobs(response.data);
+                //onAddJobs(response.data);
                 pubsub.publish('JobCreated', { message: 'A new Job Created' });
             }
             resetForm();

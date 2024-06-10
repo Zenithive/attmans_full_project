@@ -29,7 +29,7 @@ interface Exhibition {
   }
   
   interface AddExhibitionProps {
-    onAddExhibition: (exhibition: Exhibition) => void;
+    // onAddExhibition: (exhibition: Exhibition) => void;
     editingExhibition?: Exhibition | null;
     onCancelEdit?: () => void;
   }
@@ -45,7 +45,7 @@ const validationSchema = Yup.object().shape({
     subject: Yup.array().of(Yup.string())
 });
 
-export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit }:AddExhibitionProps) => {
+export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
     
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -229,7 +229,8 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
             videoUrl:values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
-            userId:userDetails._id
+            // userId:userDetails._id
+            userId:userDetails.username
         };
 
         try {
@@ -238,7 +239,7 @@ export const AddExhibition = ({ onAddExhibition, editingExhibition, onCancelEdit
                 pubsub.publish('ExhibitionUpdated', { message: 'Exhibition updated' });
             } else {
                 const response = await axios.post(APIS.EXHIBITION, exhibitionData);
-                onAddExhibition(response.data);
+                // onAddExhibition(response.data);
                 pubsub.publish('ExhibitionCreated', { message: 'A new exhibition Created' });
             }
             resetForm();

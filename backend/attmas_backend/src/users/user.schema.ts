@@ -64,7 +64,7 @@ export class User {
 
   @Prop()
   userType?: string;
-  _id: string;
+  // _id: string;
 
   @Prop({ default: false })
   isAllProfileCompleted: boolean;

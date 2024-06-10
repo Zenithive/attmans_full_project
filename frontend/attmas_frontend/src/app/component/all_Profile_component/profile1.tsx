@@ -73,10 +73,10 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                 Object.keys(values).forEach(key => {
                     formData.append(key, (values as any)[key]);
                 });
-                console.log("userDetails._id from 1st", userDetails._id);
+                // console.log("userDetails._id from 1st", userDetails._id);
 
 
-                formData.append('userId', userDetails._id)
+                // formData.append('userId', userDetails._id)
 
                 await axios.post(APIS.FORM1, formData, {
                     headers: {
