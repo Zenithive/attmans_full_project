@@ -129,4 +129,19 @@ export class ProfileService {
   ): Promise<void> {
     await this.usersService.updateProfileCompletionStatus(username);
   }
+
+  async getProfileCompletionStatus(
+    username: string,
+  ): Promise<{ profileCompleted: number }> {
+    const form1 = await this.profileModel.findOne({ username });
+    if (!form1) return { profileCompleted: 1 };
+
+    const form2 = await this.workExprience.findOne({ username });
+    if (!form2) return { profileCompleted: 2 };
+
+    const form3 = await this.categories.findOne({ username });
+    if (!form3) return { profileCompleted: 3 };
+
+    return { profileCompleted: 4 }; // Assume 4 means all steps completed
+  }
 }

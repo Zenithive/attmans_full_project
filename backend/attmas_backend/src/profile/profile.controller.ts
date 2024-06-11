@@ -2,8 +2,10 @@
 import {
   Body,
   Controller,
+  Get,
   // Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -54,5 +56,10 @@ export class ProfileController {
   @Post('form3')
   async createForm3(@Body() Categories: Categories): Promise<Categories> {
     return this.profileService.createOrUpdateForm3(Categories);
+  }
+
+  @Get('check')
+  async checkProfileCompletion(@Query('username') username: string): Promise<{ profileCompleted: number }> {
+    return this.profileService.getProfileCompletionStatus(username);
   }
 }

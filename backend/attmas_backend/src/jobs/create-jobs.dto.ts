@@ -2,36 +2,36 @@ import { IsNotEmpty, IsString } from 'class-validator';
 // import { Types } from 'mongoose';
 
 export class CreateJobsDto {
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   title: string;
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   description: string;
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   Expertiselevel: string;
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   Category: string[];
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   Subcategorys: string[];
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   TimeFrame: Date;
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   username: string;
 
-  // @IsNotEmpty()
-  // @IsString()
+  @IsNotEmpty()
+  @IsString()
   Budget: number;
 }
 

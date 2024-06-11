@@ -9,4 +9,5 @@ export const APIS = {
     FORM3:`${SERVER_URL}/profile/form3`,
     EXHIBITION:`${SERVER_URL}/exhibitions`,
     JOBS:`${SERVER_URL}/jobs`,
+    CHECK_PROFILE:`${SERVER_URL}/profile/check`
 }
