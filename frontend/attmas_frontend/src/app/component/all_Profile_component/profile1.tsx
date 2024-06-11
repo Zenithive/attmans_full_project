@@ -47,7 +47,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             billingAddress: '',
             username: userDetails.username,
         },
-        validationSchema: Yup.object({
+        validationSchema: Yup.object({      
             gender: Yup.string().required('Required'),
             address: Yup.string().required('Required'),
             city: Yup.string().required('Required'),
@@ -55,7 +55,8 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
             pinCode: Yup.string().required('Required'),
             country: Yup.string().required('Required'),
             linkedIn: Yup.string().url('Invalid URL').required('Required'),
-            billingAddress: Yup.string(),
+            billingAddress: Yup.string().required('Required'),
+            // profilePhoto: Yup.mixed().required('Profile photo is required'),
         }),
 
 
@@ -65,6 +66,10 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
 
 
         onSubmit: async (values) => {
+            if (!profilePhoto) {
+                alert('Profile photo is required');
+                return;
+            }
             setLoading(true);
             try {
 
@@ -131,11 +136,11 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                         }}
                     />
                     <label htmlFor="profile-photo">
-                        <IconButton component="span" sx={{ width: 50, height: 50, mb: 2 }}>
+                        <IconButton component="span" sx={{ width: 100, height: 100, mb: 2 }}>
                             <Avatar
                                 alt="Profile Photo"
                                 src={profilePhotoURL || '/default-profile.png'}
-                                sx={{ width: 50, height: 50, mb: 2, mx: 'auto' }}
+                                sx={{ width: 100, height: 100, mb: 2, mx: 'auto' }}
                             />
                             <CameraAltIcon
                                 sx={{

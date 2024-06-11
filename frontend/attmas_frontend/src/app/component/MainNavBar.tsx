@@ -13,8 +13,6 @@ import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { APIS } from '../constants/api.constant';
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -152,8 +150,20 @@ export default function MainNavBar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)' }}>
-        <Toolbar>
+      {/* <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', boxShadow:'none' }}> */}
+      <AppBar 
+        position="fixed" 
+        sx={{ 
+          right: 0, 
+          left: 'auto', 
+          width: 'calc(100% - 240px)', 
+          boxShadow: 'none', 
+          // borderBottomLeftRadius: '16px', 
+          // borderBottomRightRadius: '16px',
+          // backgroundColor: 'darkgrey'
+        }}
+      >
+        <Toolbar sx={{ height: 70 }}>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton

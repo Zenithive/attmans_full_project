@@ -10,7 +10,9 @@ import {
     TextField,
     Typography,
     FormHelperText,
-    CircularProgress
+    CircularProgress,
+    FormControlLabel,
+    Checkbox
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -19,7 +21,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { APIS } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-
 
 interface ProfileForm2Props {
     onNext: () => void;
@@ -33,7 +34,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-
     const validationSchema = Yup.object({
         qualification: Yup.string().required('Qualification is required'),
         organization: Yup.string().nullable(),
@@ -46,6 +46,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         productDescription: Yup.string().nullable(),
         productType: Yup.string().nullable(),
         productPrice: Yup.string().nullable(),
+        hasPatent: Yup.boolean().nullable(),
+        currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'), // Validation for currency
     });
 
     const formik = useFormik({
@@ -62,18 +64,15 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productType: '',
             productPrice: '',
             // userId: userDetails._id,
+            hasPatent: false,
             username: userDetails.username,
+            currency: 'INR', // Default to INR
         },
-
-
-
         validationSchema,
         onSubmit: async (values) => {
             setLoading(true);
 
             try {
-                // console.log('userDetails._id from 2nd', userDetails._id);
-
                 const response = await axios.post(APIS.FORM2, values);
                 console.log('Profile data saved:', response.data);
                 onNext();
@@ -86,8 +85,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     });
 
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        const value = event.target.value as string;
         formik.handleChange(event);
-        if (event.target.value === 'Freelancer') {
+        if (value === 'Freelancer') {
             setIsFreelancer(true);
         } else {
             setIsFreelancer(false);
@@ -144,11 +144,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             </TextField>
                         </Grid>
 
-
-
-
-
-
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
@@ -198,7 +193,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={3} // Adjust the number of rows as needed
+                                rows={3}
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="workAddress"
                                 label="Work Address (If any)"
@@ -215,13 +210,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 }}
                                 inputProps={{
                                     style: {
-                                        padding: '10px', // Adjust the padding as needed
+                                        padding: '10px',
                                     },
                                 }}
                             />
                         </Grid>
-
-
 
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -237,7 +230,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 error={formik.touched.userType && Boolean(formik.errors.userType)}
                             >
                                 <MenuItem value="Freelancer">Freelancer</MenuItem>
-                                <MenuItem value="Business">Business</MenuItem>
+                                <MenuItem value="Business">Project Owner</MenuItem>
                                 <MenuItem value="Innovators">Innovators</MenuItem>
                             </TextField>
                             {formik.touched.userType && formik.errors.userType && (
@@ -245,7 +238,23 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             )}
                         </Grid>
 
-                        {formik.values.userType === 'Freelancer' && (
+                        {isFreelancer && (
+                            <Grid item xs={12} sm={6}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={formik.values.hasPatent}
+                                            onChange={formik.handleChange}
+                                            name="hasPatent"
+                                            color="primary"
+                                        />
+                                    }
+                                    label="I have a patent"
+                                />
+                            </Grid>
+                        )}
+
+                        {isFreelancer && (
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -315,6 +324,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         helperText={formik.touched.productType && formik.errors.productType}
                                     />
                                 </Grid>
+
+
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
@@ -327,8 +338,24 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         value={formik.values.productPrice}
                                         error={formik.touched.productPrice && Boolean(formik.errors.productPrice)}
                                         helperText={formik.touched.productPrice && formik.errors.productPrice}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <TextField
+                                                    select
+                                                    value={formik.values.currency || 'INR'}
+                                                    onChange={formik.handleChange}
+                                                    name="currency"
+                                                    id="currency"
+                                                    style={{ width: '60px', marginRight: '10px' }}
+                                                >
+                                                    <MenuItem value="INR">₹</MenuItem>
+                                                    <MenuItem value="USD">$</MenuItem>
+                                                </TextField>
+                                            ),
+                                        }}
                                     />
                                 </Grid>
+
                             </>
                         )}
                     </Grid>

@@ -41,6 +41,12 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   username: string;
+
+  @Prop({ required: false })
+  hasPatent: boolean;
+
+  @Prop({ required: false })
+  currency: string; // Added currency field
 }
 
 export const WorkSchema = SchemaFactory.createForClass(WorkExprience);

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { PersonalProfile } from './schemas/personalProfile.schema';
-import { WorkExprience } from './schemas/work.exprience.shema';
+import { WorkExprience } from './schemas/work.exprience.schema';
 import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';

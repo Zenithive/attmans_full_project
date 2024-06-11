@@ -23,6 +23,7 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { categories, subcategories } from '@/app/constants/categories';
 
 
 interface Jobs {

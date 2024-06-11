@@ -8,8 +8,14 @@ const steps = [
   { label: 'Category', icon: <Flag /> },
 ];
 
-const CustomStepIcon = (props:any) => {
-  const { active, completed, icon } = props;
+interface CustomStepIconProps {
+  active: boolean;
+  completed: boolean;
+  icon: React.ReactNode;
+}
+
+const CustomStepIcon: React.FC<CustomStepIconProps> = ({ active, completed, icon }) => {
+  const iconColor = completed ? '#aaffaa' : '#ccc'; // Green for completed, grey for others
 
   return (
     <div
@@ -20,7 +26,7 @@ const CustomStepIcon = (props:any) => {
         width: 40,
         height: 40,
         borderRadius: '50%',
-        backgroundColor: active ? '#00aaff' : completed ? '#aaffaa' : '#ccc',
+        backgroundColor: iconColor,
         color: 'white',
       }}
     >
@@ -49,10 +55,11 @@ const HorizontalStepper: React.FC<HorizontalStepperProps> = ({ currentStep }) =>
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            color: '#000 !important',
           },
           '& .MuiStepConnector-line': {
             borderTopWidth: 2,
-            borderTopColor: '#00aaff',
+            borderTopColor: '#D3D3D3',
             marginTop: 1, // Adjust this value to move the connector line down
           },
         }}
@@ -66,7 +73,7 @@ const HorizontalStepper: React.FC<HorizontalStepperProps> = ({ currentStep }) =>
                 icon={step.icon}
               />
             )}>
-              <Typography variant="caption" color={currentStep - 1 === index ? 'primary' : 'textSecondary'}>
+              <Typography variant="caption" color={currentStep - 1 === index ? 'secondary' : 'textSecondary'}>
                 {step.label}
               </Typography>
             </StepLabel>

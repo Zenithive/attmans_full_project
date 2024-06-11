@@ -21,8 +21,17 @@ export class UsersService {
   }
 
   async findByUsername(username: string): Promise<User> {
-    const tmpData = await this.userModel.findOne({ username }).exec();
-    return tmpData;
+    const user = await this.userModel.findOne({ username }).exec();
+    return user;
+  }
+
+  async findUserWithJobsAndExhibitions(username: string): Promise<User> {
+    const user = await this.userModel
+      .findOne({ username })
+      .populate('jobs')
+      .populate('exhibitions')
+      .exec();
+    return user;
   }
 
   async updateUserTypes(username: string, userType: string): Promise<User> {

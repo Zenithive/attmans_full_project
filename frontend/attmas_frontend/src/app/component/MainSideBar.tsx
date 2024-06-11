@@ -91,9 +91,12 @@ export default function MainSideBar() {
         anchor="left"
       >
         <Toolbar>
-          <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} />
+          {/* <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} /> */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} />
+          </Box>
         </Toolbar>
-        <Divider />
+        {/* <Divider /> */}
         {pathName !== '/profile' && (
           <List>
             {SIDEBAR_LIST_NAVS.map((navItem, index) => (

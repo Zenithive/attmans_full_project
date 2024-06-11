@@ -12,7 +12,7 @@ export class Exhibition {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ nullable: true })
+  @Prop()
   status: string;
 
   @Prop({ type: [String], required: true })
@@ -27,7 +27,7 @@ export class Exhibition {
   @Prop({ default: Date.now })
   createdAt: Date;
 
-  @Prop({ required: true })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
   @Prop({

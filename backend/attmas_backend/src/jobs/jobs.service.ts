@@ -21,6 +21,10 @@ export class JobsService {
     return this.jobsModel.find().exec();
   }
 
+  async findJobWithUser(id: string): Promise<Jobs> {
+    return this.jobsModel.findById(id).populate('user').exec();
+  }
+
   async update(id: string, updateJobsDto: UpdateJobsDto): Promise<Jobs> {
     const existingJob = await this.jobsModel.findById({ _id: id });
     console.log('update existingJobs', existingJob);
