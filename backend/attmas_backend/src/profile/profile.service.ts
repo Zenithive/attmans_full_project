@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PersonalProfile } from './schemas/personalProfile.schema';
-import { WorkExprience } from './schemas/work.exprience.shema';
+import { WorkExprience } from './schemas/work.exprience.schema';
 import { Categories } from './schemas/category.schema';
 import { UsersService } from 'src/users/users.service';
 
@@ -128,5 +128,20 @@ export class ProfileService {
     username: string,
   ): Promise<void> {
     await this.usersService.updateProfileCompletionStatus(username);
+  }
+
+  async getProfileCompletionStatus(
+    username: string,
+  ): Promise<{ profileCompleted: number }> {
+    const form1 = await this.profileModel.findOne({ username });
+    if (!form1) return { profileCompleted: 1 };
+
+    const form2 = await this.workExprience.findOne({ username });
+    if (!form2) return { profileCompleted: 2 };
+
+    const form3 = await this.categories.findOne({ username });
+    if (!form3) return { profileCompleted: 3 };
+
+    return { profileCompleted: 4 }; // Assume 4 means all steps completed
   }
 }

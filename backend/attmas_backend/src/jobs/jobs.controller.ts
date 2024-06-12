@@ -13,7 +13,7 @@ import { CreateJobsDto, UpdateJobsDto } from './create-jobs.dto';
 import { Jobs } from './jobs.schema';
 
 @Controller('jobs')
-export class jobsController {
+export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Post()
@@ -24,6 +24,15 @@ export class jobsController {
   @Get()
   async findAll(): Promise<Jobs[]> {
     return this.jobsService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Jobs> {
+    const job = await this.jobsService.findJobWithUser(id);
+    if (!job) {
+      throw new NotFoundException(`Job with id ${id} not found`);
+    }
+    return job;
   }
 
   @Put(':id')

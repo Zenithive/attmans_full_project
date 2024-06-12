@@ -2,14 +2,16 @@
 import {
   Body,
   Controller,
+  Get,
   // Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { PersonalProfile } from './schemas/personalProfile.schema';
-import { WorkExprience } from './schemas/work.exprience.shema';
+import { WorkExprience } from './schemas/work.exprience.schema';
 import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -54,5 +56,10 @@ export class ProfileController {
   @Post('form3')
   async createForm3(@Body() Categories: Categories): Promise<Categories> {
     return this.profileService.createOrUpdateForm3(Categories);
+  }
+
+  @Get('check')
+  async checkProfileCompletion(@Query('username') username: string): Promise<{ profileCompleted: number }> {
+    return this.profileService.getProfileCompletionStatus(username);
   }
 }

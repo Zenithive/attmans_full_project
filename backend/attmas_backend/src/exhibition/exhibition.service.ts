@@ -24,6 +24,10 @@ export class ExhibitionService {
     return this.exhibitionModel.find().exec();
   }
 
+  async findExhibitionWithUser(id: string): Promise<Exhibition> {
+    return this.exhibitionModel.findById(id).populate('userId').exec();
+  }
+
   async update(
     id: string,
     updateExhibitionDto: UpdateExhibitionDto,
@@ -39,9 +43,7 @@ export class ExhibitionService {
 
   async delete(id: string): Promise<Exhibition> {
     const existingExhibitionDelete =
-      await this.exhibitionModel.findByIdAndDelete({
-        _id: id,
-      });
+      await this.exhibitionModel.findByIdAndDelete({ _id: id });
     console.log('deleye existingExhibition', existingExhibitionDelete);
     if (!existingExhibitionDelete) {
       throw new NotFoundException(`Exhibition with id ${id} not found`);

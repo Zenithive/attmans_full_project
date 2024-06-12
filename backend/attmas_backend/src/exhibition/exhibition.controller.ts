@@ -31,6 +31,15 @@ export class ExhibitionController {
     return this.exhibitionService.findAll();
   }
 
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Exhibition> {
+    const exhibition = await this.exhibitionService.findExhibitionWithUser(id);
+    if (!exhibition) {
+      throw new NotFoundException(`Exhibition with id ${id} not found`);
+    }
+    return exhibition;
+  }
+
   @Put(':id')
   async update(
     @Param('id') id: string,

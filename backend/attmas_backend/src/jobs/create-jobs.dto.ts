@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Types } from 'mongoose';
+// import { Types } from 'mongoose';
 
 export class CreateJobsDto {
   @IsNotEmpty()
@@ -28,7 +28,7 @@ export class CreateJobsDto {
 
   @IsNotEmpty()
   @IsString()
-  userId: Types.ObjectId;
+  username: string;
 
   @IsNotEmpty()
   @IsString()
