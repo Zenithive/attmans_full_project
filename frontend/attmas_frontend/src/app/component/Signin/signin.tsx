@@ -73,8 +73,8 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
         dispatch(addUser(user))
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        if (response.data.user._doc.isAllProfileCompleted ||
-          ["innoveters", "freelancer", "business"].includes(response.data.user._doc.userType)) {
+        if (response.data.user.isAllProfileCompleted ||
+          ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
           router.push("/dashboard");
         }
         else {
