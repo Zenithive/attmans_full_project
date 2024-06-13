@@ -43,6 +43,7 @@ import HorizontalStepper from '../component/all_Profile_component/upperLine';
 import { APIS } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import MainSideBar from '../component/MainSideBar';
 
 const Page: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number | null>(null);
@@ -76,6 +77,7 @@ const Page: React.FC = () => {
 
   return (
     <>
+    {/* <MainSideBar/> */}
       <HorizontalStepper currentStep={currentStep} />
       {currentStep === 1 && <Profile1 onNext={handleNext} />}
       {currentStep === 2 && <Profile2 onNext={handleNext} onPrevious={handlePrevious} />}

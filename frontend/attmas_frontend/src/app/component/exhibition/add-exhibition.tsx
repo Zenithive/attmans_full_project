@@ -26,6 +26,7 @@ interface Exhibition {
     dateTime: string;
     industries: string[];
     subjects: string[];
+    userId: string;
 }
 
 interface AddExhibitionProps {
@@ -57,7 +58,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         videoUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
-        subject: []
+        subject: [],
+        userId: userDetails._id 
     };
 
     React.useEffect(() => {
@@ -229,8 +231,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
             videoUrl: values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
-            // userId:userDetails._id
-            userId: userDetails.username
+            userId:userDetails._id
+            // userId: userDetails.username
         };
 
         try {
