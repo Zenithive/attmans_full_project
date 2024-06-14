@@ -240,7 +240,7 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
             Budget:values.Budget,
             Category: values.categoryforCategory,
             Subcategorys: values.Subcategory,
-            username:userDetails.username
+            userId:userDetails._id,
         };
 
         try {

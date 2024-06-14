@@ -1,7 +1,8 @@
-"use client"
+'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Button } from '@mui/material';
 import { AddJobs } from '../component/jobs/jobs';
+import { AddApply } from '../component/apply/apply';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
@@ -23,6 +24,7 @@ interface Job {
 const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
+    const [applyOpen, setApplyOpen] = useState(false);
 
     const fetchJobs = async () => {
         try {
@@ -67,10 +69,14 @@ const Jobs = () => {
         try {
             await axios.delete(`${APIS.JOBS}/${jobToDelete._id}`);
             setJobs(jobs.filter(job => job._id !== jobToDelete._id));
-            pubsub.publish('JobDeleted', {}); 
+            pubsub.publish('JobDeleted', {});
         } catch (error) {
             console.error('Error deleting job:', error);
         }
+    };
+
+    const handleApplyClick = () => {
+        setApplyOpen(true); 
     };
 
     return (
@@ -78,6 +84,22 @@ const Jobs = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
                 <AddJobs editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                <Button
+                    onClick={handleApplyClick}
+                    type="button"
+                    size="small"
+                    variant="contained"
+                    sx={{
+                        borderRadius: 3,
+                        backgroundColor: '#616161',
+                        color: 'white',
+                        '&:hover': {
+                            background: '#757575',
+                        },
+                    }}
+                >
+                    Apply
+                </Button>
             </Box>
             <Box sx={{ mt: 2 }}>
                 {jobs.map((job) => (
@@ -95,6 +117,7 @@ const Jobs = () => {
                             <Typography variant="body2">{job.description}</Typography>
                             <Typography variant="body2">{job.Budget}</Typography>
                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+                            <AddApply open={applyOpen} setOpen={setApplyOpen} /> 
                             <Typography sx={{ display: "flex", float: "right" }}>
                                 <IconButton onClick={() => handleEditJob(job)}>
                                     <EditIcon />

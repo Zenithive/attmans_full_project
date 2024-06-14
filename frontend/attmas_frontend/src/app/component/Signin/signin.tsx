@@ -63,18 +63,18 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
         const user = {
           token: response.data.access_token,
           username: values.email,
-          firstname: res.firstname,
-          lastname: res.lastname,
-          mobilenumber: res.mobilenumber,
-          // _id: res._id,
+          firstName: res.firstName,
+          lastName: res.lastName,
+          mobileNumber: res.mobileNumber,
+          _id: res._id,
         };
         console.log("user", user)
 
         dispatch(addUser(user))
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        if (response.data.user._doc.isAllProfileCompleted ||
-          ["innoveters", "freelancer", "business"].includes(response.data.user._doc.userType)) {
+        if (response.data.user.isAllProfileCompleted ||
+          ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
           router.push("/dashboard");
         }
         else {

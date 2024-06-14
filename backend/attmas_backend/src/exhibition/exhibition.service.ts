@@ -6,6 +6,7 @@ import {
   CreateExhibitionDto,
   UpdateExhibitionDto,
 } from './create-exhibition.dto';
+import { User, UserDocument } from 'src/users/user.schema';
 
 @Injectable()
 export class ExhibitionService {
@@ -13,19 +14,20 @@ export class ExhibitionService {
   constructor(
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async create(createExhibitionDto: CreateExhibitionDto): Promise<Exhibition> {
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
+
     return createdExhibition.save();
   }
 
   async findAll(): Promise<Exhibition[]> {
-    return this.exhibitionModel.find().exec();
-  }
-
-  async findExhibitionWithUser(id: string): Promise<Exhibition> {
-    return this.exhibitionModel.findById(id).populate('userId').exec();
+    return this.exhibitionModel
+      .find()
+      .populate('userId', 'firstName lastName username', this.userModel)
+      .exec();
   }
 
   async update(

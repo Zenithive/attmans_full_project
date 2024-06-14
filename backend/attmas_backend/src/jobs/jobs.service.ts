@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Jobs, JobsDocument } from './jobs.schema';
 import { CreateJobsDto, UpdateJobsDto } from './create-jobs.dto';
+import { User, UserDocument } from 'src/users/user.schema';
 
 @Injectable()
 export class JobsService {
@@ -10,6 +11,7 @@ export class JobsService {
   constructor(
     @InjectModel(Jobs.name)
     private jobsModel: Model<JobsDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
@@ -18,7 +20,10 @@ export class JobsService {
   }
 
   async findAll(): Promise<Jobs[]> {
-    return this.jobsModel.find().exec();
+    return this.jobsModel
+      .find()
+      .populate('userId', 'firstName lastName username', this.userModel)
+      .exec();
   }
 
   async findJobWithUser(id: string): Promise<Jobs> {

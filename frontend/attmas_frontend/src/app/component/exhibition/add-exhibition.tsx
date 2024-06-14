@@ -229,8 +229,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
             videoUrl:values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
-            // userId:userDetails._id
-            userId:userDetails.username
+            userId:userDetails._id
+            // userId:userDetails.username
         };
 
         try {

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
   Document,
+  Types,
   // Types
 } from 'mongoose';
 
@@ -29,11 +30,11 @@ export class Jobs {
   @Prop({ default: Date.now })
   createdAt: Date;
 
-  @Prop({ required: false })
-  username: string;
-
   @Prop({ required: true })
   Budget: number;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId: Types.ObjectId;
 
   // @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   // user: Types.ObjectId;
