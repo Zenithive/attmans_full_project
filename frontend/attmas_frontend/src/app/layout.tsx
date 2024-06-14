@@ -9,6 +9,8 @@ import { config } from "@/middleware";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { store } from "./reducers/store";
+import { BorderColor } from "@mui/icons-material";
+import { DateTimePicker } from "@mui/lab";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +34,7 @@ const theme = createTheme({
           color: '#616161',
           '&.Mui-selected': {
             color: 'white',
-            backgroundColor: '#616161',
+            backgroundColor:'#616161',
           },
           '&.Mui-selected .MuiListItemIcon-root': {
             color: 'white'
@@ -66,6 +68,18 @@ const theme = createTheme({
         },
       },
     },
+    // MuiDateTimePicker: {
+    //   styleOverrides: {
+    //     root: {
+    //       '& .MuiInput-root': {
+    //         borderRadius: 20,
+    //         '&:hover fieldset': {
+    //           borderColor: '#616161',
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
   },
 });
 

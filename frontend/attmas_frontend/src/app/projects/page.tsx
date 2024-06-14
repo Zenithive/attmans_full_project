@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Typography, Card, CardContent, IconButton, Button } from '@mui/material';
-import { AddJobs } from '../component/jobs/jobs';
 import { AddApply } from '../component/apply/apply';
+import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
@@ -83,7 +83,7 @@ const Jobs = () => {
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
-                <AddJobs editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
                 <Button
                     onClick={handleApplyClick}
                     type="button"
@@ -100,6 +100,8 @@ const Jobs = () => {
                 >
                     Apply
                 </Button>
+                <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
+                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
             </Box>
             <Box sx={{ mt: 2 }}>
                 {jobs.map((job) => (

@@ -161,9 +161,10 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 fullWidth
                                 multiline
                                 rows={6} // Adjust the number of rows as needed
-                                style={{ background: "white", borderRadius: "25px" }}
+                                style={{borderRadius: "25px" }}
                                 id="address"
                                 label="Address"
+                                color='secondary'
                                 name="address"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -189,6 +190,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="city"
                                 label="City"
+                                color='secondary'
                                 name="city"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -204,6 +206,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="state"
                                 label="State"
+                                color='secondary'
                                 name="state"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -219,6 +222,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="pinCode"
                                 label="Pin Code"
+                                color='secondary'
                                 name="pinCode"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -234,6 +238,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="country"
                                 label="Country"
+                                color='secondary'
                                 name="country"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -249,6 +254,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="linkedIn"
                                 label="LinkedIn"
+                                color='secondary'
                                 name="linkedIn"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -265,6 +271,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="gender"
                                 label="Gender"
+                                color='secondary'
                                 name="gender"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -288,6 +295,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="billingAddress"
                                 label="Billing Address"
+                                color='secondary'
                                 name="billingAddress"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}

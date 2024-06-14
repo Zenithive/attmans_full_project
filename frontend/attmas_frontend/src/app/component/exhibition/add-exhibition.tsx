@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import { CircularProgress, MenuItem } from '@mui/material';
-import { Button, Chip, Divider, Drawer, FormControl, InputLabel,Select, TextField, Autocomplete } from '@mui/material';
+import { Button, Chip, Divider, Drawer, FormControl, InputLabel, Select, TextField, Autocomplete } from '@mui/material';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -22,42 +22,44 @@ interface Exhibition {
     title: string;
     description: string;
     status: string;
-    videoUrl:string;
+    // videoUrl: string;
     dateTime: string;
     industries: string[];
     subjects: string[];
-  }
-  
-  interface AddExhibitionProps {
+    userId?: string;
+}
+
+interface AddExhibitionProps {
     // onAddExhibition: (exhibition: Exhibition) => void;
     editingExhibition?: Exhibition | null;
     onCancelEdit?: () => void;
-  }
-  
+}
+
 
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
     status: Yup.string(),
-    videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
+    // videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
 });
 
-export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionProps) => {
+export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
-    
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const initialValues = {
         title: '',
         description: '',
-        status:'',
-        videoUrl: '',
+        status: '',
+        // videoUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
-        subject: []
+        subject: [],
+        userId: userDetails._id 
     };
 
     React.useEffect(() => {
@@ -220,17 +222,17 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         label: item
     })));
 
-    const handleSubmit = async (values: { title: string; description: string; status:string;videoUrl:string,dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = async (values: { title: string; description: string; status: string; dateTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
             dateTime: values.dateTime ? values.dateTime.toISOString() : null,
-            status:values.status,
-            videoUrl:values.videoUrl,
+            status: values.status,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId:userDetails._id
             // userId:userDetails.username
+            // userId: userDetails.username
         };
 
         try {
@@ -271,8 +273,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                     initialValues={editingExhibition ? {
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
-                        status:editingExhibition.status || '',
-                        videoUrl:editingExhibition.videoUrl || "",
+                        status: editingExhibition.status || '',
+                        // videoUrl: editingExhibition.videoUrl || "",
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
@@ -282,9 +284,10 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                 >
                     {({ values, setFieldValue, handleChange, handleBlur, handleSubmit, isSubmitting, errors, touched }) => (
                         <Form onSubmit={handleSubmit}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2,position:"relative",left:"15px" }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: "relative", left: "15px" }}>
                                 <TextField
                                     label="Title"
+                                    color='secondary'
                                     name="title"
                                     variant="outlined"
                                     value={values.title}
@@ -296,6 +299,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                 />
                                 <TextField
                                     label="Description"
+                                    color='secondary'
                                     name="description"
                                     variant="outlined"
                                     value={values.description}
@@ -307,35 +311,25 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
-                                <TextField
-                                    fullWidth
-                                    name="videoUrl"
-                                    label="Video URL"
-                                    value={values.videoUrl}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={touched.videoUrl && Boolean(errors.videoUrl)}
-                                    helperText={touched.videoUrl && errors.videoUrl}
-                                    margin="normal"
-                                />
+                                
                                 {editingExhibition && (
-                                 <FormControl fullWidth>
-                                    <InputLabel id="status-label">Status</InputLabel>
-                                    <Select
-                                        labelId="status-label"
-                                        id="status"
-                                        name="status"
-                                        value={values.status}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        label="Status"
-                                    >
-                                        <MenuItem value="cancel">cancel </MenuItem>
-                                        <MenuItem value="open">open</MenuItem>
-                                        <MenuItem value="close">close</MenuItem>
-                                    </Select>
-                                </FormControl>
-                             )}
+                                    <FormControl fullWidth>
+                                        <InputLabel id="status-label">Status</InputLabel>
+                                        <Select
+                                            labelId="status-label"
+                                            id="status"
+                                            name="status"
+                                            value={values.status}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            label="Status"
+                                        >
+                                            <MenuItem value="cancel">cancel </MenuItem>
+                                            <MenuItem value="open">open</MenuItem>
+                                            <MenuItem value="close">close</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                )}
                                 <Autocomplete
                                     multiple
                                     options={industries}
@@ -359,14 +353,15 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                             {...params}
                                             variant="outlined"
                                             label="Preferred Industries"
+                                            color='secondary'
                                             placeholder="Select industries"
                                             error={!!(errors.categoryforIndustries && touched.categoryforIndustries)}
                                             helperText={
                                                 typeof errors.categoryforIndustries === 'string' && touched.categoryforIndustries
-                                                  ? errors.categoryforIndustries
-                                                  : undefined
-                                              }
-                                              
+                                                    ? errors.categoryforIndustries
+                                                    : undefined
+                                            }
+
                                         />
                                     )}
                                 />
@@ -382,6 +377,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                             {value.map((option, index) => (
                                                 <Chip
                                                     label={option.label}
+
                                                     {...getTagProps({ index })}
                                                     onDelete={() => setFieldValue('subject', values.subject.filter((sub: any) => sub !== option.label))}
                                                     key={option.label}
@@ -394,13 +390,14 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                             {...params}
                                             variant="outlined"
                                             label="Subject matter expertise"
+                                            color='secondary'
                                             placeholder="Select subjects"
                                             error={!!(errors.subject && touched.subject)}
                                             helperText={
                                                 typeof errors.subject === 'string' && touched.subject
-                                                  ? errors.subject
-                                                  : undefined
-                                              }
+                                                    ? errors.subject
+                                                    : undefined
+                                            }
                                         />
                                     )}
                                     renderGroup={(params) => (
@@ -410,13 +407,49 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                         </li>
                                     )}
                                 />
-                               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DateTimePicker
-                                    label="Date & Time"
-                                    value={values.dateTime}
-                                    onChange={(newValue) => setFieldValue('dateTime', newValue)}
-                                />
-                            </LocalizationProvider>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    {/* <Box color='secondary'> */}
+
+                                    
+
+                                    <DateTimePicker
+                                        label="Date & Time"
+                                        value={values.dateTime}
+                                        onChange={(newValue) => setFieldValue('dateTime', newValue)}
+                                        slotProps={{
+                                            textField: {
+                                                sx: {
+                                                    '& .MuiInputBase-root': {
+                                                        '&:hover': {
+                                                            '& fieldset': {
+                                                                borderColor: '#616161',
+                                                            },
+                                                        },
+                                                    },
+                                                    '& .Mui-focused .MuiInputBase-input': {
+                                                        borderColor: '#616161', // Ensure the border color is the same on focus
+                                                    },
+                                                    '& .MuiInputBase-input::placeholder': {
+                                                        color: '#616161',
+                                                    },
+                                                    '& .MuiInputLabel-root.Mui-focused': {
+                                                        color: '#616161', // Change label color to match border color on focus
+                                                    },
+                                                },
+                                                InputLabelProps: {
+                                                    sx: {
+                                                        color: '#616161', // Ensure the initial label color is black
+                                                        '&.Mui-focused': {
+                                                            color: '#616161', // Ensure the label color matches the border color on focus
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
+                                    />
+
+                                    {/* </Box> */}
+                                </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                                     <Button variant="contained" color='primary' onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
                                     <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>     {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>

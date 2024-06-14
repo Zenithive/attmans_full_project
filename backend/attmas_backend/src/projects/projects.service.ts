@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Jobs, JobsDocument } from './jobs.schema';
-import { CreateJobsDto, UpdateJobsDto } from './create-jobs.dto';
+
 import { User, UserDocument } from 'src/users/user.schema';
+import { Jobs, JobsDocument } from './projects.schema';
+import { CreateJobsDto, UpdateJobsDto } from './create-projects.dto';
 
 @Injectable()
 export class JobsService {

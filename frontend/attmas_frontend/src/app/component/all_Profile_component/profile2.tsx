@@ -128,6 +128,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="qualification"
                                 label="Qualification"
+                                color='secondary'
                                 name="qualification"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -150,6 +151,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="organization"
                                 label="Name of the organization (If any)"
+                                color='secondary'
                                 name="organization"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -165,6 +167,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="sector"
                                 label="Sector (If any)"
+                                color='secondary'
                                 name="sector"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -180,6 +183,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="designation"
                                 label="Designation"
+                                color='secondary'
                                 name="designation"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -197,6 +201,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="workAddress"
                                 label="Work Address (If any)"
+                                color='secondary'
                                 name="workAddress"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -223,6 +228,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="userType"
                                 label="User Type"
+                                color='secondary'
                                 name="userType"
                                 value={formik.values.userType}
                                 onChange={handleUserTypeChange}
@@ -245,8 +251,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         <Checkbox
                                             checked={formik.values.hasPatent}
                                             onChange={formik.handleChange}
+                                            color='secondary'
                                             name="hasPatent"
-                                            color="primary"
+                                            
                                         />
                                     }
                                     label="I have a patent"
@@ -262,6 +269,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="productToMarket"
                                     label="Do you have a product to market?"
+                                    color='secondary'
                                     name="productToMarket"
                                     value={formik.values.productToMarket}
                                     onChange={(e) => {
@@ -288,6 +296,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productName"
                                         label="Product Name"
+                                        color='secondary'
                                         name="productName"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -302,6 +311,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productDescription"
                                         label="Product Description"
+                                        color='secondary'
                                         name="productDescription"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -316,6 +326,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productType"
                                         label="Product Type"
+                                        color='secondary'
                                         name="productType"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -332,6 +343,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productPrice"
                                         label="Product Price"
+                                        color='secondary'
                                         name="productPrice"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
