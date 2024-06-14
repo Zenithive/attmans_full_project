@@ -12,8 +12,10 @@ import { ExhibitionService } from './exhibition.service';
 import {
   CreateExhibitionDto,
   UpdateExhibitionDto,
-} from './create-exhibition.dto';
-import { Exhibition } from './exhibition.schema';
+} from './dto/create-exhibition.dto';
+import { Exhibition } from './schema/exhibition.schema';
+import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
+import { SendToInnovators } from './schema/sendToInnovators.schema';
 
 @Controller('exhibitions')
 export class ExhibitionController {
@@ -24,6 +26,13 @@ export class ExhibitionController {
     @Body() createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
     return this.exhibitionService.create(createExhibitionDto);
+  }
+
+  @Post('sendinovators')
+  async createSendInnovators(
+    @Body() sendToInnovatorsDto: SendToInnovatorsDto,
+  ): Promise<SendToInnovators> {
+    return this.exhibitionService.createSendInnovators(sendToInnovatorsDto);
   }
 
   @Get()

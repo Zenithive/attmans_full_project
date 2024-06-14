@@ -22,11 +22,11 @@ interface Exhibition {
     title: string;
     description: string;
     status: string;
-    videoUrl: string;
+    // videoUrl: string;
     dateTime: string;
     industries: string[];
     subjects: string[];
-    userId: string;
+    userId?: string;
 }
 
 interface AddExhibitionProps {
@@ -40,7 +40,7 @@ const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
     status: Yup.string(),
-    videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
+    // videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
@@ -55,7 +55,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         title: '',
         description: '',
         status: '',
-        videoUrl: '',
+        // videoUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: [],
@@ -222,13 +222,12 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         label: item
     })));
 
-    const handleSubmit = async (values: { title: string; description: string; status: string; videoUrl: string, dateTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = async (values: { title: string; description: string; status: string; dateTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
             dateTime: values.dateTime ? values.dateTime.toISOString() : null,
             status: values.status,
-            videoUrl: values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId:userDetails._id
@@ -274,7 +273,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
                         status: editingExhibition.status || '',
-                        videoUrl: editingExhibition.videoUrl || "",
+                        // videoUrl: editingExhibition.videoUrl || "",
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
@@ -311,18 +310,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
-                                <TextField
-                                    fullWidth
-                                    name="videoUrl"
-                                    color='secondary'
-                                    label="Video URL"
-                                    value={values.videoUrl}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={touched.videoUrl && Boolean(errors.videoUrl)}
-                                    helperText={touched.videoUrl && errors.videoUrl}
-                                    margin="normal"
-                                />
+                                
                                 {editingExhibition && (
                                     <FormControl fullWidth>
                                         <InputLabel id="status-label">Status</InputLabel>
@@ -421,28 +409,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     {/* <Box color='secondary'> */}
 
-                                    {/* <DateTimePicker
-                                            label="Date & Time"
-                                            // color='secondary'
-                                            value={values.dateTime}
-                                            onChange={(newValue) => setFieldValue('dateTime', newValue)}
-                                            slotProps={{
-                                                textField: {
-                                                    sx: {
-                                                        '& .MuiInputBase-root': {
-                                                            '&:hover': {
-                                                                '& fieldset': {
-                                                                    borderColor: '#616161',
-                                                                },
-                                                            },
-                                                        },
-                                                        '& .MuiInputBase-input::placeholder': {
-                                                            color: '#616161',
-                                                        },
-                                                    },
-                                                },
-                                            }}
-                                        /> */}
+                                    
 
                                     <DateTimePicker
                                         label="Date & Time"

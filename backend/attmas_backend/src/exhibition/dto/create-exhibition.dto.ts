@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateExhibitionDto {
   @IsNotEmpty()
@@ -27,11 +28,11 @@ export class CreateExhibitionDto {
 
   @IsNotEmpty()
   @IsString()
-  userId: string;
+  userId: Types.ObjectId;
 
-  @IsNotEmpty()
-  @IsString()
-  videoUrl: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // videoUrl: string;
 }
 
 export class UpdateExhibitionDto {
