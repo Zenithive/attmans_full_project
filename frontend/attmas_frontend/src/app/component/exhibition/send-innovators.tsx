@@ -80,7 +80,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
   return (
     <Drawer sx={{ '& .MuiDrawer-paper': { width: '30%', borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancel(); }}>
       <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
-        <Typography variant="h5">Send Exhibition to Innovators</Typography>
+        <h2>Send Exhibition to Innovators</h2>
         <IconButton aria-label="close" onClick={() => { toggleDrawer(false); onCancel(); }} sx={{ p: 0, right: 0 }}>
           <CloseIcon />
         </IconButton>
@@ -135,8 +135,8 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
                 helperText={<ErrorMessage name="message" />}
               />
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                <Button variant="contained" color="primary" onClick={() => { toggleDrawer(false); onCancel(); }}>Cancel</Button>
-                <Button variant="contained" style={{ background: '#616161', color: 'white' }} type="submit" disabled={isSubmitting}>
+                <Button variant="contained" sx={{bgcolor: '#616161', ':hover': {bgcolor: '#616161'} }} onClick={() => { toggleDrawer(false); onCancel(); }}>Cancel</Button>
+                <Button variant="contained" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Send'}
                 </Button>
               </Box>

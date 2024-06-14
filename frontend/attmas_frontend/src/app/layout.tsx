@@ -20,8 +20,8 @@ const theme = createTheme({
       main: "#f5f5f5",
     },
     secondary: {
-      main: "#616161",
-    }
+      main: "#cc4800",
+    },
   },
   shape: {
     borderRadius: 20,
@@ -33,18 +33,22 @@ const theme = createTheme({
         root: {
           color: '#616161',
           '&.Mui-selected': {
-            color: 'white',
-            backgroundColor:'#616161',
+            color: '#fff',
+            backgroundColor:'#cc4800',
           },
           '&.Mui-selected .MuiListItemIcon-root': {
-            color: 'white'
+            color: '#fff'
           },
           ':hover .MuiListItemIcon-root': {
-            color: 'white'
+            color: '#fff'
           },
           ':hover': {
-            color: 'white',
-            backgroundColor: '#616161',
+            color: '#fff',
+            backgroundColor: '#cc4800',
+          },
+          '&.Mui-selected:hover': {
+            color: '#fff',
+            backgroundColor: '#cc4800',
           }
         },
       }
@@ -64,7 +68,12 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 20,
+          color: "#fff",
           textTransform: 'none',
+          backgroundColor:'#cc4800',
+          ':hover': {
+            backgroundColor:'#cc4800', 
+          }
         },
       },
     },

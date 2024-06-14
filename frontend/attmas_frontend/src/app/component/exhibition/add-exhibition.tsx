@@ -256,11 +256,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
 
     return (
         <>
-            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
-                borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
-                    background: "#757575"
-                }
-            }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
                     <h2> {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
@@ -340,7 +336,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                             {value.map((option: string, index) => (
                                                 <Chip
                                                     label={option}
-                                                    variant="outlined"
+                                                    color='secondary'
                                                     {...getTagProps({ index })}
                                                     key={option}
                                                     onDelete={() => setFieldValue('categoryforIndustries', values.categoryforIndustries.filter((ind: string) => ind !== option))}
@@ -377,7 +373,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                             {value.map((option, index) => (
                                                 <Chip
                                                     label={option.label}
-
+                                                    color='secondary'
                                                     {...getTagProps({ index })}
                                                     onDelete={() => setFieldValue('subject', values.subject.filter((sub: any) => sub !== option.label))}
                                                     key={option.label}
@@ -418,32 +414,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                         onChange={(newValue) => setFieldValue('dateTime', newValue)}
                                         slotProps={{
                                             textField: {
-                                                sx: {
-                                                    '& .MuiInputBase-root': {
-                                                        '&:hover': {
-                                                            '& fieldset': {
-                                                                borderColor: '#616161',
-                                                            },
-                                                        },
-                                                    },
-                                                    '& .Mui-focused .MuiInputBase-input': {
-                                                        borderColor: '#616161', // Ensure the border color is the same on focus
-                                                    },
-                                                    '& .MuiInputBase-input::placeholder': {
-                                                        color: '#616161',
-                                                    },
-                                                    '& .MuiInputLabel-root.Mui-focused': {
-                                                        color: '#616161', // Change label color to match border color on focus
-                                                    },
-                                                },
-                                                InputLabelProps: {
-                                                    sx: {
-                                                        color: '#616161', // Ensure the initial label color is black
-                                                        '&.Mui-focused': {
-                                                            color: '#616161', // Ensure the label color matches the border color on focus
-                                                        },
-                                                    },
-                                                },
+                                                color: 'secondary'
                                             },
                                         }}
                                     />
@@ -451,8 +422,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     {/* </Box> */}
                                 </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                                    <Button variant="contained" color='primary' onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
-                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>     {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
+                                    <Button variant="contained" sx={{bgcolor: '#616161', ':hover': {bgcolor: '#616161'} }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+                                    <Button variant="contained" type="submit" disabled={isSubmitting}>     {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>
                         </Form>

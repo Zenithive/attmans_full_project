@@ -76,30 +76,12 @@ const Jobs = () => {
     };
 
     const handleApplyClick = () => {
-        setApplyOpen(true); 
+        setApplyOpen(true);
     };
 
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
-                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-                <Button
-                    onClick={handleApplyClick}
-                    type="button"
-                    size="small"
-                    variant="contained"
-                    sx={{
-                        borderRadius: 3,
-                        backgroundColor: '#616161',
-                        color: 'white',
-                        '&:hover': {
-                            background: '#757575',
-                        },
-                    }}
-                >
-                    Apply
-                </Button>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
                 <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
             </Box>
@@ -119,7 +101,7 @@ const Jobs = () => {
                             <Typography variant="body2">{job.description}</Typography>
                             <Typography variant="body2">{job.Budget}</Typography>
                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                            <AddApply open={applyOpen} setOpen={setApplyOpen} /> 
+                            <AddApply open={applyOpen} setOpen={setApplyOpen} />
                             <Typography sx={{ display: "flex", float: "right" }}>
                                 <IconButton onClick={() => handleEditJob(job)}>
                                     <EditIcon />
@@ -127,6 +109,14 @@ const Jobs = () => {
                                 <IconButton onClick={() => handleDeleteJob(job)}>
                                     <DeleteRoundedIcon />
                                 </IconButton>
+                                <Button
+                                    onClick={handleApplyClick}
+                                    type="button"
+                                    size="small"
+                                    variant="contained"
+                                >
+                                    Apply
+                                </Button>
                             </Typography>
                         </CardContent>
                     </Card>

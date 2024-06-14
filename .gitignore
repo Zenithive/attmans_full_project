@@ -49,3 +49,5 @@ Thumbs.db
 *.mov
 *.wmv
 
+#uploaded files on local
+backend/attmas_backend/profilePhoto
