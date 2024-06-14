@@ -64,11 +64,11 @@ export default function MainSideBar() {
       Name: "Exhibition"
     },
     {
-      path: '/jobs',
+      path: '/projects',
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Jobs"
+      Name: "Projects"
     }
 
   ];

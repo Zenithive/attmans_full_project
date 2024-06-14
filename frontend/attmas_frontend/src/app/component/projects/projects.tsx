@@ -1,17 +1,10 @@
 'use client'
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
-import { CircularProgress, FilledTextFieldProps, MenuItem, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from '@mui/material';
-import { Button, Chip, Divider, Drawer, FormControl, InputLabel, ListSubheader, ListSubheaderProps, OutlinedInput, Select, TextField, Autocomplete } from '@mui/material';
-import { title } from 'process';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { CircularProgress, MenuItem } from '@mui/material';
+import { Button, Chip, Divider, Drawer, FormControl, InputLabel, Select, TextField, Autocomplete } from '@mui/material';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,49 +12,48 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import pubsub from '@/app/services/pubsub.service';
-import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
+import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { categories, subcategories } from '@/app/constants/categories';
 
 
 interface Jobs {
     _id?: string;
     title: string;
     description: string;
-    Budget:number;
+    Budget: number;
     Expertiselevel: string;
     TimeFrame: string | null;
     Category: string[];
     Subcategorys: string[];
-  }
-  
-  interface AddJobsProps {
+}
+
+interface AddJobsProps {
     editingJobs?: Jobs | null;
     onCancelEdit?: () => void;
-  }
-  
+}
+
 
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
     Expertiselevel: Yup.string(),
-    Budget:Yup.number().required("Budget is required"),
+    Budget: Yup.number().required("Budget is required"),
     TimeFrame: Yup.date().nullable('Date & Time is required'),
     categoryforCategory: Yup.array().of(Yup.string()),
     Subcategory: Yup.array().of(Yup.string())
 });
 
-export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
+export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     const [open, toggleDrawer] = React.useState(false);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
-    
+
     const initialValues = {
         title: '',
         description: '',
-        Expertiselevel:'',
+        Expertiselevel: '',
         Budget: 0,
         TimeFrame: null as Dayjs | null,
         categoryforCategory: [],
@@ -229,18 +221,18 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
         category: Subcategory.category,
         label: item
     })));
- 
 
-    const handleSubmit = async (values: { title: string; description: string; Expertiselevel:string;Budget:number,TimeFrame:Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; }, { setSubmitting, resetForm }: any) => {
+
+    const handleSubmit = async (values: { title: string; description: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,
             description: values.description,
             TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
-            Expertiselevel:values.Expertiselevel,
-            Budget:values.Budget,
+            Expertiselevel: values.Expertiselevel,
+            Budget: values.Budget,
             Category: values.categoryforCategory,
             Subcategorys: values.Subcategory,
-            username:userDetails.username
+            userId:userDetails._id,
         };
 
         try {
@@ -264,14 +256,10 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
 
     return (
         <>
-            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
-                borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
-                    background: "#757575"
-                }
-            }}>    {editingJobs ? 'Edit Jobs' : 'Create Jobs'}</Button>
+            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'> Create Projects</Button>
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
-                    <h2> {editingJobs ? 'Edit Jobs' : 'Create Jobs'}</h2>
+                    <h2> {editingJobs ? 'Edit Project' : 'Create Project'}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
@@ -281,8 +269,8 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                     initialValues={editingJobs ? {
                         title: editingJobs.title || '',
                         description: editingJobs.description || '',
-                        Expertiselevel:editingJobs.Expertiselevel || '',
-                        Budget:editingJobs.Budget || 0,
+                        Expertiselevel: editingJobs.Expertiselevel || '',
+                        Budget: editingJobs.Budget || 0,
                         TimeFrame: editingJobs.TimeFrame ? dayjs(editingJobs.TimeFrame) : null,
                         categoryforCategory: editingJobs.Category || [],
                         Subcategory: editingJobs.Subcategorys || []
@@ -292,9 +280,10 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                 >
                     {({ values, setFieldValue, handleChange, handleBlur, handleSubmit, isSubmitting, errors, touched }) => (
                         <Form onSubmit={handleSubmit}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2,position:"relative",left:"15px" }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: "relative", left: "15px" }}>
                                 <TextField
                                     label="Title"
+                                    color='secondary'
                                     name="title"
                                     variant="outlined"
                                     value={values.title}
@@ -307,6 +296,7 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                 <TextField
                                     label="Description"
                                     name="description"
+                                    color='secondary'
                                     variant="outlined"
                                     value={values.description}
                                     onChange={handleChange}
@@ -320,8 +310,9 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                 <TextField
                                     fullWidth
                                     name="Budget"
+                                    color='secondary'
                                     label="BUDGET"
-                                    type="number" 
+                                    type="number"
                                     value={values.Budget}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -329,10 +320,11 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                     helperText={touched.Budget && errors.Budget}
                                     margin="normal"
                                 />
-                                 <FormControl fullWidth>
-                                    <InputLabel id="Expertiselevel-label">Expertise Level</InputLabel>
+                                <FormControl fullWidth>
+                                    <InputLabel color='secondary' id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
                                         labelId="Expertiselevel-label"
+                                        color='secondary'
                                         id="Expertiselevel"
                                         name="Expertiselevel"
                                         value={values.Expertiselevel}
@@ -350,13 +342,14 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                     multiple
                                     options={Category}
                                     value={values.categoryforCategory}
+
                                     onChange={(event, value) => setFieldValue('categoryforCategory', value)}
                                     renderTags={(value, getTagProps) => (
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                             {value.map((option: string, index) => (
                                                 <Chip
                                                     label={option}
-                                                    variant="outlined"
+                                                    color='secondary'
                                                     {...getTagProps({ index })}
                                                     key={option}
                                                     onDelete={() => setFieldValue('categoryforCategory', values.categoryforCategory.filter((ind: string) => ind !== option))}
@@ -369,14 +362,15 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                             {...params}
                                             variant="outlined"
                                             label="Preferred Category"
+                                            color='secondary'
                                             placeholder="Select Category"
                                             error={!!(errors.categoryforCategory && touched.categoryforCategory)}
                                             helperText={
                                                 typeof errors.categoryforCategory === 'string' && touched.categoryforCategory
-                                                  ? errors.categoryforCategory
-                                                  : undefined
-                                              }
-                                              
+                                                    ? errors.categoryforCategory
+                                                    : undefined
+                                            }
+
                                         />
                                     )}
                                 />
@@ -392,6 +386,7 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                             {value.map((option, index) => (
                                                 <Chip
                                                     label={option.label}
+                                                    color='secondary'
                                                     {...getTagProps({ index })}
                                                     onDelete={() => setFieldValue('subject', values.Subcategory.filter((sub: any) => sub !== option.label))}
                                                     key={option.label}
@@ -404,13 +399,14 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                             {...params}
                                             variant="outlined"
                                             label="Subcategory matter expertise"
+                                            color='secondary'
                                             placeholder="Select Subcategorys"
                                             error={!!(errors.Subcategory && touched.Subcategory)}
                                             helperText={
                                                 typeof errors.Subcategory === 'string' && touched.Subcategory
-                                                  ? errors.Subcategory
-                                                  : undefined
-                                              }
+                                                    ? errors.Subcategory
+                                                    : undefined
+                                            }
                                         />
                                     )}
                                     renderGroup={(params) => (
@@ -420,17 +416,23 @@ export const AddJobs = ({ editingJobs, onCancelEdit }:AddJobsProps) => {
                                         </li>
                                     )}
                                 />
-                               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DateTimePicker
-                                    label="Time Frame"
-                                    value={values.TimeFrame}
-                                    onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
-                                    
-                                />
-                            </LocalizationProvider>
+                                <LocalizationProvider  dateAdapter={AdapterDayjs}>
+                                    <DateTimePicker
+                                        label="Time Frame"
+                                        // color='secondary'
+                                        value={values.TimeFrame}
+                                        onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
+
+                                        slotProps={{
+                                            textField: {
+                                                color:'secondary'      
+                                            },
+                                        }}
+                                    />
+                                </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                                    <Button variant="contained" color='primary' onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
-                                    <Button variant="contained" style={{ background: "#616161", color: "white" }} type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
+                                    <Button variant="contained" sx={{bgcolor: '#616161', ':hover': {bgcolor: '#616161'} }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+                                    <Button variant="contained" type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>
                         </Form>

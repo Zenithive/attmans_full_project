@@ -8,9 +8,9 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { JobsService } from './jobs.service';
-import { CreateJobsDto, UpdateJobsDto } from './create-jobs.dto';
-import { Jobs } from './jobs.schema';
+import { JobsService } from './projects.service';
+import { CreateJobsDto, UpdateJobsDto } from './create-projects.dto';
+import { Jobs } from './projects.schema';
 
 @Controller('jobs')
 export class JobsController {
