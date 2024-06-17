@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ProfileService {
+  [x: string]: any;
   constructor(
     @InjectModel(PersonalProfile.name)
     private readonly profileModel: Model<PersonalProfile>,
@@ -143,5 +144,9 @@ export class ProfileService {
     if (!form3) return { profileCompleted: 3 };
 
     return { profileCompleted: 4 }; // Assume 4 means all steps completed
+  }
+
+  async getProfileByUserId(userId: string): Promise<PersonalProfile> {
+    return this.profileModel.findOne({ userId }).exec();
   }
 }

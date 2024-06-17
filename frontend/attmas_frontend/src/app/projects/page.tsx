@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Button } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -21,11 +21,173 @@ interface Job {
     Subcategorys: string[];
 }
 
+const Category = [
+    "Agriculture",
+    "Chemicals",
+    "Electronics",
+    "Energy",
+    "Environmental and waste management",
+    "Food and beverage",
+    "Healthcare",
+    "Medical devices and equipment",
+    "Mining and metals",
+    "Real estate and construction",
+    "Textiles"
+];
+
+const Expertiselevel=[
+    "Beginner",
+    "Intermidiate",
+    "Expert",
+    "Phd"
+];
+
+const Subcategorys = [
+    {
+        category: "Chemistry",
+        items: [
+            "Chemical Reagent Development",
+            "Dewatering & Drying Technology",
+            "Electronics",
+            "Catalysis",
+            "Trace Elements",
+            "Mathematical Chemistry",
+            "Dispersion Chemistry",
+            "Surface Science"
+        ]
+    },
+    {
+        category: "Materials Science & Engineering",
+        items: [
+            "Nanotechnology & Nanomaterials",
+            "Surface Chemistry",
+            "Metallurgy",
+            "Glass Science",
+            "Ceramic Engineering",
+            "Corrosion",
+            "Structural Chemistry",
+            "Microencapsulation",
+            "Supramolecular Chemistry",
+            "Fiber & Textile Engineering",
+            "Carbon Materials",
+            "Nanotechnology"
+        ]
+    },
+    {
+        category: "Biomaterials",
+        items: [
+            "Collagen",
+            "Bioplastics",
+            "Powder Metallurgy",
+            "Powders & Bulk Materials",
+            "Refractory Materials",
+            "Composite Materials",
+            "Electronic, Optical & Magnetic Materials",
+            "Dental Materials",
+            "Biocatalysis",
+            "Marine Chemistry",
+            "Coordination Compounds",
+            "Inorganic Chemistry",
+            "Natural Product Chemistry",
+            "Molecular Engineering",
+            "Physical Chemistry"
+        ]
+    },
+    {
+        category: "Physical Chemistry",
+        items: [
+            "Molecular Docking",
+            "Chemoinformatics",
+            "Biopolymers",
+            "Polymer Chemistry"
+        ]
+    },
+    {
+        category: "Analytical Chemistry",
+        items: [
+            "Deformulation",
+            "Separation & Purification Crystallography",
+            "X-Ray Crystallography Spectroscopy",
+            'Atomic Absorption Spectroscopy',
+            'Atomic Emission Spectroscopy',
+            'UV Spectroscopy ',
+            'Fluorescence Spectroscopy',
+            'Raman Spectroscopy',
+            'NMR Spectroscopy',
+            'Circular Dichroism Spectroscopy',
+            'Spectrophotometry',
+            'Mass Spectrometry',
+            'Molecular Imaging',
+            'Liquid Chromatography/HPLC',
+            'Thermal Analysis',
+            'Microcalorimetry',
+            'Gas Chromatography',
+            'Optical Rotation',
+            'Particle Size Distribution',
+            'Stable Isotope Analysis',
+            'Particle-Induced X-Ray Emission',
+            'Electrochemistry',
+            'Agricultural Chemistry',
+            "Cosmochemistry",
+            "Radiochemistry",
+            "Astrochemistry",
+            "Petrochemistry",
+        ]
+    },
+    {
+        category: "Solid State Sciences",
+        items: [
+            "Condensed Matter Physics",
+            "Solid-State Chemistry",
+            "Flow Chemistry",
+            "Green Chemistry",
+            "Refractory Materials",
+            "Organometallic Chemistry",
+            "Photochemistry",
+            "Quantum Chemistry",
+        ]
+    },
+    {
+        category: "Organic Chemistry",
+        items: [
+            "Retrosynthesis",
+            "Thermochemistry",
+            "Computational Chemistry",
+            "Mechanochemistry",
+            "Sonochemistry",
+            "Peptide Synthesis",
+            "Physical Organic Chemistry",
+            "Adhesion Technology",
+            "Applied Chemistry",
+        ]
+    },
+    {
+        category: "Agriculture",
+        items: [
+            "Plant Science:",
+            "Agronomy:",
+            "Plant Breeding:",
+            "Mechanochemistry",
+            "Sonochemistry",
+            "Peptide Synthesis",
+            "Physical Organic Chemistry",
+            "Adhesion Technology",
+            "Applied Chemistry",
+        ]
+    },
+];
+
+const getSubcategorys = (Subcategorys: any[]) => {
+    return Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
+  };
 const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
     const [jobTitle, setJobTitle] = useState<string>('');
+    const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+    const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
+    const [selectedExpertis,setSelectedExpertis]=useState<string[]>([]);
 
     const fetchJobs = async () => {
         try {
@@ -49,13 +211,23 @@ const Jobs = () => {
     }, []);
 
     useEffect(() => {
+        pubsub.subscribe('JobUpdated', refetch);
+    
+        return () => {
+          pubsub.unsubscribe('JobUpdated', refetch);
+        };
+    
+      }, []);
+
+    
+      useEffect(() => {
         pubsub.subscribe('JobCreated', refetch);
     
         return () => {
           pubsub.unsubscribe('JobCreated', refetch);
         };
     
-      }, []);
+      }, []);  
 
     const handleEditJob = (job: Job) => {
         setEditingJob(job);
@@ -80,14 +252,49 @@ const Jobs = () => {
         setJobTitle(title); 
     };
 
+    const filteredProjects = jobs.filter(project =>
+        (selectedCategory.length === 0 || selectedCategory.some(Categorys => project.Category.includes(Categorys))) &&
+        (selectedSubcategory.length === 0 || selectedSubcategory.some(Subcategory => project.Subcategorys.includes(Subcategory))) &&
+        (selectedExpertis.length === 0 || selectedExpertis.some(expertiselevel=> project.Expertiselevel.includes(expertiselevel)))
+      );
+
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
-                <AddJobs editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
             </Box>
+            <Box sx={{ display: 'flex', gap: 10, my: 2 }}>
+                <Autocomplete
+                sx={{width:"25%"}}
+                multiple
+                color='secondary'
+                options={Category}
+                value={selectedCategory}
+                onChange={(event, value) => setSelectedCategory(value)}
+                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{borderRadius:"20px"}} />}
+                />
+                <Autocomplete
+                multiple
+                sx={{width:"25%"}}
+                options={getSubcategorys(Subcategorys)}
+                color='secondary'
+                value={selectedSubcategory}
+                onChange={(event, value) => setSelectedSubcategory(value)}
+                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' sx={{borderRadius: "20px"}}/>}
+                />
+                <Autocomplete
+                sx={{width:"25%"}}
+                multiple
+                color='secondary'
+                options={Expertiselevel}
+                value={selectedExpertis}
+                onChange={(event, value) => setSelectedExpertis(value)}
+                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' sx={{borderRadius:"20px"}} />}
+                />
+      </Box>
             <Box sx={{ mt: 2 }}>
-                {jobs.map((job) => (
+                {filteredProjects.map((job) => (
                     <Card key={job._id} sx={{ mb: 2 }}>
                         <CardContent>
                             <Typography variant="h5">
