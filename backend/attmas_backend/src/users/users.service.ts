@@ -51,4 +51,11 @@ export class UsersService {
     user.isAllProfileCompleted = true;
     return user.save();
   }
+
+  // Add this method to find users by their usertype
+  async findUsersByUserType(userType: string): Promise<User[]> {
+    const users = await this.userModel.find({ userType }).select('-password');
+    // .exec();
+    return users;
+  }
 }
