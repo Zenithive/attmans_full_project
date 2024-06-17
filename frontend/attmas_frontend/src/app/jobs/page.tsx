@@ -8,7 +8,7 @@ import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import pubsub from '../services/pubsub.service';
+import pubsub from '../services/pubsub.service'; 
 
 interface Job {
     _id?: string;
@@ -25,6 +25,7 @@ const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
+    const [jobTitle, setJobTitle] = useState<string>('');
 
     const fetchJobs = async () => {
         try {
@@ -48,14 +49,13 @@ const Jobs = () => {
     }, []);
 
     useEffect(() => {
-        const jobCreatedHandler = () => refetch();
-
-        pubsub.subscribe('JobCreated', jobCreatedHandler);
-
+        pubsub.subscribe('JobCreated', refetch);
+    
         return () => {
-            pubsub.unsubscribe('JobCreated', jobCreatedHandler);
+          pubsub.unsubscribe('JobCreated', refetch);
         };
-    }, []);
+    
+      }, []);
 
     const handleEditJob = (job: Job) => {
         setEditingJob(job);
@@ -75,8 +75,9 @@ const Jobs = () => {
         }
     };
 
-    const handleApplyClick = () => {
+    const handleApplyClick = (title:string) => {
         setApplyOpen(true); 
+        setJobTitle(title); 
     };
 
     return (
@@ -84,22 +85,6 @@ const Jobs = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
                 <AddJobs editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-                <Button
-                    onClick={handleApplyClick}
-                    type="button"
-                    size="small"
-                    variant="contained"
-                    sx={{
-                        borderRadius: 3,
-                        backgroundColor: '#616161',
-                        color: 'white',
-                        '&:hover': {
-                            background: '#757575',
-                        },
-                    }}
-                >
-                    Apply
-                </Button>
             </Box>
             <Box sx={{ mt: 2 }}>
                 {jobs.map((job) => (
@@ -117,19 +102,24 @@ const Jobs = () => {
                             <Typography variant="body2">{job.description}</Typography>
                             <Typography variant="body2">{job.Budget}</Typography>
                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                            <AddApply open={applyOpen} setOpen={setApplyOpen} /> 
-                            <Typography sx={{ display: "flex", float: "right" }}>
-                                <IconButton onClick={() => handleEditJob(job)}>
-                                    <EditIcon />
-                                </IconButton>
-                                <IconButton onClick={() => handleDeleteJob(job)}>
-                                    <DeleteRoundedIcon />
-                                </IconButton>
-                            </Typography>
+                            <Box sx={{ display: "flex", justifyContent: "space-between"}}>
+                                <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)} sx={{position:"relative",left:"95%",bottom:"60px"}}>
+                                    Apply
+                                </Button>
+                                <Box>
+                                    <IconButton onClick={() => handleEditJob(job)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton onClick={() => handleDeleteJob(job)}>
+                                        <DeleteRoundedIcon />
+                                    </IconButton>
+                                </Box>
+                            </Box>
                         </CardContent>
                     </Card>
                 ))}
             </Box>
+            <AddApply open={applyOpen} setOpen={setApplyOpen} jobTitle={jobTitle} />
         </Box>
     );
 };

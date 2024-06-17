@@ -238,7 +238,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                 await axios.put(`${APIS.EXHIBITION}/${editingExhibition._id}`, exhibitionData);
                 pubsub.publish('ExhibitionUpdated', { message: 'Exhibition updated' });
             } else {
-                const response = await axios.post(APIS.EXHIBITION, exhibitionData);
+                 await axios.post(APIS.EXHIBITION, exhibitionData);
                 // onAddExhibition(response.data);
                 pubsub.publish('ExhibitionCreated', { message: 'A new exhibition Created' });
             }

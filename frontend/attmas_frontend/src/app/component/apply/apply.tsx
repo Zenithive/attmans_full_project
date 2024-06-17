@@ -32,13 +32,14 @@ const validationSchema = Yup.object().shape({
 interface AddApplyProps {
   open: boolean;
   setOpen: (open: boolean) => void;
+  jobTitle: string;
 }
 
-export const AddApply: React.FC<AddApplyProps> = ({ open, setOpen }) => {
+export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const initialValues = {
-    title: '',
+    title: jobTitle,
     description: '',
     Budget: 0,
     TimeFrame: null as Dayjs | null,
@@ -57,7 +58,7 @@ export const AddApply: React.FC<AddApplyProps> = ({ open, setOpen }) => {
     };
 
     try {
-      const response = await axios.post(APIS.APPLY, applyData);
+      await axios.post(APIS.APPLY, applyData);
       pubsub.publish('ApplyCreated', { message: 'A new Apply Created' });
       resetForm();
       setOpen(false);
