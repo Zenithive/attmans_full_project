@@ -1,8 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Typography, Card, CardContent, IconButton, Button } from '@mui/material';
-import { AddJobs } from '../component/jobs/jobs';
 import { AddApply } from '../component/apply/apply';
+import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';

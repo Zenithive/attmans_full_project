@@ -5,6 +5,8 @@
   "scripts": {
     "start-dev-server": "cd backend/attmas_backend && npm run start:dev",
     "start-dev-client": "cd frontend/attmas_frontend && npm run dev",
+    "build-server": "cd backend/attmas_backend && npm run build",
+    "build-client": "cd frontend/attmas_frontend && npm run build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import { ProfileModule } from './profile/profile.module';
 import { ExhibitionModule } from './exhibition/exhibition.module';
-import { JobsModule } from './jobs/jobs.module';
+import { JobsModule } from './projects/projects.module';
 import { ApplyModule } from './apply/apply.module';
 
 dotenv.config();

@@ -90,7 +90,7 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
               <TextField
                 label="Title"
                 name="title"
-                variant="outlined"
+                color='secondary'
                 value={values.title}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -101,6 +101,7 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
               <TextField
                 label="Description"
                 name="description"
+                color='secondary'
                 variant="outlined"
                 value={values.description}
                 onChange={handleChange}
@@ -115,6 +116,7 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
                 fullWidth
                 name="Budget"
                 label="BUDGET"
+                color='secondary'
                 type="number"
                 value={values.Budget}
                 onChange={handleChange}
@@ -127,16 +129,20 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
                 <DateTimePicker
                   label="Time Frame"
                   value={values.TimeFrame}
+                  slotProps={{
+                    textField: {
+                        color:'secondary'      
+                    },
+                }}
                   onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                 />
               </LocalizationProvider>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                <Button variant="contained" color="primary" onClick={() => setOpen(false)}>
+                <Button variant="contained" sx={{bgcolor: '#616161', ':hover': {bgcolor: '#616161'} }} onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
                 <Button
                   variant="contained"
-                  style={{ background: '#616161', color: 'white' }}
                   type="submit"
                   disabled={isSubmitting}
                 >

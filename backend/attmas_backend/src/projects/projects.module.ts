@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JobsService } from './jobs.service';
-import { JobsController } from './jobs.controller';
-import { Jobs, JobsSchema } from './jobs.schema';
+
 import { UsersModule } from 'src/users/users.module';
+import { JobsService } from './projects.service';
+import { JobsController } from './projects.controller';
+import { Jobs, JobsSchema } from './projects.schema';
 
 @Module({
   imports: [

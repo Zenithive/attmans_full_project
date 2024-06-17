@@ -134,11 +134,13 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <FormControl fullWidth>
-                                <InputLabel id="categories-label">Categories</InputLabel>
+                                <InputLabel color='secondary' id="categories-label">Categories</InputLabel>
                                 <Select
                                     labelId="categories-label"
                                     id="categories"
                                     name="categories"
+                                    color='secondary'
+                                    
                                     multiple
                                     value={selectedCategories}
                                     onChange={handleCategoryChange}
@@ -155,7 +157,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                                 >
                                     {categories.map((category) => (
                                         <MenuItem key={category} value={category} style={getStyles(category, selectedCategories, customTheme)}>
-                                            <Checkbox checked={selectedCategories.indexOf(category) > -1} />
+                                            <Checkbox color='secondary' checked={selectedCategories.indexOf(category) > -1} />
                                             <ListItemText primary={category} />
                                         </MenuItem>
                                     ))}
@@ -165,10 +167,11 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                         {selectedCategories.length > 0 && (
                             <Grid item xs={12} sm={6}>
                                 <FormControl fullWidth>
-                                    <InputLabel id="subcategories-label">Subcategories</InputLabel>
+                                    <InputLabel color='secondary' id="subcategories-label">Subcategories</InputLabel>
                                     <Select
                                         labelId="subcategories-label"
                                         id="subcategories"
+                                        color='secondary'
                                         name="subcategories"
                                         multiple
                                         value={selectedSubcategories}
@@ -187,7 +190,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                                         {selectedCategories.flatMap(category =>
                                             subcategories[category].map((subcategory) => (
                                                 <MenuItem key={subcategory} value={subcategory}>
-                                                    <Checkbox checked={selectedSubcategories.indexOf(subcategory) > -1} />
+                                                    <Checkbox color='secondary' checked={selectedSubcategories.indexOf(subcategory) > -1} />
                                                     <ListItemText primary={subcategory} />
                                                 </MenuItem>
                                             ))

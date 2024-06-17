@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Exhibition, ExhibitionDocument } from './exhibition.schema';
+import { Exhibition, ExhibitionDocument } from './schema/exhibition.schema';
+import {
+  SendToInnovators,
+  SendToInnovatorsDocument,
+} from './schema/sendToInnovators.schema';
 import {
   CreateExhibitionDto,
   UpdateExhibitionDto,
-} from './create-exhibition.dto';
-import { User, UserDocument } from 'src/users/user.schema';
+} from './dto/create-exhibition.dto';
+import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 
 @Injectable()
 export class ExhibitionService {
@@ -14,13 +18,23 @@ export class ExhibitionService {
   constructor(
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(SendToInnovators.name)
+    private sendToInnovatorsModel: Model<SendToInnovatorsDocument>,
   ) {}
 
   async create(createExhibitionDto: CreateExhibitionDto): Promise<Exhibition> {
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
 
     return createdExhibition.save();
+  }
+
+  async createSendInnovators(
+    sendToInnovatorsDto: SendToInnovatorsDto,
+  ): Promise<SendToInnovators> {
+    const sendInnovatorsFromExibition = new this.sendToInnovatorsModel(
+      sendToInnovatorsDto,
+    );
+    return sendInnovatorsFromExibition.save();
   }
 
   async findAll(): Promise<Exhibition[]> {

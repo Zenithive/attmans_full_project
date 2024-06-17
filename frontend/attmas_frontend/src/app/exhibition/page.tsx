@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useState } from 'react';
 import { Box, Button, colors, Typography, Card, CardContent, IconButton } from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
@@ -8,6 +8,8 @@ import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import pubsub from '../services/pubsub.service';
+import SendIcon from '@mui/icons-material/Send';
+import { SendInnovators } from '../component/exhibition/send-innovators';
 
 interface Exhibition {
   _id?: string;
@@ -18,11 +20,13 @@ interface Exhibition {
   dateTime: string;
   industries: string[];
   subjects: string[];
+  userId?: string; // Make this optional if it can be undefined
 }
 
 const Exhibition = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [editingExhibition, setEditingExhibition] = useState<Exhibition | null>(null);
+  const [sendingExhibition, setSendingExhibition] = useState<Exhibition | null>(null);
 
   const fetchExhibitions = async () => {
     try {
@@ -47,21 +51,10 @@ const Exhibition = () => {
 
   useEffect(() => {
     pubsub.subscribe('ExhibitionCreated', refetch);
-
     return () => {
       pubsub.unsubscribe('ExhibitionCreated', refetch);
     };
-
   }, []);
-
-  // const handleAddExhibition = async (newExhibition: any) => {
-  //   try {
-  //     await axios.post(APIS.EXHIBITION, newExhibition);
-  //     fetchExhibitions();
-  //   } catch (error) {
-  //     console.error('Error adding exhibition:', error);
-  //   }
-  // };
 
   const handleEditExhibition = (exhibition: Exhibition) => {
     setEditingExhibition(exhibition);
@@ -81,12 +74,19 @@ const Exhibition = () => {
     }
   };
 
+  const handleSendInnovators = (exhibition: Exhibition) => {
+    setSendingExhibition(exhibition);
+  };
+
+  const handleCancelSend = () => {
+    setSendingExhibition(null);
+  };
+
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
-        <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} 
-         />
+        <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
       </Box>
       <Box sx={{ mt: 2 }}>
         {exhibitions.map((exhibition) => (
@@ -110,11 +110,17 @@ const Exhibition = () => {
                 <IconButton onClick={() => handleDeleteExhibition(exhibition)}>
                   <DeleteRoundedIcon />
                 </IconButton>
+                <IconButton onClick={() => handleSendInnovators(exhibition)}>
+                  <SendIcon />
+                </IconButton>
               </Typography>
             </CardContent>
           </Card>
         ))}
       </Box>
+      {sendingExhibition && (
+        <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
+      )}
     </Box>
   );
 };
