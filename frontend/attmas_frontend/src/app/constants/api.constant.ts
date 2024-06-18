@@ -12,5 +12,6 @@ export const APIS = {
     JOBS: `${SERVER_URL}/jobs`,
     CHECK_PROFILE: `${SERVER_URL}/profile/check`,
     APPLY: `${SERVER_URL}/apply`,
-    SEND_INNOVATORS: `${SERVER_URL}/exhibitions/sendinovators`
+    SEND_INNOVATORS: `${SERVER_URL}/exhibitions/sendinovators`,
+    CATEGORIES: `${SERVER_URL}/profile/categories`
 }

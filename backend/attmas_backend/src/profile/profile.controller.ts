@@ -62,4 +62,9 @@ export class ProfileController {
   async checkProfileCompletion(@Query('username') username: string): Promise<{ profileCompleted: number }> {
     return this.profileService.getProfileCompletionStatus(username);
   }
+
+  @Get('categories')
+  async getAllCategories(): Promise<Categories[]> {
+    return this.profileService.getAllCategories();
+  }
 }

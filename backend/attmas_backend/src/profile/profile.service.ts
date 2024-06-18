@@ -144,4 +144,8 @@ export class ProfileService {
 
     return { profileCompleted: 4 }; // Assume 4 means all steps completed
   }
+
+  async getAllCategories(): Promise<Categories[]> {
+    return this.categories.find().exec();
+  }
 }

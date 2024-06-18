@@ -53,9 +53,18 @@ export class UsersService {
   }
 
   // Add this method to find users by their usertype
-  async findUsersByUserType(userType: string): Promise<User[]> {
-    const users = await this.userModel.find({ userType }).select('-password');
-    // .exec();
-    return users;
+
+  async findUsersByUserType(
+    userType: string,
+    page: number,
+    limit: number,
+  ): Promise<User[]> {
+    const skip = (page - 1) * limit;
+    return this.userModel
+      .find({ userType })
+      .select('-password')
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 }

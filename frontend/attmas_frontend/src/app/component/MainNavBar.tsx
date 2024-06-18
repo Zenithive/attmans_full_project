@@ -1,18 +1,17 @@
-"use client"
+"use client";
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
+import { MenuItem } from '@mui/material';
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -27,8 +26,7 @@ function clearCookies() {
 
 export default function MainNavBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const router = useRouter();
 
@@ -70,6 +68,11 @@ export default function MainNavBar() {
     }
   };
 
+  const handleProfileRedirect = () => {
+    handleMenuClose();
+    router.push('/editprofile');
+  };
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -91,7 +94,7 @@ export default function MainNavBar() {
         Signed in as <br />
         {/* {userDetails.username} */}
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleProfileRedirect}>Profile</MenuItem>
       <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   );
@@ -150,7 +153,6 @@ export default function MainNavBar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', boxShadow:'none' }}> */}
       <AppBar 
         position="fixed" 
         sx={{ 
@@ -158,9 +160,6 @@ export default function MainNavBar() {
           left: 'auto', 
           width: 'calc(100% - 240px)', 
           boxShadow: 'none', 
-          // borderBottomLeftRadius: '16px', 
-          // borderBottomRightRadius: '16px',
-          // backgroundColor: 'darkgrey'
         }}
       >
         <Toolbar sx={{ height: 70 }}>

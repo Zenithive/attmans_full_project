@@ -1,58 +1,137 @@
-'use client';
+"use client";
 import * as React from 'react';
-import { AgGridReact } from 'ag-grid-react';
-import { ColDef } from 'ag-grid-community';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip } from '@mui/material';
 import axios from 'axios';
 import { APIS } from '../../constants/api.constant';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface User {
   _id: string;
   firstName: string;
   lastName: string;
-  userType: string;
   mobileNumber: string;
-  username: string;  // Added username field
+  username: string;
+  userType: string;
+}
+
+interface CategoryData {
+  categories: string[];
+  subcategories: string[];
+  username: string;
+  objectKey: string;
 }
 
 const Freelancers: React.FC = () => {
   const [rowData, setRowData] = React.useState<User[]>([]);
+  const [categoryData, setCategoryData] = React.useState<CategoryData[]>([]);
+  const [filterText, setFilterText] = React.useState<string>('');
+  const [filterVisible, setFilterVisible] = React.useState<boolean>(false);
+  const [page, setPage] = React.useState<number>(1);
+  const [hasMore, setHasMore] = React.useState<boolean>(true);
 
   React.useEffect(() => {
-    const fetchFreelancers = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await axios.get(APIS.FREELANCERS);
-        console.log('response', response);
-
-        setRowData(response.data.map((user: User, index: number) => ({ ...user, id: index + 1 })));
+        const categoriesResponse = await axios.get<CategoryData[]>(APIS.CATEGORIES);
+        setCategoryData(categoriesResponse.data);
       } catch (error) {
-        console.error('Error fetching freelancers:', error);
+        console.error('Error fetching categories:', error);
       }
     };
 
+    fetchCategories();
+  }, []);
+
+  const fetchFreelancers = async () => {
+    try {
+      const response = await axios.get<User[]>(`${APIS.FREELANCERS}&page=${page}&limit=6`);
+      if (response.data.length === 0) {
+        setHasMore(false);
+      } else {
+        setRowData(prev => [...prev, ...response.data]);
+        setPage(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error fetching freelancers:', error);
+    }
+  };
+
+  React.useEffect(() => {
     fetchFreelancers();
   }, []);
 
-  const columnDefs: ColDef[] = [
-    { headerName: 'ID', field: 'id', width: 90 },
-    { headerName: 'First name', field: 'firstName', width: 150 },
-    { headerName: 'Last name', field: 'lastName', width: 150 },
-    { headerName: 'User Type', field: 'userType', width: 150 },
-    { headerName: 'Mobile Number', field: 'mobileNumber', width: 150 },
-    { headerName: 'Email', field: 'username', width: 290 }
-  ];
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterText(event.target.value);
+  };
+
+  const toggleFilterVisibility = () => {
+    setFilterVisible(!filterVisible);
+  };
+
+  const getUserCategoryData = (username: string) => {
+    const userCategoryData = categoryData.find(data => data.username === username);
+    return userCategoryData ? userCategoryData : { categories: [], subcategories: [] };
+  };
+
+  const filteredData = rowData.filter((user) =>
+    `${user.firstName} ${user.lastName}`.toLowerCase().includes(filterText.toLowerCase())
+  );
 
   return (
-    <div className="ag-theme-alpine" style={{ height: 500, width: '982px' }}> 
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        pagination={true}
-        paginationPageSize={5}
-        domLayout='autoHeight'
-      />
-    </div>
+    <Box sx={{ background: '#f0f0f0', p: 2, borderRadius: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4">Freelancers</Typography>
+        <IconButton onClick={toggleFilterVisibility}>
+          <FilterAltIcon />
+        </IconButton>
+        {filterVisible && (
+          <TextField
+            label="Filter by name"
+            color="secondary"
+            variant="outlined"
+            value={filterText}
+            onChange={handleFilterChange}
+            sx={{ width: '25%' }}
+          />
+        )}
+      </Box>
+      <InfiniteScroll
+        dataLength={rowData.length}
+        next={fetchFreelancers}
+        hasMore={hasMore}
+        loader={<h4>Loading...</h4>}
+        endMessage={<p style={{ textAlign: 'center' }}>No more freelancers</p>}
+      >
+        <Box sx={{ mt: 2 }}>
+          {filteredData.map((user) => {
+            const { categories, subcategories } = getUserCategoryData(user.username);
+            return (
+              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px' }}>
+                <CardContent>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
+                      <Chip variant="outlined" label={user.userType} color="secondary" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {user.username} | {user.mobileNumber}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {categories.join(', ')} | {subcategories.join(', ')}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </Box>
+      </InfiniteScroll>
+    </Box>
   );
 };
 

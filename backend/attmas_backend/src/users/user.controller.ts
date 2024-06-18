@@ -44,10 +44,20 @@ export class UsersController {
   // }
 
   // Add this new route to handle users by usertype
-  @Get('by-type')
-  async getUsersByUserType(@Query('userType') userType: string) {
-    const users = await this.usersService.findUsersByUserType(userType);
 
+  @Get('by-type')
+  async getUsersByUserType(
+    @Query('userType') userType: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '5',
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const users = await this.usersService.findUsersByUserType(
+      userType,
+      pageNumber,
+      limitNumber,
+    );
     return users;
   }
 }
