@@ -7,6 +7,7 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { JobsService } from './projects.service';
 import { CreateJobsDto, UpdateJobsDto } from './create-projects.dto';
@@ -22,8 +23,11 @@ export class JobsController {
   }
 
   @Get()
-  async findAll(): Promise<Jobs[]> {
-    return this.jobsService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<Jobs[]> {
+    return this.jobsService.findAll(page, limit);
   }
 
   @Get(':id')

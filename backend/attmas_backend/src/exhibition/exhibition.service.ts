@@ -37,9 +37,12 @@ export class ExhibitionService {
     return sendInnovatorsFromExibition.save();
   }
 
-  async findAll(): Promise<Exhibition[]> {
+  async findAll(page: number, limit: number): Promise<Exhibition[]> {
+    const skip = (page - 1) * limit;
     return this.exhibitionModel
       .find()
+      .skip(skip)
+      .limit(limit)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
   }

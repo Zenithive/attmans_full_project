@@ -437,3 +437,4 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         </>
     );
 };
+export default AddExhibition;

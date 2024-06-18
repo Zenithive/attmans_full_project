@@ -9,6 +9,8 @@ import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import pubsub from '../services/pubsub.service'; 
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface Job {
     _id?: string;
@@ -188,11 +190,26 @@ const Jobs = () => {
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis,setSelectedExpertis]=useState<string[]>([]);
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [hasMore,setHasMore]=useState(true);
+    const [page, setPage] = useState(1);
 
-    const fetchJobs = async () => {
+    const fetchJobs = async (page: number) => {
         try {
-            const response = await axios.get(APIS.JOBS);
-            setJobs(response.data);
+            const response = await axios.get(APIS.JOBS, {
+                params: { page, limit: 10 }
+              });
+              if (response.data.length === 0) {
+                setHasMore(false);
+              } else{
+                setJobs((prev) => {
+                  const newJobs = response.data.filter((newJobs: Job) => {
+                    return !prev.some((existingJobs) => existingJobs._id === newJobs._id);
+                  });
+                  console.log("...prev, ...newJobs",[...prev, ...newJobs])
+                  return [...prev, ...newJobs];
+                });
+              }
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
@@ -200,15 +217,18 @@ const Jobs = () => {
 
     const refetch = async () => {
         try {
-            await fetchJobs();
+            setPage(1);
+            setJobs([]);
+            setHasMore(true);
+            await fetchJobs(1);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
     };
 
     useEffect(() => {
-        fetchJobs();
-    }, []);
+        fetchJobs(page);
+    }, [page]);
 
     useEffect(() => {
         pubsub.subscribe('JobUpdated', refetch);
@@ -259,40 +279,54 @@ const Jobs = () => {
       );
 
     return (
-        <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
+        <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important",overflowX:"hidden !important"}}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
-                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-            </Box>
-            <Box sx={{ display: 'flex', gap: 10, my: 2 }}>
+                <Box sx={{position:"relative",left:"69%",width:"60%",display:"flex"}}>
+                <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+                    <FilterAltIcon />
+                </IconButton>
+        {filterOpen && (
+             <Box sx={{ display: "flex", gap: 3 ,width:"90%"}}>
                 <Autocomplete
-                sx={{width:"25%"}}
+                sx={{position:"relative",right:"39%",width:"35%"}}
                 multiple
-                color='secondary'
-                options={Category}
-                value={selectedCategory}
-                onChange={(event, value) => setSelectedCategory(value)}
-                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{borderRadius:"20px"}} />}
-                />
-                <Autocomplete
-                multiple
-                sx={{width:"25%"}}
-                options={getSubcategorys(Subcategorys)}
-                color='secondary'
-                value={selectedSubcategory}
-                onChange={(event, value) => setSelectedSubcategory(value)}
-                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' sx={{borderRadius: "20px"}}/>}
-                />
-                <Autocomplete
-                sx={{width:"25%"}}
-                multiple
-                color='secondary'
+                size='small'
                 options={Expertiselevel}
                 value={selectedExpertis}
                 onChange={(event, value) => setSelectedExpertis(value)}
                 renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' sx={{borderRadius:"20px"}} />}
                 />
+                <Autocomplete
+                multiple
+                sx={{position:"relative",right:"110%",width:"35%"}}
+                size='small'
+                options={getSubcategorys(Subcategorys)}
+                value={selectedSubcategory}
+                onChange={(event, value) => setSelectedSubcategory(value)}
+                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' sx={{borderRadius: "20px"}}/>}
+                />
+                <Autocomplete
+                sx={{position:"relative",right:"176.2%",width:"30%"}}
+                multiple
+                size='small'
+                options={Category}
+                value={selectedCategory}
+                onChange={(event, value) => setSelectedCategory(value)}
+                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{borderRadius:"20px"}} />}
+                />
+              </Box>
+        )}
+        </Box>
+      <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
       </Box>
+      <InfiniteScroll
+        dataLength={filteredProjects.length}
+        next={() => setPage(prev => prev + 1)}
+        hasMore={hasMore}
+        loader={<Typography>Loading...</Typography>}
+        endMessage={<Typography>You are all set!</Typography>}
+      >
             <Box sx={{ mt: 2 }}>
                 {filteredProjects.map((job) => (
                     <Card key={job._id} sx={{ mb: 2 }}>
@@ -309,23 +343,23 @@ const Jobs = () => {
                             <Typography variant="body2">{job.description}</Typography>
                             <Typography variant="body2">{job.Budget}</Typography>
                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                            <Box sx={{ display: "flex", justifyContent: "space-between"}}>
-                                <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)} sx={{position:"relative",left:"95%",bottom:"60px"}}>
+                            <Box sx={{float:"right"}}>
+                                <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
                                     Apply
                                 </Button>
-                                <Box>
+                                
                                     <IconButton onClick={() => handleEditJob(job)}>
                                         <EditIcon />
                                     </IconButton>
                                     <IconButton onClick={() => handleDeleteJob(job)}>
                                         <DeleteRoundedIcon />
                                     </IconButton>
-                                </Box>
-                            </Box>
+                            </Box>        
                         </CardContent>
                     </Card>
                 ))}
             </Box>
+            </InfiniteScroll>
             <AddApply open={applyOpen} setOpen={setApplyOpen} jobTitle={jobTitle} />
         </Box>
     );

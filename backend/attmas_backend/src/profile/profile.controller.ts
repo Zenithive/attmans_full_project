@@ -41,7 +41,7 @@ export class ProfileController {
     @Body() profileData: PersonalProfile,
   ): Promise<PersonalProfile> {
     if (profilePhoto) {
-      profileData.profilePhoto = join('profilePhoto', profilePhoto.filename); // Assuming you have a field for the filename
+      profileData.profilePhoto = join('profilePhoto', profilePhoto.filename); 
     }
     return this.profileService.createOrUpdateForm1(profileData);
   }

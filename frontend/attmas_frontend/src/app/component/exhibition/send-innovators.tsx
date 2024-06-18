@@ -147,3 +147,5 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
     </Drawer>
   );
 };
+
+export default SendInnovators;

@@ -7,6 +7,7 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ExhibitionService } from './exhibition.service';
 import {
@@ -36,8 +37,11 @@ export class ExhibitionController {
   }
 
   @Get()
-  async findAll(): Promise<Exhibition[]> {
-    return this.exhibitionService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<Exhibition[]> {
+    return this.exhibitionService.findAll(page, limit);
   }
 
   @Get(':id')

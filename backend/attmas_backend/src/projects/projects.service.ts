@@ -20,9 +20,12 @@ export class JobsService {
     return createdJobs.save();
   }
 
-  async findAll(): Promise<Jobs[]> {
+  async findAll(page: number, limit: number): Promise<Jobs[]> {
+    const skip = (page - 1) * limit;
     return this.jobsModel
       .find()
+      .skip(skip)
+      .limit(limit)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
   }

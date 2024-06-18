@@ -61,10 +61,10 @@ const theme = createTheme({
               borderRadius: 20,
             },
             '&:hover fieldset': {
-              borderColor: '#cc4800', 
+              borderColor: '#616161', 
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#cc4800', 
+              borderColor: '#616161', 
             },
           },
         },
@@ -76,13 +76,13 @@ const theme = createTheme({
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderRadius: 20,
-              borderColor: '#cc4800', 
+              borderColor: '#616161', 
             },
             '&:hover fieldset': {
-              borderColor: '#cc4800', 
+              borderColor: '#616161', 
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#cc4800', 
+              borderColor: '#616161', 
             },
           },
         },

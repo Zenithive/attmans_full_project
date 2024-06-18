@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField} from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -10,6 +10,8 @@ import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import pubsub from '../services/pubsub.service';
 import SendIcon from '@mui/icons-material/Send';
 import { SendInnovators } from '../component/exhibition/send-innovators';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface Exhibition {
   _id?: string;
@@ -182,11 +184,28 @@ const Exhibition = () => {
   const [sendingExhibition, setSendingExhibition] = useState<Exhibition | null>(null);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [hasMore,setHasMore]=useState(true);
 
-  const fetchExhibitions = async () => {
+  const [page, setPage] = useState(1);
+
+  const fetchExhibitions = async (page: number) => {
     try {
-      const response = await axios.get(APIS.EXHIBITION);
-      setExhibitions(response.data);
+      const response = await axios.get(APIS.EXHIBITION, {
+        params: { page, limit: 10 }
+      });
+      console.log("response.data.length",response.data.length);
+      if (response.data.length === 0) {
+        setHasMore(false);
+      } else {
+        setExhibitions((prev) => {
+          const newExhibitions = response.data.filter((newExhibition: Exhibition) => {
+            return !prev.some((existingExhibition) => existingExhibition._id === newExhibition._id);
+          });
+          console.log("...prev, ...newExhibitions",[...prev, ...newExhibitions])
+          return [...prev, ...newExhibitions];
+        });
+      }
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
     }
@@ -194,15 +213,18 @@ const Exhibition = () => {
 
   const refetch = async () => {
     try {
-      await fetchExhibitions();
+      setPage(1);
+      setExhibitions([]);
+      setHasMore(true); 
+      await fetchExhibitions(1); 
     } catch (error) {
       console.error('Error refetching exhibitions:', error);
     }
   };
 
   useEffect(() => {
-    fetchExhibitions();
-  }, []);
+    fetchExhibitions(page);
+  }, [page]);
 
   useEffect(() => {
     pubsub.subscribe('ExhibitionCreated', refetch);
@@ -251,31 +273,46 @@ const Exhibition = () => {
   );
 
   return (
-    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" }}>
+    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
+        <Box sx={{position:"relative",left:"69%",width:"60%",display:"flex"}}>
+          <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+            <FilterAltIcon />
+          </IconButton>
+        {filterOpen && (
+          <Box sx={{ display: "flex", gap: 3 ,width:"75%"}}>
+            <Autocomplete
+              multiple
+              size='small'
+              sx={{width:"30%",position:"relative",right:"37.5%"}}
+              options={getSubjectItems(subjects)}
+              value={selectedSubjects}
+              onChange={(event, value) => setSelectedSubjects(value)}
+              renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subjects" color='secondary' sx={{ borderRadius: "20px" }} />}
+            />
+            <Autocomplete
+              multiple
+              sx={{width:"30%",position:"relative",right:"104%"}}
+              size='small'
+              options={industries}
+              value={selectedIndustries}
+              onChange={(event, value) => setSelectedIndustries(value)}
+              renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Industries" color='secondary' sx={{ borderRadius: "20px" }} />}
+            />
+          </Box>
+        )}
+        </Box>
         <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
       </Box>
-      <Box sx={{ display: 'flex', gap: 10, my: 2 }}>
-        <Autocomplete
-          sx={{width:"25%"}}
-          multiple
-          color='secondary'
-          options={industries}
-          value={selectedIndustries}
-          onChange={(event, value) => setSelectedIndustries(value)}
-          renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Industries" color='secondary' sx={{borderRadius:"20px"}} />}
-        />
-        <Autocomplete
-          multiple
-          sx={{width:"25%"}}
-          options={getSubjectItems(subjects)}
-          color='secondary'
-          value={selectedSubjects}
-          onChange={(event, value) => setSelectedSubjects(value)}
-          renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subjects" color='secondary' sx={{borderRadius: "20px"}}/>}
-        />
-      </Box>
+      <InfiniteScroll
+        dataLength={filteredExhibitions.length}
+        next={() => setPage(prev => prev + 1)}
+        hasMore={hasMore}
+        loader={<Typography>Loading...</Typography>}
+        endMessage={<Typography>You are all set!</Typography>}
+      >
+
       <Box sx={{ mt: 2 }}>
         {filteredExhibitions.map((exhibition) => (
           <Card key={exhibition._id} sx={{ mb: 2 }}>
@@ -306,6 +343,7 @@ const Exhibition = () => {
           </Card>
         ))}
       </Box>
+      </InfiniteScroll>
       {sendingExhibition && (
         <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
       )}
