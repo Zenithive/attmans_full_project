@@ -3,14 +3,14 @@ import * as React from 'react';
 import UserList from '../Freelancer&InnovatorsCard';
 import { APIS } from '../../constants/api.constant';
 
-const Freelancers: React.FC = () => {
+const Innovators: React.FC = () => {
   return (
     <UserList
-      apiUrl={APIS.FREELANCERS}
-      title="Freelancers"
-      endMessage="No more freelancers"
+      apiUrl={APIS.INNOVATORS}
+      title="Innovators"
+      endMessage="No more innovators"
     />
   );
 };
 
-export default Freelancers;
+export default Innovators;

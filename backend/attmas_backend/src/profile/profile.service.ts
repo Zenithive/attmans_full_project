@@ -18,13 +18,6 @@ export class ProfileService {
     private readonly usersService: UsersService,
   ) {}
 
-  // async createForm1(
-  //   PersonalProfile: PersonalProfile,
-  // ): Promise<PersonalProfile> {
-  //   const createdProfile = new this.profileModel(PersonalProfile);
-  //   return createdProfile.save();
-  // }
-
   async createOrUpdateForm1(
     personalProfile: PersonalProfile,
   ): Promise<PersonalProfile> {
@@ -41,17 +34,6 @@ export class ProfileService {
       return createdProfile.save();
     }
   }
-
-  // async createForm2(WorkExprience: WorkExprience): Promise<WorkExprience> {
-  //   console.log('workExprience', WorkExprience);
-  //   const createdProfile = new this.workExprience(WorkExprience);
-  //   const Profiled = createdProfile.save();
-  //   await this.usersService.updateUserTypes(
-  //     WorkExprience.username,
-  //     WorkExprience.userType,
-  //   );
-  //   return Profiled;
-  // }
 
   async createOrUpdateForm2(
     workExprience: WorkExprience,
@@ -80,23 +62,6 @@ export class ProfileService {
       return Profiled;
     }
   }
-
-  // async createForm3(Categories: Categories): Promise<Categories> {
-  //   const createdProfile = new this.categories(Categories);
-  //   await this.usersService.updateProfileCompletionStatus(Categories.username);
-  //   return createdProfile.save();
-  // }
-
-  // async updateUserType(username: string, userType: string): Promise<void> {
-  //   await this.usersService.updateUserTypes(username, userType);
-  // }
-
-  //   private async checkAndUpdateProfileCompletion(
-  //     username: string,
-  //   ): Promise<void> {
-  //     await this.usersService.updateProfileCompletionStatus(username);
-  //   }
-  // }
 
   async createOrUpdateForm3(categories: Categories): Promise<Categories> {
     const existingProfile = await this.categories.findOne({
@@ -147,5 +112,19 @@ export class ProfileService {
 
   async getAllCategories(): Promise<Categories[]> {
     return this.categories.find().exec();
+  }
+
+  async getProfileByUsername(
+    username: string,
+  ): Promise<PersonalProfile | null> {
+    return this.profileModel.findOne({ username }).exec();
+  }
+
+  async getProfileByUsername2(username: string): Promise<WorkExprience | null> {
+    return this.workExprience.findOne({ username }).exec();
+  }
+
+  async getProfileByUsername3(username: string): Promise<Categories | null> {
+    return this.categories.findOne({ username }).exec();
   }
 }

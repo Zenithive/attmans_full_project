@@ -67,4 +67,19 @@ export class ProfileController {
   async getAllCategories(): Promise<Categories[]> {
     return this.profileService.getAllCategories();
   }
+
+  @Get('profileByUsername')
+  async getProfileByUsername(@Query('username') username: string): Promise<PersonalProfile | null> {
+    return this.profileService.getProfileByUsername(username);
+  }
+
+  @Get('profileByUsername2')
+  async getProfileByUsername2(@Query('username') username: string): Promise<WorkExprience | null> {
+    return this.profileService.getProfileByUsername2(username);
+  }
+
+  @Get('profileByUsername3')
+  async getProfileByUsername3(@Query('username') username: string): Promise<Categories | null> {
+    return this.profileService.getProfileByUsername3(username);
+  }
 }
