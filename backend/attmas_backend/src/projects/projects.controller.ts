@@ -26,8 +26,17 @@ export class JobsController {
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('Category') Category: string[],
+    @Query('Subcategorys') Subcategorys: string[],
+    @Query('Expertiselevel') Expertiselevel: string[],
   ): Promise<Jobs[]> {
-    return this.jobsService.findAll(page, limit);
+    return this.jobsService.findAll(
+      page,
+      limit,
+      Category,
+      Subcategorys,
+      Expertiselevel,
+    );
   }
 
   @Get(':id')

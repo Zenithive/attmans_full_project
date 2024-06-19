@@ -189,10 +189,10 @@ const Exhibition = () => {
 
   const [page, setPage] = useState(1);
 
-  const fetchExhibitions = async (page: number) => {
+  const fetchExhibitions = async (page: number, industriesFilter: string[], subjectsFilter: string[]) => {
     try {
       const response = await axios.get(APIS.EXHIBITION, {
-        params: { page, limit: 10 }
+        params: { page, limit: 10,industries: industriesFilter.join(','), subjects: subjectsFilter.join(',') }
       });
       console.log("response.data.length",response.data.length);
       if (response.data.length === 0) {
@@ -205,6 +205,9 @@ const Exhibition = () => {
           console.log("...prev, ...newExhibitions",[...prev, ...newExhibitions])
           return [...prev, ...newExhibitions];
         });
+        if (response.data.length < 10) {
+          setHasMore(false);
+        }
       }
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
@@ -216,14 +219,20 @@ const Exhibition = () => {
       setPage(1);
       setExhibitions([]);
       setHasMore(true); 
-      await fetchExhibitions(1); 
+      await fetchExhibitions(1, selectedIndustries, selectedSubjects); 
     } catch (error) {
       console.error('Error refetching exhibitions:', error);
     }
   };
 
   useEffect(() => {
-    fetchExhibitions(page);
+    refetch(); 
+  }, [selectedIndustries, selectedSubjects]);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchExhibitions(page, selectedIndustries, selectedSubjects); 
+    }
   }, [page]);
 
   useEffect(() => {
@@ -267,10 +276,9 @@ const Exhibition = () => {
     setSendingExhibition(null);
   };
 
-  const filteredExhibitions = exhibitions.filter(exhibition =>
-    (selectedIndustries.length === 0 || selectedIndustries.some(industry => exhibition.industries.includes(industry))) &&
-    (selectedSubjects.length === 0 || selectedSubjects.some(subject => exhibition.subjects.includes(subject)))
-  );
+  const handleFilterChange = () => {
+    refetch();
+  };
 
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
@@ -300,21 +308,22 @@ const Exhibition = () => {
               onChange={(event, value) => setSelectedIndustries(value)}
               renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Industries" color='secondary' sx={{ borderRadius: "20px" }} />}
             />
+              <button onClick={handleFilterChange}>Apply Filters</button>
           </Box>
         )}
         </Box>
         <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
       </Box>
       <InfiniteScroll
-        dataLength={filteredExhibitions.length}
+        dataLength={exhibitions.length}
         next={() => setPage(prev => prev + 1)}
         hasMore={hasMore}
         loader={<Typography>Loading...</Typography>}
-        endMessage={<Typography>You are all set!</Typography>}
+        endMessage={<Typography>No more Exhibitions</Typography>}
       >
 
       <Box sx={{ mt: 2 }}>
-        {filteredExhibitions.map((exhibition) => (
+        {exhibitions.map((exhibition) => (
           <Card key={exhibition._id} sx={{ mb: 2 }}>
             <CardContent>
               <Typography variant="h5">

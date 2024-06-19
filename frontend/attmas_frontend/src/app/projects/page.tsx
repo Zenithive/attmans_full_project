@@ -194,10 +194,10 @@ const Jobs = () => {
     const [hasMore,setHasMore]=useState(true);
     const [page, setPage] = useState(1);
 
-    const fetchJobs = async (page: number) => {
+    const fetchJobs = async (page: number,CategoryesFilter: string[], SubcategorysFilter: string[],ExpertiselevelFilter: string[]) => {
         try {
             const response = await axios.get(APIS.JOBS, {
-                params: { page, limit: 10 }
+                params: { page, limit: 10,Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','),Expertiselevel: ExpertiselevelFilter.join(',')}
               });
               if (response.data.length === 0) {
                 setHasMore(false);
@@ -209,6 +209,9 @@ const Jobs = () => {
                   console.log("...prev, ...newJobs",[...prev, ...newJobs])
                   return [...prev, ...newJobs];
                 });
+                if (response.data.length < 10) {
+                    setHasMore(false);
+                  }
               }
         } catch (error) {
             console.error('Error fetching jobs:', error);
@@ -220,15 +223,21 @@ const Jobs = () => {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1);
+            await fetchJobs(1,selectedCategory,selectedSubcategory,selectedExpertis);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
     };
 
     useEffect(() => {
-        fetchJobs(page);
-    }, [page]);
+        refetch(); 
+      }, [selectedCategory, selectedSubcategory,selectedExpertis]);
+   
+  useEffect(() => {
+    if (page > 1) {
+        fetchJobs(page, selectedCategory, selectedSubcategory,selectedExpertis); 
+    }
+  }, [page]);
 
     useEffect(() => {
         pubsub.subscribe('JobUpdated', refetch);
@@ -271,12 +280,9 @@ const Jobs = () => {
         setApplyOpen(true); 
         setJobTitle(title); 
     };
-
-    const filteredProjects = jobs.filter(project =>
-        (selectedCategory.length === 0 || selectedCategory.some(Categorys => project.Category.includes(Categorys))) &&
-        (selectedSubcategory.length === 0 || selectedSubcategory.some(Subcategory => project.Subcategorys.includes(Subcategory))) &&
-        (selectedExpertis.length === 0 || selectedExpertis.some(expertiselevel=> project.Expertiselevel.includes(expertiselevel)))
-      );
+    const handleFilterChange = () => {
+        refetch();
+      };
 
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important",overflowX:"hidden !important"}}>
@@ -287,7 +293,7 @@ const Jobs = () => {
                     <FilterAltIcon />
                 </IconButton>
         {filterOpen && (
-             <Box sx={{ display: "flex", gap: 3 ,width:"90%"}}>
+             <Box sx={{ display: "flex", gap: 3 ,width:"95%"}}>
                 <Autocomplete
                 sx={{position:"relative",right:"39%",width:"35%"}}
                 multiple
@@ -315,20 +321,21 @@ const Jobs = () => {
                 onChange={(event, value) => setSelectedCategory(value)}
                 renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{borderRadius:"20px"}} />}
                 />
+                 <button onClick={handleFilterChange}>Apply Filters</button>
               </Box>
         )}
         </Box>
       <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
       </Box>
       <InfiniteScroll
-        dataLength={filteredProjects.length}
+        dataLength={jobs.length}
         next={() => setPage(prev => prev + 1)}
         hasMore={hasMore}
         loader={<Typography>Loading...</Typography>}
-        endMessage={<Typography>You are all set!</Typography>}
+        endMessage={<Typography>No more Projects</Typography>}
       >
             <Box sx={{ mt: 2 }}>
-                {filteredProjects.map((job) => (
+                {jobs.map((job) => (
                     <Card key={job._id} sx={{ mb: 2 }}>
                         <CardContent>
                             <Typography variant="h5">

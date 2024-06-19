@@ -40,8 +40,10 @@ export class ExhibitionController {
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('industries') industries: string[],
+    @Query('subjects') subjects: string[],
   ): Promise<Exhibition[]> {
-    return this.exhibitionService.findAll(page, limit);
+    return this.exhibitionService.findAll(page, limit, industries, subjects);
   }
 
   @Get(':id')
