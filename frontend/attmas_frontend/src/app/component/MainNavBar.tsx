@@ -32,8 +32,8 @@ function clearCookies() {
 export default function MainNavBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+  // const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+  React.useState<null | HTMLElement>(null);
   const [profilePhoto, setProfilePhoto] = React.useState<string | null>(null);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -51,7 +51,7 @@ export default function MainNavBar() {
         });
         console.log("response", response);
         setProfilePhoto(response.data.profilePhoto);
-        console.log("userProfile",response.data.profilePhoto)
+        console.log("userProfile", response.data.profilePhoto)
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
@@ -62,7 +62,7 @@ export default function MainNavBar() {
     }
   }, [userDetails._id]);
   console.log("profilePhoto", profilePhoto);
-  
+
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -187,13 +187,6 @@ export default function MainNavBar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar 
-        position="fixed" 
-        sx={{ 
-          right: 0, 
-          left: 'auto', 
-          width: 'calc(100% - 240px)', 
-          boxShadow: 'none', 
       {/* <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', boxShadow:'none' }}> */}
       <AppBar
         position="fixed"
@@ -202,9 +195,6 @@ export default function MainNavBar() {
           left: 'auto',
           width: 'calc(100% - 240px)',
           boxShadow: 'none',
-          // borderBottomLeftRadius: '16px', 
-          // borderBottomRightRadius: '16px',
-          // backgroundColor: 'darkgrey'
         }}
       >
         <Toolbar sx={{ height: 70 }}>
