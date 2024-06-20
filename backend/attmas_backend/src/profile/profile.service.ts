@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ProfileService {
+  [x: string]: any;
   constructor(
     @InjectModel(PersonalProfile.name)
     private readonly profileModel: Model<PersonalProfile>,
@@ -126,5 +127,9 @@ export class ProfileService {
 
   async getProfileByUsername3(username: string): Promise<Categories | null> {
     return this.categories.findOne({ username }).exec();
+  }
+
+  async getProfileByUserId(userId: string): Promise<PersonalProfile> {
+    return this.profileModel.findOne({ userId }).exec();
   }
 }

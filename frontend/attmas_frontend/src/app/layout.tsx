@@ -60,6 +60,30 @@ const theme = createTheme({
             '& fieldset': {
               borderRadius: 20,
             },
+            '&:hover fieldset': {
+              borderColor: '#616161', 
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#616161', 
+            },
+          },
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 20,
+              borderColor: '#616161', 
+            },
+            '&:hover fieldset': {
+              borderColor: '#616161', 
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#616161', 
+            },
           },
         },
       },

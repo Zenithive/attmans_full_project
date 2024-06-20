@@ -37,9 +37,27 @@ export class ExhibitionService {
     return sendInnovatorsFromExibition.save();
   }
 
-  async findAll(): Promise<Exhibition[]> {
+  async findAll(
+    page: number,
+    limit: number,
+    industries: string[],
+    subjects: string[],
+  ): Promise<Exhibition[]> {
+    const skip = (page - 1) * limit;
+    const filter: any = {};
+
+    if (industries.length > 0) {
+      filter.industries = { $in: industries };
+    }
+
+    if (subjects.length > 0) {
+      filter.subjects = { $in: subjects };
+    }
+
     return this.exhibitionModel
-      .find()
+      .find(filter)
+      .skip(skip)
+      .limit(limit)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
   }

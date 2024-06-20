@@ -43,7 +43,7 @@ export class ProfileController {
     @Body() profileData: PersonalProfile,
   ): Promise<PersonalProfile> {
     if (profilePhoto) {
-      profileData.profilePhoto = join('profilePhoto', profilePhoto.filename); // Assuming you have a field for the filename
+      profileData.profilePhoto = join('profilePhoto', profilePhoto.filename); 
     }
     return this.profileService.createOrUpdateForm1(profileData);
   }
@@ -66,6 +66,11 @@ export class ProfileController {
 
   //******** Get Request from profile completion check ********//
 
+  @Get('form1')
+  async getProfileData(@Query('userId') userId: string): Promise<PersonalProfile> {
+    return this.profileService.getProfileByUserId(userId);
+  }
+  
   @Get('check')
   async checkProfileCompletion(@Query('username') username: string): Promise<{ profileCompleted: number }> {
     return this.profileService.getProfileCompletionStatus(username);

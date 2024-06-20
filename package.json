@@ -13,10 +13,17 @@
   },
   "dependencies": {
     "@date-io/date-fns": "^3.0.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.20",
+    "@mui/x-data-grid": "^7.7.0",
     "@testing-library/react": "^16.0.0",
+    "axios": "^1.7.2",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.11",
     "js-cookie": "^3.0.5",
     "next": "^14.2.3",
+    "react-infinite-scroll-component": "^6.1.0",
     "styled-components": "^6.1.11",
     "validator": "^13.12.0"
   },

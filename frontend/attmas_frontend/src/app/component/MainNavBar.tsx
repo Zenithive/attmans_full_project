@@ -12,6 +12,11 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
 import { MenuItem } from '@mui/material';
+import { UserSchema, selectUserSession } from '../reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { Avatar } from '@mui/material';
+import axios from 'axios';
+import { APIS, SERVER_URL } from '../constants/api.constant';
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -27,12 +32,37 @@ function clearCookies() {
 export default function MainNavBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+  const [profilePhoto, setProfilePhoto] = React.useState<string | null>(null);
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const router = useRouter();
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
+  React.useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get(APIS.FORM1, {
+          headers: { userId: userDetails._id },
+        });
+        console.log("response", response);
+        setProfilePhoto(response.data.profilePhoto);
+        console.log("userProfile",response.data.profilePhoto)
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    if (userDetails._id) {
+      fetchUserProfile();
+    }
+  }, [userDetails._id]);
+  console.log("profilePhoto", profilePhoto);
+  
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -92,7 +122,7 @@ export default function MainNavBar() {
     >
       <MenuItem onClick={handleMenuClose}>
         Signed in as <br />
-        {/* {userDetails.username} */}
+        {userDetails.username}
       </MenuItem>
       <MenuItem onClick={handleProfileRedirect}>Profile</MenuItem>
       <MenuItem onClick={handleLogout}>Log out</MenuItem>
@@ -144,7 +174,11 @@ export default function MainNavBar() {
           aria-haspopup="true"
           color="inherit"
         >
-          <AccountCircle />
+          {profilePhoto ? (
+            <Avatar src={`${SERVER_URL}/${profilePhoto}`} />
+          ) : (
+            <AccountCircle />
+          )}
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -160,6 +194,17 @@ export default function MainNavBar() {
           left: 'auto', 
           width: 'calc(100% - 240px)', 
           boxShadow: 'none', 
+      {/* <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', boxShadow:'none' }}> */}
+      <AppBar
+        position="fixed"
+        sx={{
+          right: 0,
+          left: 'auto',
+          width: 'calc(100% - 240px)',
+          boxShadow: 'none',
+          // borderBottomLeftRadius: '16px', 
+          // borderBottomRightRadius: '16px',
+          // backgroundColor: 'darkgrey'
         }}
       >
         <Toolbar sx={{ height: 70 }}>
@@ -174,7 +219,11 @@ export default function MainNavBar() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <AccountCircle />
+              {profilePhoto ? (
+                <Avatar src={`${SERVER_URL}/${profilePhoto}`} />
+              ) : (
+                <AccountCircle />
+              )}
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
