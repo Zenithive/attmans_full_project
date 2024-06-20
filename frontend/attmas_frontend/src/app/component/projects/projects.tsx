@@ -79,7 +79,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         "Healthcare",
         "Medical devices and equipment",
         "Mining and metals",
-        "Real estate and construction",
+        "Real estate and construction", 
         "Textiles"
     ],[]);
 
