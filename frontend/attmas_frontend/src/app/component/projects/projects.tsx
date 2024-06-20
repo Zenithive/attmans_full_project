@@ -16,6 +16,7 @@ import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { useCallback,useMemo } from 'react';
 
 
 interface Jobs {
@@ -50,7 +51,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-    const initialValues = {
+    const initialValues =React.useMemo(()=>({
         title: '',
         description: '',
         Expertiselevel: '',
@@ -60,7 +61,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         Subcategory: [],
         // username: userDetails.username
 
-    };
+    }),[]);
 
     React.useEffect(() => {
         if (editingJobs) {
@@ -68,7 +69,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         }
     }, [editingJobs]);
 
-    const Category = [
+    const Category =React.useMemo(()=>[
         "Agriculture",
         "Chemicals",
         "Electronics",
@@ -80,9 +81,9 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         "Mining and metals",
         "Real estate and construction",
         "Textiles"
-    ];
+    ],[]);
 
-    const Subcategorys = [
+    const Subcategorys =React.useMemo(()=>[
         {
             category: "Chemistry",
             items: [
@@ -215,15 +216,15 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 "Applied Chemistry",
             ]
         },
-    ];
+    ],[]);
 
-    const allSubcategoryItems = Subcategorys.flatMap(Subcategory => Subcategory.items.map(item => ({
+    const allSubcategoryItems =React.useMemo(()=>Subcategorys.flatMap(Subcategory => Subcategory.items.map(item => ({
         category: Subcategory.category,
         label: item
-    })));
+    }))),[]);
 
 
-    const handleSubmit = async (values: { title: string; description: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit =React.useCallback(async (values: { title: string; description: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,
             description: values.description,
@@ -252,7 +253,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         } finally {
             setSubmitting(false);
         }
-    };
+    },[editingJobs,userDetails,onCancelEdit]);
 
     return (
         <>
@@ -422,7 +423,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         // color='secondary'
                                         value={values.TimeFrame}
                                         onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
-
                                         slotProps={{
                                             textField: {
                                                 color:'secondary'      

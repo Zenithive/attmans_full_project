@@ -12,6 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { SendInnovators } from '../component/exhibition/send-innovators';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useMemo,useCallback } from 'react';
 
 interface Exhibition {
   _id?: string;
@@ -25,7 +26,7 @@ interface Exhibition {
   userId?: string;
 }
 
-const industries = [
+const industries =[
   "Agriculture",
   "Chemicals",
   "Electronics",
@@ -174,7 +175,7 @@ const subjects = [
   },
 ];
 
-const getSubjectItems = (subjects: any[]) => {
+const getSubjectItems =(subjects: any[]) => {
   return subjects.flatMap((subject: { items: any; }) => subject.items);
 };
 
@@ -189,7 +190,7 @@ const Exhibition = () => {
 
   const [page, setPage] = useState(1);
 
-  const fetchExhibitions = async (page: number, industriesFilter: string[], subjectsFilter: string[]) => {
+  const fetchExhibitions =useCallback(async (page: number, industriesFilter: string[], subjectsFilter: string[]) => {
     try {
       const response = await axios.get(APIS.EXHIBITION, {
         params: { page, limit: 10,industries: industriesFilter.join(','), subjects: subjectsFilter.join(',') }
@@ -212,9 +213,9 @@ const Exhibition = () => {
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
     }
-  };
+  },[]);
 
-  const refetch = async () => {
+  const refetch =useCallback(async () => {
     try {
       setPage(1);
       setExhibitions([]);
@@ -223,7 +224,7 @@ const Exhibition = () => {
     } catch (error) {
       console.error('Error refetching exhibitions:', error);
     }
-  };
+  },[fetchExhibitions,selectedIndustries,selectedSubjects]);
 
   useEffect(() => {
     refetch(); 
@@ -250,15 +251,15 @@ const Exhibition = () => {
     };
   }, []);
 
-  const handleEditExhibition = (exhibition: Exhibition) => {
+  const handleEditExhibition =useCallback((exhibition: Exhibition) => {
     setEditingExhibition(exhibition);
-  };
+  },[]);
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit =useCallback(() => {
     setEditingExhibition(null);
-  };
+  },[]);
 
-  const handleDeleteExhibition = async (editingExhibition: Exhibition) => {
+  const handleDeleteExhibition =useCallback(async (editingExhibition: Exhibition) => {
     try {
       await axios.delete(`${APIS.EXHIBITION}/${editingExhibition._id}`);
       setExhibitions(exhibitions.filter(exhibition => exhibition._id !== editingExhibition._id));
@@ -266,19 +267,19 @@ const Exhibition = () => {
     } catch (error) {
       console.error('Error deleting exhibition:', error);
     }
-  };
+  },[exhibitions]);
 
-  const handleSendInnovators = (exhibition: Exhibition) => {
+  const handleSendInnovators =useCallback((exhibition: Exhibition) => {
     setSendingExhibition(exhibition);
-  };
+  },[]);
 
-  const handleCancelSend = () => {
+  const handleCancelSend =useCallback(() => {
     setSendingExhibition(null);
-  };
+  },[]);
 
-  const handleFilterChange = () => {
+  const handleFilterChange =useCallback(() => {
     refetch();
-  };
+  },[refetch]);
 
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>

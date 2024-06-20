@@ -16,7 +16,7 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-
+import { useMemo,useCallback } from 'react';
 interface Exhibition {
     _id?: string;
     title: string;
@@ -50,7 +50,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
     
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-    const initialValues = {
+    const initialValues = React.useMemo(()=>({
         title: '',
         description: '',
         status:'',
@@ -58,7 +58,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: []
-    };
+    }),[]);
 
     React.useEffect(() => {
         if (editingExhibition) {
@@ -66,7 +66,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         }
     }, [editingExhibition]);
 
-    const industries = [
+    const industries = React.useMemo(()=>[
         "Agriculture",
         "Chemicals",
         "Electronics",
@@ -78,9 +78,9 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         "Mining and metals",
         "Real estate and construction",
         "Textiles"
-    ];
+    ],[]);
 
-    const subjects = [
+    const subjects =React.useMemo(()=>[
         {
             category: "Chemistry",
             items: [
@@ -213,14 +213,14 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                 "Applied Chemistry",
             ]
         },
-    ];
+    ],[]);
 
-    const allSubjectItems = subjects.flatMap(subject => subject.items.map(item => ({
+    const allSubjectItems = React.useMemo(()=>subjects.flatMap(subject => subject.items.map(item => ({
         category: subject.category,
         label: item
-    })));
+    }))),[subjects]);
 
-    const handleSubmit = async (values: { title: string; description: string; status:string;videoUrl:string,dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;videoUrl:string,dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
@@ -250,7 +250,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         } finally {
             setSubmitting(false);
         }
-    };
+    },[editingExhibition,userDetails,onCancelEdit]);
 
     return (
         <>

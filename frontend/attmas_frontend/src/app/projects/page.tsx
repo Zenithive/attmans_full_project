@@ -8,9 +8,10 @@ import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import pubsub from '../services/pubsub.service'; 
+import pubsub from '../services/pubsub.service';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useCallback, useMemo } from 'react';
 
 interface Job {
     _id?: string;
@@ -37,7 +38,7 @@ const Category = [
     "Textiles"
 ];
 
-const Expertiselevel=[
+const Expertiselevel = [
     "Beginner",
     "Intermidiate",
     "Expert",
@@ -179,9 +180,11 @@ const Subcategorys = [
     },
 ];
 
-const getSubcategorys = (Subcategorys: any[]) => {
+const getSubcategorys =(Subcategorys: any[]) => {
     return Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
-  };
+};
+
+
 const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -189,84 +192,84 @@ const Jobs = () => {
     const [jobTitle, setJobTitle] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
-    const [selectedExpertis,setSelectedExpertis]=useState<string[]>([]);
+    const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
     const [filterOpen, setFilterOpen] = useState(false);
-    const [hasMore,setHasMore]=useState(true);
+    const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
 
-    const fetchJobs = async (page: number,CategoryesFilter: string[], SubcategorysFilter: string[],ExpertiselevelFilter: string[]) => {
+    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
         try {
             const response = await axios.get(APIS.JOBS, {
-                params: { page, limit: 10,Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','),Expertiselevel: ExpertiselevelFilter.join(',')}
-              });
-              if (response.data.length === 0) {
+                params: { page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(',') }
+            });
+            if (response.data.length === 0) {
                 setHasMore(false);
-              } else{
+            } else {
                 setJobs((prev) => {
-                  const newJobs = response.data.filter((newJobs: Job) => {
-                    return !prev.some((existingJobs) => existingJobs._id === newJobs._id);
-                  });
-                  console.log("...prev, ...newJobs",[...prev, ...newJobs])
-                  return [...prev, ...newJobs];
+                    const newJobs = response.data.filter((newJobs: Job) => {
+                        return !prev.some((existingJobs) => existingJobs._id === newJobs._id);
+                    });
+                    console.log("...prev, ...newJobs", [...prev, ...newJobs])
+                    return [...prev, ...newJobs];
                 });
                 if (response.data.length < 10) {
                     setHasMore(false);
-                  }
-              }
+                }
+            }
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    };
+    }, []);
 
-    const refetch = async () => {
+    const refetch = useCallback(async () => {
         try {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1,selectedCategory,selectedSubcategory,selectedExpertis);
+            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    };
+    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory]);
 
     useEffect(() => {
-        refetch(); 
-      }, [selectedCategory, selectedSubcategory,selectedExpertis]);
-   
-  useEffect(() => {
-    if (page > 1) {
-        fetchJobs(page, selectedCategory, selectedSubcategory,selectedExpertis); 
-    }
-  }, [page]);
+        refetch();
+    }, [selectedCategory, selectedSubcategory, selectedExpertis]);
+
+    useEffect(() => {
+        if (page > 1) {
+            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis);
+        }
+    }, [page]);
 
     useEffect(() => {
         pubsub.subscribe('JobUpdated', refetch);
-    
-        return () => {
-          pubsub.unsubscribe('JobUpdated', refetch);
-        };
-    
-      }, []);
 
-    
-      useEffect(() => {
+        return () => {
+            pubsub.unsubscribe('JobUpdated', refetch);
+        };
+
+    }, [refetch]);
+
+
+    useEffect(() => {
         pubsub.subscribe('JobCreated', refetch);
-    
+
         return () => {
-          pubsub.unsubscribe('JobCreated', refetch);
+            pubsub.unsubscribe('JobCreated', refetch);
         };
-    
-      }, []);  
 
-    const handleEditJob = (job: Job) => {
+    }, [refetch]);
+
+    const handleEditJob = useCallback((job: Job) => {
         setEditingJob(job);
-    };
+    }, []);
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = useCallback(() => {
         setEditingJob(null);
-    };
+    }, []);
 
-    const handleDeleteJob = async (jobToDelete: Job) => {
+    const handleDeleteJob = useCallback(async (jobToDelete: Job) => {
         try {
             await axios.delete(`${APIS.JOBS}/${jobToDelete._id}`);
             setJobs(jobs.filter(job => job._id !== jobToDelete._id));
@@ -274,98 +277,99 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error deleting job:', error);
         }
-    };
+    }, [jobs]);
 
-    const handleApplyClick = (title:string) => {
-        setApplyOpen(true); 
-        setJobTitle(title); 
-    };
-    const handleFilterChange = () => {
+    const handleApplyClick = useCallback((title: string) => {
+        setApplyOpen(true);
+        setJobTitle(title);
+    }, []);
+    const handleFilterChange = useCallback(() => {
         refetch();
-      };
+    }, [refetch]);
+
 
     return (
-        <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important",overflowX:"hidden !important"}}>
+        <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important", overflowX: "hidden !important" }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
-                <Box sx={{position:"relative",left:"69%",width:"60%",display:"flex"}}>
-                <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                    <FilterAltIcon />
-                </IconButton>
-        {filterOpen && (
-             <Box sx={{ display: "flex", gap: 3 ,width:"95%"}}>
-                <Autocomplete
-                sx={{position:"relative",right:"39%",width:"35%"}}
-                multiple
-                size='small'
-                options={Expertiselevel}
-                value={selectedExpertis}
-                onChange={(event, value) => setSelectedExpertis(value)}
-                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' sx={{borderRadius:"20px"}} />}
-                />
-                <Autocomplete
-                multiple
-                sx={{position:"relative",right:"110%",width:"35%"}}
-                size='small'
-                options={getSubcategorys(Subcategorys)}
-                value={selectedSubcategory}
-                onChange={(event, value) => setSelectedSubcategory(value)}
-                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' sx={{borderRadius: "20px"}}/>}
-                />
-                <Autocomplete
-                sx={{position:"relative",right:"176.2%",width:"30%"}}
-                multiple
-                size='small'
-                options={Category}
-                value={selectedCategory}
-                onChange={(event, value) => setSelectedCategory(value)}
-                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{borderRadius:"20px"}} />}
-                />
-                 <button onClick={handleFilterChange}>Apply Filters</button>
-              </Box>
-        )}
-        </Box>
-      <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-      </Box>
-      <InfiniteScroll
-        dataLength={jobs.length}
-        next={() => setPage(prev => prev + 1)}
-        hasMore={hasMore}
-        loader={<Typography>Loading...</Typography>}
-        endMessage={<Typography>No more Projects</Typography>}
-      >
-            <Box sx={{ mt: 2 }}>
-                {jobs.map((job) => (
-                    <Card key={job._id} sx={{ mb: 2 }}>
-                        <CardContent>
-                            <Typography variant="h5">
-                                {job.title}
-                                <span style={{ fontSize: 'small', color: "#616161" }}>
-                                    ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                </span>
-                                <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
-                                    {job.Expertiselevel}
-                                </span>
-                            </Typography>
-                            <Typography variant="body2">{job.description}</Typography>
-                            <Typography variant="body2">{job.Budget}</Typography>
-                            <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                            <Box sx={{float:"right"}}>
-                                <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
-                                    Apply
-                                </Button>
-                                
+                <Box sx={{ position: "relative", left: "69%", width: "60%", display: "flex" }}>
+                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+                        <FilterAltIcon />
+                    </IconButton>
+                    {filterOpen && (
+                        <Box sx={{ display: "flex", gap: 3, width: "95%" }}>
+                            <Autocomplete
+                                sx={{ position: "relative", right: "39%", width: "35%" }}
+                                multiple
+                                size='small'
+                                options={Expertiselevel}
+                                value={selectedExpertis}
+                                onChange={(event, value) => setSelectedExpertis(value)}
+                                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' sx={{ borderRadius: "20px" }} />}
+                            />
+                            <Autocomplete
+                                multiple
+                                sx={{ position: "relative", right: "110%", width: "35%" }}
+                                size='small'
+                                options={getSubcategorys(Subcategorys)}
+                                value={selectedSubcategory}
+                                onChange={(event, value) => setSelectedSubcategory(value)}
+                                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' sx={{ borderRadius: "20px" }} />}
+                            />
+                            <Autocomplete
+                                sx={{ position: "relative", right: "176.2%", width: "30%" }}
+                                multiple
+                                size='small'
+                                options={Category}
+                                value={selectedCategory}
+                                onChange={(event, value) => setSelectedCategory(value)}
+                                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{ borderRadius: "20px" }} />}
+                            />
+                            <button onClick={handleFilterChange}>Apply Filters</button>
+                        </Box>
+                    )}
+                </Box>
+                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+            </Box>
+            <InfiniteScroll
+                dataLength={jobs.length}
+                next={() => setPage(prev => prev + 1)}
+                hasMore={hasMore}
+                loader={<Typography>Loading...</Typography>}
+                endMessage={<Typography>No more Projects</Typography>}
+            >
+                <Box sx={{ mt: 2 }}>
+                    {jobs.map((job) => (
+                        <Card key={job._id} sx={{ mb: 2 }}>
+                            <CardContent>
+                                <Typography variant="h5">
+                                    {job.title}
+                                    <span style={{ fontSize: 'small', color: "#616161" }}>
+                                        ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                    </span>
+                                    <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
+                                        {job.Expertiselevel}
+                                    </span>
+                                </Typography>
+                                <Typography variant="body2">{job.description}</Typography>
+                                <Typography variant="body2">{job.Budget}</Typography>
+                                <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+                                <Box sx={{ float: "right" }}>
+                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
+                                        Apply
+                                    </Button>
+
                                     <IconButton onClick={() => handleEditJob(job)}>
                                         <EditIcon />
                                     </IconButton>
                                     <IconButton onClick={() => handleDeleteJob(job)}>
                                         <DeleteRoundedIcon />
                                     </IconButton>
-                            </Box>        
-                        </CardContent>
-                    </Card>
-                ))}
-            </Box>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Box>
             </InfiniteScroll>
             <AddApply open={applyOpen} setOpen={setApplyOpen} jobTitle={jobTitle} />
         </Box>
