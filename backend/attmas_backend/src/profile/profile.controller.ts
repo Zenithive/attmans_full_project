@@ -21,6 +21,8 @@ import { extname, join } from 'path';
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) { }
 
+  //******** Post Request from main profile1 ********//
+
   @Post('form1')
   @UseInterceptors(
     FileInterceptor('profilePhoto', {
@@ -46,6 +48,8 @@ export class ProfileController {
     return this.profileService.createOrUpdateForm1(profileData);
   }
 
+  //******** Post Request from main profile2 ********//
+
   @Post('form2')
   async createForm2(
     @Body() WorkExprience: WorkExprience,
@@ -53,10 +57,14 @@ export class ProfileController {
     return this.profileService.createOrUpdateForm2(WorkExprience);
   }
 
+  //******** Post Request from main profile3 ********//
+
   @Post('form3')
   async createForm3(@Body() Categories: Categories): Promise<Categories> {
     return this.profileService.createOrUpdateForm3(Categories);
   }
+
+  //******** Get Request from profile completion check ********//
 
   @Get('form1')
   async getProfileData(@Query('userId') userId: string): Promise<PersonalProfile> {
@@ -66,5 +74,33 @@ export class ProfileController {
   @Get('check')
   async checkProfileCompletion(@Query('username') username: string): Promise<{ profileCompleted: number }> {
     return this.profileService.getProfileCompletionStatus(username);
+  }
+
+
+  //******** Get Request from categories  for Freelancers and Innovators ********//
+  @Get('categories')
+  async getAllCategories(): Promise<Categories[]> {
+    return this.profileService.getAllCategories();
+  }
+
+
+  //******** Get Request from Personal Profile for Edit Profile check ********//
+  @Get('profileByUsername')
+  async getProfileByUsername(@Query('username') username: string): Promise<PersonalProfile | null> {
+    return this.profileService.getProfileByUsername(username);
+  }
+
+
+  //******** Get Request from WorkExprience for Edit Profile check ********//
+  @Get('profileByUsername2')
+  async getProfileByUsername2(@Query('username') username: string): Promise<WorkExprience | null> {
+    return this.profileService.getProfileByUsername2(username);
+  }
+
+
+  //******** Get Request from categories for Edit Profile check ********//
+  @Get('profileByUsername3')
+  async getProfileByUsername3(@Query('username') username: string): Promise<Categories | null> {
+    return this.profileService.getProfileByUsername3(username);
   }
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createTheme } from '@mui/material/styles';
 import {
   Box,
@@ -23,7 +23,7 @@ import { useFormik } from 'formik';
 import { categories, subcategories } from '@/app/constants/categories';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { APIS } from '@/app/constants/api.constant';
+import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
@@ -48,14 +48,13 @@ function getStyles(name: string, selectedCategories: string[], theme: any) {
   };
 }
 
-interface ProfileForm3Props {
-  onPrevious: () => void;
-}
 
-const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
+
+const EditProfile3: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null); // State to hold fetch error
   const router = useRouter();
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -80,6 +79,33 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     },
   });
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`); // Adjust endpoint as per your backend API
+        const userData = response.data; 
+
+        // Update formik values with fetched data
+        formik.setValues({
+          ...formik.values,
+          categories: userData.categories || [],
+          subcategories: userData.subcategories || [],
+        });
+
+        setSelectedCategories(userData.categories || []);
+        setSelectedSubcategories(userData.subcategories || []);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setFetchError('Failed to fetch user profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [userDetails.username]);
+
   const handleCategoryChange = (event: SelectChangeEvent<typeof selectedCategories>) => {
     const {
       target: { value },
@@ -96,20 +122,6 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     } = event;
     setSelectedSubcategories(typeof value === 'string' ? value.split(',') : value);
     formik.setFieldValue('subcategories', value);
-  };
-
-  const handleDeleteCategory = (category: string) => () => {
-    const newSelectedCategories = selectedCategories.filter((cat) => cat !== category);
-    setSelectedCategories(newSelectedCategories);
-    formik.setFieldValue('categories', newSelectedCategories);
-    setSelectedSubcategories([]);
-    formik.setFieldValue('subcategories', []);
-  };
-
-  const handleDeleteSubcategory = (subcategory: string) => () => {
-    const newSelectedSubcategories = selectedSubcategories.filter((subcat) => subcat !== subcategory);
-    setSelectedSubcategories(newSelectedSubcategories);
-    formik.setFieldValue('subcategories', newSelectedSubcategories);
   };
 
   return (
@@ -134,6 +146,13 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
           View and Change your category here
         </Typography>
+
+        {fetchError && (
+          <Typography variant="body2" color="error" align="center">
+            {fetchError}
+          </Typography>
+        )}
+
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -208,14 +227,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             )}
           </Grid>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-            <Button
-              type="button"
-              variant="contained"
-              size="small"
-              onClick={onPrevious}
-            >
-              Back
-            </Button>
+
             <LoadingButton
               type="submit"
               variant="contained"
@@ -232,4 +244,4 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   );
 };
 
-export default ProfileForm3;
+export default EditProfile3;
