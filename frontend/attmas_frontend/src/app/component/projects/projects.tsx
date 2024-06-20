@@ -442,3 +442,4 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         </>
     );
 };
+export default AddProjects;

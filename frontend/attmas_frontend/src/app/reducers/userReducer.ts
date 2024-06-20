@@ -17,7 +17,7 @@ const initialState: UserState = {
     firstName: "", 
     lastName: "", 
     mobileNumber: "",
-    _id:""
+    _id:"",
   }
 }
 
