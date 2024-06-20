@@ -107,7 +107,7 @@ export class ProfileService {
     const form3 = await this.categories.findOne({ username });
     if (!form3) return { profileCompleted: 3 };
 
-    return { profileCompleted: 4 }; // Assume 4 means all steps completed
+    return { profileCompleted: 4 };
   }
 
   async getAllCategories(): Promise<Categories[]> {

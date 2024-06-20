@@ -1,10 +1,13 @@
-"use client";
+'use client';
 import * as React from 'react';
-import { Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip } from '@mui/material';
+import {
+  Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Select, MenuItem, FormControl, InputLabel
+} from '@mui/material';
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { APIS } from '../constants/api.constant';
+import { categories, subcategories } from '../constants/categories';
 
 interface User {
   _id: string;
@@ -35,6 +38,8 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const [filterVisible, setFilterVisible] = React.useState<boolean>(false);
   const [page, setPage] = React.useState<number>(1);
   const [hasMore, setHasMore] = React.useState<boolean>(true);
+  const [selectedCategory, setSelectedCategory] = React.useState<string>('');
+  const [selectedSubCategory, setSelectedSubCategory] = React.useState<string>('');
 
   React.useEffect(() => {
     const fetchCategories = async () => {
@@ -51,7 +56,9 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get<User[]>(`${apiUrl}&page=${page}&limit=6&filter=${filterText}`);
+      const response = await axios.get<User[]>(
+        `${apiUrl}&page=${page}&limit=6&filter=${filterText}&category=${selectedCategory}&subCategory=${selectedSubCategory}`
+      );
       if (response.data.length < 6) {
         setHasMore(false);
       }
@@ -65,10 +72,25 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 
   React.useEffect(() => {
     fetchUsers();
-  }, [filterText]);
+  }, [filterText, selectedCategory, selectedSubCategory]);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterText(event.target.value);
+    setPage(1);
+    setRowData([]);
+    setHasMore(true);
+  };
+
+  const handleCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedCategory(event.target.value as string);
+    setSelectedSubCategory('');
+    setPage(1);
+    setRowData([]);
+    setHasMore(true);
+  };
+
+  const handleSubCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedSubCategory(event.target.value as string);
     setPage(1);
     setRowData([]);
     setHasMore(true);
@@ -83,10 +105,6 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
     return userCategoryData ? userCategoryData : { categories: [], subcategories: [] };
   };
 
-  const filteredData = rowData.filter((user) =>
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(filterText.toLowerCase())
-  );
-
   return (
     <Box sx={{ background: '#f0f0f0', p: 2, borderRadius: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -95,14 +113,53 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
           <FilterAltIcon />
         </IconButton>
         {filterVisible && (
-          <TextField
-            label="Filter by name"
-            color="secondary"
-            variant="outlined"
-            value={filterText}
-            onChange={handleFilterChange}
-            sx={{ width: '25%' }}
-          />
+          <>
+            <TextField
+              label="Filter by name"
+              color="secondary"
+              variant="outlined"
+              value={filterText}
+              onChange={handleFilterChange}
+              sx={{ width: '25%' }}
+            />
+            <FormControl variant="outlined" sx={{ width: '25%', ml: 2 }}>
+              <InputLabel color="secondary">Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                label="Category"
+                color="secondary"
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {categories.map((category, index) => (
+                  <MenuItem key={index} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl variant="outlined" sx={{ width: '25%', ml: 2 }}>
+              <InputLabel color="secondary">Sub-category</InputLabel>
+              <Select
+                value={selectedSubCategory}
+                onChange={handleSubCategoryChange}
+                label="Sub-category"
+                color="secondary"
+                disabled={!selectedCategory}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {subcategories[selectedCategory]?.map((subCategory, index) => (
+                  <MenuItem key={index} value={subCategory}>
+                    {subCategory}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </>
         )}
       </Box>
       <InfiniteScroll
@@ -113,7 +170,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
         endMessage={<p style={{ textAlign: 'center' }}>{endMessage}</p>}
       >
         <Box sx={{ mt: 2 }}>
-          {filteredData.map((user) => {
+          {rowData.map((user) => {
             const { categories, subcategories } = getUserCategoryData(user.username);
             return (
               <Card key={user._id} sx={{ mb: 2, borderRadius: '16px' }}>
@@ -145,4 +202,3 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 };
 
 export default UserList;
-
