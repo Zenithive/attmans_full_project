@@ -86,6 +86,41 @@ export class UsersService {
   //   }
   // }
 
+  // async findUsersByUserType(
+  //   userType: string,
+  //   page: number,
+  //   limit: number,
+  //   filter: string,
+  //   category: string,
+  //   subCategory: string,
+  // ): Promise<User[]> {
+  //   const skip = (page - 1) * limit;
+  //   const filterQuery: any = { userType };
+
+  //   if (filter) {
+  //     filterQuery.$or = [
+  //       { firstName: new RegExp(filter, 'i') },
+  //       { lastName: new RegExp(filter, 'i') },
+  //     ];
+  //   }
+
+  //   if (category) {
+  //     filterQuery['categories'] = category;
+  //   }
+
+  //   if (subCategory) {
+  //     filterQuery['subcategories'] = subCategory;
+  //   }
+
+  //   console.log('filterQuery', filterQuery);
+  //   return this.userModel
+  //     .find(filterQuery)
+  //     .select('-password')
+  //     .skip(skip)
+  //     .limit(limit)
+  //     .exec();
+  // }
+
   async findUsersByUserType(
     userType: string,
     page: number,
@@ -104,21 +139,35 @@ export class UsersService {
       ];
     }
 
-    if (category) {
-      filterQuery['categories'] = category;
-    }
-
-    if (subCategory) {
-      filterQuery['subcategories'] = subCategory;
-    }
-
-    console.log('filterQuery', filterQuery);
-    return this.userModel
+    const users = await this.userModel
       .find(filterQuery)
       .select('-password')
       .skip(skip)
       .limit(limit)
       .exec();
+
+    if (category || subCategory) {
+      const usernames = users.map((user) => user.username);
+
+      const categoryFilter: any = { username: { $in: usernames } };
+      if (category) {
+        categoryFilter['categories'] = category;
+      }
+      if (subCategory) {
+        categoryFilter['subcategories'] = subCategory;
+      }
+
+      const categoryData = await this.categoriesModel
+        .find(categoryFilter)
+        .exec();
+      const filteredUsernames = new Set(
+        categoryData.map((cat) => cat.username),
+      );
+
+      return users.filter((user) => filteredUsernames.has(user.username));
+    }
+
+    return users;
   }
 
   async updateUserCategories(username: string): Promise<void> {
