@@ -37,6 +37,15 @@ export class ExhibitionService {
     return sendInnovatorsFromExibition.save();
   }
 
+  async getSubmittedInnovators(userId: string): Promise<SendToInnovators[]> {
+    console.log(
+      `Querying database for submitted innovators with userId: ${userId}`,
+    );
+    const result = await this.sendToInnovatorsModel.find({ userId }).exec();
+    console.log(`Result from database: ${JSON.stringify(result)}`);
+    return result;
+  }
+
   async findAll(
     page: number,
     limit: number,

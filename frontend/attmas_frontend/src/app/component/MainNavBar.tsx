@@ -56,7 +56,6 @@ export default function MainNavBar() {
         console.error("Error fetching user profile:", error);
       }
     };
-
     if (userDetails._id) {
       fetchUserProfile();
     }
@@ -84,12 +83,13 @@ export default function MainNavBar() {
     try {
       // Notify the server of the logout (if applicable)
       // await axios.post(APIS.LOGOUT);
-
+      await axios.post(`${SERVER_URL}/auth/logout`,);
       // Clear local storage
-      localStorage.clear();
+      // localStorage.clear();
 
       // Clear cookies
       clearCookies();
+      setProfilePhoto(null);
 
       // Redirect to homepage
       router.push('/');
