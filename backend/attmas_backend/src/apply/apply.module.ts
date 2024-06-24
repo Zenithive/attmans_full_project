@@ -4,6 +4,7 @@ import { ApplyService } from './apply.service';
 import { ApplyController } from './apply.controller';
 import { Apply, ApplySchema } from './apply.schema';
 import { UsersModule } from 'src/users/users.module';
+import { EmailService } from 'src/common/service/email.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { UsersModule } from 'src/users/users.module';
     UsersModule,
   ],
   controllers: [ApplyController],
-  providers: [ApplyService],
+  providers: [ApplyService, EmailService],
   exports: [ApplyService],
 })
 export class ApplyModule {}

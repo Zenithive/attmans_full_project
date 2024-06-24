@@ -15,10 +15,13 @@ export class CreateApplyDto {
   TimeFrame: Date;
 
   @IsNotEmpty()
-  @IsString()
   userId: Types.ObjectId;
 
   @IsNotEmpty()
   @IsString()
   Budget: number;
+
+  @IsNotEmpty()
+  // @IsEmail()
+  username: string;
 }

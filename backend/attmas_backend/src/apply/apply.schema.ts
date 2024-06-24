@@ -26,6 +26,9 @@ export class Apply {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
+
+  @Prop({ required: false })
+  username: string;
 }
 
 export const ApplySchema = SchemaFactory.createForClass(Apply);
