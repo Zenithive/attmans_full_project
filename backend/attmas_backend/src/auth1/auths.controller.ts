@@ -12,6 +12,7 @@ export class AuthController {
     const token = await this.authService.login(req.user);
     return { user: req.user._doc, ...token };
   }
+
   @Post('logout')
   async logout(@Request() req, @Response() res) {
     res.clearCookie('token');

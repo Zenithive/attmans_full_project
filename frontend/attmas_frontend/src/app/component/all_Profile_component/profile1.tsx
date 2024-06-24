@@ -60,11 +60,6 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
         }),
 
 
-
-
-
-
-
         onSubmit: async (values) => {
             if (!profilePhoto) {
                 alert('Profile photo is required');

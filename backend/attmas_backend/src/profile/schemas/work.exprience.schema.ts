@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema()
 export class WorkExprience extends Document {
@@ -36,8 +36,8 @@ export class WorkExprience extends Document {
   @Prop({ required: false })
   productPrice: string;
 
-  @Prop({ required: false })
-  userId: string;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  userId: Types.ObjectId;
 
   @Prop({ required: false })
   username: string;
@@ -47,6 +47,7 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   currency: string; // Added currency field
+  Types: any;
 }
 
 export const WorkSchema = SchemaFactory.createForClass(WorkExprience);

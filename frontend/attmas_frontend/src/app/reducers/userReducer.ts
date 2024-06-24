@@ -13,11 +13,11 @@ export interface UserState {
 const initialState: UserState = {
   user: {
     token: "",
-    username: "", 
-    firstName: "", 
-    lastName: "", 
+    username: "",
+    firstName: "",
+    lastName: "",
     mobileNumber: "",
-    _id:"",
+    _id: "",
   }
 }
 
@@ -31,7 +31,7 @@ export const userSliece = createSlice({
     },
     removeUser: (state) => {
       state.user = { ...initialState.user };
-    },
+    }, 
   }
 });
 

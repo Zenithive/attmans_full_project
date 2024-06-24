@@ -59,8 +59,9 @@ export class ProfileController {
   }
 
   @Get('form1')
-  async getProfileData(@Query('userId') userId: string): Promise<PersonalProfile> {
-    return this.profileService.getProfileByUserId(userId);
+  async getProfileData(@Query('username') username: string): Promise<PersonalProfile> {
+    console.log("username",username)
+    return this.profileService.getProfileByUserId(username);
   }
   
   @Get('check')

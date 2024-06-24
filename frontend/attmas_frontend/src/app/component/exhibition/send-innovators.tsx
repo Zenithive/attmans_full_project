@@ -162,7 +162,8 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
       <></>
       {submittedInnovators.length > 0 && (
         <Box sx={{ mt: 4, p: 2 }}>
-          <Typography variant="h5" sx={{mb:2,background:"#cc4800",color:"white",borderRadius:"15px",textAlign:"center",height:"45px"}}><div style={{position:"relative",top:"7px"}}>Submitted Innovators :-</div></Typography>
+          <Typography variant="h5" sx={{mb:2,color:"Black",borderRadius:"15px",textAlign:"center",height:"45px",fontWeight:"bolder"}}><div style={{position:"relative",top:"7px"}}>Submitted Innovators :-</div></Typography>
+            <Divider sx={{ my: '$5' }} />
           {submittedInnovators.map((innovator, index) => (
              <Card sx={{ mb: 2 }}>
               <CardContent>

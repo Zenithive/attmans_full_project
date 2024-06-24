@@ -146,7 +146,7 @@ export class ProfileService {
     return { profileCompleted: 4 }; // Assume 4 means all steps completed
   }
 
-  async getProfileByUserId(userId: string): Promise<PersonalProfile> {
-    return this.profileModel.findOne({ userId }).exec();
+  async getProfileByUserId(username: string): Promise<PersonalProfile> {
+    return this.profileModel.findOne({ username }).exec();
   }
 }
