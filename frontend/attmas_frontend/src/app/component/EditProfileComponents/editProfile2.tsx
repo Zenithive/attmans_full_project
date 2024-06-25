@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box,
-    Button,
     Container,
     CssBaseline,
     Grid,
@@ -12,7 +11,6 @@ import {
     FormHelperText,
     CircularProgress,
     FormControlLabel,
-    Checkbox,
     InputAdornment,
     Select,
     RadioGroup,
@@ -27,6 +25,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import axios from 'axios'; // Import Axios or your preferred HTTP client
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
+import { pubsub } from '@/app/services/pubsub.service';
 
 
 
@@ -78,9 +77,17 @@ const EditProfile2: React.FC = () => {
                 const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
                 console.log('Form submitted successfully:', response.data);
                 setLoading(false);
+                pubsub.publish('toast', {
+                    message: 'Profile updated successfully!',
+                    severity: 'success',
+                });
             } catch (error) {
                 console.error('Error submitting form:', error);
                 setLoading(false);
+                pubsub.publish('toast', {
+                    message: 'Failed to update profile. Please try again later.',
+                    severity: 'error',
+                });
             }
         },
     });
@@ -293,7 +300,7 @@ const EditProfile2: React.FC = () => {
                             )}
                         </Grid>
 
-                       
+
 
                         {isFreelancer && (
                             <Grid item xs={12} sm={6}>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Box, Container, CssBaseline, Typography, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
@@ -9,6 +9,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import CommonProfileFields from '../Common3rdProfileform/Common3rdProfileform';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
+import { pubsub } from '@/app/services/pubsub.service';
 
 const EditProfile3: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -30,9 +31,20 @@ const EditProfile3: React.FC = () => {
 
       try {
         const response = await axios.post(APIS.FORM3, values);
-        router.push('/dashboard');
+        pubsub.publish('toast', {
+          message: 'Profile updated successfully!',
+          severity: 'success',
+        });
+        // Delay redirection by 3 seconds to show the toast message
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 3000); // 3000 milliseconds = 3 seconds
       } catch (error) {
         console.error('Error sending data:', error);
+        pubsub.publish('toast', {
+          message: 'Failed to update profile. Please try again later.',
+          severity: 'error',
+        });
       } finally {
         setLoading(false);
       }
@@ -103,8 +115,6 @@ const EditProfile3: React.FC = () => {
             setSelectedSubcategories={setSelectedSubcategories}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-           
-
             <LoadingButton
               type="submit"
               variant="contained"

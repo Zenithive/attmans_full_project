@@ -8,7 +8,7 @@ import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import pubsub from '../services/pubsub.service';
+import { PubSub,pubsub } from '../services/pubsub.service';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useCallback, useMemo } from 'react';

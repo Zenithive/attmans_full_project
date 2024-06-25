@@ -1,6 +1,5 @@
-"use client";
-
-import type { Metadata } from "next";
+// RootLayout.tsx
+"use client"
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { usePathname } from "next/navigation";
@@ -9,8 +8,7 @@ import { config } from "@/middleware";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { store } from "./reducers/store";
-import { BorderColor } from "@mui/icons-material";
-import { DateTimePicker } from "@mui/lab";
+import Toast from "./component/toast/Toast"; // Adjust the import path accordingly
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,7 +32,7 @@ const theme = createTheme({
           color: '#616161',
           '&.Mui-selected': {
             color: '#fff',
-            backgroundColor:'#cc4800',
+            backgroundColor: '#cc4800',
           },
           '&.Mui-selected .MuiListItemIcon-root': {
             color: '#fff'
@@ -61,10 +59,10 @@ const theme = createTheme({
               borderRadius: 20,
             },
             '&:hover fieldset': {
-              borderColor: '#616161', 
+              borderColor: '#616161',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#616161', 
+              borderColor: '#616161',
             },
           },
         },
@@ -76,13 +74,13 @@ const theme = createTheme({
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
               borderRadius: 20,
-              borderColor: '#616161', 
+              borderColor: '#616161',
             },
             '&:hover fieldset': {
-              borderColor: '#616161', 
+              borderColor: '#616161',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#616161', 
+              borderColor: '#616161',
             },
           },
         },
@@ -94,25 +92,13 @@ const theme = createTheme({
           borderRadius: 20,
           color: "#fff",
           textTransform: 'none',
-          backgroundColor:'#cc4800',
+          backgroundColor: '#cc4800',
           ':hover': {
-            backgroundColor:'#cc4800', 
+            backgroundColor: '#cc4800',
           }
         },
       },
     },
-    // MuiDateTimePicker: {
-    //   styleOverrides: {
-    //     root: {
-    //       '& .MuiInput-root': {
-    //         borderRadius: 20,
-    //         '&:hover fieldset': {
-    //           borderColor: '#616161',
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
   },
 });
 
@@ -130,11 +116,12 @@ export default function RootLayout({
       <body className={inter.className} style={{ width: '100%', height: "100%" }}>
         <ThemeProvider theme={theme}>
           <Provider store={store}>
-          {isValidPage ? (
-            <Layout displayMainSideBar={!isProfilePage}>{children}</Layout>
-          ) : (
-            children
-          )}
+            {isValidPage ? (
+              <Layout displayMainSideBar={!isProfilePage}>{children}</Layout>
+            ) : (
+              children
+            )}
+            <Toast /> {/* Add Toast component here */}
           </Provider>
         </ThemeProvider>
       </body>

@@ -6,12 +6,12 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Formik, Form, FormikProps } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-
-
+import { pubsub } from '@/app/services/pubsub.service';
 
 const EditProfile1: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -20,6 +20,7 @@ const EditProfile1: React.FC = () => {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  // const router = useRouter();
 
   const initialValues = {
     gender: '',
@@ -68,8 +69,23 @@ const EditProfile1: React.FC = () => {
     setLoading(true);
     try {
       await axios.post(APIS.FORM1, values);
+
+      // Publish success toast message
+      pubsub.publish('toast', {
+        message: 'Profile updated successfully!',
+        severity: 'success'
+      });
+
+      // Redirect to dashboard after 3 seconds
+      setTimeout(() => {
+        // router.push('/dashboard');
+      }, 3000);
     } catch (error) {
       console.error('Error submitting form:', error);
+      pubsub.publish('toast', {
+        message: 'Failed to update profile.',
+        severity: 'error'
+      });
     } finally {
       setLoading(false);
     }

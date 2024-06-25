@@ -9,6 +9,7 @@ import { APIS } from '@/app/constants/api.constant';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { pubsub } from '@/app/services/pubsub.service';
 
 interface SendInnovatorsProps {
   onCancel: () => void;
@@ -49,6 +50,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
     try {
       // API call to send the message
       await axios.post(APIS.SEND_INNOVATORS, sendInnovators);
+      pubsub.publish('toast', { message: 'Exhibition send successfully!', severity: 'success' });
       resetForm();
       toggleDrawer(false);
       onCancel();

@@ -1,15 +1,15 @@
-import React from 'react'
-import DataGridDemo from '../component/freelancers/add.freelancersFromUsers'
+import React from 'react';
+import DataGridDemo from '../component/freelancers/add.freelancersFromUsers';
+import FreeLancerOrNot from '../component/IsAuthenticateForFreelancer/FreeLancerOrNot'; // Adjust the import path accordingly
 
 const Freelancers = () => {
   return (
-    <>
-    {/* <h2> */}
-      {/* Freelancers  */}
-    {/* </h2> */}
-    <DataGridDemo/>
-    </>
-  )
+    // <>
+    <FreeLancerOrNot> 
+      <DataGridDemo />
+    </FreeLancerOrNot> 
+    // </> 
+  );
 }
 
-export default Freelancers
+export default Freelancers;
