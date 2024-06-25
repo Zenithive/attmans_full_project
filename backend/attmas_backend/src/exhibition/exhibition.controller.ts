@@ -50,8 +50,15 @@ export class ExhibitionController {
     @Query('limit') limit: number = 10,
     @Query('industries') industries: string[],
     @Query('subjects') subjects: string[],
+    @Query('userId') userId: string,
   ): Promise<Exhibition[]> {
-    return this.exhibitionService.findAll(page, limit, industries, subjects);
+    return this.exhibitionService.findAll(
+      page,
+      limit,
+      userId,
+      industries,
+      subjects,
+    );
   }
 
   @Get(':id')

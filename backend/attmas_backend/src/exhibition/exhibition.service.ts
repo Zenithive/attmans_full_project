@@ -49,6 +49,7 @@ export class ExhibitionService {
   async findAll(
     page: number,
     limit: number,
+    userId: string,
     industries: string[],
     subjects: string[],
   ): Promise<Exhibition[]> {
@@ -64,7 +65,7 @@ export class ExhibitionService {
     }
 
     return this.exhibitionModel
-      .find(filter)
+      .find(filter, userId)
       .skip(skip)
       .limit(limit)
       .populate('userId', 'firstName lastName username', this.userModel)
