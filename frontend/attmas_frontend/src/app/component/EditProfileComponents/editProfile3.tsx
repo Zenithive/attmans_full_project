@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Box, Container, CssBaseline, Typography, CircularProgress, Button } from '@mui/material';
+import { Box, Container, CssBaseline, Typography, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -10,18 +10,12 @@ import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import CommonProfileFields from '../Common3rdProfileform/Common3rdProfileform';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 
-interface ProfileForm3Props {
-  onPrevious: () => void;
-}
-
-const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
+const EditProfile3: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const router = useRouter();
-
- 
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -109,20 +103,15 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             setSelectedSubcategories={setSelectedSubcategories}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-            <   Button
-              type="button"
-              variant="contained"
-              size="small"
-              onClick={onPrevious}
-            >
-              Back
-            </Button>
+           
+
             <LoadingButton
               type="submit"
               variant="contained"
               size="small"
               loading={loading}
               loadingIndicator={<CircularProgress size={24} />}
+              sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
             >
               Save
             </LoadingButton>
@@ -133,4 +122,4 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   );
 };
 
-export default ProfileForm3;
+export default EditProfile3;

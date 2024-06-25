@@ -5,8 +5,7 @@ import {
   Body,
   UseGuards,
   Get,
-  Param,
-  NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
@@ -34,13 +33,25 @@ export class UsersController {
     return { msg: 'Test message validate.' };
   }
 
-  @Get(':username')
-  async getUser(@Param('username') username: string) {
-    const user =
-      await this.usersService.findUserWithJobsAndExhibitions(username);
-    if (!user) {
-      throw new NotFoundException(`User with username ${username} not found`);
-    }
-    return user;
+  @Get('by-type')
+  async getUsersByUserType(
+    @Query('userType') userType: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '5',
+    @Query('filter') filter = '',
+    @Query('category') category = '',
+    @Query('subCategory') subCategory = '',
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const users = await this.usersService.findUsersByUserType(
+      userType,
+      pageNumber,
+      limitNumber,
+      filter,
+      category,
+      subCategory,
+    );
+    return users;
   }
 }

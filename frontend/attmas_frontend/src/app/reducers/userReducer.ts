@@ -4,7 +4,7 @@ import { RootState } from "./store";
 
 export interface UserSchema{
   token : string, username: string, firstName: string, lastName: string, mobileNumber: string 
-  ,_id:string
+  ,_id:string, userType:string
 }
 export interface UserState {
   user: UserSchema; 
@@ -17,7 +17,9 @@ const initialState: UserState = {
     firstName: "",
     lastName: "",
     mobileNumber: "",
-    _id: "",
+    _id:"",
+    userType:"",
+
   }
 }
 

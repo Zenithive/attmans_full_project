@@ -42,8 +42,8 @@ export class WorkExprience extends Document {
   @Prop({ required: false })
   username: string;
 
-  @Prop({ required: false })
-  hasPatent: boolean;
+  @Prop({ required: false, type: String }) // Change the type to String
+  hasPatent: string;
 
   @Prop({ required: false })
   currency: string; // Added currency field

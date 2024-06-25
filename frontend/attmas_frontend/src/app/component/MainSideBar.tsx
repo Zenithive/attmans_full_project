@@ -2,10 +2,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -17,11 +15,22 @@ import WorkIcon from '@mui/icons-material/Work';
 import BusinessIcon from '@mui/icons-material/Business';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 
 export const drawerWidth = 240;
 
 export default function MainSideBar() {
-  const router = useRouter();
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  console.log("userDetails",userDetails.userType);
+  
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const router = useRouter(); 
   const pathName = usePathname();
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -50,11 +59,11 @@ export default function MainSideBar() {
       Name: "Freelancers"
     },
     {
-      path: '/industries',
+      path: '/projectowner',
       icon: () => (
         <BusinessIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Industries"
+      Name: "Project Owner"
     },
     {
       path: '/exhibition',
@@ -70,8 +79,15 @@ export default function MainSideBar() {
       ),
       Name: "Projects"
     }
-
   ];
+
+  const filteredNavs = userDetails.userType === 'Freelancer'
+    ? SIDEBAR_LIST_NAVS.filter(nav => nav.Name !== "Freelancers" && nav.Name !== "Project Owner")
+    : SIDEBAR_LIST_NAVS;
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <Box component="nav"
@@ -84,22 +100,20 @@ export default function MainSideBar() {
             width: drawerWidth,
             boxSizing: 'border-box',
             backgroundColor: "primary.main",
-            color: 'white', // Set the text color to white for better contrast
+            color: 'white',
           },
         }}
         variant="permanent"
         anchor="left"
       >
         <Toolbar>
-          {/* <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} /> */}
           <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
             <Image src="/attmans (png)-01.png" alt="attmans logo" width={100} height={70} />
           </Box>
         </Toolbar>
-        {/* <Divider /> */}
         {pathName !== '/profile' && (
           <List>
-            {SIDEBAR_LIST_NAVS.map((navItem, index) => (
+            {filteredNavs.map((navItem, index) => (
               <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
                 <ListItemButton selected={pathName === navItem.path} sx={{ borderRadius: 3 }}>
                   <ListItemIcon sx={{ minWidth: 40 }}>

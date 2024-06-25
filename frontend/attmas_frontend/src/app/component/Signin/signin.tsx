@@ -66,6 +66,7 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
           firstName: res.firstName,
           lastName: res.lastName,
           mobileNumber: res.mobileNumber,
+          userType:res.userType,
           _id: res._id,
         };
         console.log("user", user)
@@ -133,11 +134,11 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox value="remember" />}
             color='secondary'
             label="Remember me"
-          />
+          /> */}
           <Button
             type="submit"
             fullWidth

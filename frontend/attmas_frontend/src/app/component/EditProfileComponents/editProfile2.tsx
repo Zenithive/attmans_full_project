@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from 'react';
+"use client"
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -11,31 +11,30 @@ import {
     Typography,
     FormHelperText,
     CircularProgress,
+    FormControlLabel,
+    Checkbox,
+    InputAdornment,
+    Select,
+    RadioGroup,
     FormControl,
     FormLabel,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
-    InputAdornment,
-    Select
+    Radio
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { APIS } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import axios from 'axios'; // Import Axios or your preferred HTTP client
+import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 
-interface ProfileForm2Props {
-    onNext: () => void;
-    onPrevious: () => void;
-}
 
-const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
+
+const EditProfile2: React.FC = () => {
     const [isFreelancer, setIsFreelancer] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -51,8 +50,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         productDescription: Yup.string().nullable(),
         productType: Yup.string().nullable(),
         productPrice: Yup.string().nullable(),
-        hasPatent: Yup.string().nullable(), 
-        currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'), 
+        hasPatent: Yup.string().nullable(),
+        currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
     });
 
     const formik = useFormik({
@@ -68,27 +67,71 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productDescription: '',
             productType: '',
             productPrice: '',
-            hasPatent: 'No', 
+            hasPatent: false,
             username: userDetails.username,
-            currency: 'INR', 
+            currency: 'INR',
         },
         validationSchema,
         onSubmit: async (values) => {
             setLoading(true);
-
             try {
-                console.log("UsertypepROFILE",userDetails.userType);
-                
-                const response = await axios.post(APIS.FORM2, values);
-                console.log('Profile data saved:', response.data);
-                onNext();
+                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
+                console.log('Form submitted successfully:', response.data);
+                setLoading(false);
             } catch (error) {
-                console.error('There was an error saving the profile data!', error);
-            } finally {
+                console.error('Error submitting form:', error);
                 setLoading(false);
             }
         },
     });
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${SERVER_URL}/profile/profileByUsername2?username=${userDetails.username}`); // Adjust endpoint as per your backend API
+                const userData = response.data; // Assuming your API returns user profile data
+
+                // Update formik values with fetched data
+                formik.setValues({
+                    ...formik.values,
+                    qualification: userData.qualification || '',
+                    organization: userData.organization || '',
+                    sector: userData.sector || '',
+                    workAddress: userData.workAddress || '',
+                    designation: userData.designation || '',
+                    userType: userData.userType || '',
+                    productToMarket: userData.productToMarket || '',
+                    productName: userData.productName || '',
+                    productDescription: userData.productDescription || '',
+                    productType: userData.productType || '',
+                    productPrice: userData.productPrice || '',
+                    hasPatent: userData.hasPatent || false,
+                    currency: userData.currency || 'INR',
+                });
+
+                // Update state based on user type for conditional rendering
+                if (userData.userType === 'Freelancer') {
+                    setIsFreelancer(true);
+                    if (userData.productToMarket === 'Yes') {
+                        setShowProductDetails(true);
+                    } else {
+                        setShowProductDetails(false);
+                    }
+                } else {
+                    setIsFreelancer(false);
+                    setShowProductDetails(false);
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                setFetchError('Failed to fetch user profile');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserProfile();
+    }, [userDetails.username]);
 
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
@@ -250,6 +293,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             )}
                         </Grid>
 
+                       
+
                         {isFreelancer && (
                             <Grid item xs={12} sm={6}>
                                 <FormControl component="fieldset">
@@ -342,6 +387,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     />
                                 </Grid>
 
+
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
@@ -391,15 +437,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                         )}
                     </Grid>
 
-                    <Button
-                        type="button"
-                        variant="contained"
-                        size="small"
-                        sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
-                        onClick={onPrevious}
-                    >
-                        Back
-                    </Button>
+
 
                     <LoadingButton
                         type="submit"
@@ -409,7 +447,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                         loadingIndicator={<CircularProgress size={24} />}
                         sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
                     >
-                        Save & Next
+                        Save
                     </LoadingButton>
                 </Box>
             </Box>
@@ -417,4 +455,4 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     );
 };
 
-export default ProfileForm2;
+export default EditProfile2;

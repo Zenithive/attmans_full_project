@@ -55,6 +55,7 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
       TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
       Budget: values.Budget,
       userId: userDetails._id,
+      username: userDetails.username
     };
 
     try {
