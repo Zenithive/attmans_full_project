@@ -169,14 +169,14 @@ export const SignUp = () => {
                   helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
                 />
               </Grid>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <FormControlLabel
                   color='secondary'
                   control={<Checkbox value="allowExtraEmails" />}
                   sx={{color:'secondary'}}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
-              </Grid>
+              </Grid> */}
             </Grid>
             <Button
               type="submit"

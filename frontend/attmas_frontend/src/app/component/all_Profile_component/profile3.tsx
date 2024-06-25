@@ -1,52 +1,14 @@
-"use client";
-import React, { useState } from 'react';
-import { createTheme } from '@mui/material/styles';
-import {
-  Box,
-  Button,
-  Container,
-  CssBaseline,
-  Grid,
-  MenuItem,
-  Typography,
-  Select,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  Checkbox,
-  ListItemText,
-  SelectChangeEvent,
-  CircularProgress,
-  Chip,
-} from '@mui/material';
+"use client"
+import React, { useState, useEffect } from 'react';
+import { Box, Container, CssBaseline, Typography, CircularProgress, Button } from '@mui/material';
 import { useFormik } from 'formik';
-import { categories, subcategories } from '@/app/constants/categories';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { APIS } from '@/app/constants/api.constant';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-
-const customTheme = createTheme({
-  palette: {
-    primary: {
-      main: "rgb(0,23,98)",
-    },
-  },
-  shape: {
-    borderRadius: 20,
-  },
-});
-
-function getStyles(name: string, selectedCategories: string[], theme: any) {
-  return {
-    fontWeight:
-      selectedCategories.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
+import CommonProfileFields from '../Common3rdProfileform/Common3rdProfileform';
+import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 
 interface ProfileForm3Props {
   onPrevious: () => void;
@@ -56,7 +18,10 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const router = useRouter();
+
+ 
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -80,37 +45,31 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     },
   });
 
-  const handleCategoryChange = (event: SelectChangeEvent<typeof selectedCategories>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedCategories(typeof value === 'string' ? value.split(',') : value);
-    setSelectedSubcategories([]);
-    formik.setFieldValue('categories', value);
-    formik.setFieldValue('subcategories', []);
-  };
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`);
+        const userData = response.data;
 
-  const handleSubcategoryChange = (event: SelectChangeEvent<typeof selectedSubcategories>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedSubcategories(typeof value === 'string' ? value.split(',') : value);
-    formik.setFieldValue('subcategories', value);
-  };
+        formik.setValues({
+          ...formik.values,
+          categories: userData.categories || [],
+          subcategories: userData.subcategories || [],
+        });
 
-  const handleDeleteCategory = (category: string) => () => {
-    const newSelectedCategories = selectedCategories.filter((cat) => cat !== category);
-    setSelectedCategories(newSelectedCategories);
-    formik.setFieldValue('categories', newSelectedCategories);
-    setSelectedSubcategories([]);
-    formik.setFieldValue('subcategories', []);
-  };
+        setSelectedCategories(userData.categories || []);
+        setSelectedSubcategories(userData.subcategories || []);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setFetchError('Failed to fetch user profile');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleDeleteSubcategory = (subcategory: string) => () => {
-    const newSelectedSubcategories = selectedSubcategories.filter((subcat) => subcat !== subcategory);
-    setSelectedSubcategories(newSelectedSubcategories);
-    formik.setFieldValue('subcategories', newSelectedSubcategories);
-  };
+    fetchUserProfile();
+  }, [userDetails.username]);
 
   return (
     <Container component="main" maxWidth="md">
@@ -134,81 +93,23 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
           View and Change your category here
         </Typography>
+
+        {fetchError && (
+          <Typography variant="body2" color="error" align="center">
+            {fetchError}
+          </Typography>
+        )}
+
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel color='secondary' id="categories-label">Categories</InputLabel>
-                <Select
-                  labelId="categories-label"
-                  id="categories"
-                  name="categories"
-                  color='secondary'
-                  multiple
-                  value={selectedCategories}
-                  onChange={handleCategoryChange}
-                  input={<OutlinedInput id="select-multiple-chip" label="Categories" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {(selected as string[]).map((value) => (
-                        <Chip
-                          key={value}
-                          label={value}
-                          variant="outlined"
-                        />
-                      ))}
-                    </Box>
-                  )}
-                >
-                  {categories.map((category) => (
-                    <MenuItem key={category} value={category} style={getStyles(category, selectedCategories, customTheme)}>
-                      <Checkbox color='secondary' checked={selectedCategories.indexOf(category) > -1} />
-                      <ListItemText primary={category} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            {selectedCategories.length > 0 && (
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel color='secondary' id="subcategories-label">Subcategories</InputLabel>
-                  <Select
-                    labelId="subcategories-label"
-                    id="subcategories"
-                    color='secondary'
-                    name="subcategories"
-                    multiple
-                    value={selectedSubcategories}
-                    onChange={handleSubcategoryChange}
-                    input={<OutlinedInput id="select-multiple-chip" label="Subcategories" />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {(selected as string[]).map((value) => (
-                          <Chip
-                            key={value}
-                            label={value}
-                            variant="outlined"
-                          />
-                        ))}
-                      </Box>
-                    )}
-                  >
-                    {selectedCategories.flatMap(category =>
-                      subcategories[category].map((subcategory) => (
-                        <MenuItem key={subcategory} value={subcategory}>
-                          <Checkbox color='secondary' checked={selectedSubcategories.indexOf(subcategory) > -1} />
-                          <ListItemText primary={subcategory} />
-                        </MenuItem>
-                      ))
-                    )}
-                  </Select>
-                </FormControl>
-              </Grid>
-            )}
-          </Grid>
+          <CommonProfileFields
+            formik={formik}
+            selectedCategories={selectedCategories}
+            selectedSubcategories={selectedSubcategories}
+            setSelectedCategories={setSelectedCategories}
+            setSelectedSubcategories={setSelectedSubcategories}
+          />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-            <Button
+            <   Button
               type="button"
               variant="contained"
               size="small"
