@@ -49,23 +49,27 @@ export class ExhibitionService {
   async findAll(
     page: number,
     limit: number,
-    userId: string,
-    industries: string[],
-    subjects: string[],
+    userId?: string,
+    industries?: string[],
+    subjects?: string[],
   ): Promise<Exhibition[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
 
-    if (industries.length > 0) {
+    if (userId) {
+      filter.userId = userId;
+    }
+
+    if (industries && industries.length > 0) {
       filter.industries = { $in: industries };
     }
 
-    if (subjects.length > 0) {
+    if (subjects && subjects.length > 0) {
       filter.subjects = { $in: subjects };
     }
 
     return this.exhibitionModel
-      .find(filter, userId)
+      .find(filter)
       .skip(skip)
       .limit(limit)
       .populate('userId', 'firstName lastName username', this.userModel)
