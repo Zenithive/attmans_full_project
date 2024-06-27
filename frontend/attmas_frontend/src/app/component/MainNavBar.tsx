@@ -13,10 +13,13 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
 import { MenuItem } from '@mui/material';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
+import { removeUser } from '../reducers/userReducer';
+
+
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -37,6 +40,8 @@ export default function MainNavBar() {
   const [profilePhoto, setProfilePhoto] = React.useState<string | null>(null);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+    
+  const dispatch = useAppDispatch();
 
   const router = useRouter();
 
@@ -46,8 +51,8 @@ export default function MainNavBar() {
   React.useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(APIS.FORM1, {
-          headers: { userId: userDetails._id },
+        const response = await axios.get(`${APIS.FORM1}?username=${userDetails.username}`, {
+          headers: { username: userDetails.username },
         });
         console.log("response", response);
         setProfilePhoto(response.data.profilePhoto);
@@ -56,11 +61,10 @@ export default function MainNavBar() {
         console.error("Error fetching user profile:", error);
       }
     };
-
-    if (userDetails._id) {
+    if (userDetails.username) {
       fetchUserProfile();
     }
-  }, [userDetails._id]);
+  }, [userDetails.username]);
   console.log("profilePhoto", profilePhoto);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -84,13 +88,14 @@ export default function MainNavBar() {
     try {
       // Notify the server of the logout (if applicable)
       // await axios.post(APIS.LOGOUT);
-
+      await axios.post(APIS.LOGOUT);
       // Clear local storage
       localStorage.clear();
 
       // Clear cookies
       clearCookies();
-
+      setProfilePhoto(null);
+      dispatch(removeUser());
       // Redirect to homepage
       router.push('/');
     } catch (error) {

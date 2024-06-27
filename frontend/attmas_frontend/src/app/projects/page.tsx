@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -24,6 +24,14 @@ interface Job {
     TimeFrame: string | null;
     Category: string[];
     Subcategorys: string[];
+    Sector: string;
+    AreaOfProduct: string;
+    ProductDescription: string;
+    DetailsOfInnovationChallenge: string;
+    SelectService:string; 
+    Objective:string;
+    Expectedoutcomes:string;
+    IPRownership:string;
 }
 
 const Category = [
@@ -377,6 +385,15 @@ const Jobs = () => {
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
                                         {job.Expertiselevel}
                                     </span>
+                                    <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right",position:"relative",right:"20px",bottom:"8px"}}>
+                                        <Chip
+                                            label={job.SelectService}
+                                            variant="outlined"
+                                            color='secondary'
+                                        />
+                                    </span>
+
+                                  
                                 </Typography>
                                 <Typography variant="body2">{job.description}</Typography>
                                 <Typography variant="body2">{job.Budget}</Typography>

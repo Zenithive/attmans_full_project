@@ -37,20 +37,34 @@ export class ExhibitionService {
     return sendInnovatorsFromExibition.save();
   }
 
+  async getSubmittedInnovators(userId: string): Promise<SendToInnovators[]> {
+    console.log(
+      `Querying database for submitted innovators with userId: ${userId}`,
+    );
+    const result = await this.sendToInnovatorsModel.find({ userId }).exec();
+    console.log(`Result from database: ${JSON.stringify(result)}`);
+    return result;
+  }
+
   async findAll(
     page: number,
     limit: number,
-    industries: string[],
-    subjects: string[],
+    userId?: string,
+    industries?: string[],
+    subjects?: string[],
   ): Promise<Exhibition[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
 
-    if (industries.length > 0) {
+    if (userId) {
+      filter.userId = userId;
+    }
+
+    if (industries && industries.length > 0) {
       filter.industries = { $in: industries };
     }
 
-    if (subjects.length > 0) {
+    if (subjects && subjects.length > 0) {
       filter.subjects = { $in: subjects };
     }
 

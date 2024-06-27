@@ -23,6 +23,7 @@ export const APIS = {
     //****** Exhibitions API url ******//
     EXHIBITION: `${SERVER_URL}/exhibitions`,
     SEND_INNOVATORS: `${SERVER_URL}/exhibitions/sendinovators`,
+    GET_SUBMITTED_INNOVATORS:`${SERVER_URL}/exhibitions/submitted-innovators`,
 
 
     //****** FreeLancers and Innovators API url ******//

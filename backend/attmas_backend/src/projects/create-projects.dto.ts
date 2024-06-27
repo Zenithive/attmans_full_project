@@ -13,7 +13,39 @@ export class CreateJobsDto {
 
   @IsNotEmpty()
   @IsString()
+  Objective: string;
+
+  @IsNotEmpty()
+  @IsString()
+  Expectedoutcomes: string;
+
+  @IsNotEmpty()
+  @IsString()
+  IPRownership: string;
+
+  @IsNotEmpty()
+  @IsString()
+  SelectService: string;
+
+  @IsNotEmpty()
+  @IsString()
   Expertiselevel: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ProductDescription: string;
+
+  @IsNotEmpty()
+  @IsString()
+  AreaOfProduct: string;
+
+  @IsNotEmpty()
+  @IsString()
+  Sector: string;
+
+  @IsNotEmpty()
+  @IsString()
+  DetailsOfInnovationChallenge: string;
 
   @IsNotEmpty()
   @IsString()
@@ -47,7 +79,39 @@ export class UpdateJobsDto {
 
   @IsNotEmpty()
   @IsString()
+  Objective?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  Expected_out_comes?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  IPR_ownership?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  SelectService?: string;
+
+  @IsNotEmpty()
+  @IsString()
   Expertiselevel?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ProductDescription?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  AreaOfProduct?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  Sector?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  DetailsOfInnovationChallenge?: string;
 
   @IsNotEmpty()
   @IsString()

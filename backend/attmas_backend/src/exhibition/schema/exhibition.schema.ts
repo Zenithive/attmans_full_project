@@ -29,15 +29,6 @@ export class Exhibition {
   @Prop({ type: Types.ObjectId, ref: 'User', required: false })
   userId: Types.ObjectId;
 
-  // @Prop({
-  //   required: true,
-  //   validate: {
-  //     validator: (v: string) => validator.isURL(v),
-  //     message: (props: any) => `${props.value} is not a valid URL!`,
-  //   },
-  // })
-  // videoUrl: string;
-
   // New fields for sending to innovators
   @Prop({ required: false })
   message?: string;
