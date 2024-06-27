@@ -11,7 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import pubsub from '@/app/services/pubsub.service';
+import {pubsub} from '@/app/services/pubsub.service';
 import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
@@ -272,10 +272,14 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             if (editingJobs) {
                 await axios.put(`${APIS.JOBS}/${editingJobs._id}`, jobsData);
                 pubsub.publish('JobUpdated', { message: 'Jobs updated' });
+                pubsub.publish('toast', { message: 'Edit Project successfully!', severity: 'success' });
+
             } else {
                 const response = await axios.post(APIS.JOBS, jobsData);
                 //onAddJobs(response.data);
                 pubsub.publish('JobCreated', { message: 'A new Job Created' });
+                pubsub.publish('toast', { message: 'Create Project successfully!', severity: 'success' });
+
             }
             resetForm();
             toggleDrawer(false);

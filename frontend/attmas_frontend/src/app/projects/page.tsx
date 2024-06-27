@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -8,10 +8,12 @@ import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import pubsub from '../services/pubsub.service';
+import { PubSub, pubsub } from '../services/pubsub.service';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useCallback, useMemo } from 'react';
+import { useAppSelector } from '../reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '../reducers/userReducer';
 
 interface Job {
     _id?: string;
@@ -188,10 +190,10 @@ const Subcategorys = [
     },
 ];
 
-const getSubcategorys =(Subcategorys: any[]) => {
-    return Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
-};
 
+
+
+const getSubcategorys = (Subcategorys: any[]) => Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
 
 const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
@@ -204,11 +206,17 @@ const Jobs = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
+    const [filterType, setFilterType] = useState("all");
+
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+    const { userType, _id: userId } = userDetails;
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
         try {
             const response = await axios.get(APIS.JOBS, {
-                params: { page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(',') }
+                params: { page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','), 
+                    userId:filterType === "mine" ?userId:undefined
+                }
             });
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -217,7 +225,6 @@ const Jobs = () => {
                     const newJobs = response.data.filter((newJobs: Job) => {
                         return !prev.some((existingJobs) => existingJobs._id === newJobs._id);
                     });
-                    console.log("...prev, ...newJobs", [...prev, ...newJobs])
                     return [...prev, ...newJobs];
                 });
                 if (response.data.length < 10) {
@@ -227,7 +234,7 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, []);
+    }, [userId, filterType]);
 
     const refetch = useCallback(async () => {
         try {
@@ -242,7 +249,7 @@ const Jobs = () => {
 
     useEffect(() => {
         refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis]);
+    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType]);
 
     useEffect(() => {
         if (page > 1) {
@@ -256,9 +263,7 @@ const Jobs = () => {
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
         };
-
     }, [refetch]);
-
 
     useEffect(() => {
         pubsub.subscribe('JobCreated', refetch);
@@ -266,7 +271,6 @@ const Jobs = () => {
         return () => {
             pubsub.unsubscribe('JobCreated', refetch);
         };
-
     }, [refetch]);
 
     const handleEditJob = useCallback((job: Job) => {
@@ -295,50 +299,73 @@ const Jobs = () => {
         refetch();
     }, [refetch]);
 
+    const handleFilterTypeChange = (event: any, newFilterType: string) => {
+        if (newFilterType !== null) {
+            setFilterType(newFilterType);
+        }
+    }
 
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important", overflowX: "hidden !important" }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
-                <Box sx={{ position: "relative", left: "69%", width: "60%", display: "flex" }}>
-                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                        <FilterAltIcon />
-                    </IconButton>
-                    {filterOpen && (
-                        <Box sx={{ display: "flex", gap: 3, width: "95%" }}>
-                            <Autocomplete
-                                sx={{ position: "relative", right: "39%", width: "35%" }}
-                                multiple
-                                size='small'
-                                options={Expertiselevel}
-                                value={selectedExpertis}
-                                onChange={(event, value) => setSelectedExpertis(value)}
-                                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' sx={{ borderRadius: "20px" }} />}
-                            />
-                            <Autocomplete
-                                multiple
-                                sx={{ position: "relative", right: "110%", width: "35%" }}
-                                size='small'
-                                options={getSubcategorys(Subcategorys)}
-                                value={selectedSubcategory}
-                                onChange={(event, value) => setSelectedSubcategory(value)}
-                                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' sx={{ borderRadius: "20px" }} />}
-                            />
-                            <Autocomplete
-                                sx={{ position: "relative", right: "176.2%", width: "30%" }}
-                                multiple
-                                size='small'
-                                options={Category}
-                                value={selectedCategory}
-                                onChange={(event, value) => setSelectedCategory(value)}
-                                renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' sx={{ borderRadius: "20px" }} />}
-                            />
-                            <button onClick={handleFilterChange}>Apply Filters</button>
-                        </Box>
-                    )}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <ToggleButtonGroup
+                        value={filterType}
+                        exclusive
+                        onChange={handleFilterTypeChange}
+                        aria-label="filter exhibitions"
+                        sx={{ height: "30px" }}
+                    >
+                        <ToggleButton value="all" aria-label="all exhibitions">
+                            All Exhibitions
+                        </ToggleButton>
+                        <ToggleButton value="mine" aria-label="my exhibitions">
+                            My Exhibitions
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                    <Tooltip title="Filter" arrow>
+                        <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+                            <FilterAltIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
                 <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
             </Box>
+            {filterOpen && (
+                <Box sx={{ mt: 2, display: "flex", gap: 3, alignItems: 'center' }}>
+                    <Autocomplete
+                        sx={{ flex: 1 }}
+                        multiple
+                        size='small'
+                        options={Expertiselevel}
+                        value={selectedExpertis}
+                        onChange={(event, value) => setSelectedExpertis(value)}
+                        renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' />}
+                    />
+
+                    <Autocomplete
+                        sx={{ flex: 1 }}
+                        multiple
+                        size='small'
+                        options={Category}
+                        value={selectedCategory}
+                        onChange={(event, value) => setSelectedCategory(value)}
+                        renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' />}
+                    />
+
+                    <Autocomplete
+                        sx={{ flex: 1 }}
+                        multiple
+                        size='small'
+                        options={getSubcategorys(Subcategorys)}
+                        value={selectedSubcategory}
+                        onChange={(event, value) => setSelectedSubcategory(value)}
+                        renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' />}
+                    />
+                    <Button onClick={handleFilterChange} variant="contained" color="primary">Apply Filters</Button>
+                </Box>
+            )}
             <InfiniteScroll
                 dataLength={jobs.length}
                 next={() => setPage(prev => prev + 1)}
@@ -375,13 +402,16 @@ const Jobs = () => {
                                     <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
                                         Apply
                                     </Button>
-
-                                    <IconButton onClick={() => handleEditJob(job)}>
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton onClick={() => handleDeleteJob(job)}>
-                                        <DeleteRoundedIcon />
-                                    </IconButton>
+                                    <Tooltip title="Edit" arrow>
+                                        <IconButton onClick={() => handleEditJob(job)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete" arrow>
+                                        <IconButton onClick={() => handleDeleteJob(job)}>
+                                            <DeleteRoundedIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                 </Box>
                             </CardContent>
                         </Card>

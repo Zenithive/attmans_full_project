@@ -4,36 +4,36 @@ import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import { CircularProgress, MenuItem } from '@mui/material';
-import { Button, Chip, Divider, Drawer, FormControl, InputLabel,Select, TextField, Autocomplete } from '@mui/material';
+import { Button, Chip, Divider, Drawer, FormControl, InputLabel, Select, TextField, Autocomplete } from '@mui/material';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import pubsub from '@/app/services/pubsub.service';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { useMemo,useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
+import { PubSub, pubsub } from '@/app/services/pubsub.service';
 interface Exhibition {
     _id?: string;
     title: string;
     description: string;
     status: string;
-    videoUrl:string;
+    videoUrl: string;
     dateTime: string;
     industries: string[];
     subjects: string[];
-  }
-  
-  interface AddExhibitionProps {
+}
+
+interface AddExhibitionProps {
     // onAddExhibition: (exhibition: Exhibition) => void;
     editingExhibition?: Exhibition | null;
     onCancelEdit?: () => void;
-  }
-  
+}
+
 
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
@@ -46,18 +46,18 @@ const validationSchema = Yup.object().shape({
 
 export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
-    
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const {userType} = userDetails;
 
-    const initialValues = React.useMemo(()=>({
+    const initialValues = React.useMemo(() => ({
         title: '',
         description: '',
         status:'',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: []
-    }),[]);
+    }), []);
 
     React.useEffect(() => {
         if (editingExhibition) {
@@ -65,7 +65,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
         }
     }, [editingExhibition]);
 
-    const industries = React.useMemo(()=>[
+    const industries = React.useMemo(() => [
         "Agriculture",
         "Chemicals",
         "Electronics",
@@ -77,9 +77,9 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
         "Mining and metals",
         "Real estate and construction",
         "Textiles"
-    ],[]);
+    ], []);
 
-    const subjects =React.useMemo(()=>[
+    const subjects = React.useMemo(() => [
         {
             category: "Chemistry",
             items: [
@@ -212,12 +212,12 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                 "Applied Chemistry",
             ]
         },
-    ],[]);
+    ], []);
 
-    const allSubjectItems = React.useMemo(()=>subjects.flatMap(subject => subject.items.map(item => ({
+    const allSubjectItems = React.useMemo(() => subjects.flatMap(subject => subject.items.map(item => ({
         category: subject.category,
         label: item
-    }))),[subjects]);
+    }))), [subjects]);
 
     const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
@@ -227,7 +227,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             status:values.status,
             industries: values.categoryforIndustries,
             subjects: values.subject,
-            userId:userDetails._id
+            userId: userDetails._id
             // userId:userDetails.username
         };
 
@@ -237,20 +237,23 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             if (editingExhibition) {
                 await axios.put(`${APIS.EXHIBITION}/${editingExhibition._id}`, exhibitionData);
                 pubsub.publish('ExhibitionUpdated', { message: 'Exhibition updated' });
+                pubsub.publish('toast', { message: 'Exhibition updated successfully!', severity: 'success' });
             } else {
-                 await axios.post(APIS.EXHIBITION, exhibitionData);
+                await axios.post(APIS.EXHIBITION, exhibitionData);
                 // onAddExhibition(response.data);
                 pubsub.publish('ExhibitionCreated', { message: 'A new exhibition Created' });
+                pubsub.publish('toast', { message: 'New exhibition created successfully!', severity: 'success' });
             }
             resetForm();
             toggleDrawer(false);
             onCancelEdit && onCancelEdit();
         } catch (error) {
             console.error('Error creating/updating exhibition:', error);
+            pubsub.publish('toast', { message: 'Failed to create/update exhibition.', severity: 'error' });
         } finally {
             setSubmitting(false);
         }
-    },[editingExhibition,userDetails,onCancelEdit]);
+    }, [editingExhibition, userDetails, onCancelEdit]);
 
     return (
         <>
@@ -284,7 +287,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                 >
                     {({ values, setFieldValue, handleChange, handleBlur, handleSubmit, isSubmitting, errors, touched }) => (
                         <Form onSubmit={handleSubmit}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2,position:"relative",left:"15px" }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: "relative", left: "15px" }}>
                                 <TextField
                                     label="Title"
                                     name="title"
@@ -312,24 +315,24 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                     helperText={<ErrorMessage name="description" />}
                                 />
                                 {editingExhibition && (
-                                 <FormControl fullWidth>
-                                    <InputLabel id="status-label">Status</InputLabel>
-                                    <Select
-                                        labelId="status-label"
-                                        id="status"
-                                        name="status"
-                                        color='secondary'
-                                        value={values.status}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        label="Status"
-                                    >
-                                        <MenuItem value="cancel">cancel </MenuItem>
-                                        <MenuItem value="open">open</MenuItem>
-                                        <MenuItem value="close">close</MenuItem>
-                                    </Select>
-                                </FormControl>
-                             )}
+                                    <FormControl fullWidth>
+                                        <InputLabel id="status-label">Status</InputLabel>
+                                        <Select
+                                            labelId="status-label"
+                                            id="status"
+                                            name="status"
+                                            color='secondary'
+                                            value={values.status}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            label="Status"
+                                        >
+                                            <MenuItem value="cancel">cancel </MenuItem>
+                                            <MenuItem value="open">open</MenuItem>
+                                            <MenuItem value="close">close</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                )}
                                 <Autocomplete
                                     multiple
                                     options={industries}
@@ -359,10 +362,10 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                             error={!!(errors.categoryforIndustries && touched.categoryforIndustries)}
                                             helperText={
                                                 typeof errors.categoryforIndustries === 'string' && touched.categoryforIndustries
-                                                  ? errors.categoryforIndustries
-                                                  : undefined
-                                              }
-                                              
+                                                    ? errors.categoryforIndustries
+                                                    : undefined
+                                            }
+
                                         />
                                     )}
                                 />
@@ -396,9 +399,9 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                             error={!!(errors.subject && touched.subject)}
                                             helperText={
                                                 typeof errors.subject === 'string' && touched.subject
-                                                  ? errors.subject
-                                                  : undefined
-                                              }
+                                                    ? errors.subject
+                                                    : undefined
+                                            }
                                         />
                                     )}
                                     renderGroup={(params) => (
@@ -408,13 +411,13 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                         </li>
                                     )}
                                 />
-                               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DateTimePicker
-                                    label="Date & Time"
-                                    value={values.dateTime}
-                                    onChange={(newValue) => setFieldValue('dateTime', newValue)}
-                                />
-                            </LocalizationProvider>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DateTimePicker
+                                        label="Date & Time"
+                                        value={values.dateTime}
+                                        onChange={(newValue) => setFieldValue('dateTime', newValue)}
+                                    />
+                                </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                                     <Button variant="contained" style={{ background: "#616161", color: "white" }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
                                     <Button variant="contained" color='primary' type="submit" disabled={isSubmitting} > {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
