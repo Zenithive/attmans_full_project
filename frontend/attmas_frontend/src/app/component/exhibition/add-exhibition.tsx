@@ -257,7 +257,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
 
     return (
         <>
-        {userType === "Project Owner" && (
+        {userType === "Admin" && (
             <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
                 borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
                     background: "#757575"
