@@ -54,4 +54,20 @@ export class UsersController {
     );
     return users;
   }
+
+  @Get('by-type1')
+  async getUsersByUserType1(
+    @Query('userType') userType: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '5',
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const users = await this.usersService.findUsersByUserType1(
+      userType,
+      pageNumber,
+      limitNumber,
+    );
+    return users;
+  }
 }

@@ -56,71 +56,6 @@ export class UsersService {
     return user.save();
   }
 
-  // Add this method to find users by their usertype
-
-  //   async findUsersByUserType(
-  //     userType: string,
-  //     page: number,
-  //     limit: number,
-  //     filter: string,
-  //   ): Promise<User[]> {
-  //     const skip = (page - 1) * limit;
-  //     const filterQuery = filter
-  //       ? {
-  //           userType,
-  //           $or: [
-  //             { firstName: new RegExp(filter, 'i') },
-  //             { lastName: new RegExp(filter, 'i') },
-  //           ],
-  //         }
-  //       : { userType };
-  //     return (
-  //       this.userModel
-  //         // .find({ userType })
-  //         .find(filterQuery)
-  //         .select('-password')
-  //         .skip(skip)
-  //         .limit(limit)
-  //         .exec()
-  //     );
-  //   }
-  // }
-
-  // async findUsersByUserType(
-  //   userType: string,
-  //   page: number,
-  //   limit: number,
-  //   filter: string,
-  //   category: string,
-  //   subCategory: string,
-  // ): Promise<User[]> {
-  //   const skip = (page - 1) * limit;
-  //   const filterQuery: any = { userType };
-
-  //   if (filter) {
-  //     filterQuery.$or = [
-  //       { firstName: new RegExp(filter, 'i') },
-  //       { lastName: new RegExp(filter, 'i') },
-  //     ];
-  //   }
-
-  //   if (category) {
-  //     filterQuery['categories'] = category;
-  //   }
-
-  //   if (subCategory) {
-  //     filterQuery['subcategories'] = subCategory;
-  //   }
-
-  //   console.log('filterQuery', filterQuery);
-  //   return this.userModel
-  //     .find(filterQuery)
-  //     .select('-password')
-  //     .skip(skip)
-  //     .limit(limit)
-  //     .exec();
-  // }
-
   async findUsersByUserType(
     userType: string,
     page: number,
@@ -166,6 +101,23 @@ export class UsersService {
 
       return users.filter((user) => filteredUsernames.has(user.username));
     }
+
+    return users;
+  }
+
+  async findUsersByUserType1(
+    userType: string,
+    page: number,
+    limit: number,
+  ): Promise<User[]> {
+    const skip = (page - 1) * limit;
+    const filterQuery: any = { userType };
+
+    const users = await this.userModel
+      .find(filterQuery)
+      .skip(skip)
+      .limit(limit)
+      .exec();
 
     return users;
   }
