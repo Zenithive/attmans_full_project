@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -183,6 +183,8 @@ const Subcategorys = [
 ];
 
 
+
+
 const getSubcategorys = (Subcategorys: any[]) => Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
 
 const Jobs = () => {
@@ -204,9 +206,8 @@ const Jobs = () => {
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
         try {
             const response = await axios.get(APIS.JOBS, {
-                params: {
-                    page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
-                    userId: filterType === "mine" ? userId : undefined
+                params: { page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','), 
+                    userId:filterType === "mine" ?userId:undefined
                 }
             });
             if (response.data.length === 0) {
@@ -254,9 +255,7 @@ const Jobs = () => {
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
         };
-
     }, [refetch]);
-
 
     useEffect(() => {
         pubsub.subscribe('JobCreated', refetch);
@@ -264,7 +263,6 @@ const Jobs = () => {
         return () => {
             pubsub.unsubscribe('JobCreated', refetch);
         };
-
     }, [refetch]);
 
     const handleEditJob = useCallback((job: Job) => {
@@ -318,9 +316,11 @@ const Jobs = () => {
                             My Exhibitions
                         </ToggleButton>
                     </ToggleButtonGroup>
-                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                        <FilterAltIcon />
-                    </IconButton>
+                    <Tooltip title="Filter" arrow>
+                        <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+                            <FilterAltIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
                 <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
             </Box>
@@ -385,12 +385,16 @@ const Jobs = () => {
                                     <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
                                         Apply
                                     </Button>
-                                    <IconButton onClick={() => handleEditJob(job)}>
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton onClick={() => handleDeleteJob(job)}>
-                                        <DeleteRoundedIcon />
-                                    </IconButton>
+                                    <Tooltip title="Edit" arrow>
+                                        <IconButton onClick={() => handleEditJob(job)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Delete" arrow>
+                                        <IconButton onClick={() => handleDeleteJob(job)}>
+                                            <DeleteRoundedIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                 </Box>
                             </CardContent>
                         </Card>
