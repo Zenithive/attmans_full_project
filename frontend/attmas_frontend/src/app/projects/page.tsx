@@ -318,10 +318,10 @@ const Jobs = () => {
                         sx={{ height: "30px" }}
                     >
                         <ToggleButton value="all" aria-label="all exhibitions">
-                            All Exhibitions
+                            All Projects
                         </ToggleButton>
                         <ToggleButton value="mine" aria-label="my exhibitions">
-                            My Exhibitions
+                            My Projects
                         </ToggleButton>
                     </ToggleButtonGroup>
                     <Tooltip title="Filter" arrow>
