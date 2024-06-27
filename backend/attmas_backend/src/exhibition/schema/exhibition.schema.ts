@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import validator from 'validator';
 
 export type ExhibitionDocument = Exhibition & Document;
 
@@ -32,6 +33,15 @@ export class Exhibition {
   // New fields for sending to innovators
   @Prop({ required: false })
   message?: string;
+
+  @Prop({
+    required: true,
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+      message: (props: any) => `${props.value} is not a valid URL!`,
+    },
+  })
+  videoUrl: string;
 
   @Prop({ type: [String], required: false })
   innovators?: string[];
