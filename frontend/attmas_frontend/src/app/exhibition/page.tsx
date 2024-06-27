@@ -382,25 +382,27 @@ const Exhibition = () => {
               </Typography>
               <Typography variant="body2">{exhibition.description}</Typography>
               <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
-              {userType === "Project Owner" && (
               <Typography sx={{ display: "flex", float: "right" }}>
+              {userType === "Admin" && (
                 <IconButton onClick={() => handleEditExhibition(exhibition)}>
                 <Tooltip title="Edit">
                   <EditIcon />
                   </Tooltip>
                 </IconButton>
+                 )}
+                {userType === "Admin" && (
                 <IconButton onClick={() => handleDeleteExhibition(exhibition)}>
                 <Tooltip title="Delete">
                   <DeleteRoundedIcon />
                   </Tooltip>
                 </IconButton>
+                  )}
                 <IconButton onClick={() => handleSendInnovators(exhibition)}>
                 <Tooltip title="innovators">
                   <SendIcon />
                   </Tooltip>
                 </IconButton>
               </Typography>
-            )}
             </CardContent>
           </Card>
         ))}
