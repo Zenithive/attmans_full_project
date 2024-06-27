@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PersonalProfile } from './schemas/personalProfile.schema';
-import { WorkExprience } from './schemas/work.exprience.shema';
+import { WorkExprience } from './schemas/work.exprience.schema';
 import { Categories } from './schemas/category.schema';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ProfileService {
+  [x: string]: any;
   constructor(
     @InjectModel(PersonalProfile.name)
     private readonly profileModel: Model<PersonalProfile>,
@@ -17,13 +18,6 @@ export class ProfileService {
     private readonly categories: Model<Categories>,
     private readonly usersService: UsersService,
   ) {}
-
-  // async createForm1(
-  //   PersonalProfile: PersonalProfile,
-  // ): Promise<PersonalProfile> {
-  //   const createdProfile = new this.profileModel(PersonalProfile);
-  //   return createdProfile.save();
-  // }
 
   async createOrUpdateForm1(
     personalProfile: PersonalProfile,
@@ -41,17 +35,6 @@ export class ProfileService {
       return createdProfile.save();
     }
   }
-
-  // async createForm2(WorkExprience: WorkExprience): Promise<WorkExprience> {
-  //   console.log('workExprience', WorkExprience);
-  //   const createdProfile = new this.workExprience(WorkExprience);
-  //   const Profiled = createdProfile.save();
-  //   await this.usersService.updateUserTypes(
-  //     WorkExprience.username,
-  //     WorkExprience.userType,
-  //   );
-  //   return Profiled;
-  // }
 
   async createOrUpdateForm2(
     workExprience: WorkExprience,
@@ -80,23 +63,6 @@ export class ProfileService {
       return Profiled;
     }
   }
-
-  // async createForm3(Categories: Categories): Promise<Categories> {
-  //   const createdProfile = new this.categories(Categories);
-  //   await this.usersService.updateProfileCompletionStatus(Categories.username);
-  //   return createdProfile.save();
-  // }
-
-  // async updateUserType(username: string, userType: string): Promise<void> {
-  //   await this.usersService.updateUserTypes(username, userType);
-  // }
-
-  //   private async checkAndUpdateProfileCompletion(
-  //     username: string,
-  //   ): Promise<void> {
-  //     await this.usersService.updateProfileCompletionStatus(username);
-  //   }
-  // }
 
   async createOrUpdateForm3(categories: Categories): Promise<Categories> {
     const existingProfile = await this.categories.findOne({
@@ -128,5 +94,42 @@ export class ProfileService {
     username: string,
   ): Promise<void> {
     await this.usersService.updateProfileCompletionStatus(username);
+  }
+
+  async getProfileCompletionStatus(
+    username: string,
+  ): Promise<{ profileCompleted: number }> {
+    const form1 = await this.profileModel.findOne({ username });
+    if (!form1) return { profileCompleted: 1 };
+
+    const form2 = await this.workExprience.findOne({ username });
+    if (!form2) return { profileCompleted: 2 };
+
+    const form3 = await this.categories.findOne({ username });
+    if (!form3) return { profileCompleted: 3 };
+
+    return { profileCompleted: 4 };
+  }
+
+  async getAllCategories(): Promise<Categories[]> {
+    return this.categories.find().exec();
+  }
+
+  async getProfileByUsername(
+    username: string,
+  ): Promise<PersonalProfile | null> {
+    return this.profileModel.findOne({ username }).exec();
+  }
+
+  async getProfileByUsername2(username: string): Promise<WorkExprience | null> {
+    return this.workExprience.findOne({ username }).exec();
+  }
+
+  async getProfileByUsername3(username: string): Promise<Categories | null> {
+    return this.categories.findOne({ username }).exec();
+  }
+
+  async getProfileByUserId(username: string): Promise<PersonalProfile> {
+    return this.profileModel.findOne({ username }).exec();
   }
 }

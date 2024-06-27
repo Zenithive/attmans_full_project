@@ -10,7 +10,14 @@ import {
     TextField,
     Typography,
     FormHelperText,
-    CircularProgress
+    CircularProgress,
+    FormControl,
+    FormLabel,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    InputAdornment,
+    Select
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -19,7 +26,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { APIS } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-
 
 interface ProfileForm2Props {
     onNext: () => void;
@@ -33,7 +39,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-
     const validationSchema = Yup.object({
         qualification: Yup.string().required('Qualification is required'),
         organization: Yup.string().nullable(),
@@ -46,6 +51,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         productDescription: Yup.string().nullable(),
         productType: Yup.string().nullable(),
         productPrice: Yup.string().nullable(),
+        hasPatent: Yup.string().nullable(), 
+        currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'), 
     });
 
     const formik = useFormik({
@@ -61,19 +68,17 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productDescription: '',
             productType: '',
             productPrice: '',
-            userId: userDetails._id,
+            hasPatent: 'No', 
             username: userDetails.username,
+            currency: 'INR', 
         },
-
-
-
         validationSchema,
         onSubmit: async (values) => {
             setLoading(true);
 
             try {
-                console.log('userDetails._id from 2nd', userDetails._id);
-
+                console.log("UsertypepROFILE",userDetails.userType);
+                
                 const response = await axios.post(APIS.FORM2, values);
                 console.log('Profile data saved:', response.data);
                 onNext();
@@ -86,8 +91,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     });
 
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        const value = event.target.value as string;
         formik.handleChange(event);
-        if (event.target.value === 'Freelancer') {
+        if (value === 'Freelancer') {
             setIsFreelancer(true);
         } else {
             setIsFreelancer(false);
@@ -128,6 +134,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="qualification"
                                 label="Qualification"
+                                color='secondary'
                                 name="qualification"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -144,17 +151,13 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             </TextField>
                         </Grid>
 
-
-
-
-
-
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="organization"
                                 label="Name of the organization (If any)"
+                                color='secondary'
                                 name="organization"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -170,6 +173,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="sector"
                                 label="Sector (If any)"
+                                color='secondary'
                                 name="sector"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -185,6 +189,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="designation"
                                 label="Designation"
+                                color='secondary'
                                 name="designation"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -198,10 +203,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             <TextField
                                 fullWidth
                                 multiline
-                                rows={3} // Adjust the number of rows as needed
+                                rows={3}
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="workAddress"
                                 label="Work Address (If any)"
+                                color='secondary'
                                 name="workAddress"
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -215,13 +221,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 }}
                                 inputProps={{
                                     style: {
-                                        padding: '10px', // Adjust the padding as needed
+                                        padding: '10px',
                                     },
                                 }}
                             />
                         </Grid>
-
-
 
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -230,6 +234,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 style={{ background: "white", borderRadius: "25px" }}
                                 id="userType"
                                 label="User Type"
+                                color='secondary'
                                 name="userType"
                                 value={formik.values.userType}
                                 onChange={handleUserTypeChange}
@@ -237,7 +242,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 error={formik.touched.userType && Boolean(formik.errors.userType)}
                             >
                                 <MenuItem value="Freelancer">Freelancer</MenuItem>
-                                <MenuItem value="Business">Business</MenuItem>
+                                <MenuItem value="Project Owner">Project Owner</MenuItem>
                                 <MenuItem value="Innovators">Innovators</MenuItem>
                             </TextField>
                             {formik.touched.userType && formik.errors.userType && (
@@ -245,7 +250,24 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             )}
                         </Grid>
 
-                        {formik.values.userType === 'Freelancer' && (
+                        {isFreelancer && (
+                            <Grid item xs={12} sm={6}>
+                                <FormControl component="fieldset">
+                                    <FormLabel color='secondary' component="legend">Do you have a patent?</FormLabel>
+                                    <RadioGroup
+                                        aria-label="hasPatent"
+                                        name="hasPatent"
+                                        value={formik.values.hasPatent}
+                                        onChange={formik.handleChange}
+                                    >
+                                        <FormControlLabel value="Yes" control={<Radio color='secondary' />} label="I have a patent" />
+                                        <FormControlLabel value="No" control={<Radio color='secondary' />} label="I don't have a patent" />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Grid>
+                        )}
+
+                        {isFreelancer && (
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -253,6 +275,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="productToMarket"
                                     label="Do you have a product to market?"
+                                    color='secondary'
                                     name="productToMarket"
                                     value={formik.values.productToMarket}
                                     onChange={(e) => {
@@ -279,6 +302,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productName"
                                         label="Product Name"
+                                        color='secondary'
                                         name="productName"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -293,6 +317,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productDescription"
                                         label="Product Description"
+                                        color='secondary'
                                         name="productDescription"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -307,6 +332,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productType"
                                         label="Product Type"
+                                        color='secondary'
                                         name="productType"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -315,20 +341,52 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         helperText={formik.touched.productType && formik.errors.productType}
                                     />
                                 </Grid>
+
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productPrice"
                                         label="Product Price"
+                                        color='secondary'
                                         name="productPrice"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         value={formik.values.productPrice}
                                         error={formik.touched.productPrice && Boolean(formik.errors.productPrice)}
                                         helperText={formik.touched.productPrice && formik.errors.productPrice}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Select
+                                                        value={formik.values.currency}
+                                                        onChange={formik.handleChange}
+                                                        name="currency"
+                                                        id="currency"
+                                                        sx={{
+                                                            background: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '25px 0 0 25px', // Rounded corners on the left side
+                                                            height: '56px', // Match the height of TextField
+                                                            paddingRight: '10px',
+                                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                                border: 'none'
+                                                            },
+                                                        }}
+                                                    >
+                                                        <MenuItem value="INR">₹</MenuItem>
+                                                        <MenuItem value="USD">$</MenuItem>
+                                                    </Select>
+                                                </InputAdornment>
+                                            ),
+                                            style: {
+                                                borderRadius: '25px',
+                                                paddingLeft: 0 // Ensure no extra padding on the left side
+                                            }
+                                        }}
                                     />
                                 </Grid>
+
                             </>
                         )}
                     </Grid>

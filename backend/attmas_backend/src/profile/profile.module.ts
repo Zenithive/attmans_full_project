@@ -6,7 +6,7 @@ import {
   PersonalProfile,
   ProfileSchema,
 } from './schemas/personalProfile.schema';
-import { WorkExprience, WorkSchema } from './schemas/work.exprience.shema';
+import { WorkExprience, WorkSchema } from './schemas/work.exprience.schema';
 import { Categories, CategorySchema } from './schemas/category.schema';
 import { UsersModule } from 'src/users/users.module';
 

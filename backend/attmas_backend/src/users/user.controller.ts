@@ -5,6 +5,7 @@ import {
   Body,
   UseGuards,
   Get,
+  Query,
 } from '@nestjs/common';
 import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
@@ -30,5 +31,27 @@ export class UsersController {
   @Get('test')
   async test() {
     return { msg: 'Test message validate.' };
+  }
+
+  @Get('by-type')
+  async getUsersByUserType(
+    @Query('userType') userType: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '5',
+    @Query('filter') filter = '',
+    @Query('category') category = '',
+    @Query('subCategory') subCategory = '',
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const users = await this.usersService.findUsersByUserType(
+      userType,
+      pageNumber,
+      limitNumber,
+      filter,
+      category,
+      subCategory,
+    );
+    return users;
   }
 }

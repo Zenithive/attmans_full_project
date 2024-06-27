@@ -1,0 +1,46 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+
+export type ExhibitionDocument = Exhibition & Document;
+
+@Schema()
+export class Exhibition {
+  @Prop({ required: false })
+  title: string;
+
+  @Prop({ required: false })
+  description: string;
+
+  @Prop()
+  status: string;
+
+  @Prop({ type: [String], required: false })
+  industries: string[];
+
+  @Prop({ type: [String], required: false })
+  subjects: string[];
+
+  @Prop({ required: true, default: Date.now })
+  dateTime: Date;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  userId: Types.ObjectId;
+
+  // New fields for sending to innovators
+  @Prop({ required: false })
+  message?: string;
+
+  @Prop({ type: [String], required: false })
+  innovators?: string[];
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  userIdForInnovators?: Types.ObjectId;
+
+  @Prop({ required: false })
+  usernameForInnovators?: string;
+}
+
+export const ExhibitionSchema = SchemaFactory.createForClass(Exhibition);

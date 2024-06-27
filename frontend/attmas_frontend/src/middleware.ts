@@ -2,19 +2,28 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Log to check if middleware is being executed
   console.log("Middleware executed");
 
   // Check if the user is authenticated
   const isAuthenticated = checkAuth(request);
 
-  // If the user is not authenticated, redirect them to the login page
-  if (!isAuthenticated) {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Define the routes where authenticated users should be redirected
+  const authRoutes = ['/', '/signup'];
+
+  // If the request is for the sign-in or sign-up route and the user is authenticated
+  if (authRoutes.includes(request.nextUrl.pathname)) {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+  } else {
+    // For other routes, if the user is not authenticated, redirect to the sign-in page
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
-  // Allow the request to proceed if the user is authenticated
-  //return NextResponse.next();
+  // Allow the request to proceed
+  return NextResponse.next();
 }
 
 function checkAuth(request: NextRequest): boolean {
@@ -27,5 +36,5 @@ function checkAuth(request: NextRequest): boolean {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/dashboard', '/freelancers', '/innovators', '/industries', '/exhibition','/profile','/jobs'],
+  matcher: ['/', '/editprofile','/signup', '/dashboard', '/freelancers', '/innovators', '/projectowner', '/exhibition', '/profile', '/projects'],
 };

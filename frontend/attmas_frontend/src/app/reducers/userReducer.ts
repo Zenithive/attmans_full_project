@@ -3,7 +3,8 @@ import { RootState } from "./store";
 
 
 export interface UserSchema{
-  token : string, username: string, firstname: string, lastname: string, mobilenumber: string ,_id:string
+  token : string, username: string, firstName: string, lastName: string, mobileNumber: string 
+  ,_id:string, userType:string
 }
 export interface UserState {
   user: UserSchema; 
@@ -12,11 +13,13 @@ export interface UserState {
 const initialState: UserState = {
   user: {
     token: "",
-    username: "", 
-    firstname: "", 
-    lastname: "", 
-    mobilenumber: "",
-    _id:""
+    username: "",
+    firstName: "",
+    lastName: "",
+    mobileNumber: "",
+    _id:"",
+    userType:"",
+
   }
 }
 
@@ -30,7 +33,7 @@ export const userSliece = createSlice({
     },
     removeUser: (state) => {
       state.user = { ...initialState.user };
-    },
+    }, 
   }
 });
 

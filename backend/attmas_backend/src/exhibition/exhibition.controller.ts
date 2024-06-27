@@ -7,13 +7,16 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ExhibitionService } from './exhibition.service';
 import {
   CreateExhibitionDto,
   UpdateExhibitionDto,
-} from './create-exhibition.dto';
-import { Exhibition } from './exhibition.schema';
+} from './dto/create-exhibition.dto';
+import { Exhibition } from './schema/exhibition.schema';
+import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
+import { SendToInnovators } from './schema/sendToInnovators.schema';
 
 @Controller('exhibitions')
 export class ExhibitionController {
@@ -26,9 +29,45 @@ export class ExhibitionController {
     return this.exhibitionService.create(createExhibitionDto);
   }
 
+  @Post('sendinovators')
+  async createSendInnovators(
+    @Body() sendToInnovatorsDto: SendToInnovatorsDto,
+  ): Promise<SendToInnovators> {
+    return this.exhibitionService.createSendInnovators(sendToInnovatorsDto);
+  }
+
+  @Get('submitted-innovators')
+  async getSubmittedInnovators(
+    @Query('userId') userId: string,
+  ): Promise<SendToInnovators[]> {
+    console.log(`Fetching submitted innovators for userId: ${userId}`);
+    return this.exhibitionService.getSubmittedInnovators(userId);
+  }
+
   @Get()
-  async findAll(): Promise<Exhibition[]> {
-    return this.exhibitionService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('industries') industries: string[] = [],
+    @Query('subjects') subjects: string[] = [],
+    @Query('userId') userId?: string,
+  ): Promise<Exhibition[]> {
+    return this.exhibitionService.findAll(
+      page,
+      limit,
+      userId,
+      industries,
+      subjects,
+    );
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Exhibition> {
+    const exhibition = await this.exhibitionService.findExhibitionWithUser(id);
+    if (!exhibition) {
+      throw new NotFoundException(`Exhibition with id ${id} not found`);
+    }
+    return exhibition;
   }
 
   @Put(':id')

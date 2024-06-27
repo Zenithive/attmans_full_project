@@ -58,20 +58,15 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
         console.log("response.data.access_token", response.data.access_token);
         console.log("response", response.data.user);
-        console.log("response.ds", response.data.user._doc.isAllProfileCompleted
-        )
-        console.log("response.usertype", response.data.user._doc.userType
-        )
-
-
 
         const res = response.data.user;
         const user = {
           token: response.data.access_token,
           username: values.email,
-          firstname: res.firstname,
-          lastname: res.lastname,
-          mobilenumber: res.mobilenumber,
+          firstName: res.firstName,
+          lastName: res.lastName,
+          mobileNumber: res.mobileNumber,
+          userType:res.userType,
           _id: res._id,
         };
         console.log("user", user)
@@ -79,8 +74,8 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
         dispatch(addUser(user))
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        if (response.data.user._doc.isAllProfileCompleted ||
-          ["innoveters", "freelancer", "business"].includes(response.data.user._doc.userType)) {
+        if (response.data.user.isAllProfileCompleted ||
+          ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
           router.push("/dashboard");
         }
         else {
@@ -139,11 +134,11 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox value="remember" />}
             color='secondary'
             label="Remember me"
-          />
+          /> */}
           <Button
             type="submit"
             fullWidth

@@ -1,6 +1,5 @@
-"use client";
-
-import type { Metadata } from "next";
+// RootLayout.tsx
+"use client"
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { usePathname } from "next/navigation";
@@ -9,6 +8,7 @@ import { config } from "@/middleware";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { store } from "./reducers/store";
+import Toast from "./component/toast/Toast"; // Adjust the import path accordingly
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +18,8 @@ const theme = createTheme({
       main: "#f5f5f5",
     },
     secondary: {
-      main: "#616161",
-    }
+      main: "#cc4800",
+    },
   },
   shape: {
     borderRadius: 20,
@@ -31,18 +31,22 @@ const theme = createTheme({
         root: {
           color: '#616161',
           '&.Mui-selected': {
-            color: 'white',
-            backgroundColor: '#616161',
+            color: '#fff',
+            backgroundColor: '#cc4800',
           },
           '&.Mui-selected .MuiListItemIcon-root': {
-            color: 'white'
+            color: '#fff'
           },
           ':hover .MuiListItemIcon-root': {
-            color: 'white'
+            color: '#fff'
           },
           ':hover': {
-            color: 'white',
-            backgroundColor: '#616161',
+            color: '#fff',
+            backgroundColor: '#cc4800',
+          },
+          '&.Mui-selected:hover': {
+            color: '#fff',
+            backgroundColor: '#cc4800',
           }
         },
       }
@@ -54,6 +58,30 @@ const theme = createTheme({
             '& fieldset': {
               borderRadius: 20,
             },
+            '&:hover fieldset': {
+              borderColor: '#616161',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#616161',
+            },
+          },
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderRadius: 20,
+              borderColor: '#616161',
+            },
+            '&:hover fieldset': {
+              borderColor: '#616161',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#616161',
+            },
           },
         },
       },
@@ -62,7 +90,12 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 20,
+          color: "#fff",
           textTransform: 'none',
+          backgroundColor: '#cc4800',
+          ':hover': {
+            backgroundColor: '#cc4800',
+          }
         },
       },
     },
@@ -83,11 +116,12 @@ export default function RootLayout({
       <body className={inter.className} style={{ width: '100%', height: "100%" }}>
         <ThemeProvider theme={theme}>
           <Provider store={store}>
-          {isValidPage ? (
-            <Layout displayMainSideBar={!isProfilePage}>{children}</Layout>
-          ) : (
-            children
-          )}
+            {isValidPage ? (
+              <Layout displayMainSideBar={!isProfilePage}>{children}</Layout>
+            ) : (
+              children
+            )}
+            <Toast /> {/* Add Toast component here */}
           </Provider>
         </ThemeProvider>
       </body>

@@ -7,13 +7,14 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
-import { JobsService } from './jobs.service';
-import { CreateJobsDto, UpdateJobsDto } from './create-jobs.dto';
-import { Jobs } from './jobs.schema';
+import { JobsService } from './projects.service';
+import { CreateJobsDto, UpdateJobsDto } from './create-projects.dto';
+import { Jobs } from './projects.schema';
 
 @Controller('jobs')
-export class jobsController {
+export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Post()
@@ -22,8 +23,31 @@ export class jobsController {
   }
 
   @Get()
-  async findAll(): Promise<Jobs[]> {
-    return this.jobsService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('Category') Category: string[] = [],
+    @Query('userId') userId?: string,
+    @Query('Subcategorys') Subcategorys: string[] = [],
+    @Query('Expertiselevel') Expertiselevel: string[] = [],
+  ): Promise<Jobs[]> {
+    return this.jobsService.findAll(
+      page,
+      limit,
+      Category,
+      userId,
+      Subcategorys,
+      Expertiselevel,
+    );
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Jobs> {
+    const job = await this.jobsService.findJobWithUser(id);
+    if (!job) {
+      throw new NotFoundException(`Job with id ${id} not found`);
+    }
+    return job;
   }
 
   @Put(':id')

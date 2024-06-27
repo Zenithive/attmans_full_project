@@ -8,7 +8,8 @@ import { ConfigModule } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import { ProfileModule } from './profile/profile.module';
 import { ExhibitionModule } from './exhibition/exhibition.module';
-import { JobsModule } from './jobs/jobs.module';
+import { JobsModule } from './projects/projects.module';
+import { ApplyModule } from './apply/apply.module';
 
 dotenv.config();
 console.log('process.env.MONGO_URL', process.env.URI);
@@ -24,6 +25,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     ProfileModule,
     ExhibitionModule,
     JobsModule,
+    ApplyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
