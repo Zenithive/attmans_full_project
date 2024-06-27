@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField} from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField, Tooltip, ToggleButton, ToggleButtonGroup} from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -13,6 +13,9 @@ import { SendInnovators } from '../component/exhibition/send-innovators';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useMemo,useCallback } from 'react';
+import { useAppSelector } from '../reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '../reducers/userReducer';
+import ExhibitionDetails from '../component/viewonly/viewonly';
 
 interface Exhibition {
   _id?: string;
@@ -187,15 +190,24 @@ const Exhibition = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [hasMore,setHasMore]=useState(true);
-
   const [page, setPage] = useState(1);
+  const [filterType, setFilterType] = useState('all');
+  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null); 
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const { userType, _id: userId } = userDetails;
 
   const fetchExhibitions =useCallback(async (page: number, industriesFilter: string[], subjectsFilter: string[]) => {
     try {
       const response = await axios.get(APIS.EXHIBITION, {
-        params: { page, limit: 10,industries: industriesFilter.join(','), subjects: subjectsFilter.join(',') }
+        params: {
+          page,
+          limit: 10,
+          industries: industriesFilter.join(','),
+          subjects: subjectsFilter.join(','),
+          userId: filterType === 'mine' ? userId : undefined
+        }
       });
-      console.log("response.data.length",response.data.length);
       if (response.data.length === 0) {
         setHasMore(false);
       } else {
@@ -213,7 +225,7 @@ const Exhibition = () => {
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
     }
-  },[]);
+  },[userId,filterType]);
 
   const refetch =useCallback(async () => {
     try {
@@ -228,7 +240,7 @@ const Exhibition = () => {
 
   useEffect(() => {
     refetch(); 
-  }, [selectedIndustries, selectedSubjects]);
+  }, [selectedIndustries, selectedSubjects,filterType]);
 
   useEffect(() => {
     if (page > 1) {
@@ -281,13 +293,44 @@ const Exhibition = () => {
     refetch();
   },[refetch]);
 
+  const handleFilterTypeChange = (event: React.MouseEvent<HTMLElement>, newFilterType: string) => {
+    if (newFilterType !== null) {
+      setFilterType(newFilterType);
+    }
+  };
+
+  const handleTitleClick = (exhibition: Exhibition) => {
+    setSelectedExhibition(exhibition);
+  };
+
+  const handleDrawerClose = () => {
+    setSelectedExhibition(null);
+  };
+
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
-        <Box sx={{position:"relative",left:"69%",width:"60%",display:"flex"}}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 ,height:"30px",position:"relative",top:"8px"}}>
+        <ToggleButtonGroup
+          value={filterType}
+          exclusive
+          onChange={handleFilterTypeChange}
+          aria-label="filter exhibitions"
+        >
+          <ToggleButton value="all" aria-label="all exhibitions">
+            All Exhibitions
+          </ToggleButton>
+          <ToggleButton value="mine" aria-label="my exhibitions">
+            My Exhibitions
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+        <Box sx={{position:"relative",left:"57%",width:"60%",display:"flex"}}>
           <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+          <Tooltip title="Filter">
             <FilterAltIcon />
+            </Tooltip>
           </IconButton>
         {filterOpen && (
           <Box sx={{ display: "flex", gap: 3 ,width:"75%"}}>
@@ -313,7 +356,7 @@ const Exhibition = () => {
           </Box>
         )}
         </Box>
-        <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+        <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit}/>
       </Box>
       <InfiniteScroll
         dataLength={exhibitions.length}
@@ -322,13 +365,14 @@ const Exhibition = () => {
         loader={<Typography>Loading...</Typography>}
         endMessage={<Typography>No more Exhibitions</Typography>}
       >
-
       <Box sx={{ mt: 2 }}>
         {exhibitions.map((exhibition) => (
           <Card key={exhibition._id} sx={{ mb: 2 }}>
             <CardContent>
               <Typography variant="h5">
-                {exhibition.title}
+              <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => handleTitleClick(exhibition)}>
+                    {exhibition.title}
+                  </span>
                 <span style={{ fontSize: 'small', color: "#616161" }}>
                   ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
                 </span>
@@ -338,17 +382,25 @@ const Exhibition = () => {
               </Typography>
               <Typography variant="body2">{exhibition.description}</Typography>
               <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
+              {userType === "Project Owner" && (
               <Typography sx={{ display: "flex", float: "right" }}>
                 <IconButton onClick={() => handleEditExhibition(exhibition)}>
+                <Tooltip title="Edit">
                   <EditIcon />
+                  </Tooltip>
                 </IconButton>
                 <IconButton onClick={() => handleDeleteExhibition(exhibition)}>
+                <Tooltip title="Delete">
                   <DeleteRoundedIcon />
+                  </Tooltip>
                 </IconButton>
                 <IconButton onClick={() => handleSendInnovators(exhibition)}>
+                <Tooltip title="innovators">
                   <SendIcon />
+                  </Tooltip>
                 </IconButton>
               </Typography>
+            )}
             </CardContent>
           </Card>
         ))}
@@ -356,6 +408,12 @@ const Exhibition = () => {
       </InfiniteScroll>
       {sendingExhibition && (
         <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
+      )}
+        {selectedExhibition && (
+        <ExhibitionDetails
+          exhibition={selectedExhibition}
+          onClose={handleDrawerClose}
+        />
       )}
     </Box>
   );

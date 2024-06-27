@@ -39,22 +39,21 @@ const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
     status: Yup.string(),
-    videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
 });
 
-export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionProps) => {
+export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
     
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+    const {userType} = userDetails;
 
     const initialValues = React.useMemo(()=>({
         title: '',
         description: '',
         status:'',
-        videoUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: []
@@ -220,18 +219,19 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
         label: item
     }))),[subjects]);
 
-    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;videoUrl:string,dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
             dateTime: values.dateTime ? values.dateTime.toISOString() : null,
             status:values.status,
-            videoUrl:values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId:userDetails._id
             // userId:userDetails.username
         };
+
+        console.log("wee",exhibitionData);
 
         try {
             if (editingExhibition) {
@@ -254,14 +254,16 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
 
     return (
         <>
+        {userType === "Project Owner" && (
             <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
                 borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
                     background: "#757575"
                 }
             }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+        )}
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
-                    <h2> {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
+                    <h2>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
@@ -272,13 +274,13 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
                         status:editingExhibition.status || '',
-                        videoUrl:editingExhibition.videoUrl || "",
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
                     } : initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
+                    
                 >
                     {({ values, setFieldValue, handleChange, handleBlur, handleSubmit, isSubmitting, errors, touched }) => (
                         <Form onSubmit={handleSubmit}>
@@ -308,18 +310,6 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                                     fullWidth
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
-                                />
-                                <TextField
-                                    fullWidth
-                                    name="videoUrl"
-                                    label="Video URL"
-                                    color='secondary'
-                                    value={values.videoUrl}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={touched.videoUrl && Boolean(errors.videoUrl)}
-                                    helperText={touched.videoUrl && errors.videoUrl}
-                                    margin="normal"
                                 />
                                 {editingExhibition && (
                                  <FormControl fullWidth>
@@ -427,7 +417,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }:AddExhibitionP
                             </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                                     <Button variant="contained" style={{ background: "#616161", color: "white" }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
-                                    <Button variant="contained" color='primary' type="submit" disabled={isSubmitting}>     {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
+                                    <Button variant="contained" color='primary' type="submit" disabled={isSubmitting} > {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>
                         </Form>

@@ -36,14 +36,29 @@ export class ExhibitionController {
     return this.exhibitionService.createSendInnovators(sendToInnovatorsDto);
   }
 
+  @Get('submitted-innovators')
+  async getSubmittedInnovators(
+    @Query('userId') userId: string,
+  ): Promise<SendToInnovators[]> {
+    console.log(`Fetching submitted innovators for userId: ${userId}`);
+    return this.exhibitionService.getSubmittedInnovators(userId);
+  }
+
   @Get()
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-    @Query('industries') industries: string[],
-    @Query('subjects') subjects: string[],
+    @Query('industries') industries: string[] = [],
+    @Query('subjects') subjects: string[] = [],
+    @Query('userId') userId?: string,
   ): Promise<Exhibition[]> {
-    return this.exhibitionService.findAll(page, limit, industries, subjects);
+    return this.exhibitionService.findAll(
+      page,
+      limit,
+      userId,
+      industries,
+      subjects,
+    );
   }
 
   @Get(':id')

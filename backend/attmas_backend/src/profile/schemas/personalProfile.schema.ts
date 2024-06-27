@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema()
 export class PersonalProfile extends Document {
@@ -63,8 +63,8 @@ export class PersonalProfile extends Document {
   @Prop({ required: false })
   profilePhoto: string;
 
-  @Prop({ required: false })
-  userId: string;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
+  userId: Types.ObjectId;
 
   @Prop({ required: false })
   username: string;

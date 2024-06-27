@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Box, Button, CircularProgress, Drawer, IconButton, TextField, Typography, Select, MenuItem, InputLabel, FormControl, Checkbox, ListItemText } from '@mui/material';
+import { Box, Button, CircularProgress, Drawer, IconButton, TextField, Typography, Select, MenuItem, InputLabel, FormControl, Checkbox, ListItemText, Divider, Card, CardContent } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -22,12 +22,25 @@ const validationSchema = Yup.object().shape({
 
 export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) => {
   const [open, toggleDrawer] = React.useState(false);
+  const [submittedInnovators, setSubmittedInnovators] = React.useState<{ username: string; innovators: string }[]>([]);
+  
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   React.useEffect(() => {
     toggleDrawer(true);
+    fetchSubmittedInnovators();
   }, []);
+
+  const fetchSubmittedInnovators = async () => {
+    try {
+      const response = await axios.get(`${APIS.GET_SUBMITTED_INNOVATORS}?userId=${userDetails._id}`);
+      console.log('Fetched submitted innovators:', response.data);
+      setSubmittedInnovators(response.data);
+    } catch (error) {
+      console.error('Error fetching submitted innovators:', error);
+    }
+  };
 
   const initialValues = {
     message: '',
@@ -51,6 +64,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
       await axios.post(APIS.SEND_INNOVATORS, sendInnovators);
       resetForm();
       toggleDrawer(false);
+      fetchSubmittedInnovators();
       onCancel();
     } catch (error) {
       console.error('Error sending message:', error);
@@ -144,6 +158,21 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
           </Form>
         )}
       </Formik>
+      <Divider sx={{ my: '$5' }} />
+      <></>
+      {submittedInnovators.length > 0 && (
+        <Box sx={{ mt: 4, p: 2 }}>
+          <Typography variant="h5" sx={{mb:2,color:"Black",borderRadius:"15px",textAlign:"center",height:"45px",fontWeight:"bolder"}}><div style={{position:"relative",top:"7px"}}>Submitted Innovators :-</div></Typography>
+            <Divider sx={{ my: '$5' }} />
+          {submittedInnovators.map((innovator, index) => (
+             <Card sx={{ mb: 2 }}>
+              <CardContent>
+            <Typography key={index} variant="body2" sx={{fontWeight:"bold"}}>Innovators :- {innovator.innovators} , User :- {innovator.username}</Typography>
+            </CardContent>
+            </Card>
+          ))}
+        </Box>
+      )}
     </Drawer>
   );
 };

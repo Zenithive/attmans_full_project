@@ -20,6 +20,10 @@ import { useCallback,useMemo } from 'react';
 
 
 interface Jobs {
+    Sector: string;
+    AreaOfProduct: string;
+    ProductDescription: string;
+    DetailsOfInnovationChallenge: string;
     _id?: string;
     title: string;
     description: string;
@@ -28,6 +32,10 @@ interface Jobs {
     TimeFrame: string | null;
     Category: string[];
     Subcategorys: string[];
+    SelectService:string; 
+    Objective:string;
+    Expectedoutcomes:string;
+    IPRownership:string;
 }
 
 interface AddJobsProps {
@@ -39,7 +47,15 @@ interface AddJobsProps {
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
+    SelectService: Yup.string().required('Select-Service is required'),
     Expertiselevel: Yup.string(),
+    Objective:Yup.string().required('Objective is required'),
+    IPRownership:Yup.string().required('IPR-ownerShip is required'),
+    Expectedoutcomes:Yup.string().required('Expected out comes is required'),
+    DetailsOfInnovationChallenge:Yup.string(),
+    ProductDescription:Yup.string(),
+    AreaOfProduct:Yup.string(),
+    Sector:Yup.string(),
     Budget: Yup.number().required("Budget is required"),
     TimeFrame: Yup.date().nullable('Date & Time is required'),
     categoryforCategory: Yup.array().of(Yup.string()),
@@ -54,11 +70,19 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     const initialValues =React.useMemo(()=>({
         title: '',
         description: '',
+        SelectService:"",
         Expertiselevel: '',
         Budget: 0,
+        Expectedoutcomes:'',
         TimeFrame: null as Dayjs | null,
         categoryforCategory: [],
         Subcategory: [],
+        Objective:'',
+        IPRownership:'',
+        DetailsOfInnovationChallenge: '',
+        Sector: '',
+        AreaOfProduct: '',
+        ProductDescription: '',
         // username: userDetails.username
 
     }),[]);
@@ -224,15 +248,23 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     }))),[]);
 
 
-    const handleSubmit =React.useCallback(async (values: { title: string; description: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit =React.useCallback(async (values: { title: string; description: string;SelectService:string;DetailsOfInnovationChallenge:string; Sector:string;ProductDescription:string;AreaOfProduct:string;Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[];Objective:string;Expectedoutcomes:string,IPRownership:string;}, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,
             description: values.description,
+            SelectService:values.SelectService,
             TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
             Expertiselevel: values.Expertiselevel,
             Budget: values.Budget,
             Category: values.categoryforCategory,
             Subcategorys: values.Subcategory,
+            DetailsOfInnovationChallenge: values.DetailsOfInnovationChallenge,
+            Sector: values.Sector,
+            AreaOfProduct: values.AreaOfProduct,
+            ProductDescription: values.ProductDescription,
+            Objective:values.Objective,
+            Expectedoutcomes:values.Expectedoutcomes,
+            IPRownership:values.IPRownership,
             userId:userDetails._id,
         };
 
@@ -270,11 +302,19 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                     initialValues={editingJobs ? {
                         title: editingJobs.title || '',
                         description: editingJobs.description || '',
+                        SelectService:editingJobs.SelectService || '',
                         Expertiselevel: editingJobs.Expertiselevel || '',
                         Budget: editingJobs.Budget || 0,
                         TimeFrame: editingJobs.TimeFrame ? dayjs(editingJobs.TimeFrame) : null,
                         categoryforCategory: editingJobs.Category || [],
-                        Subcategory: editingJobs.Subcategorys || []
+                        Subcategory: editingJobs.Subcategorys || [],
+                        DetailsOfInnovationChallenge: editingJobs.DetailsOfInnovationChallenge || '',
+                        Sector:editingJobs.Sector || '',
+                        AreaOfProduct:editingJobs.AreaOfProduct || "",
+                        ProductDescription:editingJobs.ProductDescription || "",
+                        Expectedoutcomes:editingJobs.Expectedoutcomes || '',
+                        Objective:editingJobs.Objective || '',
+                        IPRownership:editingJobs.IPRownership || '',
                     } : initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
@@ -308,20 +348,76 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
-                                <TextField
-                                    fullWidth
-                                    name="Budget"
-                                    color='secondary'
-                                    label="BUDGET"
-                                    type="number"
-                                    value={values.Budget}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={touched.Budget && Boolean(errors.Budget)}
-                                    helperText={touched.Budget && errors.Budget}
-                                    margin="normal"
-                                />
-                                <FormControl fullWidth>
+                                 <FormControl fullWidth>
+                                    <InputLabel color='secondary' id="SelectService-label">Select Service</InputLabel>
+                                    <Select
+                                        labelId="SelectService-label"
+                                        color='secondary'
+                                        id="SelectService"
+                                        name="SelectService"
+                                        value={values.SelectService}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        label="Select Service"
+                                    >
+                                        <MenuItem value="Outsource Research and Development ">Outsource Research and Development  </MenuItem>
+                                        <MenuItem value="Innovative product">Innovative product</MenuItem>
+                                    </Select>
+                                    {values.SelectService === 'Innovative product' && (
+
+                                    <div style={{ padding: 4}}>
+                                        <TextField
+                                        label="Details of Innovation Challenge"
+                                        name="DetailsOfInnovationChallenge"
+                                        color='secondary'
+                                        variant="outlined"
+                                        value={values.DetailsOfInnovationChallenge}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        fullWidth
+                                        error={!!(errors.DetailsOfInnovationChallenge && touched.DetailsOfInnovationChallenge)}
+                                        helperText={<ErrorMessage name="DetailsOfInnovationChallenge" />}
+                                        />
+                                        <TextField
+                                        label="Sector"
+                                        name="Sector"
+                                        color='secondary'
+                                        variant="outlined"
+                                        value={values.Sector}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        fullWidth
+                                        error={!!(errors.Sector && touched.Sector)}
+                                        helperText={<ErrorMessage name="Sector" />}
+                                        />
+                                        <TextField
+                                        label="Area of Product"
+                                        name="AreaOfProduct"
+                                        color='secondary'
+                                        variant="outlined"
+                                        value={values.AreaOfProduct}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        fullWidth
+                                        error={!!(errors.AreaOfProduct && touched.AreaOfProduct)}
+                                        helperText={<ErrorMessage name="AreaOfProduct" />}
+                                        />
+                                        <TextField
+                                        label="Product Description"
+                                        name="ProductDescription"
+                                        color='secondary'
+                                        variant="outlined"
+                                        value={values.ProductDescription}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        fullWidth
+                                        error={!!(errors.ProductDescription && touched.ProductDescription)}
+                                        helperText={<ErrorMessage name="ProductDescription" />}
+                                        />
+                                    </div>
+                                    )}
+                                </FormControl>
+                                  <FormControl fullWidth>
                                     <InputLabel color='secondary' id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
                                         labelId="Expertiselevel-label"
@@ -339,6 +435,19 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         <MenuItem value="Phd">Phd</MenuItem>
                                     </Select>
                                 </FormControl>
+                                <TextField
+                                    fullWidth
+                                    name="Budget"
+                                    color='secondary'
+                                    label="BUDGET"
+                                    type="number"
+                                    value={values.Budget}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.Budget && Boolean(errors.Budget)}
+                                    helperText={touched.Budget && errors.Budget}
+                                    margin="normal"
+                                />
                                 <Autocomplete
                                     multiple
                                     options={Category}
@@ -416,6 +525,45 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                             {params.children}
                                         </li>
                                     )}
+                                />
+                                    <TextField
+                                    label="Objective"
+                                    name="Objective"
+                                    color='secondary'
+                                    variant="outlined"
+                                    value={values.Objective}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    multiline
+                                    fullWidth
+                                    error={!!(errors.Objective && touched.Objective)}
+                                    helperText={<ErrorMessage name="Objective" />}
+                                />
+                                <TextField
+                                    label="Expected out comes"
+                                    name="Expectedoutcomes"
+                                    color='secondary'
+                                    variant="outlined"
+                                    value={values.Expectedoutcomes}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    multiline
+                                    fullWidth
+                                    error={!!(errors.Expectedoutcomes && touched.Expectedoutcomes)}
+                                    helperText={<ErrorMessage name="Expectedoutcomes" />}
+                                />
+                                 <TextField
+                                    label="IPR ownership"
+                                    name="IPRownership"
+                                    color='secondary'
+                                    variant="outlined"
+                                    value={values.IPRownership}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    multiline
+                                    fullWidth
+                                    error={!!(errors.IPRownership && touched.IPRownership)}
+                                    helperText={<ErrorMessage name="IPRownership" />}
                                 />
                                 <LocalizationProvider  dateAdapter={AdapterDayjs}>
                                     <DateTimePicker

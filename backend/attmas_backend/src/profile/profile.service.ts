@@ -129,7 +129,7 @@ export class ProfileService {
     return this.categories.findOne({ username }).exec();
   }
 
-  async getProfileByUserId(userId: string): Promise<PersonalProfile> {
-    return this.profileModel.findOne({ userId }).exec();
+  async getProfileByUserId(username: string): Promise<PersonalProfile> {
+    return this.profileModel.findOne({ username }).exec();
   }
 }

@@ -16,6 +16,9 @@ export class SendToInnovators {
 
   @Prop({ required: true })
   username: string;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
 }
 
 export const SendToInnovatorsSchema =

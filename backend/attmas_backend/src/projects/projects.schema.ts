@@ -16,13 +16,37 @@ export class Jobs {
   description: string;
 
   @Prop({ required: true })
+  Objective: string;
+
+  @Prop({ required: true })
+  Expectedoutcomes: string;
+
+  @Prop({ required: true })
+  IPRownership: string;
+
+  @Prop({ required: true })
   Expertiselevel: string;
+
+  @Prop({ required: false })
+  DetailsOfInnovationChallenge: string;
+
+  @Prop({ required: false })
+  Sector: string;
+
+  @Prop({ required: false })
+  AreaOfProduct: string;
+
+  @Prop({ required: false })
+  ProductDescription: string;
 
   @Prop({ type: [String], required: true })
   Category: string[];
 
   @Prop({ type: [String], required: true })
   Subcategorys: string[];
+
+  @Prop({ type: [String], required: true })
+  SelectService: string[];
 
   @Prop({ required: true, default: Date.now })
   TimeFrame: Date;

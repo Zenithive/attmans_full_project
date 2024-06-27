@@ -12,13 +12,20 @@ export class AuthController {
     const token = await this.authService.login(req.user);
     return { user: req.user._doc, ...token };
   }
-  @UseGuards(LocalAuthGuard)
-  @Post('logout')
-  async logout(@Response() res) {
-    res.clearCookie('token');
 
-    return {
-      message: 'Logout success',
-    };
+  @Post('logout')
+  async logout(@Request() req, @Response() res) {
+    res.clearCookie('token');
+    if (req.session) {
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).send('Could not log out, please try again');
+        }
+
+        return res.status(200).json({ message: 'Logout success' });
+      });
+    } else {
+      return res.status(200).json({ message: 'Logout success' });
+    }
   }
 }
