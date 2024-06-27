@@ -369,7 +369,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     </Select>
                                     {values.SelectService === 'Innovative product' && (
 
-                                    <div style={{ padding: 4}}>
+                                    <Box style={{ padding: 4}}>
                                         <TextField
                                         label="Details of Innovation Challenge"
                                         name="DetailsOfInnovationChallenge"
@@ -418,7 +418,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         error={!!(errors.ProductDescription && touched.ProductDescription)}
                                         helperText={<ErrorMessage name="ProductDescription" />}
                                         />
-                                    </div>
+                                    </Box>
                                     )}
                                 </FormControl>
                                   <FormControl fullWidth>

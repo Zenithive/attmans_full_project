@@ -310,7 +310,7 @@ const Exhibition = () => {
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography component="h2" sx={{ marginY: 0 }}>Exhibitions</Typography>
+        <Typography component="h2" sx={{ marginY: 0,fontSize:"20px" }}>Exhibitions</Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 ,height:"30px",position:"relative",top:"8px"}}>
         <ToggleButtonGroup
           value={filterType}
@@ -318,10 +318,10 @@ const Exhibition = () => {
           onChange={handleFilterTypeChange}
           aria-label="filter exhibitions"
         >
-          <ToggleButton value="all" aria-label="all exhibitions">
+          <ToggleButton value="all" aria-label="all exhibitions" sx={{fontSize:"10px"}}>
             All Exhibitions
           </ToggleButton>
-          <ToggleButton value="mine" aria-label="my exhibitions">
+          <ToggleButton value="mine" aria-label="my exhibitions" sx={{fontSize:"10px"}}>
             My Exhibitions
           </ToggleButton>
         </ToggleButtonGroup>
