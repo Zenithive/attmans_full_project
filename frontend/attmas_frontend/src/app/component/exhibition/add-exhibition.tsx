@@ -39,6 +39,7 @@ const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
     status: Yup.string(),
+    videoUrl: Yup.string().required('Video URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
@@ -54,6 +55,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
         title: '',
         description: '',
         status:'',
+        videoUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: []
@@ -219,12 +221,13 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
         label: item
     }))), [subjects]);
 
-    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[]; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[];videoUrl:string; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
             dateTime: values.dateTime ? values.dateTime.toISOString() : null,
             status:values.status,
+            videoUrl:values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId: userDetails._id
@@ -277,6 +280,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
                         status:editingExhibition.status || '',
+                        videoUrl:editingExhibition.videoUrl || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
@@ -312,6 +316,19 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                     rows={4}
                                     fullWidth
                                     error={!!(errors.description && touched.description)}
+                                    helperText={<ErrorMessage name="description" />}
+                                />
+                                 <TextField
+                                    label="Video Url"
+                                    name="videoUrl"
+                                    variant="outlined"
+                                    color='secondary'
+                                    value={values.videoUrl}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    multiline
+                                    fullWidth
+                                    error={!!(errors.videoUrl && touched.videoUrl)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
                                 {editingExhibition && (
