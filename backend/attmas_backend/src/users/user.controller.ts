@@ -68,6 +68,7 @@ export class UsersController {
       pageNumber,
       limitNumber,
     );
+    console.log('Cusers', users);
     return users;
   }
 }

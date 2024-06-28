@@ -118,7 +118,7 @@ export class UsersService {
       .skip(skip)
       .limit(limit)
       .exec();
-
+    console.log('Susers', users);
     return users;
   }
 

@@ -1,4 +1,4 @@
-'use client';
+"use client"
 import * as React from 'react';
 import {
   Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent
@@ -106,7 +106,14 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   };
 
   return (
-    <Box sx={{ background: '#f0f0f0', p: 2, borderRadius: 1 }}>
+    <Box
+      sx={{
+        background: '#f0f0f0',
+        p: 2,
+        borderRadius: 1,
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.8)', // Adding shadow here
+      }}
+    >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h4">{title}</Typography>
         <IconButton onClick={toggleFilterVisibility}>
@@ -173,7 +180,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
           {rowData.map((user) => {
             const { categories, subcategories } = getUserCategoryData(user.username);
             return (
-              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px' }}>
+              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px', boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)' }}>
                 <CardContent>
                   <Grid container spacing={1}>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>

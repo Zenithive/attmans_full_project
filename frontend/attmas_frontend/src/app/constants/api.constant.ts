@@ -36,6 +36,6 @@ export const APIS = {
 
 
 
-    GET_INNOVATORS: `${SERVER_URL}/users/by-type1?userType=Innovators`,
+    GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
 
 }
