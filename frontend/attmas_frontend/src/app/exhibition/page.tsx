@@ -16,6 +16,7 @@ import { useMemo,useCallback } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import ExhibitionDetails from '../component/viewonly/viewonly';
+import Link from 'next/link';
 
 interface Exhibition {
   _id?: string;
@@ -299,13 +300,7 @@ const Exhibition = () => {
     }
   };
 
-  const handleTitleClick = (exhibition: Exhibition) => {
-    setSelectedExhibition(exhibition);
-  };
 
-  const handleDrawerClose = () => {
-    setSelectedExhibition(null);
-  };
 
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
@@ -370,8 +365,12 @@ const Exhibition = () => {
           <Card key={exhibition._id} sx={{ mb: 2 }}>
             <CardContent>
               <Typography variant="h5">
-              <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => handleTitleClick(exhibition)}>
+              <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>
+              <a href={`/view-exhibition?userId=${userDetails._id}`} target="_blank" rel="noopener noreferrer">
+                  <Typography variant="h5" component="span">
                     {exhibition.title}
+                  </Typography>
+                </a>
                   </span>
                 <span style={{ fontSize: 'small', color: "#616161" }}>
                   ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
@@ -382,25 +381,27 @@ const Exhibition = () => {
               </Typography>
               <Typography variant="body2">{exhibition.description}</Typography>
               <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
-              {userType === "Project Owner" && (
               <Typography sx={{ display: "flex", float: "right" }}>
+              {userType === "Admin" && (
                 <IconButton onClick={() => handleEditExhibition(exhibition)}>
                 <Tooltip title="Edit">
                   <EditIcon />
                   </Tooltip>
                 </IconButton>
+                 )}
+                {userType === "Admin" && (
                 <IconButton onClick={() => handleDeleteExhibition(exhibition)}>
                 <Tooltip title="Delete">
                   <DeleteRoundedIcon />
                   </Tooltip>
                 </IconButton>
+                  )}
                 <IconButton onClick={() => handleSendInnovators(exhibition)}>
                 <Tooltip title="innovators">
                   <SendIcon />
                   </Tooltip>
                 </IconButton>
               </Typography>
-            )}
             </CardContent>
           </Card>
         ))}
@@ -408,12 +409,6 @@ const Exhibition = () => {
       </InfiniteScroll>
       {sendingExhibition && (
         <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
-      )}
-        {selectedExhibition && (
-        <ExhibitionDetails
-          exhibition={selectedExhibition}
-          onClose={handleDrawerClose}
-        />
       )}
     </Box>
   );
