@@ -93,4 +93,10 @@ export class ExhibitionController {
     }
     return deletedExhibition;
   }
+
+  @Get(':id')
+  async getVideoUrl(@Param('id') id: string): Promise<{ videoUrl: string }> {
+    const videoUrl = await this.exhibitionService.getVideoUrlById(id);
+    return { videoUrl };
+  }
 }

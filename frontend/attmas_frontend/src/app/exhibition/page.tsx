@@ -301,7 +301,6 @@ const Exhibition = () => {
   };
 
 
-
   return (
     <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -366,12 +365,12 @@ const Exhibition = () => {
             <CardContent>
               <Typography variant="h5">
               <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>
-              <a href={`/view-exhibition?userId=${userDetails._id}`} target="_blank" rel="noopener noreferrer">
+                <a href={`/view-exhibition?exhibitionId=${exhibition._id}`} target="_blank" rel="noopener noreferrer">
                   <Typography variant="h5" component="span">
                     {exhibition.title}
                   </Typography>
                 </a>
-                  </span>
+              </span>
                 <span style={{ fontSize: 'small', color: "#616161" }}>
                   ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
                 </span>
