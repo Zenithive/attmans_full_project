@@ -26,6 +26,7 @@
     "js-cookie": "^3.0.5",
     "next": "^14.2.3",
     "nodemailer": "^6.9.14",
+    "notistack": "^3.0.1",
     "react-infinite-scroll-component": "^6.1.0",
     "styled-components": "^6.1.11",
     "validator": "^13.12.0"

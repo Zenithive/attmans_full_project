@@ -24,21 +24,26 @@ export class JobsService {
     page: number,
     limit: number,
     Category: string[],
-    Subcategorys: string[],
-    Expertiselevel: string[],
+    userId?: string,
+    Subcategorys?: string[],
+    Expertiselevel?: string[],
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
 
-    if (Category.length > 0) {
+    if (userId) {
+      filter.userId = userId;
+    }
+
+    if (Category && Category.length > 0) {
       filter.Category = { $in: Category };
     }
 
-    if (Subcategorys.length > 0) {
+    if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
 
-    if (Expertiselevel.length > 0) {
+    if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
     }
 

@@ -8,7 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import pubsub from '@/app/services/pubsub.service';
+import {pubsub} from '@/app/services/pubsub.service';
 import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
@@ -61,6 +61,8 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
     try {
       await axios.post(APIS.APPLY, applyData);
       pubsub.publish('ApplyCreated', { message: 'A new Apply Created' });
+      pubsub.publish('toast', { message: 'Applied successfully!', severity: 'success' });
+    
       resetForm();
       setOpen(false);
     } catch (error) {
