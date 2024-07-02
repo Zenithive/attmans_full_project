@@ -98,13 +98,18 @@ export class ExhibitionService {
     }
     return existingExhibitionDelete;
   }
-  async getVideoUrlById(id: string): Promise<string> {
-    const exhibition = await this.exhibitionModel
-      .findById({ _id: id }, 'videoUrl')
-      .exec();
-    if (!exhibition) {
-      throw new NotFoundException(`Exhibition with id ${id} not found`);
+
+  async findOneExhibition(id: string): Promise<Exhibition> {
+    try {
+      const exhibition = await this.exhibitionModel.findById(id).exec();
+      if (!exhibition) {
+        throw new NotFoundException(`Exhibition with id ${id} not found`);
+      }
+      return exhibition;
+    } catch (error) {
+      throw new NotFoundException(
+        `Error retrieving exhibition: ${error.message}`,
+      );
     }
-    return exhibition.videoUrl;
   }
 }

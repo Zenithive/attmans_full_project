@@ -82,7 +82,7 @@ const ExhibitionsPage: React.FC = () => {
         }
       },
       {
-        name: 'Default',
+        name: 'Default',  
         check: (url: string) => true,
         embedUrl: (url: string) => url
       }
