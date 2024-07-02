@@ -93,4 +93,18 @@ export class ExhibitionController {
     }
     return deletedExhibition;
   }
+  @Get(':id')
+  async findOneExhibition(@Param('id') id: string): Promise<Exhibition> {
+    try {
+      const exhibition = await this.exhibitionService.findOne(id);
+      if (!exhibition) {
+        throw new NotFoundException(`Exhibition with id ${id} not found`);
+      }
+      return exhibition;
+    } catch (error) {
+      throw new NotFoundException(
+        `Error retrieving exhibition: ${error.message}`,
+      );
+    }
+  }
 }
