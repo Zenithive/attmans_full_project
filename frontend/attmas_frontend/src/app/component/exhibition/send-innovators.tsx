@@ -1,4 +1,3 @@
-"use client"
 import * as React from 'react';
 import { Autocomplete, Box, Button, Card, CardContent, Checkbox, CircularProgress, Drawer, IconButton, TextField, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -12,7 +11,7 @@ import { pubsub } from '@/app/services/pubsub.service';
 
 interface SendInnovatorsProps {
   onCancel: () => void;
-  exhibition: any; // Adjust this type according to your data structure
+  exhibition: any;
 }
 
 const validationSchema = Yup.object().shape({
@@ -20,8 +19,8 @@ const validationSchema = Yup.object().shape({
   innovators: Yup.array().min(1, 'At least one innovator must be selected').required('Innovators are required'),
 });
 
-export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) => {
-  const [open, toggleDrawer] = React.useState(false);
+export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
+  const [open, setOpen] = React.useState(false);
   const [submittedInnovators, setSubmittedInnovators] = React.useState<{ username: string; innovators: string }[]>([]);
   const [innovators, setInnovators] = React.useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -32,7 +31,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   React.useEffect(() => {
-    toggleDrawer(true);
+    setOpen(true);
     fetchSubmittedInnovators();
     fetchInnovators(page);
   }, []);
@@ -51,7 +50,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
     try {
       setLoading(true);
       const response = await axios.get(`${APIS.GET_INNOVATORS}&page=${page}&limit=10&search=${query}`);
-      console.log(innovators, "Fetched innovators:", response.data);
+      console.log('Fetched innovators:', response.data);
 
       if (response.data.length === 0) {
         setHasMore(false);
@@ -61,7 +60,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
           name: `${innov.firstName} ${innov.lastName}`,
         }));
         const arrayOfObjects = [...innovators, ...formattedInnovators];
-        let uniqueObjects = Array.from(new Set(arrayOfObjects.map(obj => obj.id)))
+        const uniqueObjects = Array.from(new Set(arrayOfObjects.map(obj => obj.id)))
           .map(id => {
             return arrayOfObjects.find(obj => obj.id === id);
           });
@@ -85,11 +84,11 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value;
-    setSearchQuery(query);
+    // setSearchQuery(query);  // Update search query state
     setPage(1);
-    setInnovators([]);
+    // setInnovators([]);
     setHasMore(true);
-    await fetchInnovators(1, query);
+    // await fetchInnovators(1, query);
   };
 
   const initialValues = {
@@ -114,7 +113,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
       await axios.post(APIS.SEND_INNOVATORS, sendInnovators);
       pubsub.publish('toast', { message: 'Exhibition sent successfully!', severity: 'success' });
       resetForm();
-      toggleDrawer(false);
+      setOpen(false);
       fetchSubmittedInnovators();
       onCancel();
     } catch (error) {
@@ -135,10 +134,10 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
   };
 
   return (
-    <Drawer sx={{ '& .MuiDrawer-paper': { width: '30%', borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancel(); }}>
+    <Drawer sx={{ '& .MuiDrawer-paper': { width: '30%', borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { setOpen(false); onCancel(); }}>
       <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
         <h2>Send Exhibition to Innovators</h2>
-        <IconButton aria-label="close" onClick={() => { toggleDrawer(false); onCancel(); }} sx={{ p: 0, right: 0 }}>
+        <IconButton aria-label="close" onClick={() => { setOpen(false); onCancel(); }} sx={{ p: 0, right: 0 }}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -155,10 +154,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
                 id="innovators"
                 options={innovators}
                 disableCloseOnSelect
-                getOptionLabel={(option: { id: string; name: string } | undefined) => {
-                  if (!option) return ''; // Handle case where option is undefined
-                  return option.name; // Display the name of the option
-                }}
+                getOptionLabel={(option: { id: string; name: string } | undefined) => option ? option.name : ''}
                 value={values.innovators.map(id => innovators.find(innovator => innovator.id === id))}
                 onChange={(event, value) => setFieldValue('innovators', value.map(innovator => innovator?.id))}
                 renderInput={(params) => (
@@ -166,7 +162,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
                     {...params}
                     variant="outlined"
                     label="Select Innovators"
-                    // placeholder='Search Innovators'
+                    value={searchQuery} // Set the value to the searchQuery state
                     color="secondary"
                     onChange={handleSearchChange} // Attach the search handler
                     error={!!(errors.innovators && touched.innovators)}
@@ -200,7 +196,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
                 helperText={<ErrorMessage name="message" />}
               />
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { toggleDrawer(false); onCancel(); }}>Cancel</Button>
+                <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { setOpen(false); onCancel(); }}>Cancel</Button>
                 <Button variant="contained" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? <CircularProgress size={24} color="inherit" /> : userDetails.userType === 'Admin' ? 'Invite' : 'Participate'}
                 </Button>
@@ -218,9 +214,7 @@ export const SendInnovators = ({ onCancel, exhibition }: SendInnovatorsProps) =>
             {submittedInnovators.map((innovator, index) => (
               <Card key={index} sx={{ mb: 2 }}>
                 <CardContent>
-                  <Typography variant="body2" sx={{
-                    fontWeight: "bold"
-                  }}>Innovators: {innovator.innovators}, User: {innovator.username}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>Innovators: {innovator.innovators}, User: {innovator.username}</Typography>
                 </CardContent>
               </Card>
             ))}

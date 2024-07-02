@@ -16,7 +16,10 @@ import {
     RadioGroup,
     FormControl,
     FormLabel,
-    Radio
+    Radio,
+    Checkbox,
+    Autocomplete,
+    Chip
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -51,6 +54,10 @@ const EditProfile2: React.FC = () => {
         productPrice: Yup.string().nullable(),
         hasPatent: Yup.string().nullable(),
         currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+        preferredIndustries: Yup.array()
+            .of(Yup.string().required('At least one industry must be selected'))
+            .min(1, 'At least one industry must be selected')
+            .required('Preferred Industries are required'),
     });
 
     const formik = useFormik({
@@ -69,6 +76,8 @@ const EditProfile2: React.FC = () => {
             hasPatent: false,
             username: userDetails.username,
             currency: 'INR',
+            preferredIndustries: [],  // New field initial value
+
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -115,6 +124,7 @@ const EditProfile2: React.FC = () => {
                     productPrice: userData.productPrice || '',
                     hasPatent: userData.hasPatent || false,
                     currency: userData.currency || 'INR',
+                    preferredIndustries: userData.preferredIndustries || [],  // New field initial value
                 });
 
                 // Update state based on user type for conditional rendering
@@ -298,6 +308,59 @@ const EditProfile2: React.FC = () => {
                             {formik.touched.userType && formik.errors.userType && (
                                 <FormHelperText error>{formik.errors.userType}</FormHelperText>
                             )}
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <Autocomplete
+                                multiple
+                                options={[
+                                    "Chemicals",
+                                    "Agriculture",
+                                    "Electronics",
+                                    "Energy",
+                                    "Environmental and waste management",
+                                    "Food and beverage",
+                                    "Healthcare",
+                                    "Medical devices and equipment",
+                                    "Mining and metals",
+                                    "Real estate and construction",
+                                    "Textiles",
+                                ]}
+                                disableCloseOnSelect
+                                getOptionLabel={(option) => option}
+                                onChange={(event, value) => formik.setFieldValue("preferredIndustries", value)}
+                                value={formik.values.preferredIndustries}
+                                renderTags={(value: string[], getTagProps) =>
+                                    value.map((option: string, index: number) => (
+                                        <Chip
+                                            //  key={option}  
+                                            label={option}
+                                            {...getTagProps({ index })} />
+                                    ))
+                                }
+                                renderOption={(props, option, { selected }) => (
+                                    <li {...props}>
+                                        <Checkbox
+                                            color='secondary'
+                                            style={{ marginRight: 8 }}
+                                            checked={selected}
+                                        />
+                                        {option}
+                                    </li>
+                                )}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        label="Preferred Industries"
+                                        color='secondary'
+                                        name="preferredIndustries"
+                                        error={formik.touched.preferredIndustries && Boolean(formik.errors.preferredIndustries)}
+                                        helperText={formik.touched.preferredIndustries && formik.errors.preferredIndustries}
+                                        style={{ background: "white", borderRadius: "25px" }}
+                                    />
+                                )}
+                            />
                         </Grid>
 
 

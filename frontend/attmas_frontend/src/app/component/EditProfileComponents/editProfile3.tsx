@@ -12,7 +12,6 @@ import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 
 const EditProfile3: React.FC = () => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -23,7 +22,6 @@ const EditProfile3: React.FC = () => {
   const formik = useFormik({
     initialValues: {
       username: userDetails.username,
-      categories: [] as string[],
       subcategories: [] as string[],
     },
     onSubmit: async (values) => {
@@ -60,11 +58,9 @@ const EditProfile3: React.FC = () => {
 
         formik.setValues({
           ...formik.values,
-          categories: userData.categories || [],
           subcategories: userData.subcategories || [],
         });
 
-        setSelectedCategories(userData.categories || []);
         setSelectedSubcategories(userData.subcategories || []);
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -109,9 +105,7 @@ const EditProfile3: React.FC = () => {
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
           <CommonProfileFields
             formik={formik}
-            selectedCategories={selectedCategories}
             selectedSubcategories={selectedSubcategories}
-            setSelectedCategories={setSelectedCategories}
             setSelectedSubcategories={setSelectedSubcategories}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
