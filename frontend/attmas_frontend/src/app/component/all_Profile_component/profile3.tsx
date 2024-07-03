@@ -7,8 +7,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-import CommonProfileFields from '../Common3rdProfileform/Common3rdProfileform';
+// import CommonProfileFields from '../Common3rdProfileform/Common3rdProfileform';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
+import NestedMultiselectDropdown from '../nested multiple select dropdown/nested_multiple_select_dropdown';
+import { options } from '@/app/constants/categories';
 
 interface ProfileForm3Props {
   onPrevious: () => void;
@@ -21,7 +23,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const router = useRouter();
 
- 
+
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -71,6 +73,11 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     fetchUserProfile();
   }, [userDetails.username]);
 
+
+  const handleSelectionChange = (selectedValues: string[]) => {
+    console.log('Selected values:', selectedValues);
+  };
+
   return (
     <Container component="main" maxWidth="md">
       <CssBaseline />
@@ -88,10 +95,10 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         }}
       >
         <Typography component="h1" variant="h5" align="center">
-          Category
+          Subject matter expertise
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-          View and Change your category here
+          View and Change your Subject matter expertise here
         </Typography>
 
         {fetchError && (
@@ -101,13 +108,15 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         )}
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <CommonProfileFields
+          {/* <CommonProfileFields
             formik={formik}
-            selectedCategories={selectedCategories}
             selectedSubcategories={selectedSubcategories}
-            setSelectedCategories={setSelectedCategories}
             setSelectedSubcategories={setSelectedSubcategories}
-          />
+          /> */}
+
+          <NestedMultiselectDropdown options={options} onChange={handleSelectionChange} />
+
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
             <   Button
               type="button"

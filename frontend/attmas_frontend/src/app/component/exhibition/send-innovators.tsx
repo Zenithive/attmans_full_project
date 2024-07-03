@@ -8,6 +8,7 @@ import { APIS } from '@/app/constants/api.constant';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { pubsub } from '@/app/services/pubsub.service';
+import debounce from 'lodash.debounce';
 
 interface SendInnovatorsProps {
   onCancel: () => void;
@@ -82,13 +83,20 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
     }
   };
 
+  const debouncedFetchInnovators = React.useCallback(
+    debounce((query: string) => {
+      fetchInnovators(1, query);
+    }, 500),
+    []
+  );
+
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value;
-    // setSearchQuery(query);  // Update search query state
+    setSearchQuery(query);  // Update search query state
     setPage(1);
-    // setInnovators([]);
+    setInnovators([]);
     setHasMore(true);
-    // await fetchInnovators(1, query);
+    fetchInnovators(1, query);
   };
 
   const initialValues = {
@@ -190,6 +198,7 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
                 fullWidth
                 multiline
                 rows={4}
+                value={values.message} // Ensure message field is controlled
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={!!(errors.message && touched.message)}
