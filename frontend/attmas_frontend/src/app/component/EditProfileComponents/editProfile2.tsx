@@ -77,7 +77,6 @@ const EditProfile2: React.FC = () => {
             username: userDetails.username,
             userId: userDetails._id,
             currency: 'INR',
-            preferredIndustries: [],  // New field initial value
 
         },
         validationSchema,
@@ -86,13 +85,8 @@ const EditProfile2: React.FC = () => {
             try {
                 const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
                 console.log('Form submitted successfully:', response.data);
-                const form3Data = {
-                    username: values.username,
-                    userId: values.userId,
-                    categories: values.preferredIndustries,
-                };
-                const form3Response = await axios.post(APIS.FORM3, form3Data);
-                console.log('Preferred industries submitted successfully:', form3Response.data);
+                
+
                 setLoading(false);
                 pubsub.publish('toast', {
                     message: 'Profile updated successfully!',
@@ -132,7 +126,6 @@ const EditProfile2: React.FC = () => {
                     productPrice: userData.productPrice || '',
                     hasPatent: userData.hasPatent || false,
                     currency: userData.currency || 'INR',
-                    preferredIndustries: userData.preferredIndustries || [],  // New field initial value
                 });
 
                 // Update state based on user type for conditional rendering
@@ -318,58 +311,6 @@ const EditProfile2: React.FC = () => {
                             )}
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                multiple
-                                options={[
-                                    "Chemicals",
-                                    "Agriculture",
-                                    "Electronics",
-                                    "Energy",
-                                    "Environmental and waste management",
-                                    "Food and beverage",
-                                    "Healthcare",
-                                    "Medical devices and equipment",
-                                    "Mining and metals",
-                                    "Real estate and construction",
-                                    "Textiles",
-                                ]}
-                                disableCloseOnSelect
-                                getOptionLabel={(option) => option}
-                                onChange={(event, value) => formik.setFieldValue("preferredIndustries", value)}
-                                value={formik.values.preferredIndustries}
-                                renderTags={(value: string[], getTagProps) =>
-                                    value.map((option: string, index: number) => (
-                                        <Chip
-                                            //  key={option}  
-                                            label={option}
-                                            {...getTagProps({ index })} />
-                                    ))
-                                }
-                                renderOption={(props, option, { selected }) => (
-                                    <li {...props}>
-                                        <Checkbox
-                                            color='secondary'
-                                            style={{ marginRight: 8 }}
-                                            checked={selected}
-                                        />
-                                        {option}
-                                    </li>
-                                )}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        fullWidth
-                                        label="Preferred Industries"
-                                        color='secondary'
-                                        name="preferredIndustries"
-                                        error={formik.touched.preferredIndustries && Boolean(formik.errors.preferredIndustries)}
-                                        helperText={formik.touched.preferredIndustries && formik.errors.preferredIndustries}
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                    />
-                                )}
-                            />
-                        </Grid>
 
 
 

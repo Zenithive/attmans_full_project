@@ -56,12 +56,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         productPrice: Yup.string().nullable(),
         hasPatent: Yup.string().nullable(),
         currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
-        // preferredIndustries: Yup.string().required('This field is required'),  // New field validation
-        preferredIndustries: Yup.array()
-            .of(Yup.string().required('At least one industry must be selected'))
-            .min(1, 'At least one industry must be selected')
-            .required('Preferred Industries are required'),
-    });
+          });
 
     const formik = useFormik({
         initialValues: {
@@ -80,7 +75,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             username: userDetails.username,
             userId: userDetails._id,
             currency: 'INR',
-            preferredIndustries: [],  // New field initial value
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -93,7 +87,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 const form3Data = {
                     username: values.username,
                     // userId: values.userId,
-                    categories: values.preferredIndustries,
                 };
                 const form3Response = await axios.post(APIS.FORM3, form3Data);
                 console.log('Preferred industries submitted successfully:', form3Response.data);
@@ -273,58 +266,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                         </Grid>
 
                         {/* Preferred Industries */}
-                        <Grid item xs={12} sm={6}>
-                            <Autocomplete
-                                multiple
-                                options={[
-                                    "Chemicals",
-                                    "Agriculture",
-                                    "Electronics",
-                                    "Energy",
-                                    "Environmental and waste management",
-                                    "Food and beverage",
-                                    "Healthcare",
-                                    "Medical devices and equipment",
-                                    "Mining and metals",
-                                    "Real estate and construction",
-                                    "Textiles",
-                                ]}
-                                disableCloseOnSelect
-                                getOptionLabel={(option) => option}
-                                onChange={(event, value) => formik.setFieldValue("preferredIndustries", value)}
-                                value={formik.values.preferredIndustries}
-                                renderTags={(value: string[], getTagProps) =>
-                                    value.map((option: string, index: number) => (
-                                        <Chip
-                                        //  key={option}  
-                                         label={option} 
-                                         {...getTagProps({ index })} />
-                                    ))
-                                }
-                                renderOption={(props, option, { selected }) => (
-                                    <li {...props}>
-                                        <Checkbox
-                                            color='secondary'
-                                            style={{ marginRight: 8 }}
-                                            checked={selected}
-                                        />
-                                        {option}
-                                    </li>
-                                )}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        fullWidth
-                                        label="Preferred Industries"
-                                        color='secondary'
-                                        name="preferredIndustries"
-                                        error={formik.touched.preferredIndustries && Boolean(formik.errors.preferredIndustries)}
-                                        helperText={formik.touched.preferredIndustries && formik.errors.preferredIndustries}
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                    />
-                                )}
-                            />
-                        </Grid>
+                        
 
                         {/* Additional Fields for Freelancer */}
                         {isFreelancer && (

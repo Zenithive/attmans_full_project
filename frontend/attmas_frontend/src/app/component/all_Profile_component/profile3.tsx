@@ -1,153 +1,6 @@
-// "use client"
-// import React, { useState, useEffect } from 'react';
-// import { Box, Container, CssBaseline, Typography, CircularProgress, Button } from '@mui/material';
-// import { useFormik } from 'formik';
-// import axios from 'axios';
-// import LoadingButton from '@mui/lab/LoadingButton';
-// import { useRouter } from 'next/navigation';
-// import { useAppSelector } from '@/app/reducers/hooks.redux';
-// import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-// // import CommonProfileFields from '../Common3rdProfileform/Common3rdProfileform';
-// import { APIS, SERVER_URL } from '@/app/constants/api.constant';
-// import NestedMultiselectDropdown from '../nested multiple select dropdown/nested_multiple_select_dropdown';
-// import { options } from '@/app/constants/categories';
-
-// interface ProfileForm3Props {
-//   onPrevious: () => void;
-// }
-
-// const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
-//   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-//   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
-//   const [loading, setLoading] = useState(false);
-//   const [fetchError, setFetchError] = useState<string | null>(null);
-//   const router = useRouter();
-
-
-
-//   const userDetails: UserSchema = useAppSelector(selectUserSession);
-
-//   const formik = useFormik({
-//     initialValues: {
-//       username: userDetails.username,
-//       categories: [] as string[],
-//       subcategories: [] as string[],
-//     },
-//     onSubmit: async (values) => {
-//       setLoading(true);
-
-//       try {
-//         const response = await axios.post(APIS.FORM3, values);
-//         router.push('/dashboard');
-//       } catch (error) {
-//         console.error('Error sending data:', error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     },
-//   });
-
-//   useEffect(() => {
-//     const fetchUserProfile = async () => {
-//       setLoading(true);
-//       try {
-//         const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`);
-//         const userData = response.data;
-
-//         formik.setValues({
-//           ...formik.values,
-//           categories: userData.categories || [],
-//           subcategories: userData.subcategories || [],
-//         });
-
-//         setSelectedCategories(userData.categories || []);
-//         setSelectedSubcategories(userData.subcategories || []);
-//       } catch (error) {
-//         console.error('Error fetching user profile:', error);
-//         setFetchError('Failed to fetch user profile');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchUserProfile();
-//   }, [userDetails.username]);
-
-
-//   const handleSelectionChange = (selectedValues: string[]) => {
-//     console.log('Selected values:', selectedValues);
-//   };
-
-//   return (
-//     <Container component="main" maxWidth="md">
-//       <CssBaseline />
-//       <Box
-//         sx={{
-//           marginTop: 8,
-//           padding: 4,
-//           border: '1px solid #ccc',
-//           borderRadius: 2,
-//           width: '142.5%',
-//           position: 'relative',
-//           right: '180px',
-//           bottom: "60px",
-//           boxShadow: 5,
-//         }}
-//       >
-//         <Typography component="h1" variant="h5" align="center">
-//           Subject matter expertise
-//         </Typography>
-//         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-//           View and Change your Subject matter expertise here
-//         </Typography>
-
-//         {fetchError && (
-//           <Typography variant="body2" color="error" align="center">
-//             {fetchError}
-//           </Typography>
-//         )}
-
-//         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-//           {/* <CommonProfileFields
-//             formik={formik}
-//             selectedSubcategories={selectedSubcategories}
-//             setSelectedSubcategories={setSelectedSubcategories}
-//           /> */}
-
-//           <NestedMultiselectDropdown options={options} onChange={handleSelectionChange} />
-
-
-//           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-//             <   Button
-//               type="button"
-//               variant="contained"
-//               size="small"
-//               onClick={onPrevious}
-//             >
-//               Back
-//             </Button>
-//             <LoadingButton
-//               type="submit"
-//               variant="contained"
-//               size="small"
-//               loading={loading}
-//               loadingIndicator={<CircularProgress size={24} />}
-//             >
-//               Save
-//             </LoadingButton>
-//           </Box>
-//         </Box>
-//       </Box>
-//     </Container>
-//   );
-// };
-
-// export default ProfileForm3;
-
-
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack } from '@mui/material';
+import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Checkbox, Button } from '@mui/material';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -158,13 +11,31 @@ import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import { options } from '@/app/constants/categories';
 
+interface ProfileForm3Props {
+  onPrevious: () => void;
+}
+
 type Option = {
   label: string;
   value: string;
   children?: Option[];
 };
 
-const ProfileForm3: React.FC = () => {
+const industryOptions = [
+  "Chemicals",
+  "Agriculture",
+  "Electronics",
+  "Energy",
+  "Environmental and waste management",
+  "Food and beverage",
+  "Healthcare",
+  "Medical devices and equipment",
+  "Mining and metals",
+  "Real estate and construction",
+  "Textiles",
+];
+
+const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
@@ -179,6 +50,7 @@ const ProfileForm3: React.FC = () => {
       username: userDetails.username,
       userId: userDetails._id,
       subcategories: [] as string[],
+      categories: [] as string[], // Changed preferredIndustries to categories
     },
     onSubmit: async (values) => {
       setLoading(true);
@@ -212,6 +84,7 @@ const ProfileForm3: React.FC = () => {
         formik.setValues({
           ...formik.values,
           subcategories: userData.subcategories || [],
+          categories: userData.categories || [], // Changed preferredIndustries to categories
         });
         setSelectedValues(userData.subcategories || []);
       } catch (error) {
@@ -299,7 +172,7 @@ const ProfileForm3: React.FC = () => {
           marginTop: 8,
           padding: 4,
           border: '1px solid #ccc',
-          // borderRadius: 2,
+          borderRadius: 2,
           width: '142.5%',
           position: 'relative',
           right: '180px',
@@ -321,40 +194,78 @@ const ProfileForm3: React.FC = () => {
         )}
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <div className="nested-multiselect-dropdown" ref={dropdownRef}>
-            <div className="selected-values">
-              <strong>Selected Values: </strong>
-              {selectedValues.length > 0 ? (
-                <Stack direction="row" spacing={1}>
-                  {selectedValues.map(value => (
-                    <Chip
-                      key={value}
-                      label={value}
-                      onDelete={() => handleCheckboxChange(value, false)} // Handle chip deletion
-                    />
-                  ))}
-                </Stack>
-              ) : (
-                'None'
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '45%' }}>
+              <div className="selected-values">
+                <strong>Selected Values: </strong>
+                {selectedValues.length > 0 ? (
+                  <Stack direction="row" spacing={1}>
+                    {selectedValues.map(value => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        onDelete={() => handleCheckboxChange(value, false)} // Handle chip deletion
+                      />
+                    ))}
+                  </Stack>
+                ) : (
+                  'None'
+                )}
+              </div>
+              <button type="button" onClick={handleToggleDropdown}>
+                Subject matter expertise
+              </button>
+              {isOpen && (
+                <div className="dropdown-content">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                  <div className="options-container">
+                    {renderOptions(filteredOptions)}
+                  </div>
+                </div>
               )}
             </div>
-            <button type="button" onClick={handleToggleDropdown}>
-              Subject matter expertise
-            </button>
-            {isOpen && (
-              <div className="dropdown-content">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                />
-                <div className="options-container">
-                  {renderOptions(filteredOptions)}
-                </div>
-              </div>
-            )}
-          </div>
+
+            <FormControl fullWidth sx={{ width: '45%' }}>
+              <InputLabel id="categories-label">Categories</InputLabel>
+              <Select
+                labelId="categories-label"
+                id="categories"
+                multiple
+                value={formik.values.categories}
+                onChange={(e) => formik.setFieldValue('categories', e.target.value)}
+                input={<OutlinedInput id="select-multiple-chip" label="Categories" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {(selected as string[]).map((value) => (
+                      <Chip key={value} label={value} onDelete={() => formik.setFieldValue('categories', formik.values.categories.filter((category: string) => category !== value))} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {industryOptions.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    <Checkbox checked={formik.values.categories.includes(category)} />
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          <Button
+            type="button"
+            variant="contained"
+            size="small"
+            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
+            onClick={onPrevious}
+          >
+            Back
+          </Button>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
             <LoadingButton
@@ -420,6 +331,9 @@ const ProfileForm3: React.FC = () => {
           margin-right: 10px;
           background-color: #4CAF50;
           color: white;
+          width: 570px;
+          border-radius: 20px;
+          height: 50px;
           padding: 10px 20px;
           border: none;
           cursor: pointer;

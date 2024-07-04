@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack } from '@mui/material';
+import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Checkbox } from '@mui/material';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -17,6 +17,20 @@ type Option = {
   children?: Option[];
 };
 
+const industryOptions = [
+  "Chemicals",
+  "Agriculture",
+  "Electronics",
+  "Energy",
+  "Environmental and waste management",
+  "Food and beverage",
+  "Healthcare",
+  "Medical devices and equipment",
+  "Mining and metals",
+  "Real estate and construction",
+  "Textiles",
+];
+
 const EditProfile3: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -32,6 +46,7 @@ const EditProfile3: React.FC = () => {
       username: userDetails.username,
       userId: userDetails._id,
       subcategories: [] as string[],
+      categories: [] as string[], // Changed preferredIndustries to categories
     },
     onSubmit: async (values) => {
       setLoading(true);
@@ -65,6 +80,7 @@ const EditProfile3: React.FC = () => {
         formik.setValues({
           ...formik.values,
           subcategories: userData.subcategories || [],
+          categories: userData.categories || [], // Changed preferredIndustries to categories
         });
         setSelectedValues(userData.subcategories || []);
       } catch (error) {
@@ -174,40 +190,68 @@ const EditProfile3: React.FC = () => {
         )}
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <div className="nested-multiselect-dropdown" ref={dropdownRef}>
-            <div className="selected-values">
-              <strong>Selected Values: </strong>
-              {selectedValues.length > 0 ? (
-                <Stack direction="row" spacing={1}>
-                  {selectedValues.map(value => (
-                    <Chip
-                      key={value}
-                      label={value}
-                      onDelete={() => handleCheckboxChange(value, false)} // Handle chip deletion
-                    />
-                  ))}
-                </Stack>
-              ) : (
-                'None'
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '45%' }}>
+              <div className="selected-values">
+                <strong>Selected Values: </strong>
+                {selectedValues.length > 0 ? (
+                  <Stack direction="row" spacing={1}>
+                    {selectedValues.map(value => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        onDelete={() => handleCheckboxChange(value, false)} // Handle chip deletion
+                      />
+                    ))}
+                  </Stack>
+                ) : (
+                  'None'
+                )}
+              </div>
+              <button type="button" onClick={handleToggleDropdown}>
+                Subject matter expertise
+              </button>
+              {isOpen && (
+                <div className="dropdown-content">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                  <div className="options-container">
+                    {renderOptions(filteredOptions)}
+                  </div>
+                </div>
               )}
             </div>
-            <button type="button" onClick={handleToggleDropdown}>
-              Subject matter expertise
-            </button>
-            {isOpen && (
-              <div className="dropdown-content">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                />
-                <div className="options-container">
-                  {renderOptions(filteredOptions)}
-                </div>
-              </div>
-            )}
-          </div>
+
+            <FormControl fullWidth sx={{ width: '45%' }}>
+              <InputLabel id="categories-label">Categories</InputLabel>
+              <Select
+                labelId="categories-label"
+                id="categories"
+                multiple
+                value={formik.values.categories}
+                onChange={(e) => formik.setFieldValue('categories', e.target.value)}
+                input={<OutlinedInput id="select-multiple-chip" label="Categories" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {(selected as string[]).map((value) => (
+                      <Chip key={value} label={value} onDelete={() => formik.setFieldValue('categories', formik.values.categories.filter((category: string) => category !== value))} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {industryOptions.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    <Checkbox checked={formik.values.categories.includes(category)} />
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
             <LoadingButton
