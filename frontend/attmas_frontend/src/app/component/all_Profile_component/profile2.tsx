@@ -78,6 +78,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             productPrice: '',
             hasPatent: 'No',
             username: userDetails.username,
+            userId: userDetails._id,
             currency: 'INR',
             preferredIndustries: [],  // New field initial value
         },
@@ -89,6 +90,13 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 // Make sure all necessary form values are included in the request
                 const response = await axios.post(APIS.FORM2, values);
                 console.log('Profile data saved:', response.data);
+                const form3Data = {
+                    username: values.username,
+                    // userId: values.userId,
+                    categories: values.preferredIndustries,
+                };
+                const form3Response = await axios.post(APIS.FORM3, form3Data);
+                console.log('Preferred industries submitted successfully:', form3Response.data);
                 onNext();
             } catch (error) {
                 console.error('There was an error saving the profile data!', error);

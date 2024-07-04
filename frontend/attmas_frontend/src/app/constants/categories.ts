@@ -1,367 +1,367 @@
 export interface Subcategory {
-    name: string;
-    subcategories?: Subcategory[];
-  }
+  name: string;
+  subcategories?: Subcategory[];
+}
 
-  export const subcategories: Subcategory[] = [
-    {
-      name: 'Chemistry',
-      subcategories: [
-        { name: 'Chemical Reagent Development' },
-        { name: 'Dewatering & Drying Technology' },
-        { name: 'Catalysis' },
-        { name: 'Trace Elements' },
-        { name: 'Mathematical Chemistry' },
-        { name: 'Dispersion Chemistry' },
-        { name: 'Surface Science' },
-        {
-          name: 'Materials Science & Engineering',
-          subcategories: [
-            {
-              name: 'Nanotechnology & Nanomaterials',
-              subcategories: [
-                { name: 'Biomaterials ' },
-              ],
-            },
-            { name: 'Surface Chemistry' },
-            { name: 'Metallurgy' },
-            { name: 'Glass Science' },
-            { name: 'Ceramic Engineering' },
-            { name: 'Corrosion' },
-            { name: 'Structural Chemistry' },
-            { name: 'Microencapsulation' },
-            { name: 'Supramolecular Chemistry' },
-            { name: 'Fiber & Textile Engineering' },
-            { name: 'Carbon Materials' },
-          ],
-        },
-        {
-          name: 'Biomaterials',
-          subcategories: [
-            { name: 'Collagen' },
-            { name: 'Bioplastics' },
-            { name: 'Powder Metallurgy' },
-            { name: 'Powders & Bulk Materials' },
-            { name: 'Refractory Materials' },
-            { name: 'Composite Materials' },
-            { name: 'Electronic, Optical & Magnetic Materials' },
-            { name: 'Dental Materials' },
-            { name: 'Biocatalysis' },
-            { name: 'Marine Chemistry' },
-            { name: 'Coordination Compounds' },
-            { name: 'Inorganic Chemistry' },
-            { name: 'Natural Product Chemistry' },
-            { name: 'Molecular Engineering' },
-            { name: 'Physical Chemistry' },
-          ],
-        },
-        {
-          name: 'Molecular Modeling',
-          subcategories: [
-            { name: 'Molecular Docking' },
-            { name: 'Chemoinformatics' },
-            { name: 'Biopolymers' },
-            { name: 'Polymer Chemistry' },
-          ],
-        },
-        {
-          name: 'Analytical Chemistry',
-          subcategories: [
-            { name: 'Deformulation' },
-            { name: 'Separation & Purification' },
-            { name: 'Crystallography' },
-            { name: 'X-Ray Crystallography' },
-            {
-              name: 'Spectroscopy',
-              subcategories: [
-                { name: 'Atomic Absorption Spectroscopy' },
-                { name: 'Atomic Emission Spectroscopy' },
-                { name: 'UV Spectroscopy' },
-                { name: 'Fluorescence Spectroscopy' },
-                { name: 'IR Spectroscopy' },
-                { name: 'Raman Spectroscopy' },
-                { name: 'NMR Spectroscopy' },
-                { name: 'Circular Dichroism Spectroscopy' },
-                { name: 'Spectrophotometry' },
-                { name: 'Mass Spectrometry' },
-                { name: 'Molecular Imaging' },
-              ],
-            },
-            { name: 'Liquid Chromatography/HPLC' },
-            { name: 'Thermal Analysis' },
-            { name: 'Microcalorimetry' },
-            { name: 'Gas Chromatography' },
-            { name: 'Particle Size Distribution' },
-            { name: 'Optical Rotation' },
-            { name: 'Stable Isotope Analysis' },
-            { name: 'Particle-Induced X-Ray Emission' },
-            { name: 'Electrochemistry' },
-            { name: 'Agricultural Chemistry' },
-            { name: 'Cosmochemistry' },
-            { name: 'Radiochemistry' },
-            { name: 'Astrochemistry' },
-            { name: 'Petrochemistry' },
-          ],
-        },
-        {
-          name: 'Solid State Sciences',
-          subcategories: [
-            { name: 'Condensed Matter Physics' },
-            { name: 'Solid-State Chemistry' },
-            { name: 'Flow Chemistry' },
-            { name: 'Green Chemistry' },
-            { name: 'Organometallic Chemistry' },
-            { name: 'Photochemistry' },
-            { name: 'Quantum Chemistry' },
-            { name: 'Theoretical Chemistry' },
-          ],
-        },
-        {
-          name: 'Organic Chemistry',
-          subcategories: [
-            { name: 'Retrosynthesis' },
-            { name: 'Thermochemistry' },
-            { name: 'Computational Chemistry' },
-            { name: 'Mechanochemistry' },
-            { name: 'Sonochemistry' },
-            { name: 'Peptide Synthesis' },
-            { name: 'Physical Organic Chemistry' },
-            { name: 'Adhesion Technology' },
-            { name: 'Applied Chemistry' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'Agriculture',
-      subcategories: [
-        {
-          name: 'Plant Science',
-          subcategories: [
-            { name: 'Agronomy' },
-            { name: 'Plant Breeding' },
-            { name: 'Horticulture' },
-            { name: 'Entomology' },
-            { name: 'Plant Pathology' },
-            { name: 'Soil Science' },
-            { name: 'Weed Science' },
-          ],
-        },
-        {
-          name: 'Agricultural Engineering and Technology',
-          subcategories: [
-            { name: 'Precision Agriculture' },
-            { name: 'Irrigation and Drainage Engineering' },
-            { name: 'Farm Machinery and Equipment' },
-            { name: 'Renewable Energy in Agriculture' },
-            { name: 'Post-harvest Technology' },
-          ],
-        },
-        {
-          name: 'Organic agriculture',
-          subcategories: [
-            { name: 'Soil Health & Fertility Management' },
-            { name: 'Pest & Disease' },
-            { name: 'Integrated Pest Management (IPM)' },
-            { name: 'Crop Rotations & Intercropping' },
-            { name: 'Pollinator & Natural Enemy Habitat Creation' },
-            { name: 'Biodiversity Conservation' },
-            { name: 'Composting & Biofertilizer Production' },
-            { name: 'Weed Management' },
-            { name: 'Irrigation & Water Management' },
-            { name: 'Seed Saving & Variety Selection' },
-            { name: 'On-farm Research & Experimentation' },
-            { name: 'Organic Seed Saving' },
-            { name: 'Nutrient Cycling' },
-            { name: 'Composting and Vermicomposting' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'Engineering',
-      subcategories: [
-        {
-          name: 'Aviation',
-          subcategories: [
-            { name: 'Aviation Transport' },
-            { name: 'Aviation Management' },
-            { name: 'Aviation Safety' },
-            { name: 'Aircraft Maintenance' },
-            { name: 'Air Traffic Control' },
-            { name: 'Airline Management & Operations' },
-            { name: 'Airport Management & Operations' },
-            { name: 'Unmanned Aerial Systems' },
-          ],
-        },
-        {
-          name: 'Electrical Engineering',
-          subcategories: [
-            { name: 'Semiconductors' },
-            { name: 'Batteries & Fuel Cells' },
-            { name: 'Power Engineering' },
-            { name: 'Electronics Engineering' },
-            { name: 'Electronic Circuits' },
-            { name: 'Integrated Circuits/Microchips' },
-            { name: 'Signal Processing' },
-            { name: 'Microelectronics' },
-            { name: 'Computer Engineering' },
-            { name: 'Telecommunications Engineering' },
-            { name: 'Instrumentation Engineering' },
-            { name: 'Electro-Optics' },
-            { name: 'Distribution Engineering' },
-            { name: 'Wireless Sensor Networks' },
-            { name: 'Microwave Engineering' },
-            { name: 'Cold Regions Engineering' },
-            { name: 'Biological Engineering' },
-            { name: 'Engineering Education' },
-            { name: 'Engineering Physics' },
-          ],
-        },
-        {
-          name: 'Civil engineering',
-          subcategories: [
-            { name: 'Urban Planning & Development' },
-            { name: 'Offshore Structures' },
-            { name: 'Hydraulic Engineering' },
-            { name: 'Geotechnical Engineering' },
-            { name: 'Structural Engineering' },
-            { name: 'Construction Engineering' },
-            { name: 'Civil Site Design' },
-            { name: 'Site Survey' },
-            { name: 'Earthquake Engineering' },
-            { name: 'Coastal Engineering' },
-            { name: 'Regional Planning & Development' },
-            { name: 'Ocean Engineering' },
-            { name: 'Petroleum Engineering' },
-            { name: 'Sound Design' },
-            { name: 'Remote Sensing' },
-            { name: 'Surveillance Systems' },
-          ],
-        },
-        {
-          name: 'Automotive engineering',
-          subcategories: [
-            {
-              name: 'Powertrain & Drivetrain',
-              subcategories: [
-                { name: 'Engine Development' },
-                { name: 'Transmission Development' },
-                { name: 'Vehicle Control Systems' },
-              ],
-            },
-            {
-              name: 'Chassis & Suspension',
-              subcategories: [
-                { name: 'Vehicle Dynamics' },
-                { name: 'Suspension Design' },
-                { name: 'Brake Systems' },
-              ],
-            },
-            {
-              name: 'Vehicle Safety & Crashworthiness',
-              subcategories: [
-                { name: 'Occupant Protection' },
-                { name: 'Crash Testing' },
-                { name: 'Collision Repair' },
-              ],
-            },
-            { name: 'Noise, Vibration, & Harshness (NVH)' },
-            { name: 'Vehicle Electronics' },
-            { name: 'Advanced Driver Assistance Systems (ADAS)' },
-            { name: 'Vehicle Ergonomics' },
-            { name: 'Vehicle Aerodynamics' },
-          ],
-        },
-      ],
-    },
-    {
-      name: 'Earth and Atmospheric Science',
-      subcategories: [
-        { name: 'Climatology' },
-        { name: 'Oceanography' },
-        { name: 'Geophysics' },
-        { name: 'Geology' },
-        { name: 'Meteorology' },
-        { name: 'Hydrology' },
-        { name: 'Geomorphology' },
-        { name: 'Seismology' },
-        { name: 'Vulcanology' },
-      ],
-    },
-    {
-      name: 'Environmental Science',
-      subcategories: [
-        { name: 'Air Pollution Control' },
-        { name: 'Water Treatment & Purification' },
-        { name: 'Solid Waste Management' },
-        { name: 'Environmental Toxicology' },
-        { name: 'Environmental Impact Assessment' },
-        { name: 'Sustainable Development' },
-        { name: 'Environmental Policy' },
-        { name: 'Ecosystem Management' },
-        { name: 'Biodiversity Conservation' },
-      ],
-    },
-    {
-      name: 'Food Science',
-      subcategories: [
-        { name: 'Food Chemistry' },
-        { name: 'Food Microbiology' },
-        { name: 'Food Engineering' },
-        { name: 'Food Safety' },
-        { name: 'Sensory Science' },
-        { name: 'Food Processing & Preservation' },
-        { name: 'Functional Foods' },
-        { name: 'Nutraceuticals' },
-      ],
-    },
-    {
-      name: 'Renewable Energy',
-      subcategories: [
-        { name: 'Solar Energy' },
-        { name: 'Wind Energy' },
-        { name: 'Hydropower' },
-        { name: 'Bioenergy' },
-        { name: 'Geothermal Energy' },
-        { name: 'Ocean Energy' },
-      ],
-    },
-    {
-      name: 'Medical Device',
-      subcategories: [
-        { name: 'Medical Imaging' },
-        { name: 'Diagnostic Equipment' },
-        { name: 'Surgical Instruments' },
-        { name: 'Prosthetics' },
-        { name: 'Orthopedics' },
-        { name: 'Dental Devices' },
-      ],
-    },
-    {
-      name: 'Healthcare',
-      subcategories: [
-        { name: 'Public Health' },
-        { name: 'Epidemiology' },
-        { name: 'Health Policy' },
-        { name: 'Health Economics' },
-        { name: 'Health Services Research' },
-        { name: 'Health Informatics' },
-      ],
-    },
-    {
-      name: 'Sustainability Science',
-      subcategories: [
-        { name: 'Sustainable Agriculture' },
-        { name: 'Sustainable Energy' },
-        { name: 'Sustainable Development' },
-        { name: 'Sustainable Cities' },
-        { name: 'Sustainable Water Management' },
-        { name: 'Sustainable Tourism' },
-        { name: 'Sustainable Transportation' },
-      ],
-    },
-  ];
+export const subcategories: Subcategory[] = [
+  {
+    name: 'Chemistry',
+    subcategories: [
+      { name: 'Chemical Reagent Development' },
+      { name: 'Dewatering & Drying Technology' },
+      { name: 'Catalysis' },
+      { name: 'Trace Elements' },
+      { name: 'Mathematical Chemistry' },
+      { name: 'Dispersion Chemistry' },
+      { name: 'Surface Science' },
+      {
+        name: 'Materials Science & Engineering',
+        subcategories: [
+          {
+            name: 'Nanotechnology & Nanomaterials',
+            subcategories: [
+              { name: 'Biomaterials ' },
+            ],
+          },
+          { name: 'Surface Chemistry' },
+          { name: 'Metallurgy' },
+          { name: 'Glass Science' },
+          { name: 'Ceramic Engineering' },
+          { name: 'Corrosion' },
+          { name: 'Structural Chemistry' },
+          { name: 'Microencapsulation' },
+          { name: 'Supramolecular Chemistry' },
+          { name: 'Fiber & Textile Engineering' },
+          { name: 'Carbon Materials' },
+        ],
+      },
+      {
+        name: 'Biomaterials',
+        subcategories: [
+          { name: 'Collagen' },
+          { name: 'Bioplastics' },
+          { name: 'Powder Metallurgy' },
+          { name: 'Powders & Bulk Materials' },
+          { name: 'Refractory Materials' },
+          { name: 'Composite Materials' },
+          { name: 'Electronic, Optical & Magnetic Materials' },
+          { name: 'Dental Materials' },
+          { name: 'Biocatalysis' },
+          { name: 'Marine Chemistry' },
+          { name: 'Coordination Compounds' },
+          { name: 'Inorganic Chemistry' },
+          { name: 'Natural Product Chemistry' },
+          { name: 'Molecular Engineering' },
+          { name: 'Physical Chemistry' },
+        ],
+      },
+      {
+        name: 'Molecular Modeling',
+        subcategories: [
+          { name: 'Molecular Docking' },
+          { name: 'Chemoinformatics' },
+          { name: 'Biopolymers' },
+          { name: 'Polymer Chemistry' },
+        ],
+      },
+      {
+        name: 'Analytical Chemistry',
+        subcategories: [
+          { name: 'Deformulation' },
+          { name: 'Separation & Purification' },
+          { name: 'Crystallography' },
+          { name: 'X-Ray Crystallography' },
+          {
+            name: 'Spectroscopy',
+            subcategories: [
+              { name: 'Atomic Absorption Spectroscopy' },
+              { name: 'Atomic Emission Spectroscopy' },
+              { name: 'UV Spectroscopy' },
+              { name: 'Fluorescence Spectroscopy' },
+              { name: 'IR Spectroscopy' },
+              { name: 'Raman Spectroscopy' },
+              { name: 'NMR Spectroscopy' },
+              { name: 'Circular Dichroism Spectroscopy' },
+              { name: 'Spectrophotometry' },
+              { name: 'Mass Spectrometry' },
+              { name: 'Molecular Imaging' },
+            ],
+          },
+          { name: 'Liquid Chromatography/HPLC' },
+          { name: 'Thermal Analysis' },
+          { name: 'Microcalorimetry' },
+          { name: 'Gas Chromatography' },
+          { name: 'Particle Size Distribution' },
+          { name: 'Optical Rotation' },
+          { name: 'Stable Isotope Analysis' },
+          { name: 'Particle-Induced X-Ray Emission' },
+          { name: 'Electrochemistry' },
+          { name: 'Agricultural Chemistry' },
+          { name: 'Cosmochemistry' },
+          { name: 'Radiochemistry' },
+          { name: 'Astrochemistry' },
+          { name: 'Petrochemistry' },
+        ],
+      },
+      {
+        name: 'Solid State Sciences',
+        subcategories: [
+          { name: 'Condensed Matter Physics' },
+          { name: 'Solid-State Chemistry' },
+          { name: 'Flow Chemistry' },
+          { name: 'Green Chemistry' },
+          { name: 'Organometallic Chemistry' },
+          { name: 'Photochemistry' },
+          { name: 'Quantum Chemistry' },
+          { name: 'Theoretical Chemistry' },
+        ],
+      },
+      {
+        name: 'Organic Chemistry',
+        subcategories: [
+          { name: 'Retrosynthesis' },
+          { name: 'Thermochemistry' },
+          { name: 'Computational Chemistry' },
+          { name: 'Mechanochemistry' },
+          { name: 'Sonochemistry' },
+          { name: 'Peptide Synthesis' },
+          { name: 'Physical Organic Chemistry' },
+          { name: 'Adhesion Technology' },
+          { name: 'Applied Chemistry' },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Agriculture',
+    subcategories: [
+      {
+        name: 'Plant Science',
+        subcategories: [
+          { name: 'Agronomy' },
+          { name: 'Plant Breeding' },
+          { name: 'Horticulture' },
+          { name: 'Entomology' },
+          { name: 'Plant Pathology' },
+          { name: 'Soil Science' },
+          { name: 'Weed Science' },
+        ],
+      },
+      {
+        name: 'Agricultural Engineering and Technology',
+        subcategories: [
+          { name: 'Precision Agriculture' },
+          { name: 'Irrigation and Drainage Engineering' },
+          { name: 'Farm Machinery and Equipment' },
+          { name: 'Renewable Energy in Agriculture' },
+          { name: 'Post-harvest Technology' },
+        ],
+      },
+      {
+        name: 'Organic agriculture',
+        subcategories: [
+          { name: 'Soil Health & Fertility Management' },
+          { name: 'Pest & Disease' },
+          { name: 'Integrated Pest Management (IPM)' },
+          { name: 'Crop Rotations & Intercropping' },
+          { name: 'Pollinator & Natural Enemy Habitat Creation' },
+          { name: 'Biodiversity Conservation' },
+          { name: 'Composting & Biofertilizer Production' },
+          { name: 'Weed Management' },
+          { name: 'Irrigation & Water Management' },
+          { name: 'Seed Saving & Variety Selection' },
+          { name: 'On-farm Research & Experimentation' },
+          { name: 'Organic Seed Saving' },
+          { name: 'Nutrient Cycling' },
+          { name: 'Composting and Vermicomposting' },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Engineering',
+    subcategories: [
+      {
+        name: 'Aviation',
+        subcategories: [
+          { name: 'Aviation Transport' },
+          { name: 'Aviation Management' },
+          { name: 'Aviation Safety' },
+          { name: 'Aircraft Maintenance' },
+          { name: 'Air Traffic Control' },
+          { name: 'Airline Management & Operations' },
+          { name: 'Airport Management & Operations' },
+          { name: 'Unmanned Aerial Systems' },
+        ],
+      },
+      {
+        name: 'Electrical Engineering',
+        subcategories: [
+          { name: 'Semiconductors' },
+          { name: 'Batteries & Fuel Cells' },
+          { name: 'Power Engineering' },
+          { name: 'Electronics Engineering' },
+          { name: 'Electronic Circuits' },
+          { name: 'Integrated Circuits/Microchips' },
+          { name: 'Signal Processing' },
+          { name: 'Microelectronics' },
+          { name: 'Computer Engineering' },
+          { name: 'Telecommunications Engineering' },
+          { name: 'Instrumentation Engineering' },
+          { name: 'Electro-Optics' },
+          { name: 'Distribution Engineering' },
+          { name: 'Wireless Sensor Networks' },
+          { name: 'Microwave Engineering' },
+          { name: 'Cold Regions Engineering' },
+          { name: 'Biological Engineering' },
+          { name: 'Engineering Education' },
+          { name: 'Engineering Physics' },
+        ],
+      },
+      {
+        name: 'Civil engineering',
+        subcategories: [
+          { name: 'Urban Planning & Development' },
+          { name: 'Offshore Structures' },
+          { name: 'Hydraulic Engineering' },
+          { name: 'Geotechnical Engineering' },
+          { name: 'Structural Engineering' },
+          { name: 'Construction Engineering' },
+          { name: 'Civil Site Design' },
+          { name: 'Site Survey' },
+          { name: 'Earthquake Engineering' },
+          { name: 'Coastal Engineering' },
+          { name: 'Regional Planning & Development' },
+          { name: 'Ocean Engineering' },
+          { name: 'Petroleum Engineering' },
+          { name: 'Sound Design' },
+          { name: 'Remote Sensing' },
+          { name: 'Surveillance Systems' },
+        ],
+      },
+      {
+        name: 'Automotive engineering',
+        subcategories: [
+          {
+            name: 'Powertrain & Drivetrain',
+            subcategories: [
+              { name: 'Engine Development' },
+              { name: 'Transmission Development' },
+              { name: 'Vehicle Control Systems' },
+            ],
+          },
+          {
+            name: 'Chassis & Suspension',
+            subcategories: [
+              { name: 'Vehicle Dynamics' },
+              { name: 'Suspension Design' },
+              { name: 'Brake Systems' },
+            ],
+          },
+          {
+            name: 'Vehicle Safety & Crashworthiness',
+            subcategories: [
+              { name: 'Occupant Protection' },
+              { name: 'Crash Testing' },
+              { name: 'Collision Repair' },
+            ],
+          },
+          { name: 'Noise, Vibration, & Harshness (NVH)' },
+          { name: 'Vehicle Electronics' },
+          { name: 'Advanced Driver Assistance Systems (ADAS)' },
+          { name: 'Vehicle Ergonomics' },
+          { name: 'Vehicle Aerodynamics' },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Earth and Atmospheric Science',
+    subcategories: [
+      { name: 'Climatology' },
+      { name: 'Oceanography' },
+      { name: 'Geophysics' },
+      { name: 'Geology' },
+      { name: 'Meteorology' },
+      { name: 'Hydrology' },
+      { name: 'Geomorphology' },
+      { name: 'Seismology' },
+      { name: 'Vulcanology' },
+    ],
+  },
+  {
+    name: 'Environmental Science',
+    subcategories: [
+      { name: 'Air Pollution Control' },
+      { name: 'Water Treatment & Purification' },
+      { name: 'Solid Waste Management' },
+      { name: 'Environmental Toxicology' },
+      { name: 'Environmental Impact Assessment' },
+      { name: 'Sustainable Development' },
+      { name: 'Environmental Policy' },
+      { name: 'Ecosystem Management' },
+      { name: 'Biodiversity Conservation' },
+    ],
+  },
+  {
+    name: 'Food Science',
+    subcategories: [
+      { name: 'Food Chemistry' },
+      { name: 'Food Microbiology' },
+      { name: 'Food Engineering' },
+      { name: 'Food Safety' },
+      { name: 'Sensory Science' },
+      { name: 'Food Processing & Preservation' },
+      { name: 'Functional Foods' },
+      { name: 'Nutraceuticals' },
+    ],
+  },
+  {
+    name: 'Renewable Energy',
+    subcategories: [
+      { name: 'Solar Energy' },
+      { name: 'Wind Energy' },
+      { name: 'Hydropower' },
+      { name: 'Bioenergy' },
+      { name: 'Geothermal Energy' },
+      { name: 'Ocean Energy' },
+    ],
+  },
+  {
+    name: 'Medical Device',
+    subcategories: [
+      { name: 'Medical Imaging' },
+      { name: 'Diagnostic Equipment' },
+      { name: 'Surgical Instruments' },
+      { name: 'Prosthetics' },
+      { name: 'Orthopedics' },
+      { name: 'Dental Devices' },
+    ],
+  },
+  {
+    name: 'Healthcare',
+    subcategories: [
+      { name: 'Public Health' },
+      { name: 'Epidemiology' },
+      { name: 'Health Policy' },
+      { name: 'Health Economics' },
+      { name: 'Health Services Research' },
+      { name: 'Health Informatics' },
+    ],
+  },
+  {
+    name: 'Sustainability Science',
+    subcategories: [
+      { name: 'Sustainable Agriculture' },
+      { name: 'Sustainable Energy' },
+      { name: 'Sustainable Development' },
+      { name: 'Sustainable Cities' },
+      { name: 'Sustainable Water Management' },
+      { name: 'Sustainable Tourism' },
+      { name: 'Sustainable Transportation' },
+    ],
+  },
+];
 
 export interface Subcategory {
   name: string;
@@ -397,6 +397,54 @@ export interface Subcategory {
 //     ],
 //   },
 // ];
+
+
+// export const categories: string[] = [
+//   "Agriculture",
+//   "Chemicals",
+//   "Electronics",
+//   "Energy",
+//   "Environmental and waste management",
+//   "Food and beverage",
+//   "Healthcare",
+//   "Medical devices and equipment",
+//   "Mining and metals",
+//   "Real estate and construction",
+//   "Textiles",
+// ];
+
+
+// constants/categories.ts
+
+export const categories: string[] = [
+  "Agriculture",
+  "Chemicals",
+  "Electronics",
+  "Energy",
+  "Environmental and waste management",
+  "Food and beverage",
+  "Healthcare",
+  "Medical devices and equipment",
+  "Mining and metals",
+  "Real estate and construction",
+  "Textiles",
+  // ... other categories
+];
+
+export const subcategories1: { [key: string]: string[] } = {
+  'Agriculture': ['Subcategory 1', 'Subcategory 2'],
+  'Chemicals': ['Subcategory 3', 'Subcategory 4'],
+  'Electronics': ['Subcategory 5', 'Subcategory 6'],
+  'Energy': ['Subcategory 5', 'Subcategory 6'],
+  'Environmental and waste management': ['Subcategory 5', 'Subcategory 6'],
+  'Food and beverage': ['Subcategory 5', 'Subcategory 6'],
+  'Healthcare': ['Subcategory 5', 'Subcategory 6'],
+  'Medical devices and equipment': ['Subcategory 5', 'Subcategory 6'],
+  'Mining and metals': ['Subcategory 5', 'Subcategory 6'],
+  'Real estate and construction': ['Subcategory 5', 'Subcategory 6'],
+  'Textiles': ['Subcategory 5', 'Subcategory 6'],
+  // ... other subcategories
+};
 
 
 
@@ -1686,7 +1734,7 @@ export const options = [
 
 
 
-  
+
       },
       {
         "label": "Climate Change",
@@ -1790,7 +1838,7 @@ export const options = [
         ////////////////// baki
       }
     ]
-    
+
   },
 
   ///////////////////////////Renewable Energy/////////////////////////////////////
@@ -2325,7 +2373,7 @@ export const options = [
             "value": "Water Resource Management"
           }
         ]
-        
+
       },
       {
         "label": "Other Areas of Expertise",
@@ -2348,10 +2396,10 @@ export const options = [
             "value": "Biodiversity Conservation and Ecosystem Services"
           }
         ]
-        
+
       }
     ]
-    
+
   },
 
 ];

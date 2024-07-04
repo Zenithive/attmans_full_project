@@ -1,13 +1,13 @@
 "use client"
 import * as React from 'react';
 import {
-  Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Autocomplete, CircularProgress
+  Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Autocomplete
 } from '@mui/material';
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { APIS } from '../constants/api.constant';
-import { categories, subcategories } from '../constants/categories';
+import { categories, subcategories1 } from '../constants/categories';
 
 interface User {
   _id: string;
@@ -142,7 +142,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
             <Autocomplete
               value={selectedSubCategory}
               onChange={handleSubCategoryChange}
-              options={selectedCategory ? subcategories[selectedCategory] : []}
+              options={selectedCategory ? subcategories1[selectedCategory] : []}
               getOptionLabel={(option) => option}
               renderInput={(params) => (
                 <TextField {...params} label="Sub-category" color="secondary" variant="outlined" />

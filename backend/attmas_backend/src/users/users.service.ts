@@ -122,34 +122,34 @@ export class UsersService {
     return users;
   }
 
-  async updateUserCategories(username: string): Promise<void> {
-    const user = await this.userModel.findOne({ username }).exec();
-    if (!user) {
-      throw new NotFoundException(`User with username ${username} not found`);
-    }
+  // async updateUserCategories(username: string): Promise<void> {
+  //   const user = await this.userModel.findOne({ username }).exec();
+  //   if (!user) {
+  //     throw new NotFoundException(`User with username ${username} not found`);
+  //   }
 
-    const categoriesData = await this.categoriesModel
-      .findOne({ username })
-      .exec();
-    console.log('categoriesData', categoriesData);
+  //   const categoriesData = await this.categoriesModel
+  //     .findOne({ username })
+  //     .exec();
+  //   console.log('categoriesData', categoriesData);
 
-    if (categoriesData) {
-      // Add categories and subcategories to user without removing existing ones
-      if (categoriesData.categories && categoriesData.categories.length > 0) {
-        user.categories = [
-          ...new Set([...user.categories, ...categoriesData.categories]),
-        ];
-      }
-      if (
-        categoriesData.subcategories &&
-        categoriesData.subcategories.length > 0
-      ) {
-        user.subcategories = [
-          ...new Set([...user.subcategories, ...categoriesData.subcategories]),
-        ];
-      }
+  //   if (categoriesData) {
+  //     // Add categories and subcategories to user without removing existing ones
+  //     if (categoriesData.categories && categoriesData.categories.length > 0) {
+  //       user.categories = [
+  //         ...new Set([...user.categories, ...categoriesData.categories]),
+  //       ];
+  //     }
+  //     if (
+  //       categoriesData.subcategories &&
+  //       categoriesData.subcategories.length > 0
+  //     ) {
+  //       user.subcategories = [
+  //         ...new Set([...user.subcategories, ...categoriesData.subcategories]),
+  //       ];
+  //     }
 
-      await user.save();
-    }
-  }
+  //     await user.save();
+  //   }
+  // }
 }

@@ -75,6 +75,7 @@ const EditProfile2: React.FC = () => {
             productPrice: '',
             hasPatent: false,
             username: userDetails.username,
+            userId: userDetails._id,
             currency: 'INR',
             preferredIndustries: [],  // New field initial value
 
@@ -85,6 +86,13 @@ const EditProfile2: React.FC = () => {
             try {
                 const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
                 console.log('Form submitted successfully:', response.data);
+                const form3Data = {
+                    username: values.username,
+                    userId: values.userId,
+                    categories: values.preferredIndustries,
+                };
+                const form3Response = await axios.post(APIS.FORM3, form3Data);
+                console.log('Preferred industries submitted successfully:', form3Response.data);
                 setLoading(false);
                 pubsub.publish('toast', {
                     message: 'Profile updated successfully!',
