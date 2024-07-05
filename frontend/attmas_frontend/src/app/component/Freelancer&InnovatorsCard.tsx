@@ -1,13 +1,13 @@
-'use client';
+"use client"
 import * as React from 'react';
 import {
-  Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent
+  Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Autocomplete
 } from '@mui/material';
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { APIS } from '../constants/api.constant';
-import { categories, subcategories } from '../constants/categories';
+import { categories, subcategories1 } from '../constants/categories';
 
 interface User {
   _id: string;
@@ -38,8 +38,8 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const [filterVisible, setFilterVisible] = React.useState<boolean>(false);
   const [page, setPage] = React.useState<number>(1);
   const [hasMore, setHasMore] = React.useState<boolean>(true);
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('');
-  const [selectedSubCategory, setSelectedSubCategory] = React.useState<string>('');
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const fetchCategories = async () => {
@@ -57,7 +57,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get<User[]>(
-        `${apiUrl}&page=${page}&limit=6&filter=${filterText}&category=${selectedCategory}&subCategory=${selectedSubCategory}`
+        `${apiUrl}&page=${page}&limit=6&filter=${filterText}&category=${selectedCategory ?? ''}&subCategory=${selectedSubCategory ?? ''}`
       );
       if (response.data.length < 6) {
         setHasMore(false);
@@ -81,16 +81,16 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
     setHasMore(true);
   };
 
-  const handleCategoryChange = (event: SelectChangeEvent<string>, child: React.ReactNode) => {
-    setSelectedCategory(event.target.value as string);
-    setSelectedSubCategory('');
+  const handleCategoryChange = (event: React.SyntheticEvent, value: string | null) => {
+    setSelectedCategory(value);
+    setSelectedSubCategory(null);
     setPage(1);
     setRowData([]);
     setHasMore(true);
   };
 
-  const handleSubCategoryChange = (event: SelectChangeEvent<string>, child: React.ReactNode) => {
-    setSelectedSubCategory(event.target.value as string);
+  const handleSubCategoryChange = (event: React.SyntheticEvent, value: string | null) => {
+    setSelectedSubCategory(value);
     setPage(1);
     setRowData([]);
     setHasMore(true);
@@ -106,7 +106,14 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   };
 
   return (
-    <Box sx={{ background: '#f0f0f0', p: 2, borderRadius: 1 }}>
+    <Box
+      sx={{
+        background: '#f0f0f0',
+        p: 2,
+        borderRadius: 1,
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.8)', // Adding shadow here
+      }}
+    >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h4">{title}</Typography>
         <IconButton onClick={toggleFilterVisibility}>
@@ -122,43 +129,27 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
               onChange={handleFilterChange}
               sx={{ width: '25%' }}
             />
-            <FormControl variant="outlined" sx={{ width: '25%', ml: 2 }}>
-              <InputLabel color="secondary">Category</InputLabel>
-              <Select
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                label="Category"
-                color="secondary"
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {categories.map((category, index) => (
-                  <MenuItem key={index} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl variant="outlined" sx={{ width: '25%', ml: 2 }}>
-              <InputLabel color="secondary">Sub-category</InputLabel>
-              <Select
-                value={selectedSubCategory}
-                onChange={handleSubCategoryChange}
-                label="Sub-category"
-                color="secondary"
-                disabled={!selectedCategory}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                {subcategories[selectedCategory]?.map((subCategory, index) => (
-                  <MenuItem key={index} value={subCategory}>
-                    {subCategory}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              options={categories}
+              getOptionLabel={(option) => option}
+              renderInput={(params) => (
+                <TextField {...params} label="Category" color="secondary" variant="outlined" />
+              )}
+              sx={{ width: '25%', ml: 2 }}
+            />
+            <Autocomplete
+              value={selectedSubCategory}
+              onChange={handleSubCategoryChange}
+              options={selectedCategory ? subcategories1[selectedCategory] : []}
+              getOptionLabel={(option) => option}
+              renderInput={(params) => (
+                <TextField {...params} label="Sub-category" color="secondary" variant="outlined" />
+              )}
+              sx={{ width: '25%', ml: 2 }}
+              disabled={!selectedCategory}
+            />
           </>
         )}
       </Box>
@@ -173,7 +164,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
           {rowData.map((user) => {
             const { categories, subcategories } = getUserCategoryData(user.username);
             return (
-              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px' }}>
+              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px', boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)' }}>
                 <CardContent>
                   <Grid container spacing={1}>
                     <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>

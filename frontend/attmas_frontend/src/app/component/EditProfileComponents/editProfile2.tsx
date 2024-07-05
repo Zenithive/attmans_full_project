@@ -16,7 +16,10 @@ import {
     RadioGroup,
     FormControl,
     FormLabel,
-    Radio
+    Radio,
+    Checkbox,
+    Autocomplete,
+    Chip
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -51,6 +54,10 @@ const EditProfile2: React.FC = () => {
         productPrice: Yup.string().nullable(),
         hasPatent: Yup.string().nullable(),
         currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+        preferredIndustries: Yup.array()
+            .of(Yup.string().required('At least one industry must be selected'))
+            .min(1, 'At least one industry must be selected')
+            .required('Preferred Industries are required'),
     });
 
     const formik = useFormik({
@@ -68,7 +75,9 @@ const EditProfile2: React.FC = () => {
             productPrice: '',
             hasPatent: false,
             username: userDetails.username,
+            userId: userDetails._id,
             currency: 'INR',
+
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -76,6 +85,8 @@ const EditProfile2: React.FC = () => {
             try {
                 const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
                 console.log('Form submitted successfully:', response.data);
+                
+
                 setLoading(false);
                 pubsub.publish('toast', {
                     message: 'Profile updated successfully!',
@@ -299,6 +310,7 @@ const EditProfile2: React.FC = () => {
                                 <FormHelperText error>{formik.errors.userType}</FormHelperText>
                             )}
                         </Grid>
+
 
 
 

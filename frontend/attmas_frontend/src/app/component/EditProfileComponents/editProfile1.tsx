@@ -7,7 +7,7 @@ import { Formik, Form, FormikProps } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields';
+import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';

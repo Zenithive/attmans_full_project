@@ -31,5 +31,11 @@ export const APIS = {
     INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
     PROJECTOWNERS: `${SERVER_URL}/users/by-type?userType=Project Owner`,
 
-    CATEGORIES: `${SERVER_URL}/profile/categories`
+    CATEGORIES: `${SERVER_URL}/profile/categories`,
+
+
+
+
+    GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
+
 }

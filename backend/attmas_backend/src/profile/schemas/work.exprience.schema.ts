@@ -48,6 +48,9 @@ export class WorkExprience extends Document {
   @Prop({ required: false })
   currency: string; // Added currency field
   Types: any;
+
+  @Prop({ required: false, type: [String] })
+  preferredIndustries: string[];
 }
 
 export const WorkSchema = SchemaFactory.createForClass(WorkExprience);
