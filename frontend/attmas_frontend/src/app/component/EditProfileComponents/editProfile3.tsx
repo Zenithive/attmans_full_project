@@ -252,6 +252,8 @@ const EditProfile3: React.FC = () => {
               renderOption={(props, option, { selected }) => (
                 <li {...props}>
                   <Checkbox
+                    color='secondary'
+
                     checked={selected}
                     onChange={(e) => handleCategoryCheckboxChange(option, e.target.checked)}
                     style={{ marginRight: 8 }}
