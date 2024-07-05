@@ -1,10 +1,10 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack, MenuItem, Select, InputLabel, FormControl, OutlinedInput, Checkbox } from '@mui/material';
+import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack, Autocomplete, TextField, Checkbox } from '@mui/material';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Assuming it's next/router for routing
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
@@ -105,6 +105,16 @@ const EditProfile3: React.FC = () => {
     formik.setFieldValue('subcategories', updatedSelectedValues);
   };
 
+  const handleCategoryCheckboxChange = (value: string, isChecked: boolean) => {
+    let updatedCategories = [...formik.values.categories];
+    if (isChecked) {
+      updatedCategories.push(value);
+    } else {
+      updatedCategories = updatedCategories.filter(v => v !== value);
+    }
+    formik.setFieldValue('categories', updatedCategories);
+  };
+
   const filterOptions = (options: Option[], searchTerm: string): Option[] => {
     return options.reduce<Option[]>((acc, option) => {
       const match = option.label.toLowerCase().includes(searchTerm.toLowerCase());
@@ -128,8 +138,8 @@ const EditProfile3: React.FC = () => {
           </div>
         ) : (
           <label>
-            <input
-              type="checkbox"
+            <Checkbox
+              color='secondary'
               value={option.value}
               checked={selectedValues.includes(option.value)}
               onChange={e => handleCheckboxChange(option.value, e.target.checked)}
@@ -192,24 +202,20 @@ const EditProfile3: React.FC = () => {
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '45%' }}>
-              <div className="selected-values">
-                <strong>Selected Values: </strong>
-                {selectedValues.length > 0 ? (
-                  <Stack direction="row" spacing={1}>
-                    {selectedValues.map(value => (
-                      <Chip
-                        key={value}
-                        label={value}
-                        onDelete={() => handleCheckboxChange(value, false)} // Handle chip deletion
-                      />
-                    ))}
-                  </Stack>
-                ) : (
-                  'None'
-                )}
-              </div>
               <button type="button" onClick={handleToggleDropdown}>
-                Subject matter expertise
+                {selectedValues.length > 0 ? (
+                  selectedValues.map(value => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      onDelete={() => handleCheckboxChange(value, false)}
+                      color="primary"
+                      style={{ marginRight: 5, marginBottom: 5 }}
+                    />
+                  ))
+                ) : (
+                  'Subject matter expertise'
+                )}
               </button>
               {isOpen && (
                 <div className="dropdown-content">
@@ -226,31 +232,37 @@ const EditProfile3: React.FC = () => {
               )}
             </div>
 
-            <FormControl fullWidth sx={{ width: '45%' }}>
-              <InputLabel id="categories-label">Categories</InputLabel>
-              <Select
-                labelId="categories-label"
-                id="categories"
-                multiple
-                value={formik.values.categories}
-                onChange={(e) => formik.setFieldValue('categories', e.target.value)}
-                input={<OutlinedInput id="select-multiple-chip" label="Categories" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(selected as string[]).map((value) => (
-                      <Chip key={value} label={value} onDelete={() => formik.setFieldValue('categories', formik.values.categories.filter((category: string) => category !== value))} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {industryOptions.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    <Checkbox checked={formik.values.categories.includes(category)} />
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              multiple
+              id="categories"
+              options={industryOptions}
+              disableCloseOnSelect
+              getOptionLabel={(option) => option}
+              value={formik.values.categories}
+              onChange={(event, newValue) => formik.setFieldValue('categories', newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Categories"
+                  placeholder="Select categories"
+                  color="secondary"
+                />
+              )}
+              renderOption={(props, option, { selected }) => (
+                <li {...props}>
+                  <Checkbox
+                    color='secondary'
+
+                    checked={selected}
+                    onChange={(e) => handleCategoryCheckboxChange(option, e.target.checked)}
+                    style={{ marginRight: 8 }}
+                  />
+                  {option}
+                </li>
+              )}
+              style={{ width: '45%' }}
+            />
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
@@ -260,17 +272,20 @@ const EditProfile3: React.FC = () => {
               size="small"
               loading={loading}
               loadingIndicator={<CircularProgress size={24} />}
-              sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
+              sx={{ mt: 2, mb: 2, ml: '90%', width: 100, borderRadius: 2 }}
+              color="secondary"
             >
               Save
             </LoadingButton>
           </Box>
         </Box>
       </Box>
+
       <style jsx>{`
         .nested-multiselect-dropdown {
           position: relative;
           display: inline-block;
+          width: 560px;
         }
 
         .dropdown-content {
@@ -315,18 +330,16 @@ const EditProfile3: React.FC = () => {
 
         button {
           margin-right: 10px;
-          background-color: #4CAF50;
-          color: white;
           width: 570px;
           border-radius: 20px;
-          height: 50px;
+          background-color:white;
+          height: 57px;
           padding: 10px 20px;
-          border: none;
           cursor: pointer;
-        }
-
-        button:hover {
-          background-color: #45a049;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
         }
 
         .dropdown-content input {
