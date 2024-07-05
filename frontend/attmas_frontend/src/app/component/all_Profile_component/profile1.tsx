@@ -7,7 +7,7 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
-import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields';
+import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import defaultProfileImg  from '../../assets/Zenithithive Logo Black PNG  (1).png'

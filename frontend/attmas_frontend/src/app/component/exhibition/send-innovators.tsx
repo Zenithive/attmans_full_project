@@ -8,7 +8,6 @@ import { APIS } from '@/app/constants/api.constant';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { pubsub } from '@/app/services/pubsub.service';
-import debounce from 'lodash.debounce';
 
 interface SendInnovatorsProps {
   onCancel: () => void;
@@ -34,8 +33,12 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
   React.useEffect(() => {
     setOpen(true);
     fetchSubmittedInnovators();
-    fetchInnovators(page);
+    // fetchInnovators(1,searchQuery);
   }, []);
+
+  React.useEffect(() => {
+    fetchInnovators(1,searchQuery);
+  }, [searchQuery]);
 
   const fetchSubmittedInnovators = async () => {
     try {
@@ -47,10 +50,10 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
     }
   };
 
-  const fetchInnovators = async (page: number, query: string = '') => {
+  const fetchInnovators = async (page: number, searchQuery: string = '') => {
     try {
       setLoading(true);
-      const response = await axios.get(`${APIS.GET_INNOVATORS}&page=${page}&limit=10&search=${query}`);
+      const response = await axios.get(`${APIS.GET_INNOVATORS}&page=${page}&limit=6&search=${searchQuery}`);
       console.log('Fetched innovators:', response.data);
 
       if (response.data.length === 0) {
@@ -83,20 +86,15 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
     }
   };
 
-  const debouncedFetchInnovators = React.useCallback(
-    debounce((query: string) => {
-      fetchInnovators(1, query);
-    }, 500),
-    []
-  );
+  
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
-    setSearchQuery(query);  // Update search query state
+    // const query = event.target.value;
+    setSearchQuery(event.target.value);  // Update search query state
     setPage(1);
     setInnovators([]);
     setHasMore(true);
-    fetchInnovators(1, query);
+    // fetchInnovators(1, query);
   };
 
   const initialValues = {
