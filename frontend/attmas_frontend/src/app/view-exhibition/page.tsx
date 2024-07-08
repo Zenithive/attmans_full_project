@@ -4,7 +4,9 @@ import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button } from '@mui/material';
+import BoothDetailsModal from '../component/booth/booth';
+import { useSearchParams } from 'next/navigation'
 
 interface Exhibition {
   _id?: string;
@@ -17,39 +19,66 @@ interface Exhibition {
   subjects: string[];
   userId?: string;
 }
-
-interface SubmittedInnovator {
-  username: string;
-  innovators: string;
+interface Booth {
+  _id: string;
+  title: string;
+  description: string;
+  products: { name: string; description: string; productType: string; price: number; }[];
 }
 
-const ExhibitionsPage: React.FC = () => {
+
+const ExhibitionsPage: React.FC= () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
-  const [submittedInnovators, setSubmittedInnovators] = useState<SubmittedInnovator[]>([]);
+  const [booths, setBooths] = useState<Booth[]>([]);
+  const [showModal, setShowModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const searchParams = useSearchParams();
+  const { userType} = userDetails;
+
 
   useEffect(() => {
     const fetchExhibitions = async () => {
       try {
-        const response = await axios.get(APIS.EXHIBITION);
-        setExhibitions(response.data);
+        const exhibitionId = searchParams.get('exhibitionId');
+        if(!exhibitionId){
+          console.error('id not found')
+          return;
+        }
+        const response = await axios.get(`${APIS.EXHIBITION}/${exhibitionId}`);
+        console.log("respons",response);
+        setExhibitions([response.data]);
       } catch (error) {
         console.log(error);
       }
     };
-
-    const fetchSubmittedInnovators = async () => {
+  
+      const fetchBooths = async () => {
       try {
-        const response = await axios.get(`${APIS.GET_SUBMITTED_INNOVATORS}?userId=${userDetails._id}`);
-        setSubmittedInnovators(response.data);
+        const response = await axios.get(`${APIS.GET_BOOTH}`); 
+        setBooths(response.data);
       } catch (error) {
-        console.error('Error fetching submitted innovators:', error);
+        console.error('Error fetching booths:', error);
       }
     };
 
     fetchExhibitions();
-    fetchSubmittedInnovators();
-  }, [userDetails._id]);
+    fetchBooths();
+  }, [userDetails._id,searchParams]);
+  
+
+  const handleCreateBooth = async (boothData: any) => {
+    try {
+      const response = await axios.post(APIS.CREATE_BOOTH, boothData);
+      console.log('Booth created:', response.data);
+      closeModal();
+    } catch (error) {
+      console.error('Error creating booth:', error);
+    }
+  };
+
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   const renderVideo = (url: string) => {
     if (!url) {
@@ -101,8 +130,8 @@ const ExhibitionsPage: React.FC = () => {
     } else {
       return (
         <iframe
-          width="1100"
-          height="615"
+          width="500"
+          height="500"
           style={{ borderRadius: "30px" }}
           src={embedUrl}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -115,34 +144,49 @@ const ExhibitionsPage: React.FC = () => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ flex: 1, marginRight: '20px' }}>
-       <div style={{position:"relative",color:'white',textAlign:"center",background:"#cc4800",height:"4%",right:"8px",width:"113.3%",bottom:"29px"}}><h1 style={{position:'relative',top:"15%"}}>Exhibition</h1></div>
+      <div style={{ flex: 1, marginRight: '20px'}}>
+       <div style={{position:"relative",color:'white',textAlign:"center",background:"#cc4800",right:"8px",width:"102%",bottom:"29px"}}><h1 style={{position:'relative',top:"15%"}}>Exhibition</h1>
+       {!(userType === "Admin") && (
+          <Button variant="contained" color="primary" onClick={openModal} style={{ position:'relative', float:"right", bottom:'60px', right:'5%', background:'#757575', fontWeight:'bolder', color:'white'}}>
+              Create Booth
+            </Button>
+        )}
+
+        <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} />
+       </div>
         {exhibitions.map((exhibition) => (
           <div key={exhibition._id}>
-            <h2 style={{position:'relative',float:"right"}}>{exhibition.title}</h2>
+            <Box sx={{float:'right',right:'18%',position:'relative'}}>
+            <Box sx={{background:'red',width:'56%',color:'white',borderRadius:'10px'}}><h1>Exhibition Details</h1></Box>
+            <h2>Title:- {exhibition.title}</h2>
+           <h2>Description:- {exhibition.description}</h2>
+           <h2>Date-Time:- {exhibition.dateTime}</h2>
+           <h2>Industries:- {exhibition.industries}</h2>
+           <h2>Subjects:- {exhibition.subjects}</h2>
+           </Box>
            <div style={{position:'relative',left:'65px'}}>{renderVideo(exhibition.videoUrl)}</div>
           </div>
+          
         ))}
-      </div>
-
-      <div style={{ width: '4px', backgroundColor: 'gray',position:'relative',left:"7%",bottom:"8px"}}></div>
-
-      <div style={{ flex: 1}}>
-        <Box sx={{ mt: 4, p: 2 ,width:'70%',float:"right"}}>
-          <Typography variant="h5" sx={{ mb: 2, color: "Black", borderRadius: "15px", textAlign: "center", height: "45px", fontWeight: "bolder" }}>
-            <div style={{ position: "relative", top: "7px" }}>Submitted Innovators :-</div>
-          </Typography>
-          <Divider sx={{ my: '$5' }} />
-          {submittedInnovators.map((innovator, index) => (
-            <Card sx={{ mb: 2 }} key={index}>
-              <CardContent>
-                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                  Innovators: {innovator.innovators}, User: {innovator.username}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
+          <div>
+             {booths.map(booth => (
+               <div key={booth._id}>
+                 <Box sx={{position:'relative',left:'10%'}}>
+                 <Box sx={{background:'red',width:'13%',color:'white',borderRadius:'10px'}}><h1>Booth Details</h1></Box>
+                   <h2>Title:- {booth.title}</h2>
+                   <h2>Description:- {booth.description}</h2>
+                   <h2>Products:- </h2>
+                   <ul>
+                     {booth.products.map(product => (
+                       <li key={product.name}>
+                         <h2>{product.name} - {product.description} - {product.productType} - ${product.price}</h2>
+                       </li>
+                     ))}
+                   </ul>
+                   </Box>
+               </div>
+             ))}
+           </div>
       </div>
     </div>
   );

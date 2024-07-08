@@ -101,7 +101,9 @@ export class ExhibitionService {
 
   async findOneExhibition(id: string): Promise<Exhibition> {
     try {
-      const exhibition = await this.exhibitionModel.findById(id).exec();
+      const exhibition = await this.exhibitionModel
+        .findById({ _id: id })
+        .exec();
       if (!exhibition) {
         throw new NotFoundException(`Exhibition with id ${id} not found`);
       }

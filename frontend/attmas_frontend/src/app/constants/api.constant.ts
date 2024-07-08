@@ -24,6 +24,8 @@ export const APIS = {
     EXHIBITION: `${SERVER_URL}/exhibitions`,
     SEND_INNOVATORS: `${SERVER_URL}/exhibitions/sendinovators`,
     GET_SUBMITTED_INNOVATORS:`${SERVER_URL}/exhibitions/submitted-innovators`,
+    CREATE_BOOTH: `${SERVER_URL}/booths`,
+    GET_BOOTH: `${SERVER_URL}/booths`,
 
 
     //****** FreeLancers and Innovators API url ******//
