@@ -7,7 +7,6 @@ import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
@@ -18,6 +17,13 @@ import { Avatar } from '@mui/material';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
+import MailIcon from '@mui/icons-material/Mail';
+
+interface Email {
+  to: string;
+  subject: string;
+  text: string;
+}
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -35,7 +41,7 @@ export default function MainNavBar() {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = React.useState<null | HTMLElement>(null);
   const [profilePhoto, setProfilePhoto] = React.useState<string | null>(null);
-  const [notificationCount, setNotificationCount] = React.useState<number>(0);
+  const [notifications, setNotifications] = React.useState<Email[]>([]);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const dispatch = useAppDispatch();
@@ -64,16 +70,15 @@ export default function MainNavBar() {
   React.useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
-        setNotificationCount(response.data.notificationCount);
+        const response = await axios.get(`${APIS.NOTIFICATIONS}`);
+        console.log("API response:", response.data); // Log the response
+        setNotifications(response.data);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
     };
-    if (userDetails.username) {
-      fetchNotifications();
-    }
-  }, [userDetails.username]);
+    fetchNotifications();
+  }, []);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -161,11 +166,12 @@ export default function MainNavBar() {
       open={isNotificationMenuOpen}
       onClose={handleNotificationMenuClose}
     >
-      <MenuItem onClick={handleNotificationMenuClose}>Notification 1</MenuItem>
-      <Divider />
-      <MenuItem onClick={handleNotificationMenuClose}>Notification 2</MenuItem>
-      <Divider />
-      <MenuItem onClick={handleNotificationMenuClose}>Notification 3</MenuItem>
+      {notifications.map((notification, index) => (
+        <React.Fragment key={index}>
+          <MenuItem onClick={handleNotificationMenuClose}>{notification.text}</MenuItem>
+          {index < notifications.length - 1 && <Divider />}
+        </React.Fragment>
+      ))}
     </Menu>
   );
 
@@ -197,10 +203,10 @@ export default function MainNavBar() {
       <MenuItem onClick={handleNotificationMenuOpen}>
         <IconButton
           size="large"
-          aria-label={`show ${notificationCount} new notifications`}
+          aria-label={`show ${notifications.length} new notifications`}
           color="inherit"
         >
-          <Badge badgeContent={notificationCount} color="error">
+          <Badge badgeContent={notifications.length} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -241,11 +247,11 @@ export default function MainNavBar() {
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"
-              aria-label={`show ${notificationCount} new notifications`}
+              aria-label={`show ${notifications.length} new notifications`}
               color="inherit"
               onClick={handleNotificationMenuOpen}
             >
-              <Badge badgeContent={notificationCount} color="error">
+              <Badge badgeContent={notifications.length} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

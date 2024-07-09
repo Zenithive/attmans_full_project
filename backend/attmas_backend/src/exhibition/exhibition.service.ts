@@ -54,10 +54,6 @@ export class ExhibitionService {
     const subject = 'New Exhibition Created';
     const message = `Dear User, a new exhibition ${savedExhibition.title} has been created.`;
 
-    // usernames.forEach(async (username) => {
-    //   await this.emailService.sendEmail(username, subject, message);
-    // });
-
     for (const username of usernames) {
       await this.emailService.sendEmail2(username, subject, message);
     }

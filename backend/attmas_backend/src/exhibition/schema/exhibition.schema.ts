@@ -30,6 +30,9 @@ export class Exhibition {
   @Prop({ type: Types.ObjectId, ref: 'User', required: false })
   userId: Types.ObjectId;
 
+  @Prop({ required: true })
+  username: string;
+
   // New fields for sending to innovators
   @Prop({ required: false })
   message?: string;

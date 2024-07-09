@@ -40,6 +40,6 @@ export const APIS = {
     GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
 
 
-    NOTIFICATIONS: `${SERVER_URL}`,
+    NOTIFICATIONS: `${SERVER_URL}/emails`,
 
 }
