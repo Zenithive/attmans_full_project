@@ -22,7 +22,7 @@ export class EmailService2 {
     });
   }
 
-  async sendEmail(to: string, subject: string, text: string) {
+  async sendEmail2(to: string, subject: string, text: string) {
     try {
       await this.transporter.sendMail({
         from: process.env.EMAIL_USER,

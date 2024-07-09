@@ -23,10 +23,12 @@ export class ExhibitionController {
   constructor(private readonly exhibitionService: ExhibitionService) {}
 
   @Post()
-  async createExibitionWithSendEmail(
+  async create(
     @Body() createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
-    return this.exhibitionService.create(createExhibitionDto);
+    return this.exhibitionService.createExibitionWithSendEmail(
+      createExhibitionDto,
+    );
   }
 
   @Post('sendinovators')

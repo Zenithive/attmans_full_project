@@ -12,7 +12,8 @@ import {
 } from './dto/create-exhibition.dto';
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { UsersService } from 'src/users/users.service';
-import { EmailServices } from 'src/common/service/emailExibition';
+// import { EmailServices } from 'src/common/service/emailExibition';
+import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 
 @Injectable()
 export class ExhibitionService {
@@ -23,7 +24,7 @@ export class ExhibitionService {
     @InjectModel(SendToInnovators.name)
     private sendToInnovatorsModel: Model<SendToInnovatorsDocument>,
     private usersService: UsersService,
-    private readonly emailService: EmailServices,
+    private readonly emailService: EmailService2,
   ) {
     this.fetchUsernamesByUserType1();
   }
@@ -53,9 +54,13 @@ export class ExhibitionService {
     const subject = 'New Exhibition Created';
     const message = `Dear User, a new exhibition ${savedExhibition.title} has been created.`;
 
-    usernames.forEach(async (username) => {
-      await this.emailService.sendEmail(username, subject, message);
-    });
+    // usernames.forEach(async (username) => {
+    //   await this.emailService.sendEmail(username, subject, message);
+    // });
+
+    for (const username of usernames) {
+      await this.emailService.sendEmail2(username, subject, message);
+    }
 
     return savedExhibition;
   }

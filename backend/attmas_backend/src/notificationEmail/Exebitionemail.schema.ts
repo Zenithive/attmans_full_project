@@ -15,6 +15,9 @@ export class Email extends Document {
 
   @Prop({ default: Date.now })
   sentAt: Date;
+
+  @Prop({ required: false })
+  username: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);

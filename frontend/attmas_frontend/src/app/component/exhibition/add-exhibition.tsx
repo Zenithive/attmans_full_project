@@ -26,6 +26,7 @@ interface Exhibition {
     dateTime: string;
     industries: string[];
     subjects: string[];
+    username: string;
 }
 
 interface AddExhibitionProps {
@@ -246,8 +247,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             videoUrl:values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
-            userId: userDetails._id
-            // userId:userDetails.username
+            userId: userDetails._id,
+            username:userDetails.username
         };
 
         console.log("wee",exhibitionData);
