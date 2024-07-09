@@ -107,49 +107,11 @@ export class UsersService {
 
   async findUsersByUserType1(
     userType: string,
-    page: number,
-    limit: number,
-  ): Promise<User[]> {
-    const skip = (page - 1) * limit;
+  ): Promise<{ username: string }[]> {
     const filterQuery: any = { userType };
-
-    const users = await this.userModel
-      .find(filterQuery)
-      .skip(skip)
-      .limit(limit)
-      .exec();
-    console.log('Susers', users);
-    return users;
+    const users = await this.userModel.find(filterQuery).exec();
+    const usernames = users.map((user) => ({ username: user.username }));
+    // console.log('Username', usernames);
+    return usernames;
   }
-
-  // async updateUserCategories(username: string): Promise<void> {
-  //   const user = await this.userModel.findOne({ username }).exec();
-  //   if (!user) {
-  //     throw new NotFoundException(`User with username ${username} not found`);
-  //   }
-
-  //   const categoriesData = await this.categoriesModel
-  //     .findOne({ username })
-  //     .exec();
-  //   console.log('categoriesData', categoriesData);
-
-  //   if (categoriesData) {
-  //     // Add categories and subcategories to user without removing existing ones
-  //     if (categoriesData.categories && categoriesData.categories.length > 0) {
-  //       user.categories = [
-  //         ...new Set([...user.categories, ...categoriesData.categories]),
-  //       ];
-  //     }
-  //     if (
-  //       categoriesData.subcategories &&
-  //       categoriesData.subcategories.length > 0
-  //     ) {
-  //       user.subcategories = [
-  //         ...new Set([...user.subcategories, ...categoriesData.subcategories]),
-  //       ];
-  //     }
-
-  //     await user.save();
-  //   }
-  // }
 }

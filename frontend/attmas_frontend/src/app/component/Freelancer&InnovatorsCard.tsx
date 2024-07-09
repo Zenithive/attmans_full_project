@@ -64,6 +64,9 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
       }
       setRowData(prev => (page === 1 ? response.data : [...prev, ...response.data]));
       setPage(prev => prev + 1);
+      response.data.forEach(user => {
+        console.log(user.username);
+      });
     } catch (error) {
       console.error('Error fetching users:', error);
       setHasMore(false);

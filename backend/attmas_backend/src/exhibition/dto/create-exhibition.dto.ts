@@ -31,8 +31,14 @@ export class CreateExhibitionDto {
   userId: Types.ObjectId;
 
   @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @IsNotEmpty()
   @IsUrl()
   videoUrl: string;
+
+  userType: string;
 }
 
 export class UpdateExhibitionDto {

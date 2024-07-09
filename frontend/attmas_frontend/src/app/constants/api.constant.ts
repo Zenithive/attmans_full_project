@@ -31,6 +31,7 @@ export const APIS = {
     //****** FreeLancers and Innovators API url ******//
     FREELANCERS: `${SERVER_URL}/users/by-type?userType=Freelancer`,
     INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
+    INNOVATORSFOREXIBITION: `${SERVER_URL}/users/by-type1?userType=Innovators`,
     PROJECTOWNERS: `${SERVER_URL}/users/by-type?userType=Project Owner`,
 
     CATEGORIES: `${SERVER_URL}/profile/categories`,
@@ -39,5 +40,8 @@ export const APIS = {
 
 
     GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
+
+
+    NOTIFICATIONS: `${SERVER_URL}/emails`,
 
 }

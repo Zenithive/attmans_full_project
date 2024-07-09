@@ -7,19 +7,23 @@ import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
-import { MenuItem } from '@mui/material';
+import { Divider, MenuItem } from '@mui/material';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
+import MailIcon from '@mui/icons-material/Mail';
 
-
+interface Email {
+  to: string;
+  subject: string;
+  text: string;
+}
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -35,18 +39,17 @@ function clearCookies() {
 export default function MainNavBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
-  // const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-  React.useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = React.useState<null | HTMLElement>(null);
   const [profilePhoto, setProfilePhoto] = React.useState<string | null>(null);
+  const [notifications, setNotifications] = React.useState<Email[]>([]);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-    
   const dispatch = useAppDispatch();
-
   const router = useRouter();
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const isNotificationMenuOpen = Boolean(notificationAnchorEl);
 
   React.useEffect(() => {
     const fetchUserProfile = async () => {
@@ -54,9 +57,7 @@ export default function MainNavBar() {
         const response = await axios.get(`${APIS.FORM1}?username=${userDetails.username}`, {
           headers: { username: userDetails.username },
         });
-        console.log("response", response);
         setProfilePhoto(response.data.profilePhoto);
-        console.log("userProfile", response.data.profilePhoto)
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
@@ -65,7 +66,19 @@ export default function MainNavBar() {
       fetchUserProfile();
     }
   }, [userDetails.username]);
-  console.log("profilePhoto", profilePhoto);
+
+  React.useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(`${APIS.NOTIFICATIONS}`);
+        console.log("API response:", response.data); // Log the response
+        setNotifications(response.data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+    fetchNotifications();
+  }, []);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -84,19 +97,21 @@ export default function MainNavBar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationMenuClose = () => {
+    setNotificationAnchorEl(null);
+  };
+
   const handleLogout = async () => {
     try {
-      // Notify the server of the logout (if applicable)
-      // await axios.post(APIS.LOGOUT);
       await axios.post(APIS.LOGOUT);
-      // Clear local storage
       localStorage.clear();
-
-      // Clear cookies
       clearCookies();
       setProfilePhoto(null);
       dispatch(removeUser());
-      // Redirect to homepage
       router.push('/');
     } catch (error) {
       console.error("Error during logout:", error);
@@ -134,6 +149,32 @@ export default function MainNavBar() {
     </Menu>
   );
 
+  const notificationMenuId = 'primary-notification-menu';
+  const renderNotificationMenu = (
+    <Menu
+      anchorEl={notificationAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={notificationMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isNotificationMenuOpen}
+      onClose={handleNotificationMenuClose}
+    >
+      {notifications.map((notification, index) => (
+        <React.Fragment key={index}>
+          <MenuItem onClick={handleNotificationMenuClose}>{notification.text}</MenuItem>
+          {index < notifications.length - 1 && <Divider />}
+        </React.Fragment>
+      ))}
+    </Menu>
+  );
+
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
     <Menu
@@ -159,13 +200,13 @@ export default function MainNavBar() {
         </IconButton>
         <p>Messages</p>
       </MenuItem>
-      <MenuItem>
+      <MenuItem onClick={handleNotificationMenuOpen}>
         <IconButton
           size="large"
-          aria-label="show 17 new notifications"
+          aria-label={`show ${notifications.length} new notifications`}
           color="inherit"
         >
-          <Badge badgeContent={17} color="error">
+          <Badge badgeContent={notifications.length} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -192,7 +233,6 @@ export default function MainNavBar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* <AppBar position="fixed" sx={{ right: 0, left: 'auto', width: 'calc(100% - 240px)', boxShadow:'none' }}> */}
       <AppBar
         position="fixed"
         sx={{
@@ -205,6 +245,16 @@ export default function MainNavBar() {
         <Toolbar sx={{ height: 70 }}>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton
+              size="large"
+              aria-label={`show ${notifications.length} new notifications`}
+              color="inherit"
+              onClick={handleNotificationMenuOpen}
+            >
+              <Badge badgeContent={notifications.length} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
             <IconButton
               size="large"
               edge="end"
@@ -237,6 +287,7 @@ export default function MainNavBar() {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
+      {renderNotificationMenu}
     </Box>
   );
 }

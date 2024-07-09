@@ -26,7 +26,9 @@ export class ExhibitionController {
   async create(
     @Body() createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
-    return this.exhibitionService.create(createExhibitionDto);
+    return this.exhibitionService.createExibitionWithSendEmail(
+      createExhibitionDto,
+    );
   }
 
   @Post('sendinovators')
