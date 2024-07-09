@@ -3,11 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Booth, BoothDocument } from './booth.schema';
 import { CreateBoothDto } from './create-booth.dto';
+import { User, UserDocument } from 'src/users/user.schema';
 
 @Injectable()
 export class BoothService {
   constructor(
     @InjectModel(Booth.name) private boothModel: Model<BoothDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
@@ -16,7 +18,10 @@ export class BoothService {
   }
 
   async findAll(): Promise<Booth[]> {
-    return this.boothModel.find().exec();
+    return this.boothModel
+      .find()
+      .populate('userId', 'firstName lastName', this.userModel)
+      .exec();
   }
 
   async findOne(id: string): Promise<Booth> {

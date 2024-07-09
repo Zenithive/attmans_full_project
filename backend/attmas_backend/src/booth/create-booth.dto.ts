@@ -45,5 +45,9 @@ export class CreateBoothDto {
   products: ProductDto[];
 
   @IsNotEmpty()
+  @IsString()
   userId: Types.ObjectId;
+
+  @IsNotEmpty()
+  exhibitionId: Types.ObjectId;
 }

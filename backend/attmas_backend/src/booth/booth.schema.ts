@@ -37,6 +37,9 @@ export class Booth {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'Exhibition', required: false })
+  exhibitionId: Types.ObjectId;
+
   @Prop({ default: Date.now })
   createdAt: Date;
 }

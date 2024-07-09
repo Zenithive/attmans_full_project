@@ -4,9 +4,11 @@ import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent, Button } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button, Chip } from '@mui/material';
 import BoothDetailsModal from '../component/booth/booth';
 import { useSearchParams } from 'next/navigation'
+import { relative } from 'path';
+import dayjs from 'dayjs';
 
 interface Exhibition {
   _id?: string;
@@ -24,6 +26,10 @@ interface Booth {
   title: string;
   description: string;
   products: { name: string; description: string; productType: string; price: number; }[];
+  userId: {
+    firstName: string;
+    lastName: string;
+  };
 }
 
 
@@ -54,7 +60,11 @@ const ExhibitionsPage: React.FC= () => {
   
       const fetchBooths = async () => {
       try {
-        const response = await axios.get(`${APIS.GET_BOOTH}`); 
+        const response = await axios.get(`${APIS.GET_BOOTH}`,{
+          params:{
+            userId:userDetails._id
+          }
+        }); 
         setBooths(response.data);
       } catch (error) {
         console.error('Error fetching booths:', error);
@@ -130,7 +140,7 @@ const ExhibitionsPage: React.FC= () => {
     } else {
       return (
         <iframe
-          width="500"
+          width="750"
           height="500"
           style={{ borderRadius: "30px" }}
           src={embedUrl}
@@ -145,48 +155,71 @@ const ExhibitionsPage: React.FC= () => {
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ flex: 1, marginRight: '20px'}}>
-       <div style={{position:"relative",color:'white',textAlign:"center",background:"#cc4800",right:"8px",width:"102%",bottom:"29px"}}><h1 style={{position:'relative',top:"15%"}}>Exhibition</h1>
-       {!(userType === "Admin") && (
-          <Button variant="contained" color="primary" onClick={openModal} style={{ position:'relative', float:"right", bottom:'60px', right:'5%', background:'#757575', fontWeight:'bolder', color:'white'}}>
-              Create Booth
+       <div style={{position:"relative",color:'black',textAlign:"center",background:"#f5f5f5",right:"8px",width:"102%",bottom:"29px"}}><h1 style={{position:'relative',top:"15%"}}>Exhibition</h1>
+       {(userType === "Innovators") && (
+          <Button variant="contained" color="primary" onClick={openModal} style={{ position:'relative', float:"right", bottom:'60px', right:'5%', background:'#757575', fontWeight:'bolder', color:'white',height:'32px'}}>
+              Participate
             </Button>
         )}
 
         <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} />
        </div>
-        {exhibitions.map((exhibition) => (
-          <div key={exhibition._id}>
-            <Box sx={{float:'right',right:'18%',position:'relative'}}>
-            <Box sx={{background:'red',width:'56%',color:'white',borderRadius:'10px'}}><h1>Exhibition Details</h1></Box>
-            <h2>Title:- {exhibition.title}</h2>
-           <h2>Description:- {exhibition.description}</h2>
-           <h2>Date-Time:- {exhibition.dateTime}</h2>
-           <h2>Industries:- {exhibition.industries}</h2>
-           <h2>Subjects:- {exhibition.subjects}</h2>
-           </Box>
-           <div style={{position:'relative',left:'65px'}}>{renderVideo(exhibition.videoUrl)}</div>
-          </div>
-          
+       <div>
+      {exhibitions.map((exhibition) => (
+        <Box key={exhibition._id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+          <Card sx={{ flex: 1, marginRight: '10px' }}>
+            <CardContent>
+              {renderVideo(exhibition.videoUrl)}
+            </CardContent>
+          </Card>
+          <Divider orientation="vertical" flexItem />
+          <Card sx={{ flex: 1, marginLeft: '10px',marginBottom:'20%'}}>
+            <CardContent>
+              <Typography variant="h6">{exhibition.title}, ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})</Typography>
+              <Typography variant="h6">{exhibition.description}</Typography>
+              <Typography variant="h6"> {exhibition.industries}</Typography>
+              <Typography variant="h6">{exhibition.subjects}</Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      ))}
+    </div>
+    <Divider orientation="horizontal" flexItem/>
+      <div>
+      <Box sx={{width: '13%', color: 'black', position: 'relative', left: '10%' }}>
+        <h1>Booth Details</h1>
+      </Box>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', position: 'relative', left: '10%',width:'70%' }}>
+        {booths.map(booth => (
+          <Card key={booth._id} sx={{ flex: '1 1 calc(33.333% - 10px)', boxSizing: 'border-box', marginBottom: '10px'}}>
+            <CardContent>
+              <Typography>{booth.title}</Typography>
+              <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
+              <Box sx={{position:'relative',left:'70%',width:'48%',bottom:'24px'}}> <Chip
+                                            label='inProgress'
+                                            variant="outlined"
+                                            color='secondary'
+                                        /></Box>
+              <Typography>Products:- </Typography>
+              <Typography>
+                <ul>
+                  {booth.products.map(product => (
+                    <div key={product.name} style={{ margin: '20px' }}>
+                      <li>
+                         {product.name} <br />
+                         {product.description} <br />
+                         {product.productType} <br />
+                         ${product.price}
+                      </li>
+                    </div>
+                  ))}
+                </ul>
+              </Typography>
+            </CardContent>
+          </Card>
         ))}
-          <div>
-             {booths.map(booth => (
-               <div key={booth._id}>
-                 <Box sx={{position:'relative',left:'10%'}}>
-                 <Box sx={{background:'red',width:'13%',color:'white',borderRadius:'10px'}}><h1>Booth Details</h1></Box>
-                   <h2>Title:- {booth.title}</h2>
-                   <h2>Description:- {booth.description}</h2>
-                   <h2>Products:- </h2>
-                   <ul>
-                     {booth.products.map(product => (
-                       <li key={product.name}>
-                         <h2>{product.name} - {product.description} - {product.productType} - ${product.price}</h2>
-                       </li>
-                     ))}
-                   </ul>
-                   </Box>
-               </div>
-             ))}
-           </div>
+      </Box>
+    </div>
       </div>
     </div>
   );

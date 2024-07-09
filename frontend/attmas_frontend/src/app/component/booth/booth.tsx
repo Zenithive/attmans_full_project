@@ -4,7 +4,6 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close';
 
 interface BoothDetailsModalProps {
   open: boolean;
@@ -19,7 +18,7 @@ interface Product {
   price: number;
 }
 
-const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth }) => {
+const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth}) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const initialBoothDetails = {
     title: '',
