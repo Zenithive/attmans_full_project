@@ -37,8 +37,8 @@ interface AddExhibitionProps {
 
 
 const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required') || "title",
-    description: Yup.string().required('Description is required')  || "sar",
+    title: Yup.string().required('Title is required'),
+    description: Yup.string().required('Description is required'),
     status: Yup.string(),
     videoUrl: Yup.string().required('Video URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),

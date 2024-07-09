@@ -28,6 +28,7 @@ interface Exhibition {
   industries: string[];
   subjects: string[];
   userId?: string;
+  username: string;
 }
 
 const industries =[
@@ -196,7 +197,7 @@ const Exhibition = () => {
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null); 
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  const { userType, _id: userId } = userDetails;
+  const { userType, _id: userId, username } = userDetails;
 
   const fetchExhibitions =useCallback(async (page: number, industriesFilter: string[], subjectsFilter: string[]) => {
     try {
