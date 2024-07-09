@@ -26,6 +26,7 @@ interface Exhibition {
     dateTime: string;
     industries: string[];
     subjects: string[];
+    username: string;
 }
 
 interface AddExhibitionProps {
@@ -36,8 +37,8 @@ interface AddExhibitionProps {
 
 
 const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Description is required'),
+    title: Yup.string().required('Title is required') || "title",
+    description: Yup.string().required('Description is required')  || "sar",
     status: Yup.string(),
     videoUrl: Yup.string().required('Video URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
@@ -47,6 +48,7 @@ const validationSchema = Yup.object().shape({
 
 export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
+    const [usernames, setUsernames] = React.useState<string[]>([]);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const {userType} = userDetails;
@@ -66,6 +68,21 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             toggleDrawer(true);
         }
     }, [editingExhibition]);
+
+    React.useEffect(() => {
+        // Fetch the list of usernames from the backend
+        const fetchUsernames = async () => {
+            try {
+                const response = await axios.get(`${APIS.INNOVATORSFOREXIBITION}`);
+                console.log("response", response);
+                
+                setUsernames(response.data);
+            } catch (error) {
+                console.error('Error fetching usernames:', error);
+            }
+        };
+        fetchUsernames();
+    }, []);
 
     const industries = React.useMemo(() => [
         "Agriculture",
@@ -230,8 +247,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             videoUrl:values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
-            userId: userDetails._id
-            // userId:userDetails.username
+            userId: userDetails._id,
+            username:userDetails.username
         };
 
         console.log("wee",exhibitionData);
