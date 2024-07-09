@@ -33,6 +33,8 @@ export class CreateExhibitionDto {
   @IsNotEmpty()
   @IsUrl()
   videoUrl: string;
+
+  userType: string;
 }
 
 export class UpdateExhibitionDto {

@@ -11,6 +11,8 @@ import {
   UpdateExhibitionDto,
 } from './dto/create-exhibition.dto';
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
+import { UsersService } from 'src/users/users.service';
+import { EmailServices } from 'src/common/service/emailExibition';
 
 @Injectable()
 export class ExhibitionService {
@@ -20,12 +22,42 @@ export class ExhibitionService {
     private exhibitionModel: Model<ExhibitionDocument>,
     @InjectModel(SendToInnovators.name)
     private sendToInnovatorsModel: Model<SendToInnovatorsDocument>,
-  ) {}
+    private usersService: UsersService,
+    private readonly emailService: EmailServices,
+  ) {
+    this.fetchUsernamesByUserType1();
+  }
 
-  async create(createExhibitionDto: CreateExhibitionDto): Promise<Exhibition> {
+  private async fetchUsernamesByUserType1() {
+    try {
+      const userType = 'Innovators'; // Set your desired userType here
+      const users = await this.usersService.findUsersByUserType1(userType);
+      this.cachedUsernames = users.map((user) => user.username);
+      console.log('Cached Usernames:', this.cachedUsernames);
+    } catch (error) {
+      console.error('Error fetching usernames:', error);
+    }
+  }
+
+  async createExibitionWithSendEmail(
+    createExhibitionDto: CreateExhibitionDto,
+  ): Promise<Exhibition> {
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
+    const savedExhibition = await createdExhibition.save();
 
-    return createdExhibition.save();
+    // Get all usernames using UsersService
+    const users = await this.usersService.findUsersByUserType1('Innovators');
+    const usernames = users.map((user) => user.username);
+
+    // Send emails to all usernames
+    const subject = 'New Exhibition Created';
+    const message = `Dear User, a new exhibition ${savedExhibition.title} has been created.`;
+
+    usernames.forEach(async (username) => {
+      await this.emailService.sendEmail(username, subject, message);
+    });
+
+    return savedExhibition;
   }
 
   async createSendInnovators(

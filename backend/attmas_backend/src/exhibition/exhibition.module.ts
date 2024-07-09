@@ -8,6 +8,8 @@ import {
   SendToInnovators,
   SendToInnovatorsSchema,
 } from './schema/sendToInnovators.schema';
+import { EmailServices } from 'src/common/service/emailExibition';
+import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
 
 @Module({
   imports: [
@@ -16,9 +18,10 @@ import {
       { name: SendToInnovators.name, schema: SendToInnovatorsSchema },
     ]),
     UsersModule,
+    EmailModule,
   ],
   controllers: [ExhibitionController],
-  providers: [ExhibitionService],
+  providers: [ExhibitionService, EmailServices],
   exports: [ExhibitionService],
 })
 export class ExhibitionModule {}

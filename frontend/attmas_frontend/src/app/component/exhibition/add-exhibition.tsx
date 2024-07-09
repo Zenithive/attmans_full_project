@@ -47,6 +47,7 @@ const validationSchema = Yup.object().shape({
 
 export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
+    const [usernames, setUsernames] = React.useState<string[]>([]);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const {userType} = userDetails;
@@ -66,6 +67,21 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             toggleDrawer(true);
         }
     }, [editingExhibition]);
+
+    React.useEffect(() => {
+        // Fetch the list of usernames from the backend
+        const fetchUsernames = async () => {
+            try {
+                const response = await axios.get(`${APIS.INNOVATORSFOREXIBITION}`);
+                console.log("response", response);
+                
+                setUsernames(response.data);
+            } catch (error) {
+                console.error('Error fetching usernames:', error);
+            }
+        };
+        fetchUsernames();
+    }, []);
 
     const industries = React.useMemo(() => [
         "Agriculture",
