@@ -42,7 +42,7 @@ export class ExhibitionService {
       `Querying database for submitted innovators with userId: ${userId}`,
     );
     const result = await this.sendToInnovatorsModel.find({ userId }).exec();
-    console.log(`Result from database: ${JSON.stringify(result)}`);
+    // console.log(`Result from database: ${JSON.stringify(result)}`);
     return result;
   }
 

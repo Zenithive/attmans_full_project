@@ -7,9 +7,13 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
-import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields';
+import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import defaultProfileImg  from '../../assets/Zenithithive Logo Black PNG  (1).png'
+
+
+const defaultProfileImgSrc = defaultProfileImg || defaultProfileImg;
 
 interface ProfileForm1Props {
   onNext: () => void;
@@ -121,7 +125,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                 <IconButton component="span" sx={{ width: 100, height: 100, mb: 2 }}>
                   <Avatar
                     alt="Profile Photo"
-                    src={profilePhotoURL || '/default-profile.png'}
+                    src={profilePhotoURL || ''}
                     sx={{ width: 100, height: 100, mb: 2, mx: 'auto' }}
                   />
                   <CameraAltIcon

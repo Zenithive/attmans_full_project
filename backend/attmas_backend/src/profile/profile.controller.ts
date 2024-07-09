@@ -68,7 +68,7 @@ export class ProfileController {
 
   @Get('form1')
   async getProfileData(@Query('username') username: string): Promise<PersonalProfile> {
-    console.log("username",username)
+    // console.log("username",username)
     return this.profileService.getProfileByUserId(username);
   }
   

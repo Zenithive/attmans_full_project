@@ -76,11 +76,11 @@ export class User {
   // @Prop({ type: [{ type: Types.ObjectId, ref: 'Exhibition' }] })
   // exhibitions: Types.ObjectId[];
 
-  @Prop({ type: [{ type: String }] }) // Assuming categories are stored as an array of strings
-  categories: string[];
+  // @Prop({ type: [{ type: String }] }) // Assuming categories are stored as an array of strings
+  // categories: string[];
 
-  @Prop({ type: [{ type: String }] }) // Assuming subcategories are stored as an array of strings
-  subcategories: string[];
+  // @Prop({ type: [{ type: String }] }) // Assuming subcategories are stored as an array of strings
+  // subcategories: string[];
 
   // _id: Types.ObjectId;
 }
