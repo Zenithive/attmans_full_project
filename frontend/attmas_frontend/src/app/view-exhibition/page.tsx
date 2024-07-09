@@ -4,7 +4,7 @@ import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent, Button, Chip } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import BoothDetailsModal from '../component/booth/booth';
 import { useSearchParams } from 'next/navigation'
 import { relative } from 'path';
@@ -40,6 +40,7 @@ const ExhibitionsPage: React.FC= () => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const searchParams = useSearchParams();
   const { userType} = userDetails;
+  const [filterType, setFilterType] = useState("all");
 
 
   useEffect(() => {
@@ -150,6 +151,12 @@ const ExhibitionsPage: React.FC= () => {
       );
     }
   };
+
+  const handleFilterTypeChange = (event: any, newFilterType: string) => {
+    if (newFilterType !== null) {
+        setFilterType(newFilterType);
+    }
+}
   
 
   return (
@@ -199,7 +206,8 @@ const ExhibitionsPage: React.FC= () => {
                                             label='inProgress'
                                             variant="outlined"
                                             color='secondary'
-                                        /></Box>
+                 
+                /></Box>                      
               <Typography>Products:- </Typography>
               <Typography>
                 <ul>
@@ -215,6 +223,22 @@ const ExhibitionsPage: React.FC= () => {
                   ))}
                 </ul>
               </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between',marginLeft:'48%'}}>
+               <ToggleButtonGroup
+                        value={filterType}
+                        exclusive
+                        onChange={handleFilterTypeChange}
+                        aria-label="filter exhibitions"
+                        sx={{ height: "30px" }}
+                    >
+                        <ToggleButton value="all" aria-label="all exhibitions">
+                         Approved
+                        </ToggleButton>
+                        <ToggleButton value="mine" aria-label="my exhibitions">
+                           Reject
+                        </ToggleButton>
+                    </ToggleButtonGroup>                          
+              </Box> 
             </CardContent>
           </Card>
         ))}
