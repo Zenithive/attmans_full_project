@@ -70,7 +70,7 @@ export default function MainNavBar() {
   React.useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`${APIS.NOTIFICATIONS}`);
+        const response = await axios.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
         console.log("API response:", response.data); // Log the response
         setNotifications(response.data);
       } catch (error) {

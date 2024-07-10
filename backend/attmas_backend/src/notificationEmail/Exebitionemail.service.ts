@@ -1,4 +1,3 @@
-// email.service.ts
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
@@ -40,7 +39,7 @@ export class EmailService2 {
     }
   }
 
-  async findAllEmails(): Promise<Email[]> {
-    return this.emailModel.find().exec();
+  async findEmailsByUsername(to: string): Promise<Email[]> {
+    return this.emailModel.find({ to: to }).exec();
   }
 }

@@ -8,29 +8,25 @@ import {
     MenuItem,
     TextField,
     Typography,
-    FormHelperText,
     CircularProgress,
-    FormControlLabel,
-    InputAdornment,
-    Select,
-    RadioGroup,
     FormControl,
     FormLabel,
+    RadioGroup,
+    FormControlLabel,
     Radio,
-    Checkbox,
-    Autocomplete,
-    Chip
+    IconButton,
+    InputAdornment,
+    Select
 } from '@mui/material';
-import { useFormik } from 'formik';
+import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
+import { useFormik, FormikProvider, FieldArray, getIn } from 'formik';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-import axios from 'axios'; // Import Axios or your preferred HTTP client
+import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
-
-
 
 const EditProfile2: React.FC = () => {
     const [isFreelancer, setIsFreelancer] = useState(false);
@@ -48,16 +44,16 @@ const EditProfile2: React.FC = () => {
         designation: Yup.string().nullable(),
         userType: Yup.string().required('Required'),
         productToMarket: Yup.string().nullable(),
-        productName: Yup.string().nullable(),
-        productDescription: Yup.string().nullable(),
-        productType: Yup.string().nullable(),
-        productPrice: Yup.string().nullable(),
+        products: Yup.array().of(
+            Yup.object().shape({
+                productName: Yup.string().nullable(),
+                productDescription: Yup.string().nullable(),
+                productType: Yup.string().nullable(),
+                productPrice: Yup.string().nullable(),
+                currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+            })
+        ),
         hasPatent: Yup.string().nullable(),
-        currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
-        preferredIndustries: Yup.array()
-            .of(Yup.string().required('At least one industry must be selected'))
-            .min(1, 'At least one industry must be selected')
-            .required('Preferred Industries are required'),
     });
 
     const formik = useFormik({
@@ -69,15 +65,10 @@ const EditProfile2: React.FC = () => {
             designation: '',
             userType: '',
             productToMarket: '',
-            productName: '',
-            productDescription: '',
-            productType: '',
-            productPrice: '',
+            products: [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
             hasPatent: false,
             username: userDetails.username,
             userId: userDetails._id,
-            currency: 'INR',
-
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -85,7 +76,6 @@ const EditProfile2: React.FC = () => {
             try {
                 const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
                 console.log('Form submitted successfully:', response.data);
-                
 
                 setLoading(false);
                 pubsub.publish('toast', {
@@ -120,12 +110,8 @@ const EditProfile2: React.FC = () => {
                     designation: userData.designation || '',
                     userType: userData.userType || '',
                     productToMarket: userData.productToMarket || '',
-                    productName: userData.productName || '',
-                    productDescription: userData.productDescription || '',
-                    productType: userData.productType || '',
-                    productPrice: userData.productPrice || '',
+                    products: userData.products || [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
                     hasPatent: userData.hasPatent || false,
-                    currency: userData.currency || 'INR',
                 });
 
                 // Update state based on user type for conditional rendering
@@ -185,290 +171,341 @@ const EditProfile2: React.FC = () => {
                     View and change your work experience here
                 </Typography>
 
-                <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-                    <Grid container spacing={2}>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                select
-                                style={{ background: "white", borderRadius: "25px" }}
-                                id="qualification"
-                                label="Qualification"
-                                color='secondary'
-                                name="qualification"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.qualification}
-                                error={formik.touched.qualification && Boolean(formik.errors.qualification)}
-                                helperText={formik.touched.qualification && formik.errors.qualification}
-                            >
-                                <MenuItem value="School">School</MenuItem>
-                                <MenuItem value="Senior Secondary">Senior Secondary</MenuItem>
-                                <MenuItem value="Bachelors">Bachelors</MenuItem>
-                                <MenuItem value="Masters">Masters</MenuItem>
-                                <MenuItem value="PhD">PhD</MenuItem>
-                                <MenuItem value="PostDoc">PostDoc</MenuItem>
-                            </TextField>
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                style={{ background: "white", borderRadius: "25px" }}
-                                id="organization"
-                                label="Name of the organization (If any)"
-                                color='secondary'
-                                name="organization"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.organization}
-                                error={formik.touched.organization && Boolean(formik.errors.organization)}
-                                helperText={formik.touched.organization && formik.errors.organization}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                style={{ background: "white", borderRadius: "25px" }}
-                                id="sector"
-                                label="Sector (If any)"
-                                color='secondary'
-                                name="sector"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.sector}
-                                error={formik.touched.sector && Boolean(formik.errors.sector)}
-                                helperText={formik.touched.sector && formik.errors.sector}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                style={{ background: "white", borderRadius: "25px" }}
-                                id="designation"
-                                label="Designation"
-                                color='secondary'
-                                name="designation"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.designation}
-                                error={formik.touched.designation && Boolean(formik.errors.designation)}
-                                helperText={formik.touched.designation && formik.errors.designation}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                style={{ background: "white", borderRadius: "25px" }}
-                                id="workAddress"
-                                label="Work Address (If any)"
-                                color='secondary'
-                                name="workAddress"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                value={formik.values.workAddress}
-                                error={formik.touched.workAddress && Boolean(formik.errors.workAddress)}
-                                helperText={formik.touched.workAddress && formik.errors.workAddress}
-                                InputProps={{
-                                    style: {
-                                        borderRadius: '25px',
-                                    },
-                                }}
-                                inputProps={{
-                                    style: {
-                                        padding: '10px',
-                                    },
-                                }}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                select
-                                style={{ background: "white", borderRadius: "25px" }}
-                                id="userType"
-                                label="User Type"
-                                color='secondary'
-                                name="userType"
-                                value={formik.values.userType}
-                                onChange={handleUserTypeChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.userType && Boolean(formik.errors.userType)}
-                            >
-                                <MenuItem value="Freelancer">Freelancer</MenuItem>
-                                <MenuItem value="Project Owner">Project Owner</MenuItem>
-                                <MenuItem value="Innovators">Innovators</MenuItem>
-                            </TextField>
-                            {formik.touched.userType && formik.errors.userType && (
-                                <FormHelperText error>{formik.errors.userType}</FormHelperText>
-                            )}
-                        </Grid>
-
-
-
-
-                        {isFreelancer && (
-                            <Grid item xs={12} sm={6}>
-                                <FormControl component="fieldset">
-                                    <FormLabel color='secondary' component="legend">Do you have a patent?</FormLabel>
-                                    <RadioGroup
-                                        aria-label="hasPatent"
-                                        name="hasPatent"
-                                        value={formik.values.hasPatent}
-                                        onChange={formik.handleChange}
-                                    >
-                                        <FormControlLabel value="Yes" control={<Radio color='secondary' />} label="I have a patent" />
-                                        <FormControlLabel value="No" control={<Radio color='secondary' />} label="I don't have a patent" />
-                                    </RadioGroup>
-                                </FormControl>
-                            </Grid>
-                        )}
-
-                        {isFreelancer && (
+                <FormikProvider value={formik}>
+                    <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
+                        <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     select
                                     style={{ background: "white", borderRadius: "25px" }}
-                                    id="productToMarket"
-                                    label="Do you have a product to market?"
+                                    id="qualification"
+                                    label="Qualification"
                                     color='secondary'
-                                    name="productToMarket"
-                                    value={formik.values.productToMarket}
+                                    name="qualification"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.qualification}
+                                    error={formik.touched.qualification && Boolean(formik.errors.qualification)}
+                                    helperText={formik.touched.qualification && formik.errors.qualification}
+                                >
+                                    <MenuItem value="School">School</MenuItem>
+                                    <MenuItem value="Senior Secondary">Senior Secondary</MenuItem>
+                                    <MenuItem value="Bachelors">Bachelors</MenuItem>
+                                    <MenuItem value="Masters">Masters</MenuItem>
+                                    <MenuItem value="PhD">PhD</MenuItem>
+                                    <MenuItem value="PostDoc">PostDoc</MenuItem>
+                                </TextField>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="organization"
+                                    label="Name of the organization (If any)"
+                                    color='secondary'
+                                    name="organization"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.organization}
+                                    error={formik.touched.organization && Boolean(formik.errors.organization)}
+                                    helperText={formik.touched.organization && formik.errors.organization}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="sector"
+                                    label="Sector (If any)"
+                                    color='secondary'
+                                    name="sector"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.sector}
+                                    error={formik.touched.sector && Boolean(formik.errors.sector)}
+                                    helperText={formik.touched.sector && formik.errors.sector}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="designation"
+                                    label="Designation"
+                                    color='secondary'
+                                    name="designation"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.designation}
+                                    error={formik.touched.designation && Boolean(formik.errors.designation)}
+                                    helperText={formik.touched.designation && formik.errors.designation}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={3}
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="workAddress"
+                                    label="Work Address (If any)"
+                                    color='secondary'
+                                    name="workAddress"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.workAddress}
+                                    error={formik.touched.workAddress && Boolean(formik.errors.workAddress)}
+                                    helperText={formik.touched.workAddress && formik.errors.workAddress}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="userType"
+                                    label="User Type"
+                                    color='secondary'
+                                    name="userType"
                                     onChange={(e) => {
+                                        handleUserTypeChange(e);
                                         formik.handleChange(e);
-                                        setShowProductDetails(e.target.value === 'Yes');
                                     }}
                                     onBlur={formik.handleBlur}
-                                    error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
+                                    value={formik.values.userType}
+                                    error={formik.touched.userType && Boolean(formik.errors.userType)}
+                                    helperText={formik.touched.userType && formik.errors.userType}
                                 >
-                                    <MenuItem value="Yes">Yes</MenuItem>
-                                    <MenuItem value="No">No</MenuItem>
+                                    <MenuItem value="Freelancer">Freelancer</MenuItem>
+                                    <MenuItem value="Project Owner">Project Owner</MenuItem>
+                                    <MenuItem value="Innovators">Innovators</MenuItem>
                                 </TextField>
-                                {formik.touched.productToMarket && formik.errors.productToMarket && (
-                                    <FormHelperText error>{formik.errors.productToMarket}</FormHelperText>
-                                )}
                             </Grid>
-                        )}
 
-                        {showProductDetails && (
-                            <>
-                                <Grid item xs={12}>
+                            {isFreelancer && (
+                                <Grid item xs={12} sm={6}>
                                     <TextField
                                         fullWidth
+                                        select
                                         style={{ background: "white", borderRadius: "25px" }}
-                                        id="productName"
-                                        label="Product Name"
+                                        id="productToMarket"
+                                        label="Do you have any product to market?"
                                         color='secondary'
-                                        name="productName"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.productName}
-                                        error={formik.touched.productName && Boolean(formik.errors.productName)}
-                                        helperText={formik.touched.productName && formik.errors.productName}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                        id="productDescription"
-                                        label="Product Description"
-                                        color='secondary'
-                                        name="productDescription"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.productDescription}
-                                        error={formik.touched.productDescription && Boolean(formik.errors.productDescription)}
-                                        helperText={formik.touched.productDescription && formik.errors.productDescription}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                        id="productType"
-                                        label="Product Type"
-                                        color='secondary'
-                                        name="productType"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.productType}
-                                        error={formik.touched.productType && Boolean(formik.errors.productType)}
-                                        helperText={formik.touched.productType && formik.errors.productType}
-                                    />
-                                </Grid>
-
-
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                        id="productPrice"
-                                        label="Product Price"
-                                        color='secondary'
-                                        name="productPrice"
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.productPrice}
-                                        error={formik.touched.productPrice && Boolean(formik.errors.productPrice)}
-                                        helperText={formik.touched.productPrice && formik.errors.productPrice}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <Select
-                                                        value={formik.values.currency}
-                                                        onChange={formik.handleChange}
-                                                        name="currency"
-                                                        id="currency"
-                                                        sx={{
-                                                            background: 'white',
-                                                            border: 'none',
-                                                            borderRadius: '25px 0 0 25px', // Rounded corners on the left side
-                                                            height: '56px', // Match the height of TextField
-                                                            paddingRight: '10px',
-                                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                                border: 'none'
-                                                            },
-                                                        }}
-                                                    >
-                                                        <MenuItem value="INR">₹</MenuItem>
-                                                        <MenuItem value="USD">$</MenuItem>
-                                                    </Select>
-                                                </InputAdornment>
-                                            ),
-                                            style: {
-                                                borderRadius: '25px',
-                                                paddingLeft: 0 // Ensure no extra padding on the left side
+                                        name="productToMarket"
+                                        onChange={(e) => {
+                                            formik.handleChange(e);
+                                            if (e.target.value === 'Yes') {
+                                                setShowProductDetails(true);
+                                            } else {
+                                                setShowProductDetails(false);
                                             }
                                         }}
-                                    />
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.productToMarket}
+                                        error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
+                                        helperText={formik.touched.productToMarket && formik.errors.productToMarket}
+                                    >
+                                        <MenuItem value="Yes">Yes</MenuItem>
+                                        <MenuItem value="No">No</MenuItem>
+                                    </TextField>
                                 </Grid>
+                            )}
 
-                            </>
-                        )}
-                    </Grid>
+                            {showProductDetails && (
+                                <>
+                                    <Grid item xs={12}>
+                                        <FieldArray
+                                            name="products"
+                                            render={(arrayHelpers) => (
+                                                <div>
+                                                    {formik.values.products.map((product, index) => (
+                                                        <div key={index}>
+                                                            <Grid container spacing={2} alignItems="center">
+                                                                <Grid item xs={12} sm={3}>
+                                                                    <TextField
+                                                                        fullWidth
+                                                                        id={`products.${index}.productName`}
+                                                                        label="Product Name"
+                                                                        name={`products.${index}.productName`}
+                                                                        color='secondary'
+                                                                        onChange={formik.handleChange}
+                                                                        onBlur={formik.handleBlur}
+                                                                        value={getIn(formik.values, `products.${index}.productName`)}
+                                                                        error={getIn(formik.touched, `products.${index}.productName`) && Boolean(getIn(formik.errors, `products.${index}.productName`))}
+                                                                        helperText={getIn(formik.touched, `products.${index}.productName`) && getIn(formik.errors, `products.${index}.productName`)}
+                                                                    />
+                                                                </Grid>
+
+                                                                <Grid item xs={12} sm={3}>
+                                                                    <TextField
+                                                                        fullWidth
+                                                                        id={`products.${index}.productDescription`}
+                                                                        label="Product Description"
+                                                                        name={`products.${index}.productDescription`}
+                                                                        color='secondary'
+                                                                        onChange={formik.handleChange}
+                                                                        onBlur={formik.handleBlur}
+                                                                        value={getIn(formik.values, `products.${index}.productDescription`)}
+                                                                        error={getIn(formik.touched, `products.${index}.productDescription`) && Boolean(getIn(formik.errors, `products.${index}.productDescription`))}
+                                                                        helperText={getIn(formik.touched, `products.${index}.productDescription`) && getIn(formik.errors, `products.${index}.productDescription`)}
+                                                                    />
+                                                                </Grid>
+
+                                                                <Grid item xs={12} sm={3}>
+                                                                    <TextField
+                                                                        fullWidth
+                                                                        id={`products.${index}.productType`}
+                                                                        label="Product Type"
+                                                                        name={`products.${index}.productType`}
+                                                                        color='secondary'
+                                                                        onChange={formik.handleChange}
+                                                                        onBlur={formik.handleBlur}
+                                                                        value={getIn(formik.values, `products.${index}.productType`)}
+                                                                        error={getIn(formik.touched, `products.${index}.productType`) && Boolean(getIn(formik.errors, `products.${index}.productType`))}
+                                                                        helperText={getIn(formik.touched, `products.${index}.productType`) && getIn(formik.errors, `products.${index}.productType`)}
+                                                                    />
+                                                                </Grid>
+
+                                                                {/* <Grid item xs={12} sm={3}>
+                                                                    <TextField
+                                                                        fullWidth
+                                                                        id={`products.${index}.productPrice`}
+                                                                        label="Product Price"
+                                                                        name={`products.${index}.productPrice`}
+                                                                        color='secondary'
+                                                                        onChange={formik.handleChange}
+                                                                        onBlur={formik.handleBlur}
+                                                                        value={getIn(formik.values, `products.${index}.productPrice`)}
+                                                                        error={getIn(formik.touched, `products.${index}.productPrice`) && Boolean(getIn(formik.errors, `products.${index}.productPrice`))}
+                                                                        helperText={getIn(formik.touched, `products.${index}.productPrice`) && getIn(formik.errors, `products.${index}.productPrice`)}
+                                                                        InputProps={{
+                                                                            startAdornment: (
+                                                                                <InputAdornment position="start">
+                                                                                    <Select
+                                                                                        id={`products.${index}.currency`}
+                                                                                        name={`products.${index}.currency`}
+                                                                                        value={getIn(formik.values, `products.${index}.currency`)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        onBlur={formik.handleBlur}
+                                                                                        error={getIn(formik.touched, `products.${index}.currency`) && Boolean(getIn(formik.errors, `products.${index}.currency`))}
+                                                                                        style={{ marginRight: '8px' }}
+                                                                                    >
+                                                                                        <MenuItem value="INR">INR</MenuItem>
+                                                                                        <MenuItem value="USD">USD</MenuItem>
+                                                                                    </Select>
+                                                                                </InputAdornment>
+                                                                            ),
+                                                                        }}
+                                                                    />
+                                                                </Grid> */}
+
+                                                                <Grid item xs={12} sm={3}>
+                                                                    <TextField
+                                                                        fullWidth
+                                                                        id={`products.${index}.productPrice`}
+                                                                        label="Product Price"
+                                                                        name={`products.${index}.productPrice`}
+                                                                        color="secondary"
+                                                                        onChange={formik.handleChange}
+                                                                        onBlur={formik.handleBlur}
+                                                                        value={getIn(formik.values, `products.${index}.productPrice`)}
+                                                                        error={getIn(formik.touched, `products.${index}.productPrice`) && Boolean(getIn(formik.errors, `products.${index}.productPrice`))}
+                                                                        helperText={getIn(formik.touched, `products.${index}.productPrice`) && getIn(formik.errors, `products.${index}.productPrice`)}
+                                                                        InputProps={{
+                                                                            startAdornment: (
+                                                                                <InputAdornment position="start">
+                                                                                    <Select
+                                                                                        id={`products.${index}.currency`}
+                                                                                        name={`products.${index}.currency`}
+                                                                                        value={getIn(formik.values, `products.${index}.currency`)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        onBlur={formik.handleBlur}
+                                                                                        error={getIn(formik.touched, `products.${index}.currency`) && Boolean(getIn(formik.errors, `products.${index}.currency`))}
+                                                                                        sx={{
+                                                                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                                                                border: 'none'
+                                                                                            },
+                                                                                            marginRight: '8px',
+                                                                                        }}
+                                                                                    >
+                                                                                        <MenuItem value="INR">INR</MenuItem>
+                                                                                        <MenuItem value="USD">USD</MenuItem>
+                                                                                    </Select>
+                                                                                </InputAdornment>
+                                                                            ),
+                                                                        }}
+                                                                    />
+                                                                </Grid>
 
 
+                                                                <Grid item xs={12} sm={6}>
+                                                                    <IconButton
+                                                                        aria-label="remove product"
+                                                                        onClick={() => arrayHelpers.remove(index)}
+                                                                    >
+                                                                        <RemoveCircleOutline />
+                                                                    </IconButton>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </div>
+                                                    ))}
+                                                    <Box display="flex" justifyContent="center" mt={2}>
+                                                        <IconButton
+                                                            aria-label="add product"
+                                                            onClick={() => arrayHelpers.push({ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' })}
+                                                        >
+                                                            <AddCircleOutline />
+                                                        </IconButton>
+                                                    </Box>
+                                                </div>
+                                            )}
+                                        />
+                                    </Grid>
 
-                    <LoadingButton
-                        type="submit"
-                        variant="contained"
-                        size="small"
-                        loading={loading}
-                        loadingIndicator={<CircularProgress size={24} />}
-                        sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
-                    >
-                        Save
-                    </LoadingButton>
-                </Box>
+                                    <Grid item xs={12}>
+                                        <FormControl component="fieldset">
+                                            <FormLabel component="legend">Do you have a patent?</FormLabel>
+                                            <RadioGroup
+                                                aria-label="hasPatent"
+                                                name="hasPatent"
+                                                value={formik.values.hasPatent ? 'Yes' : 'No'}
+                                                onChange={(event) => formik.setFieldValue('hasPatent', event.target.value === 'Yes')}
+                                            >
+                                                <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
+                                                <FormControlLabel value="No" control={<Radio />} label="No" />
+                                            </RadioGroup>
+
+                                        </FormControl>
+                                    </Grid>
+                                </>
+                            )}
+                        </Grid>
+
+                        <Box mt={3} display="flex" justifyContent="center">
+                            <LoadingButton
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                loading={loading}
+                                loadingIndicator={<CircularProgress size={24} />}
+                            >
+                                Update Profile
+                            </LoadingButton>
+                        </Box>
+                    </Box>
+                </FormikProvider>
+
+                {fetchError && (
+                    <Typography color="error" align="center" mt={2}>
+                        {fetchError}
+                    </Typography>
+                )}
             </Box>
         </Container>
     );
