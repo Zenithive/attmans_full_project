@@ -21,18 +21,18 @@ export class EmailService2 {
     });
   }
 
-  async sendEmail2(to: string, subject: string, text: string) {
+  async sendEmail2(to: string, subject: string, html: string) {
     try {
       await this.transporter.sendMail({
         from: process.env.EMAIL_USER,
         to,
         subject,
-        text,
+        html,
       });
       console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
-      const email = new this.emailModel({ to, subject, text });
+      const email = new this.emailModel({ to, subject, html });
       await email.save();
     } catch (error) {
       console.error(`Error sending email to ${to}:`, error);

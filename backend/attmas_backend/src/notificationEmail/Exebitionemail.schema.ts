@@ -11,13 +11,16 @@ export class Email extends Document {
   subject: string;
 
   @Prop({ required: true })
-  text: string;
+  html: string;
 
   @Prop({ default: Date.now })
   sentAt: Date;
 
   @Prop({ required: false })
   username: string;
+
+  @Prop({ default: false })
+  read: boolean; 
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);

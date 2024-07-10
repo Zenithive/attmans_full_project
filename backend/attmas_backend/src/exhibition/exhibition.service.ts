@@ -40,26 +40,58 @@ export class ExhibitionService {
     }
   }
 
+
+
+  // async createExibitionWithSendEmail(
+  //   createExhibitionDto: CreateExhibitionDto,
+  // ): Promise<Exhibition> {
+  //   const createdExhibition = new this.exhibitionModel(createExhibitionDto);
+  //   const savedExhibition = await createdExhibition.save();
+
+  //   const videoUrl = createExhibitionDto.videoUrl;
+
+  //   // Get all users with userType 'Innovators' using UsersService
+  //   const users = await this.usersService.findUsersByUserType1('Innovators');
+
+  //   // Send emails to all users
+  //   const subject = 'New Exhibition Created';
+  //   for (const user of users) {
+  //     const message = `Dear ${user.firstName} ${user.lastName}, you have been invited to participate in the exhibition ${savedExhibition.title}. Click <a href="${videoUrl}" target="_blank">here</a> to participate.`;
+
+  //     // const message = `Dear ${user.firstName} ${user.lastName}, you have been invited to participate in the exhibition ${savedExhibition.title}. Click <a href="${videoUrl}" target="_blank">here</a> to participate.`;
+  //     await this.emailService.sendEmail2(user.username, subject, message);
+  //   }
+
+  //   return savedExhibition;
+  // }
+
   async createExibitionWithSendEmail(
     createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
     const savedExhibition = await createdExhibition.save();
 
-    // Get all usernames using UsersService
+    // Example: Assuming videoUrl is a property in createExhibitionDto
+    const videoUrl = createExhibitionDto.videoUrl;
+
+    // Get all users with userType 'Innovators' using UsersService
     const users = await this.usersService.findUsersByUserType1('Innovators');
-    const usernames = users.map((user) => user.username);
 
-    // Send emails to all usernames
+    // Send emails to all users
     const subject = 'New Exhibition Created';
-    const message = `Dear User, a new exhibition ${savedExhibition.title} has been created.`;
-
-    for (const username of usernames) {
-      await this.emailService.sendEmail2(username, subject, message);
+    for (const user of users) {
+      // const message = `Dear ${user.firstName} ${user.lastName}, you have been invited to participate in the exhibition ${savedExhibition.title}. Click <a href="${videoUrl}" target="_blank">here</a> to participate.`;
+      const message = `
+      Dear ${user.firstName} ${user.lastName},<br>
+      You have been invited to participate in the exhibition ${savedExhibition.title}.<br>
+      Click <a href="${videoUrl}" target="_blank">here</a> to participate.
+    `;
+      await this.emailService.sendEmail2(user.username, subject, message);
     }
 
     return savedExhibition;
   }
+
 
   async createSendInnovators(
     sendToInnovatorsDto: SendToInnovatorsDto,

@@ -469,16 +469,17 @@ const EditProfile2: React.FC = () => {
                                     </Grid>
 
                                     <Grid item xs={12}>
-                                        <FormControl component="fieldset">
-                                            <FormLabel component="legend">Do you have a patent?</FormLabel>
+                                        <FormControl color='secondary' component="fieldset">
+                                            <FormLabel color='secondary' component="legend">Do you have a patent?</FormLabel>
                                             <RadioGroup
+                                                color='secondary'
                                                 aria-label="hasPatent"
                                                 name="hasPatent"
                                                 value={formik.values.hasPatent ? 'Yes' : 'No'}
                                                 onChange={(event) => formik.setFieldValue('hasPatent', event.target.value === 'Yes')}
                                             >
-                                                <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
-                                                <FormControlLabel value="No" control={<Radio />} label="No" />
+                                                <FormControlLabel color='secondary' value="Yes" control={<Radio />} label="Yes" />
+                                                <FormControlLabel color='secondary' value="No" control={<Radio />} label="No" />
                                             </RadioGroup>
 
                                         </FormControl>
