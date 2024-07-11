@@ -18,11 +18,12 @@ import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
 import MailIcon from '@mui/icons-material/Mail';
+import DOMPurify from 'dompurify';
 
 interface Email {
   to: string;
   subject: string;
-  text: string;
+  html: string;
 }
 
 function clearCookies() {
@@ -71,7 +72,7 @@ export default function MainNavBar() {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(`${APIS.NOTIFICATIONS}`);
-        console.log("API response:", response.data); // Log the response
+        console.log("API response:", response.data); 
         setNotifications(response.data);
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -168,10 +169,11 @@ export default function MainNavBar() {
     >
       {notifications.map((notification, index) => (
         <React.Fragment key={index}>
-          <MenuItem onClick={handleNotificationMenuClose}>{notification.text}</MenuItem>
+          <MenuItem onClick={handleNotificationMenuClose}><span dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(notification.html)}}/></MenuItem>
           {index < notifications.length - 1 && <Divider />}
         </React.Fragment>
       ))}
+      {notifications.length === 0 && <MenuItem onClick={handleNotificationMenuClose}>No notifications</MenuItem>}
     </Menu>
   );
 

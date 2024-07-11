@@ -4,6 +4,7 @@ import {
   IsArray,
   ValidateNested,
   IsNumber,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
@@ -24,6 +25,10 @@ class ProductDto {
   @IsNotEmpty()
   @IsNumber()
   price: number;
+
+  @IsString()
+  @IsNotEmpty()
+  currency: string;
 }
 
 export class CreateBoothDto {
@@ -49,5 +54,14 @@ export class CreateBoothDto {
   userId: Types.ObjectId;
 
   @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @IsNotEmpty()
+  @IsString()
   exhibitionId: Types.ObjectId;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 }

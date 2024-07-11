@@ -26,4 +26,14 @@ export class BoothController {
   async delete(@Param('id') id: string): Promise<Booth> {
     return this.boothService.delete(id);
   }
+
+  @Post('approve/:id')
+  async approveBooth(@Param('id') id: string): Promise<Booth> {
+    return this.boothService.approveBooth(id);
+  }
+
+  @Post('reject/:id')
+  async rejectBooth(@Param('id') id: string): Promise<Booth> {
+    return this.boothService.rejectBooth(id);
+  }
 }

@@ -30,6 +30,7 @@ interface Booth {
     firstName: string;
     lastName: string;
   };
+  status: string;
 }
 
 
@@ -40,7 +41,7 @@ const ExhibitionsPage: React.FC= () => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const searchParams = useSearchParams();
   const { userType} = userDetails;
-  const [filterType, setFilterType] = useState("all");
+  const [hideButtons, setHideButtons] = useState<string[]>([]);
 
 
   useEffect(() => {
@@ -80,16 +81,46 @@ const ExhibitionsPage: React.FC= () => {
   const handleCreateBooth = async (boothData: any) => {
     try {
       const response = await axios.post(APIS.CREATE_BOOTH, boothData);
-      console.log('Booth created:', response.data);
+      setBooths(prevBooths => [...prevBooths, response.data]);
       closeModal();
     } catch (error) {
       console.error('Error creating booth:', error);
     }
   };
 
-
+  
+  const handleApprove = async (boothId:string) => {
+    try {
+      await axios.post(`${APIS.APPROVE_BOOTH}/${boothId}`);
+      setBooths(prevBooths =>
+        prevBooths.map(booth =>
+          booth._id === boothId ? { ...booth, status: 'Approved' } : booth
+        )
+      );
+      setHideButtons([...hideButtons, boothId]); 
+    } catch (error) {
+      console.error('Error approving booth:', error);
+    }
+  };
+  
+  const handleReject = async (boothId:string) => {
+    try {
+      await axios.post(`${APIS.REJECT_BOOTH}/${boothId}`);
+      setBooths(prevBooths =>
+        prevBooths.map(booth =>
+          booth._id === boothId ? { ...booth, status: 'Rejected' } : booth
+        )
+      );
+      setHideButtons([...hideButtons, boothId]); 
+    } catch (error) {
+      console.error('Error rejecting booth:', error);
+    }
+  };
+   
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+
+  const exhibitionId = searchParams.get('exhibitionId');
 
   const renderVideo = (url: string) => {
     if (!url) {
@@ -151,25 +182,19 @@ const ExhibitionsPage: React.FC= () => {
       );
     }
   };
-
-  const handleFilterTypeChange = (event: any, newFilterType: string) => {
-    if (newFilterType !== null) {
-        setFilterType(newFilterType);
-    }
-}
-  
+ 
 
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ flex: 1, marginRight: '20px'}}>
        <div style={{position:"relative",color:'black',textAlign:"center",background:"#f5f5f5",right:"8px",width:"102%",bottom:"29px"}}><h1 style={{position:'relative',top:"15%"}}>Exhibition</h1>
-       {(userType === "Innovators") && (
+        {(userType === 'Innovators') && (
           <Button variant="contained" color="primary" onClick={openModal} style={{ position:'relative', float:"right", bottom:'60px', right:'5%', background:'#757575', fontWeight:'bolder', color:'white',height:'32px'}}>
               Participate
             </Button>
         )}
 
-        <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} />
+        <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
        </div>
        <div>
       {exhibitions.map((exhibition) => (
@@ -202,12 +227,21 @@ const ExhibitionsPage: React.FC= () => {
             <CardContent>
               <Typography>{booth.title}</Typography>
               <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
-              <Box sx={{position:'relative',left:'70%',width:'48%',bottom:'24px'}}> <Chip
-                                            label='inProgress'
-                                            variant="outlined"
-                                            color='secondary'
-                 
-                /></Box>                      
+              <Box sx={{position:'relative',left:'70%',width:'48%',bottom:'24px'}}> 
+              <Chip
+                  label={
+                    booth.status === 'Approved' ? 'Approved' :
+                    booth.status === 'Rejected' ? 'Rejected' :
+                    'Pending'
+                  }
+                  variant="outlined"
+                  color={
+                    booth.status === 'Approved' ? 'success' :
+                    booth.status === 'Rejected' ? 'error' :
+                    'default'
+                  }
+                />
+                </Box>                      
               <Typography>Products:- </Typography>
               <Typography>
                 <ul>
@@ -223,26 +257,33 @@ const ExhibitionsPage: React.FC= () => {
                   ))}
                 </ul>
               </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between',marginLeft:'48%'}}>
-               <ToggleButtonGroup
-                        value={filterType}
-                        exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter exhibitions"
-                        sx={{ height: "30px" }}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', marginLeft: '48%' }}>
+              {!hideButtons.includes(booth._id) && (
+                  <>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleApprove(booth._id)}
+                      disabled={booth.status === 'Approved'}
                     >
-                        <ToggleButton value="all" aria-label="all exhibitions">
-                         Approved
-                        </ToggleButton>
-                        <ToggleButton value="mine" aria-label="my exhibitions">
-                           Reject
-                        </ToggleButton>
-                    </ToggleButtonGroup>                          
-              </Box> 
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
+                      Approve
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleReject(booth._id)}
+                      disabled={booth.status === 'Rejected'}
+                    >
+                      Reject
+                    </Button>
+                  </>
+                )}
+
+            </Box>
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
     </div>
       </div>
     </div>

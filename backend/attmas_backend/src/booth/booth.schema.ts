@@ -16,6 +16,9 @@ class Product {
 
   @Prop({ required: true })
   price: number;
+
+  @Prop({ required: true })
+  currency: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
@@ -37,11 +40,17 @@ export class Booth {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
+  @Prop({ ref: 'User', required: true })
+  username: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Exhibition', required: false })
   exhibitionId: Types.ObjectId;
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ default: 'Pending' })
+  status: string;
 }
 
 export const BoothSchema = SchemaFactory.createForClass(Booth);
