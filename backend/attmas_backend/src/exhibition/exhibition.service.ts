@@ -12,7 +12,6 @@ import {
 } from './dto/create-exhibition.dto';
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { UsersService } from 'src/users/users.service';
-// import { EmailServices } from 'src/common/service/emailExibition';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 
 @Injectable()
@@ -46,16 +45,14 @@ export class ExhibitionService {
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
     const savedExhibition = await createdExhibition.save();
 
-    // Get all usernames using UsersService
+    // Get all users with userType 'Innovators' using UsersService
     const users = await this.usersService.findUsersByUserType1('Innovators');
-    const usernames = users.map((user) => user.username);
 
-    // Send emails to all usernames
+    // Send emails to all users
     const subject = 'New Exhibition Created';
-    const message = `Dear User, a new exhibition ${savedExhibition.title} has been created.`;
-
-    for (const username of usernames) {
-      await this.emailService.sendEmail2(username, subject, message);
+    const exhibitionId = savedExhibition._id.toString();
+    for (const user of users) {
+      await this.emailService.sendEmail2(user.username, subject, exhibitionId);
     }
 
     return savedExhibition;
@@ -125,7 +122,7 @@ export class ExhibitionService {
   async delete(id: string): Promise<Exhibition> {
     const existingExhibitionDelete =
       await this.exhibitionModel.findByIdAndDelete({ _id: id });
-    console.log('deleye existingExhibition', existingExhibitionDelete);
+    console.log('delete existingExhibition', existingExhibitionDelete);
     if (!existingExhibitionDelete) {
       throw new NotFoundException(`Exhibition with id ${id} not found`);
     }
