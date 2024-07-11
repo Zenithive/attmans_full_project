@@ -2,17 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Exhibition, ExhibitionDocument } from './schema/exhibition.schema';
-import {
-  SendToInnovators,
-  SendToInnovatorsDocument,
-} from './schema/sendToInnovators.schema';
-import {
-  CreateExhibitionDto,
-  UpdateExhibitionDto,
-} from './dto/create-exhibition.dto';
+import { SendToInnovators, SendToInnovatorsDocument } from './schema/sendToInnovators.schema';
+import { CreateExhibitionDto, UpdateExhibitionDto } from './dto/create-exhibition.dto';
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { UsersService } from 'src/users/users.service';
-// import { EmailServices } from 'src/common/service/emailExibition';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 
 @Injectable()
@@ -40,58 +33,24 @@ export class ExhibitionService {
     }
   }
 
-
-
-  // async createExibitionWithSendEmail(
-  //   createExhibitionDto: CreateExhibitionDto,
-  // ): Promise<Exhibition> {
-  //   const createdExhibition = new this.exhibitionModel(createExhibitionDto);
-  //   const savedExhibition = await createdExhibition.save();
-
-  //   const videoUrl = createExhibitionDto.videoUrl;
-
-  //   // Get all users with userType 'Innovators' using UsersService
-  //   const users = await this.usersService.findUsersByUserType1('Innovators');
-
-  //   // Send emails to all users
-  //   const subject = 'New Exhibition Created';
-  //   for (const user of users) {
-  //     const message = `Dear ${user.firstName} ${user.lastName}, you have been invited to participate in the exhibition ${savedExhibition.title}. Click <a href="${videoUrl}" target="_blank">here</a> to participate.`;
-
-  //     // const message = `Dear ${user.firstName} ${user.lastName}, you have been invited to participate in the exhibition ${savedExhibition.title}. Click <a href="${videoUrl}" target="_blank">here</a> to participate.`;
-  //     await this.emailService.sendEmail2(user.username, subject, message);
-  //   }
-
-  //   return savedExhibition;
-  // }
-
   async createExibitionWithSendEmail(
     createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
     const savedExhibition = await createdExhibition.save();
 
-    // Example: Assuming videoUrl is a property in createExhibitionDto
-    const videoUrl = createExhibitionDto.videoUrl;
-
     // Get all users with userType 'Innovators' using UsersService
     const users = await this.usersService.findUsersByUserType1('Innovators');
 
     // Send emails to all users
     const subject = 'New Exhibition Created';
+    const exhibitionId = savedExhibition._id.toString();
     for (const user of users) {
-      // const message = `Dear ${user.firstName} ${user.lastName}, you have been invited to participate in the exhibition ${savedExhibition.title}. Click <a href="${videoUrl}" target="_blank">here</a> to participate.`;
-      const message = `
-      Dear ${user.firstName} ${user.lastName},<br>
-      You have been invited to participate in the exhibition ${savedExhibition.title}.<br>
-      Click <a href="${videoUrl}" target="_blank">here</a> to participate.
-    `;
-      await this.emailService.sendEmail2(user.username, subject, message);
+      await this.emailService.sendEmail2(user.username, subject, exhibitionId);
     }
 
     return savedExhibition;
   }
-
 
   async createSendInnovators(
     sendToInnovatorsDto: SendToInnovatorsDto,
@@ -157,7 +116,7 @@ export class ExhibitionService {
   async delete(id: string): Promise<Exhibition> {
     const existingExhibitionDelete =
       await this.exhibitionModel.findByIdAndDelete({ _id: id });
-    console.log('deleye existingExhibition', existingExhibitionDelete);
+    console.log('delete existingExhibition', existingExhibitionDelete);
     if (!existingExhibitionDelete) {
       throw new NotFoundException(`Exhibition with id ${id} not found`);
     }

@@ -1,17 +1,14 @@
 // email.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema()
 export class Email extends Document {
   @Prop({ required: true })
-  to: string;               
+  to: string;
 
   @Prop({ required: true })
   subject: string;
-
-  @Prop({ required: true })
-  html: string;
 
   @Prop({ default: Date.now })
   sentAt: Date;
@@ -20,7 +17,13 @@ export class Email extends Document {
   username: string;
 
   @Prop({ default: false })
-  read: boolean; 
+  read: boolean;
+
+  // @Prop({ type: Types.ObjectId, ref: 'exhibitions', required: false })
+  // exibitionId: Types.ObjectId;
+
+  @Prop({ required: false })
+  exhibitionId: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);
