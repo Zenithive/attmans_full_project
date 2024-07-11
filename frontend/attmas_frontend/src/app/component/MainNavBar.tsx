@@ -10,7 +10,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
-import { Divider, MenuItem } from '@mui/material';
+import { Divider, MenuItem, Typography } from '@mui/material';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
@@ -19,11 +19,15 @@ import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
 import MailIcon from '@mui/icons-material/Mail';
 import DOMPurify from 'dompurify';
+import DoneIcon from '@mui/icons-material/Done';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 
 interface Email {
+  _id: string;
   to: string;
   subject: string;
   exhibitionId: string;
+  read: boolean;
 }
 
 function clearCookies() {
@@ -106,6 +110,17 @@ export default function MainNavBar() {
     setNotificationAnchorEl(null);
   };
 
+  const handleNotificationClick = async (notificationId: string) => {
+    try {
+      await axios.post(`${APIS.MARK_AS_READ}`, { id: notificationId });
+      setNotifications(notifications.map(notification => 
+        notification._id === notificationId ? { ...notification, read: true } : notification
+      ));
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await axios.post(APIS.LOGOUT);
@@ -158,6 +173,8 @@ export default function MainNavBar() {
   );
 
   const notificationMenuId = 'primary-notification-menu';
+ 
+
   const renderNotificationMenu = (
     <Menu
       anchorEl={notificationAnchorEl}
@@ -174,16 +191,46 @@ export default function MainNavBar() {
       open={isNotificationMenuOpen}
       onClose={handleNotificationMenuClose}
     >
-      {notifications.map((notification, index) => (
-        <React.Fragment key={index}>
-          <MenuItem onClick={handleNotificationMenuClose} sx={{ whiteSpace: 'normal' }}>
-            <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
-          </MenuItem>
-          {index < notifications.length - 1 && <Divider />}
-        </React.Fragment>
-      ))}
+      {/* Read Notifications Section */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+        <Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 'bold', mb: 1 }}>Read Notifications</Typography>
+        {notifications.filter(notification => notification.read).map((notification, index) => (
+          <React.Fragment key={index}>
+            <MenuItem 
+              onClick={() => handleNotificationClick(notification._id)}
+              sx={{ whiteSpace: 'normal', display: 'flex', justifyContent: 'space-between', width: '100%' }}
+            >
+              <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+              <IconButton size="small" color="inherit">
+                <DoneAllIcon fontSize="small" />
+              </IconButton>
+            </MenuItem>
+            {index < notifications.filter(notification => notification.read).length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
+      </Box>
+      
+      {/* Unread Notifications Section */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+        <Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 'bold', mb: 1 }}>Unread Notifications</Typography>
+        {notifications.filter(notification => !notification.read).map((notification, index) => (
+          <React.Fragment key={index}>
+            <MenuItem 
+              onClick={() => handleNotificationClick(notification._id)}
+              sx={{ whiteSpace: 'normal', display: 'flex', justifyContent: 'space-between', width: '100%' }}
+            >
+              <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+              <IconButton size="small" color="inherit">
+                <DoneIcon fontSize="small" />
+              </IconButton>
+            </MenuItem>
+            {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
+      </Box>
     </Menu>
   );
+  
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
@@ -216,7 +263,7 @@ export default function MainNavBar() {
           aria-label={`show ${notifications.length} new notifications`}
           color="inherit"
         >
-          <Badge badgeContent={notifications.length} color="error">
+          <Badge badgeContent={notifications.filter(notification => !notification.read).length} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -257,11 +304,11 @@ export default function MainNavBar() {
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"
-              aria-label={`show ${notifications.length} new notifications`}
+              aria-label={`show ${notifications.filter(notification => !notification.read).length} new notifications`}
               color="inherit"
               onClick={handleNotificationMenuOpen}
             >
-              <Badge badgeContent={notifications.length} color="error">
+              <Badge badgeContent={notifications.filter(notification => !notification.read).length} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
