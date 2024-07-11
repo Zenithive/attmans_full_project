@@ -1,10 +1,10 @@
-// email.service.ts
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Email } from './Exebitionemail.schema';
+import { UsersService } from 'src/users/users.service'; // Adjust path as needed
 
 dotenv.config();
 
@@ -12,7 +12,10 @@ dotenv.config();
 export class EmailService2 {
   private transporter: nodemailer.Transporter;
 
-  constructor(@InjectModel(Email.name) private emailModel: Model<Email>) {
+  constructor(
+    @InjectModel(Email.name) private emailModel: Model<Email>,
+    private usersService: UsersService, // Inject UsersService
+  ) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -22,8 +25,20 @@ export class EmailService2 {
     });
   }
 
-  async sendEmail2(to: string, subject: string, html: string) {
+  async sendEmail2(to: string, subject: string, exhibitionId: string) {
     try {
+      // Fetch user details from UsersService
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`User with username ${to} not found`);
+      }
+
+      // Customize email message with user's first name and last name
+      const html = `
+        Dear ${user.firstName} ${user.lastName},<br>
+        You have been invited to participate in the exhibition. Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
+      `;
+
       await this.transporter.sendMail({
         from: process.env.EMAIL_USER,
         to,
@@ -33,14 +48,20 @@ export class EmailService2 {
       console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
-      const email = new this.emailModel({ to, subject, html });
+      const email = new this.emailModel({
+        to,
+        subject,
+        exhibitionId,
+        read: false,
+        sentAt: new Date(),
+      });
       await email.save();
     } catch (error) {
       console.error(`Error sending email to ${to}:`, error);
     }
   }
 
-  async findAllEmails(): Promise<Email[]> {
-    return this.emailModel.find().exec();
+  async findEmailsByUsername(to: string): Promise<Email[]> {
+    return this.emailModel.find({ to }).exec();
   }
 }

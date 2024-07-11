@@ -107,11 +107,14 @@ export class UsersService {
 
   async findUsersByUserType1(
     userType: string,
-  ): Promise<{ username: string }[]> {
+  ): Promise<{ firstName: string; lastName: string; username: string }[]> {
     const filterQuery: any = { userType };
     const users = await this.userModel.find(filterQuery).exec();
-    const usernames = users.map((user) => ({ username: user.username }));
-    // console.log('Username', usernames);
-    return usernames;
+    const userDetails = users.map((user) => ({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+    }));
+    return userDetails;
   }
 }

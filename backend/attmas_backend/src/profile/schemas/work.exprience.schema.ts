@@ -1,6 +1,31 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+// Define the ProductInfo schema
+@Schema()
+export class ProductInfo {
+  @Prop({ required: false })
+  productName: string;
+
+  @Prop({ required: false })
+  productDescription: string;
+
+  @Prop({ required: false })
+  productType: string;
+
+  @Prop({ required: false })
+  productPrice: string;
+
+  @Prop({ required: false })
+  currency: string;
+
+  @Prop({ required: false })
+  productToMarket: string;
+}
+
+export const ProductInfoSchema = SchemaFactory.createForClass(ProductInfo);
+
+// Define the WorkExperience schema
 @Schema()
 export class WorkExprience extends Document {
   @Prop({ required: false })
@@ -21,20 +46,8 @@ export class WorkExprience extends Document {
   @Prop({ required: false })
   userType: string;
 
-  @Prop({ required: false })
-  productToMarket: string;
-
-  @Prop({ required: false })
-  productName: string;
-
-  @Prop({ required: false })
-  productDescription: string;
-
-  @Prop({ required: false })
-  productType: string;
-
-  @Prop({ required: false })
-  productPrice: string;
+  @Prop({ type: [ProductInfoSchema], required: false }) // Use array of ProductInfo schema
+  products: ProductInfo[];
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: false })
   userId: Types.ObjectId;
@@ -42,15 +55,9 @@ export class WorkExprience extends Document {
   @Prop({ required: false })
   username: string;
 
-  @Prop({ required: false, type: String }) // Change the type to String
+  @Prop({ required: false, type: String }) // Ensure the type is String
   hasPatent: string;
 
-  @Prop({ required: false })
-  currency: string; // Added currency field
-  Types: any;
-
-  @Prop({ required: false, type: [String] })
-  preferredIndustries: string[];
 }
 
 export const WorkSchema = SchemaFactory.createForClass(WorkExprience);

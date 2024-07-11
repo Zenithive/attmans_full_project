@@ -23,7 +23,7 @@ import DOMPurify from 'dompurify';
 interface Email {
   to: string;
   subject: string;
-  html: string;
+  exhibitionId: string;
 }
 
 function clearCookies() {
@@ -71,8 +71,8 @@ export default function MainNavBar() {
   React.useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`${APIS.NOTIFICATIONS}`);
-        console.log("API response:", response.data); 
+        const response = await axios.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
+        console.log("API response:", response.data); // Log the response
         setNotifications(response.data);
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -124,6 +124,13 @@ export default function MainNavBar() {
     router.push('/editprofile');
   };
 
+  const generateNotificationHtml = (exhibitionId: string) => {
+    return `
+        Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+      You have been invited to participate in the exhibition. Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
+    `;
+  };
+
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -169,7 +176,9 @@ export default function MainNavBar() {
     >
       {notifications.map((notification, index) => (
         <React.Fragment key={index}>
-          <MenuItem onClick={handleNotificationMenuClose}><span dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(notification.html)}}/></MenuItem>
+          <MenuItem onClick={handleNotificationMenuClose} sx={{ whiteSpace: 'normal' }}>
+            <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+          </MenuItem>
           {index < notifications.length - 1 && <Divider />}
         </React.Fragment>
       ))}
