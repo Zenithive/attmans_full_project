@@ -109,4 +109,10 @@ export class EmailService2 {
   async findEmailsByUsername(to: string): Promise<Email[]> {
     return this.emailModel.find({ to }).exec();
   }
+
+  // email.service2.ts
+async markAsRead(id: string): Promise<void> {
+  await this.emailModel.findByIdAndUpdate(id, { read: true }).exec();
+}
+
 }

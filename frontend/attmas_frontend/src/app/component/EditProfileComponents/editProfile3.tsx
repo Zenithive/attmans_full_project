@@ -201,36 +201,6 @@ const EditProfile3: React.FC = () => {
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '45%' }}>
-              <button type="button" onClick={handleToggleDropdown}>
-                {selectedValues.length > 0 ? (
-                  selectedValues.map(value => (
-                    <Chip
-                      key={value}
-                      label={value}
-                      onDelete={() => handleCheckboxChange(value, false)}
-                      color="primary"
-                      style={{ marginRight: 5, marginBottom: 5 }}
-                    />
-                  ))
-                ) : (
-                  'Subject matter expertise'
-                )}
-              </button>
-              {isOpen && (
-                <div className="dropdown-content">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                  />
-                  <div className="options-container">
-                    {renderOptions(filteredOptions)}
-                  </div>
-                </div>
-              )}
-            </div>
 
             <Autocomplete
               multiple
@@ -263,6 +233,38 @@ const EditProfile3: React.FC = () => {
               )}
               style={{ width: '45%' }}
             />
+            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '50%' }}>
+              <button type="button" onClick={handleToggleDropdown}>
+                {selectedValues.length > 0 ? (
+                  selectedValues.map(value => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      onDelete={() => handleCheckboxChange(value, false)}
+                      color="primary"
+                      style={{ marginRight: 5, marginBottom: 5 }}
+                    />
+                  ))
+                ) : (
+                  'Subject matter expertise'
+                )}
+              </button>
+              {isOpen && (
+                <div className="dropdown-content">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                  <div className="options-container">
+                    {renderOptions(filteredOptions)}
+                  </div>
+                </div>
+              )}
+            </div>
+
+
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
