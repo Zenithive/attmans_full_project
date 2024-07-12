@@ -566,7 +566,39 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '45%' }}>
+
+            <Autocomplete
+              multiple
+              id="categories"
+              options={industryOptions}
+              disableCloseOnSelect
+              getOptionLabel={(option) => option}
+              value={formik.values.categories}
+              onChange={(event, newValue) => formik.setFieldValue('categories', newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Categories"
+                  placeholder="Select categories"
+                  color="secondary"
+                />
+              )}
+              renderOption={(props, option, { selected }) => (
+                <li {...props}>
+                  <Checkbox
+                    color='secondary'
+                    checked={selected}
+                    onChange={(e) => handleCategoryCheckboxChange(option, e.target.checked)}
+                    style={{ marginRight: 8 }}
+                  />
+                  {option}
+                </li>
+              )}
+              style={{ width: '45%' }}
+            />
+
+            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '50%' }}>
               <button type="button" onClick={handleToggleDropdown}>
                 {selectedValues.length > 0 ? (
                   selectedValues.map(value => (
@@ -597,40 +629,11 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               )}
             </div>
 
-            <Autocomplete
-              multiple
-              id="categories"
-              options={industryOptions}
-              disableCloseOnSelect
-              getOptionLabel={(option) => option}
-              value={formik.values.categories}
-              onChange={(event, newValue) => formik.setFieldValue('categories', newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Categories"
-                  placeholder="Select categories"
-                  color="secondary"
-                />
-              )}
-              renderOption={(props, option, { selected }) => (
-                <li {...props}>
-                  <Checkbox
-                  color='secondary'
-                    checked={selected}
-                    onChange={(e) => handleCategoryCheckboxChange(option, e.target.checked)}
-                    style={{ marginRight: 8 }}
-                  />
-                  {option}
-                </li>
-              )}
-              style={{ width: '45%' }}
-            />
+
           </Box>
 
           {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}> */}
-            {/* <LoadingButton
+          {/* <LoadingButton
               type="submit"
               variant="contained"
               size="small"
@@ -641,26 +644,26 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             >
               Save
             </LoadingButton> */}
-            <Button
-              type="button"
+          <Button
+            type="button"
+            variant="contained"
+            size="small"
+            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
+            onClick={onPrevious}
+          >
+            Back
+          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+            <LoadingButton
+              type="submit"
               variant="contained"
               size="small"
-              sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
-              onClick={onPrevious}
+              loading={loading}
+              loadingIndicator={<CircularProgress size={24} />}
+              sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
             >
-              Back
-            </Button>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                size="small"
-                loading={loading}
-                loadingIndicator={<CircularProgress size={24} />}
-                sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
-              >
-                Save
-              </LoadingButton>
+              Save
+            </LoadingButton>
             {/* </Box> */}
           </Box>
         </Box>
