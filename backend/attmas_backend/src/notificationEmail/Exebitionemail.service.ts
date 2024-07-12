@@ -111,8 +111,7 @@ export class EmailService2 {
   }
 
   // email.service2.ts
-async markAsRead(id: string): Promise<void> {
-  await this.emailModel.findByIdAndUpdate(id, { read: true }).exec();
-}
-
+  async markAsRead(id: string): Promise<void> {
+    await this.emailModel.findByIdAndUpdate(id, { read: true }).exec();
+  }
 }
