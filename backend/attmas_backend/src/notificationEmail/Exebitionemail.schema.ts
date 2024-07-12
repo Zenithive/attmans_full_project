@@ -5,7 +5,7 @@ import { Document } from 'mongoose';
 @Schema()
 export class Email extends Document {
   @Prop({ required: true })
-  to: string;               
+  to: string;
 
   @Prop({ required: true })
   subject: string;
