@@ -28,6 +28,7 @@ interface Email {
   subject: string;
   exhibitionId: string;
   read: boolean;
+  boothUsername?:string;
 }
 
 function clearCookies() {
@@ -139,12 +140,21 @@ export default function MainNavBar() {
     router.push('/editprofile');
   };
 
-  const generateNotificationHtml = (exhibitionId: string) => {
-    return `
+    const generateNotificationHtml = (notification: Email) => {
+    console.log('notification',notification.boothUsername)
+    if (notification.boothUsername) {
+      return `
         Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-      You have been invited to participate in the exhibition. Click <a href="/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
+        You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition. Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a>  to approve/reject.
     `;
-  };
+    }else{
+      return `
+      Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+    You have been invited to participate in the exhibition. Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
+  `;
+    }
+  }
+
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -211,7 +221,7 @@ export default function MainNavBar() {
                     backgroundColor: 'grey.200' // Grey background for unread notifications
                   }}
                 >
-                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
                   <IconButton size="small" color="inherit">
                     <DoneIcon fontSize="small" />
                   </IconButton>
@@ -237,7 +247,7 @@ export default function MainNavBar() {
                     backgroundColor: 'white' // White background for read notifications
                   }}
                 >
-                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
                   <IconButton size="small" color="inherit">
                     <DoneAllIcon fontSize="small" />
                   </IconButton>
