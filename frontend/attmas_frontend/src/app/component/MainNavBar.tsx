@@ -142,7 +142,7 @@ export default function MainNavBar() {
   const generateNotificationHtml = (exhibitionId: string) => {
     return `
         Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-      You have been invited to participate in the exhibition. Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
+      You have been invited to participate in the exhibition. Click <a href="/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
     `;
   };
 
@@ -191,45 +191,66 @@ export default function MainNavBar() {
       open={isNotificationMenuOpen}
       onClose={handleNotificationMenuClose}
     >
-      {/* Read Notifications Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-        <Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 'bold', mb: 1 }}>Read Notifications</Typography>
-        {notifications.filter(notification => notification.read).map((notification, index) => (
-          <React.Fragment key={index}>
-            <MenuItem 
-              onClick={() => handleNotificationClick(notification._id)}
-              sx={{ whiteSpace: 'normal', display: 'flex', justifyContent: 'space-between', width: '100%' }}
-            >
-              <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
-              <IconButton size="small" color="inherit">
-                <DoneAllIcon fontSize="small" />
-              </IconButton>
-            </MenuItem>
-            {index < notifications.filter(notification => notification.read).length - 1 && <Divider />}
-          </React.Fragment>
-        ))}
-      </Box>
-      
-      {/* Unread Notifications Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-        <Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 'bold', mb: 1 }}>Unread Notifications</Typography>
-        {notifications.filter(notification => !notification.read).map((notification, index) => (
-          <React.Fragment key={index}>
-            <MenuItem 
-              onClick={() => handleNotificationClick(notification._id)}
-              sx={{ whiteSpace: 'normal', display: 'flex', justifyContent: 'space-between', width: '100%' }}
-            >
-              <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
-              <IconButton size="small" color="inherit">
-                <DoneIcon fontSize="small" />
-              </IconButton>
-            </MenuItem>
-            {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
-          </React.Fragment>
-        ))}
+      <Box sx={{ width: 300 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', px: 2, py: 1 }}>
+          Notifications
+        </Typography>
+  
+        {/* Unread Notifications Section */}
+        {notifications.filter(notification => !notification.read).length > 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+            {notifications.filter(notification => !notification.read).map((notification, index) => (
+              <React.Fragment key={notification._id}>
+                <MenuItem 
+                  onClick={() => handleNotificationClick(notification._id)}
+                  sx={{ 
+                    whiteSpace: 'normal', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    width: '100%', 
+                    backgroundColor: 'grey.200' // Grey background for unread notifications
+                  }}
+                >
+                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+                  <IconButton size="small" color="inherit">
+                    <DoneIcon fontSize="small" />
+                  </IconButton>
+                </MenuItem>
+                {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
+          </Box>
+        )}
+        
+        {/* Read Notifications Section */}
+        {notifications.filter(notification => notification.read).length > 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+            {notifications.filter(notification => notification.read).map((notification, index) => (
+              <React.Fragment key={notification._id}>
+                <MenuItem 
+                  onClick={() => handleNotificationClick(notification._id)}
+                  sx={{ 
+                    whiteSpace: 'normal', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    width: '100%', 
+                    backgroundColor: 'white' // White background for read notifications
+                  }}
+                >
+                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+                  <IconButton size="small" color="inherit">
+                    <DoneAllIcon fontSize="small" />
+                  </IconButton>
+                </MenuItem>
+                {index < notifications.filter(notification => notification.read).length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
+          </Box>
+        )}
       </Box>
     </Menu>
   );
+  
   
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
