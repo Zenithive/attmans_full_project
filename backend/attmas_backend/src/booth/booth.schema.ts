@@ -25,8 +25,8 @@ export const ProductSchema = SchemaFactory.createForClass(Product);
 
 @Schema()
 export class Booth {
-  @Prop({ required: true })
-  title: string;
+  // @Prop({ required: true })
+  // title: string;
 
   @Prop({ required: true })
   description: string;
@@ -51,6 +51,9 @@ export class Booth {
 
   @Prop({ default: 'Pending' })
   status: string;
+
+  @Prop({ required: true })
+  title: string;
 }
 
 export const BoothSchema = SchemaFactory.createForClass(Booth);
