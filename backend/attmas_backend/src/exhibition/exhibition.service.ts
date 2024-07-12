@@ -2,8 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Exhibition, ExhibitionDocument } from './schema/exhibition.schema';
-import { SendToInnovators, SendToInnovatorsDocument } from './schema/sendToInnovators.schema';
-import { CreateExhibitionDto, UpdateExhibitionDto } from './dto/create-exhibition.dto';
+import {
+  SendToInnovators,
+  SendToInnovatorsDocument,
+} from './schema/sendToInnovators.schema';
+import {
+  CreateExhibitionDto,
+  UpdateExhibitionDto,
+} from './dto/create-exhibition.dto';
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { UsersService } from 'src/users/users.service';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
@@ -125,7 +131,9 @@ export class ExhibitionService {
 
   async findOneExhibition(id: string): Promise<Exhibition> {
     try {
-      const exhibition = await this.exhibitionModel.findById(id).exec();
+      const exhibition = await this.exhibitionModel
+        .findById({ _id: id })
+        .exec();
       if (!exhibition) {
         throw new NotFoundException(`Exhibition with id ${id} not found`);
       }

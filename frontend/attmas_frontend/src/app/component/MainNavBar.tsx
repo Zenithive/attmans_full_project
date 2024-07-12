@@ -139,8 +139,10 @@ export default function MainNavBar() {
     router.push('/editprofile');
   };
 
-  const generateNotificationHtml = (exhibitionId: string) => {
-    return `
+  const generateNotificationHtml = (notification: Email) => {
+    console.log('notification',notification.boothUsername)
+    if (notification.boothUsername) {
+      return `
         Dear ${userDetails.firstName} ${userDetails.lastName},<br>
       You have been invited to participate in the exhibition. Click <a href="/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
     `;
@@ -320,7 +322,7 @@ export default function MainNavBar() {
           boxShadow: 'none',
         }}
       >
-        <Toolbar sx={{ height: 70 }}>
+        <Toolbar>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton

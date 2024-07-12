@@ -1,10 +1,13 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+'use client'
+import React, { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import BoothDetailsModal from '../component/booth/booth';
+import { useSearchParams } from 'next/navigation';
+import dayjs from 'dayjs';
 
 interface Exhibition {
   _id?: string;
@@ -18,44 +21,113 @@ interface Exhibition {
   userId?: string;
 }
 
-interface SubmittedInnovator {
-  username: string;
-  innovators: string;
+interface Booth {
+  _id: string;
+  title: string;
+  description: string;
+  products: { name: string; description: string; productType: string; price: number; }[];
+  userId: {
+    firstName: string;
+    lastName: string;
+  };
+  status: string;
 }
 
 const ExhibitionsPage: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
-  const [submittedInnovators, setSubmittedInnovators] = useState<SubmittedInnovator[]>([]);
+  const [booths, setBooths] = useState<Booth[]>([]);
+  const [showModal, setShowModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const searchParams = useSearchParams();
+  const { userType } = userDetails;
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [hiddenButtons, setHiddenButtons] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const fetchExhibitions = async () => {
       try {
-        const response = await axios.get(APIS.EXHIBITION);
-        setExhibitions(response.data);
+        const exhibitionId = searchParams.get('exhibitionId');
+        if (!exhibitionId) {
+          console.error('id not found');
+          return;
+        }
+        const response = await axios.get(`${APIS.EXHIBITION}/${exhibitionId}`);
+        setExhibitions([response.data]);
       } catch (error) {
         console.log(error);
       }
     };
 
-    const fetchSubmittedInnovators = async () => {
+    const fetchBooths = async () => {
       try {
-        const response = await axios.get(`${APIS.GET_SUBMITTED_INNOVATORS}?userId=${userDetails._id}`);
-        setSubmittedInnovators(response.data);
+        const response = await axios.get(`${APIS.GET_BOOTH}`, {
+          params: {
+            userId: userDetails._id,
+            status: statusFilter,
+          },
+        });
+        setBooths(response.data);
       } catch (error) {
-        console.error('Error fetching submitted innovators:', error);
+        console.error('Error fetching booths:', error);
       }
     };
 
     fetchExhibitions();
-    fetchSubmittedInnovators();
-  }, [userDetails._id]);
+    fetchBooths();
+  }, [userDetails._id, searchParams, statusFilter]);
+
+  const handleCreateBooth = async (boothData: any) => {
+    try {
+      const response = await axios.post(APIS.CREATE_BOOTH, boothData);
+      setBooths(prevBooths => [...prevBooths, response.data]);
+      closeModal();
+    } catch (error) {
+      console.error('Error creating booth:', error);
+    }
+  };
+
+  const handleApprove = async (boothId: string) => {
+    try {
+      await axios.post(`${APIS.APPROVE_BOOTH}/${boothId}`);
+      setBooths(prevBooths =>
+        prevBooths.map(booth =>
+          booth._id === boothId ? { ...booth, status: 'Approved' } : booth
+        )
+      );
+      setHiddenButtons(prevHiddenButtons => ({ ...prevHiddenButtons, [boothId]: true }));
+    } catch (error) {
+      console.error('Error approving booth:', error);
+    }
+  };
+
+  const handleReject = async (boothId: string) => {
+    try {
+      await axios.post(`${APIS.REJECT_BOOTH}/${boothId}`);
+      setBooths(prevBooths =>
+        prevBooths.map(booth =>
+          booth._id === boothId ? { ...booth, status: 'Rejected' } : booth
+        )
+      );
+      setHiddenButtons(prevHiddenButtons => ({ ...prevHiddenButtons, [boothId]: true }));
+    } catch (error) {
+      console.error('Error rejecting booth:', error);
+    }
+  };
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
+  const exhibitionId = searchParams.get('exhibitionId');
+
+  const handleStatusFilterChange = (event: React.MouseEvent<HTMLElement>, newStatus: string | null) => {
+    setStatusFilter(newStatus);
+  };
 
   const renderVideo = (url: string) => {
     if (!url) {
       return null;
     }
-    
+
     const platforms = [
       {
         name: 'YouTube',
@@ -82,7 +154,7 @@ const ExhibitionsPage: React.FC = () => {
         }
       },
       {
-        name: 'Default',  
+        name: 'Default',
         check: (url: string) => true,
         embedUrl: (url: string) => url
       }
@@ -101,8 +173,8 @@ const ExhibitionsPage: React.FC = () => {
     } else {
       return (
         <iframe
-          width="1100"
-          height="615"
+          width="750"
+          height="500"
           style={{ borderRadius: "30px" }}
           src={embedUrl}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -111,41 +183,136 @@ const ExhibitionsPage: React.FC = () => {
       );
     }
   };
-  
 
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ flex: 1, marginRight: '20px' }}>
-       <div style={{position:"relative",color:'white',textAlign:"center",background:"#cc4800",height:"4%",right:"8px",width:"113.3%",bottom:"29px"}}><h1 style={{position:'relative',top:"15%"}}>Exhibition</h1></div>
-        {exhibitions.map((exhibition) => (
-          <div key={exhibition._id}>
-            <h2 style={{position:'relative',float:"right"}}>{exhibition.title}</h2>
-           <div style={{position:'relative',left:'65px'}}>{renderVideo(exhibition.videoUrl)}</div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ width: '4px', backgroundColor: 'gray',position:'relative',left:"7%",bottom:"8px"}}></div>
-
-      <div style={{ flex: 1}}>
-        <Box sx={{ mt: 4, p: 2 ,width:'70%',float:"right"}}>
-          <Typography variant="h5" sx={{ mb: 2, color: "Black", borderRadius: "15px", textAlign: "center", height: "45px", fontWeight: "bolder" }}>
-            <div style={{ position: "relative", top: "7px" }}>Submitted Innovators :-</div>
-          </Typography>
-          <Divider sx={{ my: '$5' }} />
-          {submittedInnovators.map((innovator, index) => (
-            <Card sx={{ mb: 2 }} key={index}>
-              <CardContent>
-                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                  Innovators: {innovator.innovators}, User: {innovator.username}
-                </Typography>
-              </CardContent>
-            </Card>
+        <div style={{ position: "relative", color: 'black', textAlign: "center", background: "#f5f5f5", right: "8px", width: "102%", bottom: "29px" }}>
+          <h1 style={{ position: 'relative', top: "15%" }}>Exhibition</h1>
+          {(userType === 'Innovators') && (
+            <Button variant="contained" color="primary" onClick={openModal} style={{ position: 'relative', float: "right", bottom: '60px', right: '5%', background: '#757575', fontWeight: 'bolder', color: 'white', height: '32px' }}>
+              Participate
+            </Button>
+          )}
+          <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
+        </div>
+        <div>
+          {exhibitions.map((exhibition) => (
+            <Box key={exhibition._id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+              <Card sx={{ flex: 1, marginRight: '10px' }}>
+                <CardContent>
+                  {renderVideo(exhibition.videoUrl)}
+                </CardContent>
+              </Card>
+              <Divider orientation="vertical" flexItem />
+              <Card sx={{ flex: 1, marginLeft: '10px', marginBottom: '20%' }}>
+                <CardContent>
+                  <Typography variant="h6">{exhibition.title}, ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})</Typography>
+                  <Typography variant="h6">{exhibition.description}</Typography>
+                  <Typography variant="h6"> {exhibition.industries}</Typography>
+                  <Typography variant="h6">{exhibition.subjects}</Typography>
+                </CardContent>
+              </Card>
+            </Box>
           ))}
-        </Box>
+        </div>
+        <Divider orientation="horizontal" flexItem />
+        <div>
+          <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '10%' }}>
+            <h1>Booth Details</h1>
+            <ToggleButtonGroup
+              value={statusFilter}
+              exclusive
+              onChange={handleStatusFilterChange}
+              aria-label="status filter"
+            >
+              <ToggleButton value="Pending" aria-label="pending">
+                Pending
+              </ToggleButton>
+              <ToggleButton value="Approved" aria-label="approved">
+                Approved
+              </ToggleButton>
+              <ToggleButton value="Rejected" aria-label="rejected">
+                Rejected
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+          </Box>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', position: 'relative', left: '10%', width: '70%' }}>
+            {booths
+              .filter(booth => userType === 'Innovators' || booth.status === 'Approved')
+              .map(booth => (
+                <Card key={booth._id} sx={{ flex: '1 1 calc(33.333% - 10px)', boxSizing: 'border-box', marginBottom: '10px' }}>
+                  <CardContent>
+                    <Typography>{booth.title}</Typography>
+                    <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
+                    <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '24px' }}>
+                      <Chip
+                        label={
+                          booth.status === 'Approved' ? 'Approved' :
+                            booth.status === 'Rejected' ? 'Rejected' :
+                              'Pending'
+                        }
+                        variant="outlined"
+                        color={
+                          booth.status === 'Approved' ? 'success' :
+                            booth.status === 'Rejected' ? 'error' :
+                              'default'
+                        }
+                      />
+                    </Box>
+                    <Typography>Products:- </Typography>
+                    <Typography>
+                      <ul>
+                        {booth.products.map(product => (
+                          <div key={product.name} style={{ margin: '20px' }}>
+                            <li>
+                              {product.name} <br />
+                              {product.description} <br />
+                              {product.productType} <br />
+                              ${product.price}
+                            </li>
+                          </div>
+                        ))}
+                      </ul>
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', marginLeft: '48%' }}>
+                      {!hiddenButtons[booth._id] && (userType === 'Innovators') && (
+                        <>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleApprove(booth._id)}
+                            disabled={booth.status === 'Approved'}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => handleReject(booth._id)}
+                            disabled={booth.status === 'Rejected'}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+          </Box>
+        </div>
       </div>
     </div>
   );
 };
+const SuspenseExhibitionsPage: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ExhibitionsPage />
+    </Suspense>
+  );
+};
 
-export default ExhibitionsPage;
+export default SuspenseExhibitionsPage;
