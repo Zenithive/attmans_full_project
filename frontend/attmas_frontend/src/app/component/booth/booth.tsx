@@ -39,16 +39,60 @@ interface Product {
   currency: string;
 }
 
-const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth, exhibitionId}) => {
+const CustomPriceField = ({ field, form, index }: { field: any; form: any; index: number }) => {
+  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+
+  return (
+    <TextField
+      {...field}
+      fullWidth
+      label="Product Price"
+      color='secondary'
+      type="text"
+      error={Boolean(productTouched && productErrors && productErrors.price)}
+      helperText={(productTouched && productErrors && productErrors.price) || (productTouched && productErrors && productErrors.currency)}
+      InputProps={{
+        startAdornment: (
+          <FormControl variant="standard" sx={{ minWidth: 60 }}>
+            <Select
+              value={form.values.products[index].currency}
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none'
+                },
+            }}
+              onChange={(event) => form.setFieldValue(`products.${index}.currency`, event.target.value)}
+              displayEmpty
+              inputProps={{ 'aria-label': 'Currency' }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 200,
+                    width: 100,
+                  },
+                },
+              }}
+            >
+              <MenuItem value="USD">USD</MenuItem>
+              <MenuItem value="INR">INR</MenuItem>
+            </Select>
+          </FormControl>
+        ),
+      }}
+    />
+  );
+};
+const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth, exhibitionId }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const initialValues = {
     title: '',
     description: '',
     videoUrl: '',
-    products: [] as Product[],
+    products: [{ name: '', description: '', productType: '', price: 0, currency: 'USD' }] as Product[],
     userId: userDetails._id,
-    username:userDetails.username,
+    username: userDetails.username,
     exhibitionId: exhibitionId || '',
   };
 
@@ -57,7 +101,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
     description: Yup.string().required('Description is required'),
     videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
     products: Yup.array().of(
-      Yup.object().required('Description is required').shape({
+      Yup.object().shape({
         name: Yup.string().required('Product name is required'),
         description: Yup.string().required('Product description is required'),
         productType: Yup.string().required('Product type is required'),
@@ -99,12 +143,13 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
           Booth Details
         </Typography>
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-          {({ values, errors, touched, handleChange, handleBlur,isSubmitting }) => (
+          {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
             <Form>
               <TextField
                 fullWidth
                 label="Title"
                 name="title"
+                color='secondary'
                 value={values.title}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -116,6 +161,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                 fullWidth
                 label="Description"
                 name="description"
+                color='secondary'
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -127,6 +173,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                 fullWidth
                 label="Video URL"
                 name="videoUrl"
+                color='secondary'
                 value={values.videoUrl}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -147,8 +194,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                           <TableCell>Name</TableCell>
                           <TableCell>Description</TableCell>
                           <TableCell>Product Type</TableCell>
-                          <TableCell>Price</TableCell>
-                          <TableCell>Currency</TableCell>
+                          <TableCell>Price & Currency</TableCell>
                           <TableCell>Actions</TableCell>
                         </TableRow>
                       </TableHead>
@@ -165,6 +211,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                                       {...field}
                                       fullWidth
                                       label="Product Name"
+                                      color='secondary'
                                       error={Boolean(productTouched && productErrors && productErrors.name)}
                                       helperText={productTouched && productErrors && productErrors.name}
                                     />
@@ -182,6 +229,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                                       {...field}
                                       fullWidth
                                       label="Product Description"
+                                      color='secondary'
                                       error={Boolean(productTouched && productErrors && productErrors.description)}
                                       helperText={productTouched && productErrors && productErrors.description}
                                     />
@@ -199,6 +247,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                                       {...field}
                                       fullWidth
                                       label="Product Type"
+                                      color='secondary'
                                       error={Boolean(productTouched && productErrors && productErrors.productType)}
                                       helperText={productTouched && productErrors && productErrors.productType}
                                     />
@@ -208,41 +257,9 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                             </TableCell>
                             <TableCell>
                               <Field name={`products.${index}.price`}>
-                                {({ field, form }: FieldProps) => {
-                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                                  return (
-                                    <TextField
-                                      {...field}
-                                      fullWidth
-                                      label="Product Price"
-                                      type="number"
-                                      error={Boolean(productTouched && productErrors && productErrors.price)}
-                                      helperText={productTouched && productErrors && productErrors.price}
-                                    />
-                                  );
-                                }}
-                              </Field>
-                            </TableCell>
-                            <TableCell>
-                              <Field name={`products.${index}.currency`}>
-                                {({ field, form }: FieldProps) => {
-                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                                  return (
-                                    <FormControl fullWidth>
-                                      <InputLabel>Currency</InputLabel>
-                                      <Select
-                                        {...field}
-                                        label="Currency"
-                                        error={Boolean(productTouched && productErrors && productErrors.currency)}
-                                      >
-                                        <MenuItem value="USD">$</MenuItem>
-                                        <MenuItem value="INR">₹</MenuItem>
-                                      </Select>
-                                    </FormControl>
-                                  );
-                                }}
+                                {({ field, form }: FieldProps) => (
+                                  <CustomPriceField field={field} form={form} index={index} />
+                                )}
                               </Field>
                             </TableCell>
                             <TableCell>
@@ -253,7 +270,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                           </TableRow>
                         ))}
                         <TableRow>
-                          <TableCell colSpan={6}>
+                          <TableCell colSpan={5}>
                             <Button
                               type="button"
                               variant="outlined"
@@ -271,7 +288,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
               </FieldArray>
 
               <Button variant="contained" color="primary" type="submit" style={{ marginTop: '20px' }} disabled={isSubmitting}>
-              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
+                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
               </Button>
             </Form>
           )}

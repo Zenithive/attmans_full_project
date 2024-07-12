@@ -59,7 +59,7 @@ export class CreateBoothDto {
 
   @IsNotEmpty()
   @IsString()
-  exhibitionId: Types.ObjectId;
+  exhibitionId: Types.ObjectId | string;
 
   @IsOptional()
   @IsString()

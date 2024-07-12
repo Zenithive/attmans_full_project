@@ -24,6 +24,7 @@ interface Email {
   to: string;
   subject: string;
   exhibitionId: string;
+  boothUsername?: string;
 }
 
 function clearCookies() {
@@ -124,11 +125,19 @@ export default function MainNavBar() {
     router.push('/editprofile');
   };
 
-  const generateNotificationHtml = (exhibitionId: string) => {
-    return `
+  const generateNotificationHtml = (notification: Email) => {
+    console.log('notification',notification.boothUsername)
+    if (notification.boothUsername) {
+      return `
         Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-      You have been invited to participate in the exhibition. Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
-    `;
+        You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition. Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to approve/reject.
+      `;
+    } else {
+      return `
+        Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+        You have been invited to participate in the exhibition. Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
+      `;
+    }
   };
 
   const menuId = 'primary-search-account-menu';
@@ -177,7 +186,7 @@ export default function MainNavBar() {
       {notifications.map((notification, index) => (
         <React.Fragment key={index}>
           <MenuItem onClick={handleNotificationMenuClose} sx={{ whiteSpace: 'normal' }}>
-            <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification.exhibitionId)) }} />
+            <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
           </MenuItem>
           {index < notifications.length - 1 && <Divider />}
         </React.Fragment>
@@ -253,7 +262,7 @@ export default function MainNavBar() {
           boxShadow: 'none',
         }}
       >
-        <Toolbar sx={{ height: 70 }}>
+        <Toolbar>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton

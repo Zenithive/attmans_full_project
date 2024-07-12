@@ -54,3 +54,8 @@ export class Booth {
 }
 
 export const BoothSchema = SchemaFactory.createForClass(Booth);
+
+BoothSchema.post('save', async (doc, next) => {
+  await doc.populate('userId');
+  next();
+});

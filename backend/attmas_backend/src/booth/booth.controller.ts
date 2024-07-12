@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { BoothService } from './booth.service';
 import { CreateBoothDto } from './create-booth.dto';
 import { Booth } from './booth.schema';
@@ -13,8 +21,8 @@ export class BoothController {
   }
 
   @Get()
-  async findAll(): Promise<Booth[]> {
-    return this.boothService.findAll();
+  async findAll(@Query('status') status: string): Promise<Booth[]> {
+    return this.boothService.findAll(status);
   }
 
   @Get(':id')

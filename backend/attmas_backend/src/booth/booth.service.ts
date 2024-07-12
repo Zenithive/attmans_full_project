@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Booth, BoothDocument } from './booth.schema';
 import { CreateBoothDto } from './create-booth.dto';
 import { User, UserDocument } from 'src/users/user.schema';
@@ -24,29 +24,31 @@ export class BoothService {
     const createdBooth = new this.boothModel(createBoothDto);
     const booth = await createdBooth.save();
 
-    if (createBoothDto.exhibitionId) {
-      const exhibition = await this.exhibitionModel.findById(
-        createBoothDto.exhibitionId,
-      );
-      if (exhibition) {
-        const emailContent = `<p>Dear ${exhibition.username},</p>
-    <p>You have been notified that ${booth.username} has requested to participate in the exhibition.</p>
-    <p>Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibition._id}" target="_blank" rel="noopener noreferrer">here</a> to approve/reject.</p>`;
+    const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
 
-        await this.emailService.sendEmail2(
-          exhibition.username,
-          'New Booth Created',
-          emailContent,
-        );
-      }
+    const exhibition = await this.exhibitionModel
+      .findById(exhibitionId)
+      .populate('userId', 'firstName lastName username', this.userModel)
+      .exec();
+    console.log('exhibition', exhibition);
+    console.log('booth', booth);
+    if (exhibition) {
+      const { username } = exhibition;
+      await this.emailService.sendEmailtoExhibition(
+        username,
+        'New Booth Created',
+        exhibitionId.toHexString(),
+        booth.username,
+      );
     }
 
     return booth;
   }
 
-  async findAll(): Promise<Booth[]> {
+  async findAll(status?: string): Promise<Booth[]> {
+    const filter = status ? { status } : {};
     return this.boothModel
-      .find()
+      .find(filter)
       .populate('userId', 'firstName lastName', this.userModel)
       .exec();
   }
@@ -88,5 +90,10 @@ export class BoothService {
     booth.status = 'Rejected';
     await booth.save();
     return booth;
+  }
+
+  async findByUsername(username: string): Promise<Booth> {
+    const user = await this.boothModel.findOne({ username }).exec();
+    return user;
   }
 }
