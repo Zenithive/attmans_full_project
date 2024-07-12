@@ -168,6 +168,8 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                 margin="normal"
                 error={Boolean(touched.description && errors.description)}
                 helperText={touched.description && errors.description}
+                multiline
+                rows={4}
               />
               <TextField
                 fullWidth
@@ -232,6 +234,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                                       color='secondary'
                                       error={Boolean(productTouched && productErrors && productErrors.description)}
                                       helperText={productTouched && productErrors && productErrors.description}
+                                      multiline
                                     />
                                   );
                                 }}
