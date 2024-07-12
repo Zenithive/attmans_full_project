@@ -81,7 +81,7 @@ export class EmailService2 {
 
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        You have been notified that the ${boothUsername} has reqested to participate in the Exhibition Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to approve/reject.
+        You have been notified that the ${boothUsername} has reqested to participate in the Exhibition Click <a href="view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to approve/reject.
       `;
 
       await this.transporter.sendMail({
