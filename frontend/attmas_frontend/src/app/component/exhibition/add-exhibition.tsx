@@ -279,9 +279,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
         <>
         {userType === "Admin" && (
             <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
-                borderRadius: 3, backgroundColor: "#616161", color: "white", '&:hover': {
-                    background: "#757575"
-                }
+                borderRadius: 3, backgroundColor:'#CC4800', color: "white"
             }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
         )}
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
