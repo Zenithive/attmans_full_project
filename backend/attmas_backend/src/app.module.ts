@@ -10,6 +10,7 @@ import { ProfileModule } from './profile/profile.module';
 import { ExhibitionModule } from './exhibition/exhibition.module';
 import { JobsModule } from './projects/projects.module';
 import { ApplyModule } from './apply/apply.module';
+import { BoothModule } from './booth/booth.module';
 import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
 
 dotenv.config();
@@ -27,6 +28,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     ExhibitionModule,
     JobsModule,
     ApplyModule,
+    BoothModule,
     EmailModule,
   ],
   controllers: [AppController],

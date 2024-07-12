@@ -36,5 +36,5 @@ function checkAuth(request: NextRequest): boolean {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/editprofile','/signup', '/dashboard', '/freelancers', '/innovators', '/projectowner', '/exhibition', '/profile', '/projects'],
+  matcher: ['/', '/editprofile','/signup', '/dashboard', '/freelancers', '/innovators', '/projectowner', '/exhibition', '/profile', '/projects,/booth'],
 };

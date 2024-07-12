@@ -63,14 +63,14 @@ export class ExhibitionController {
     );
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Exhibition> {
-    const exhibition = await this.exhibitionService.findExhibitionWithUser(id);
-    if (!exhibition) {
-      throw new NotFoundException(`Exhibition with id ${id} not found`);
-    }
-    return exhibition;
-  }
+  // @Get(':id')
+  // async findOne(@Param('id') id: string): Promise<Exhibition> {
+  //   const exhibition = await this.exhibitionService.findExhibitionWithUser(id);
+  //   if (!exhibition) {
+  //     throw new NotFoundException(`Exhibition with id ${id} not found`);
+  //   }
+  //   return exhibition;
+  // }
 
   @Put(':id')
   async update(
@@ -98,7 +98,8 @@ export class ExhibitionController {
   @Get(':id')
   async findOneExhibition(@Param('id') id: string): Promise<Exhibition> {
     try {
-      const exhibition = await this.exhibitionService.findOne(id);
+      const exhibition = await this.exhibitionService.findOneExhibition(id);
+      console.log('exhibition', exhibition);
       if (!exhibition) {
         throw new NotFoundException(`Exhibition with id ${id} not found`);
       }

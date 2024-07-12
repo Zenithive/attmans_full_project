@@ -24,6 +24,11 @@ export const APIS = {
     EXHIBITION: `${SERVER_URL}/exhibitions`,
     SEND_INNOVATORS: `${SERVER_URL}/exhibitions/sendinovators`,
     GET_SUBMITTED_INNOVATORS:`${SERVER_URL}/exhibitions/submitted-innovators`,
+    CREATE_BOOTH: `${SERVER_URL}/booths`,
+    GET_BOOTH: `${SERVER_URL}/booths`,
+    APPROVE_BOOTH: `${SERVER_URL}/booths/approve`,
+    REJECT_BOOTH: `${SERVER_URL}/booths/reject`,
+
 
 
     //****** FreeLancers and Innovators API url ******//
@@ -41,5 +46,8 @@ export const APIS = {
 
 
     NOTIFICATIONS: `${SERVER_URL}/emails`,
+
+
+    MARK_AS_READ: `${SERVER_URL}/emails/markasread`,
 
 }
