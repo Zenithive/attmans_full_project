@@ -28,13 +28,16 @@ import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface ProfileForm2Props {
     onNext: () => void;
     onPrevious: () => void;
 }
 
+
 const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
+
     const [isFreelancer, setIsFreelancer] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -81,7 +84,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             setLoading(true);
             try {
                 const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
-                onNext();
                 console.log('Form submitted successfully:', response.data);
 
                 setLoading(false);
@@ -122,7 +124,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 });
 
                 // Update state based on user type for conditional rendering
-                if (userData.userType === 'Freelancer') {
+                if (userData.userType === 'Innovators') {
                     setIsFreelancer(true);
                     if (userData.productToMarket === 'Yes') {
                         setShowProductDetails(true);
@@ -147,7 +149,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        if (value === 'Freelancer') {
+        if (value === 'Innovators') {
             setIsFreelancer(true);
         } else {
             setIsFreelancer(false);
@@ -379,38 +381,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                                                     />
                                                                 </Grid>
 
-                                                                {/* <Grid item xs={12} sm={3}>
-                                                                    <TextField
-                                                                        fullWidth
-                                                                        id={`products.${index}.productPrice`}
-                                                                        label="Product Price"
-                                                                        name={`products.${index}.productPrice`}
-                                                                        color='secondary'
-                                                                        onChange={formik.handleChange}
-                                                                        onBlur={formik.handleBlur}
-                                                                        value={getIn(formik.values, `products.${index}.productPrice`)}
-                                                                        error={getIn(formik.touched, `products.${index}.productPrice`) && Boolean(getIn(formik.errors, `products.${index}.productPrice`))}
-                                                                        helperText={getIn(formik.touched, `products.${index}.productPrice`) && getIn(formik.errors, `products.${index}.productPrice`)}
-                                                                        InputProps={{
-                                                                            startAdornment: (
-                                                                                <InputAdornment position="start">
-                                                                                    <Select
-                                                                                        id={`products.${index}.currency`}
-                                                                                        name={`products.${index}.currency`}
-                                                                                        value={getIn(formik.values, `products.${index}.currency`)}
-                                                                                        onChange={formik.handleChange}
-                                                                                        onBlur={formik.handleBlur}
-                                                                                        error={getIn(formik.touched, `products.${index}.currency`) && Boolean(getIn(formik.errors, `products.${index}.currency`))}
-                                                                                        style={{ marginRight: '8px' }}
-                                                                                    >
-                                                                                        <MenuItem value="INR">INR</MenuItem>
-                                                                                        <MenuItem value="USD">USD</MenuItem>
-                                                                                    </Select>
-                                                                                </InputAdornment>
-                                                                            ),
-                                                                        }}
-                                                                    />
-                                                                </Grid> */}
 
                                                                 <Grid item xs={12} sm={3}>
                                                                     <TextField
@@ -451,72 +421,82 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                                                 </Grid>
 
 
-                                                                <Grid item xs={12} sm={6}>
+                                                                <Grid item xs={12} container justifyContent="flex-end" alignItems="center">
                                                                     <IconButton
                                                                         aria-label="remove product"
                                                                         onClick={() => arrayHelpers.remove(index)}
                                                                     >
-                                                                        <RemoveCircleOutline />
+                                                                        {/* Remove */}
+                                                                        <DeleteIcon />
                                                                     </IconButton>
                                                                 </Grid>
                                                             </Grid>
                                                         </div>
                                                     ))}
-                                                    <Box display="flex" justifyContent="center" mt={2}>
-                                                        <IconButton
+                                                    {/* <Box display="flex" mt={2}> */}
+                                                    <Grid item xs={12} container justifyContent="flex-start" alignItems="center">
+                                                        <Button
                                                             aria-label="add product"
+
                                                             onClick={() => arrayHelpers.push({ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' })}
                                                         >
-                                                            <AddCircleOutline />
-                                                        </IconButton>
-                                                    </Box>
+                                                            Add product
+                                                        </Button>
+                                                    </Grid>
                                                 </div>
                                             )}
                                         />
                                     </Grid>
 
+
                                     <Grid item xs={12}>
-                                        <FormControl color='secondary' component="fieldset">
+                                        <FormControl component="fieldset">
                                             <FormLabel color='secondary' component="legend">Do you have a patent?</FormLabel>
                                             <RadioGroup
-                                                color='secondary'
                                                 aria-label="hasPatent"
                                                 name="hasPatent"
                                                 value={formik.values.hasPatent ? 'Yes' : 'No'}
                                                 onChange={(event) => formik.setFieldValue('hasPatent', event.target.value === 'Yes')}
                                             >
-                                                <FormControlLabel color='secondary' value="Yes" control={<Radio />} label="Yes" />
-                                                <FormControlLabel color='secondary' value="No" control={<Radio />} label="No" />
+                                                <FormControlLabel
+                                                    value="Yes"
+                                                    control={<Radio sx={{ color: '#CC4800', '&.Mui-checked': { color: '#CC4800' } }} />}
+                                                    label="Yes"
+                                                />
+                                                <FormControlLabel
+                                                    value="No"
+                                                    control={<Radio sx={{ color: '#CC4800', '&.Mui-checked': { color: '#CC4800' } }} />}
+                                                    label="No"
+                                                />
                                             </RadioGroup>
-
                                         </FormControl>
                                     </Grid>
                                 </>
                             )}
                         </Grid>
 
-                        
+
 
                         <Button
-                        type="button"
-                        variant="contained"
-                        size="small"
-                        sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
-                        onClick={onPrevious}
-                    >
-                        Back
-                    </Button>
+                            type="button"
+                            variant="contained"
+                            size="small"
+                            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
+                            onClick={onPrevious}
+                        >
+                            Back
+                        </Button>
 
-                     <LoadingButton
-                        type="submit"
-                        variant="contained"
-                        size="small"
-                        loading={loading}
-                        loadingIndicator={<CircularProgress size={24} />}
-                        sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
-                    >
-                        Save & Next
-                    </LoadingButton>
+                        <LoadingButton
+                            type="submit"
+                            variant="contained"
+                            size="small"
+                            loading={loading}
+                            loadingIndicator={<CircularProgress size={24} />}
+                            sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
+                        >
+                            Save & Next
+                        </LoadingButton>
                     </Box>
                 </FormikProvider>
 

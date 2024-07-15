@@ -10,7 +10,8 @@ import { APIS } from '@/app/constants/api.constant';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-import defaultProfileImg  from '../../assets/Zenithithive Logo Black PNG  (1).png'
+import { pubsub } from '@/app/services/pubsub.service';
+import defaultProfileImg from '../../assets/Zenithithive Logo Black PNG  (1).png'
 
 
 const defaultProfileImgSrc = defaultProfileImg || defaultProfileImg;
@@ -43,7 +44,10 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
     address: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
     state: Yup.string().required('Required'),
-    pinCode: Yup.string().required('Required'),
+    // pinCode: Yup.string().required('Required'),
+    pinCode: Yup.string()
+      .required('Required')
+      .matches(/^[0-9]+$/, 'Must be only digits'),
     country: Yup.string().required('Required'),
     linkedIn: Yup.string().url('Invalid URL').required('Required'),
     billingAddress: Yup.string().required('Required'),
@@ -67,9 +71,17 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      pubsub.publish('toast', {
+        message: 'Profile updated successfully!',
+        severity: 'success',
+      });
       onNext(); // Call onNext when the form is submitted
     } catch (error) {
       console.error('Error submitting form:', error);
+      pubsub.publish('toast', {
+        message: 'Failed to update profile. Please try again.',
+        severity: 'error',
+      });
     } finally {
       setLoading(false);
     }

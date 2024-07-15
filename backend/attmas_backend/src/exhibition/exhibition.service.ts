@@ -51,8 +51,9 @@ export class ExhibitionService {
     // Send emails to all users
     const subject = 'New Exhibition Created';
     const exhibitionId = savedExhibition._id.toString();
+    const title = savedExhibition.title;
     for (const user of users) {
-      await this.emailService.sendEmail2(user.username, subject, exhibitionId);
+      await this.emailService.sendEmail2(user.username, subject, exhibitionId, title);
     }
 
     return savedExhibition;

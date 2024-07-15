@@ -4,7 +4,7 @@ import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import BoothDetailsModal from '../component/booth/booth';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
@@ -31,6 +31,7 @@ interface Booth {
     lastName: string;
   };
   status: string;
+  exhibitionId: string;
 }
 
 const ExhibitionsPage: React.FC = () => {
@@ -39,8 +40,10 @@ const ExhibitionsPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const searchParams = useSearchParams();
-  const { userType } = userDetails || {};
+  const { userType } = userDetails;
+  const [selectedBooth, setSelectedBooth] = useState<Booth | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>('All');
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchExhibitions = async () => {
@@ -77,8 +80,20 @@ const ExhibitionsPage: React.FC = () => {
 
   const handleCreateBooth = async (boothData: any) => {
     try {
+      const exhibitionId = searchParams.get('exhibitionId');
+      if (!exhibitionId) {
+        console.error('Exhibition ID not found');
+        return;
+      }
+  
+      boothData.exhibitionId = exhibitionId;
+  
       const response = await axios.post(APIS.CREATE_BOOTH, boothData);
-      setBooths(prevBooths => [...prevBooths, response.data]);
+      if (response.data.exhibitionId === exhibitionId) {
+        setBooths(prevBooths => [...prevBooths, response.data]);
+      } else {
+        console.error('Booth created does not belong to the current exhibition');
+      }
       closeModal();
     } catch (error) {
       console.error('Error creating booth:', error);
@@ -242,11 +257,20 @@ const ExhibitionsPage: React.FC = () => {
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
             {booths
+                .filter(booth => booth.exhibitionId === exhibitionId)
                 .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
               .map(booth => (
                 <Card key={booth._id} sx={{ flex: '1 1 calc(33.333% - 10px)', boxSizing: 'border-box', marginBottom: '10px' }}>
                   <CardContent>
-                    <Typography>{booth.title}</Typography>
+                    <Typography
+                      onClick={() => {
+                        setSelectedBooth(booth);
+                        setDialogOpen(true);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {booth.title}
+                    </Typography>
                     <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                     <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '24px' }}>
                       <Chip
@@ -272,7 +296,7 @@ const ExhibitionsPage: React.FC = () => {
                               {product.name} <br />
                               {product.description} <br />
                               {product.productType} <br />
-                              ${product.price}
+                              {product.price}
                             </li>
                           </div>
                         ))}
@@ -304,11 +328,42 @@ const ExhibitionsPage: React.FC = () => {
                 </Card>
               ))}
           </Box>
+          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+            {selectedBooth && (
+              <>
+                <DialogTitle><h1>Booth Details</h1></DialogTitle>
+                <DialogContent>
+                <Typography><h2>Title :- {selectedBooth.title}</h2></Typography>
+                  <Typography><h2>Description :- {selectedBooth.description}</h2></Typography>
+                  <Typography><h2>Status :- {selectedBooth.status}</h2></Typography>
+                  <Typography><h2>Products :- </h2></Typography>
+                  <Typography>
+                      <ul>
+                        {selectedBooth.products.map(product => (
+                          <div key={product.name} style={{ margin: '20px' }}>
+                            <li><h2>
+                              {product.name} <br />
+                              {product.description} <br />
+                              {product.productType} <br />
+                              {product.price}
+                              </h2></li>
+                          </div>
+                        ))}
+                      </ul>
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setDialogOpen(false)}>Close</Button>
+                </DialogActions>
+              </>
+            )}
+          </Dialog>
         </div>
       </div>
     </div>
   );
 };
+
 const SuspenseExhibitionsPage: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
