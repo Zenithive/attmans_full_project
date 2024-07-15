@@ -39,9 +39,8 @@ const ExhibitionsPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const searchParams = useSearchParams();
-  const { userType } = userDetails;
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [hiddenButtons, setHiddenButtons] = useState<{ [key: string]: boolean }>({});
+  const { userType } = userDetails || {};
+  const [statusFilter, setStatusFilter] = useState<string | null>('All');
 
   useEffect(() => {
     const fetchExhibitions = async () => {
@@ -62,8 +61,8 @@ const ExhibitionsPage: React.FC = () => {
       try {
         const response = await axios.get(`${APIS.GET_BOOTH}`, {
           params: {
-            userId: userDetails._id,
-            status: statusFilter,
+            userId: userDetails?._id,
+            status: statusFilter === 'All' ? '' : statusFilter,
           },
         });
         setBooths(response.data);
@@ -74,7 +73,7 @@ const ExhibitionsPage: React.FC = () => {
 
     fetchExhibitions();
     fetchBooths();
-  }, [userDetails._id, searchParams, statusFilter]);
+  }, [userDetails?._id, searchParams, statusFilter]);
 
   const handleCreateBooth = async (boothData: any) => {
     try {
@@ -94,7 +93,7 @@ const ExhibitionsPage: React.FC = () => {
           booth._id === boothId ? { ...booth, status: 'Approved' } : booth
         )
       );
-      setHiddenButtons(prevHiddenButtons => ({ ...prevHiddenButtons, [boothId]: true }));
+      setStatusFilter('Approved'); 
     } catch (error) {
       console.error('Error approving booth:', error);
     }
@@ -108,7 +107,7 @@ const ExhibitionsPage: React.FC = () => {
           booth._id === boothId ? { ...booth, status: 'Rejected' } : booth
         )
       );
-      setHiddenButtons(prevHiddenButtons => ({ ...prevHiddenButtons, [boothId]: true }));
+      setStatusFilter('Rejected');
     } catch (error) {
       console.error('Error rejecting booth:', error);
     }
@@ -189,7 +188,7 @@ const ExhibitionsPage: React.FC = () => {
       <div style={{ flex: 1, marginRight: '20px' }}>
         <div style={{ position: "relative", color: 'black', textAlign: "center", background: "#f5f5f5", right: "8px", width: "102%", bottom: "29px" }}>
           <h1 style={{ position: 'relative', top: "15%" }}>Exhibition</h1>
-          {(userType === 'Innovators') && (
+          {(userDetails && userType === 'Innovators') && (
             <Button variant="contained" color="primary" onClick={openModal} style={{ position: 'relative', float: "right", bottom: '60px', right: '5%', background: '#757575', fontWeight: 'bolder', color: 'white', height: '32px',backgroundColor:'#CC4800' }}>
               Participate
             </Button>
@@ -218,14 +217,17 @@ const ExhibitionsPage: React.FC = () => {
         </div>
         <Divider orientation="horizontal" flexItem />
         <div>
-          <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '10%' }}>
+          <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '11%',top:'20px' }}>
             <h1>Booth Details</h1>
             <ToggleButtonGroup
               value={statusFilter}
               exclusive
               onChange={handleStatusFilterChange}
               aria-label="status filter"
+              sx={{position:'relative',left:'40%',bottom:'63px'}}
             >
+                <ToggleButton value="All" aria-label="all">All
+                </ToggleButton>
               <ToggleButton value="Pending" aria-label="pending">
                 Pending
               </ToggleButton>
@@ -238,9 +240,9 @@ const ExhibitionsPage: React.FC = () => {
             </ToggleButtonGroup>
 
           </Box>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', position: 'relative', left: '10%', width: '70%' }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
             {booths
-              .filter(booth => userType === 'Innovators' || booth.status === 'Approved')
+                .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
               .map(booth => (
                 <Card key={booth._id} sx={{ flex: '1 1 calc(33.333% - 10px)', boxSizing: 'border-box', marginBottom: '10px' }}>
                   <CardContent>
@@ -277,13 +279,13 @@ const ExhibitionsPage: React.FC = () => {
                       </ul>
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', marginLeft: '48%' }}>
-                      {!hiddenButtons[booth._id] && (userType === 'Admin') && (
+                      {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') &&  (
                         <>
                           <Button
                             variant="contained"
                             color="primary"
                             onClick={() => handleApprove(booth._id)}
-                            disabled={booth.status === 'Approved'}
+                            disabled={booth.status === 'Approved' || booth.status === 'Rejected'}
                           >
                             Approve
                           </Button>
@@ -291,7 +293,7 @@ const ExhibitionsPage: React.FC = () => {
                             variant="contained"
                             color="secondary"
                             onClick={() => handleReject(booth._id)}
-                            disabled={booth.status === 'Rejected'}
+                            disabled={booth.status === 'Approved' || booth.status === 'Rejected'}
                           >
                             Reject
                           </Button>

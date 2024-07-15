@@ -51,6 +51,9 @@ export class Booth {
 
   @Prop({ default: 'Pending' })
   status: string;
+
+  @Prop({ default: false })
+  buttonsHidden: boolean;
 }
 
 export const BoothSchema = SchemaFactory.createForClass(Booth);
