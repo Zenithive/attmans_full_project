@@ -44,7 +44,10 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
     address: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
     state: Yup.string().required('Required'),
-    pinCode: Yup.string().required('Required'),
+    // pinCode: Yup.string().required('Required'),
+    pinCode: Yup.string()
+      .required('Required')
+      .matches(/^[0-9]+$/, 'Must be only digits'),
     country: Yup.string().required('Required'),
     linkedIn: Yup.string().url('Invalid URL').required('Required'),
     billingAddress: Yup.string().required('Required'),

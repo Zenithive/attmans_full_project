@@ -39,7 +39,10 @@ const EditProfile1: React.FC = () => {
     address: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
     state: Yup.string().required('Required'),
-    pinCode: Yup.string().required('Required'),
+    // pinCode: Yup.string().required('Required'),
+    pinCode: Yup.string()
+      .required('Required')
+      .matches(/^[0-9]+$/, 'Must be only digits'),
     country: Yup.string().required('Required'),
     linkedIn: Yup.string().url('Invalid URL').required('Required'),
     billingAddress: Yup.string().required('Required'),
@@ -186,7 +189,7 @@ const EditProfile1: React.FC = () => {
                     loading={loading}
                     loadingIndicator={<CircularProgress size={24} />}
                   >
-                    Update Personal Details 
+                    Update Personal Details
                   </LoadingButton>
                 </Box>
 
