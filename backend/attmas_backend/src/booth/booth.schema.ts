@@ -51,8 +51,6 @@ export class Booth {
 
   @Prop({ default: 'Pending' })
   status: string;
-
-
 }
 
 export const BoothSchema = SchemaFactory.createForClass(Booth);
