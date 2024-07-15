@@ -21,6 +21,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close'; 
 import { Formik, Field, FieldArray, Form, FieldProps, FormikErrors } from 'formik';
 import * as Yup from 'yup';
 
@@ -35,7 +36,7 @@ interface Product {
   name: string;
   description: string;
   productType: string;
-  price: number;
+  price: string;
   currency: string;
 }
 
@@ -61,7 +62,13 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
                 '& .MuiOutlinedInput-notchedOutline': {
                     border: 'none'
                 },
-            }}
+                '& .MuiSelect-select': {
+                  borderBottom: 'none',
+                },
+                '&:before, &:after': {
+                  borderBottom: 'none !important',
+                },
+              }}
               onChange={(event) => form.setFieldValue(`products.${index}.currency`, event.target.value)}
               displayEmpty
               inputProps={{ 'aria-label': 'Currency' }}
@@ -74,8 +81,8 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
                 },
               }}
             >
-              <MenuItem value="USD">USD</MenuItem>
               <MenuItem value="INR">INR</MenuItem>
+              <MenuItem value="USD">USD</MenuItem>
             </Select>
           </FormControl>
         ),
@@ -83,6 +90,7 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
     />
   );
 };
+
 const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth, exhibitionId }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -90,7 +98,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
     title: '',
     description: '',
     videoUrl: '',
-    products: [{ name: '', description: '', productType: '', price: 0, currency: 'USD' }] as Product[],
+    products: [{ name: '', description: '', productType: '', price: '', currency: 'INR' }] as Product[],
     userId: userDetails._id,
     username: userDetails.username,
     exhibitionId: exhibitionId || '',
@@ -139,6 +147,17 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
           borderRadius: '20px',
         }}
       >
+           <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <Typography id="modal-title" variant="h6" component="h2">
           Booth Details
         </Typography>
