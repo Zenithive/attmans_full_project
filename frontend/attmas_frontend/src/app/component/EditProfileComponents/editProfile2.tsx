@@ -16,7 +16,8 @@ import {
     Radio,
     IconButton,
     InputAdornment,
-    Select
+    Select,
+    Button
 } from '@mui/material';
 import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
 import { useFormik, FormikProvider, FieldArray, getIn } from 'formik';
@@ -27,6 +28,8 @@ import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const EditProfile2: React.FC = () => {
     const [isFreelancer, setIsFreelancer] = useState(false);
@@ -115,7 +118,7 @@ const EditProfile2: React.FC = () => {
                 });
 
                 // Update state based on user type for conditional rendering
-                if (userData.userType === 'Freelancer') {
+                if (userData.userType === 'Innovators') {
                     setIsFreelancer(true);
                     if (userData.productToMarket === 'Yes') {
                         setShowProductDetails(true);
@@ -127,7 +130,7 @@ const EditProfile2: React.FC = () => {
                     setShowProductDetails(false);
                 }
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                console.error('Error fetching user profile:', error); 
                 setFetchError('Failed to fetch user profile');
             } finally {
                 setLoading(false);
@@ -140,7 +143,7 @@ const EditProfile2: React.FC = () => {
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        if (value === 'Freelancer') {
+        if (value === 'Innovators') {
             setIsFreelancer(true);
         } else {
             setIsFreelancer(false);
@@ -372,38 +375,6 @@ const EditProfile2: React.FC = () => {
                                                                     />
                                                                 </Grid>
 
-                                                                {/* <Grid item xs={12} sm={3}>
-                                                                    <TextField
-                                                                        fullWidth
-                                                                        id={`products.${index}.productPrice`}
-                                                                        label="Product Price"
-                                                                        name={`products.${index}.productPrice`}
-                                                                        color='secondary'
-                                                                        onChange={formik.handleChange}
-                                                                        onBlur={formik.handleBlur}
-                                                                        value={getIn(formik.values, `products.${index}.productPrice`)}
-                                                                        error={getIn(formik.touched, `products.${index}.productPrice`) && Boolean(getIn(formik.errors, `products.${index}.productPrice`))}
-                                                                        helperText={getIn(formik.touched, `products.${index}.productPrice`) && getIn(formik.errors, `products.${index}.productPrice`)}
-                                                                        InputProps={{
-                                                                            startAdornment: (
-                                                                                <InputAdornment position="start">
-                                                                                    <Select
-                                                                                        id={`products.${index}.currency`}
-                                                                                        name={`products.${index}.currency`}
-                                                                                        value={getIn(formik.values, `products.${index}.currency`)}
-                                                                                        onChange={formik.handleChange}
-                                                                                        onBlur={formik.handleBlur}
-                                                                                        error={getIn(formik.touched, `products.${index}.currency`) && Boolean(getIn(formik.errors, `products.${index}.currency`))}
-                                                                                        style={{ marginRight: '8px' }}
-                                                                                    >
-                                                                                        <MenuItem value="INR">INR</MenuItem>
-                                                                                        <MenuItem value="USD">USD</MenuItem>
-                                                                                    </Select>
-                                                                                </InputAdornment>
-                                                                            ),
-                                                                        }}
-                                                                    />
-                                                                </Grid> */}
 
                                                                 <Grid item xs={12} sm={3}>
                                                                     <TextField
@@ -444,44 +415,54 @@ const EditProfile2: React.FC = () => {
                                                                 </Grid>
 
 
-                                                                <Grid item xs={12} sm={6}>
+                                                                <Grid item xs={12} container justifyContent="flex-end" alignItems="center">
                                                                     <IconButton
                                                                         aria-label="remove product"
                                                                         onClick={() => arrayHelpers.remove(index)}
                                                                     >
-                                                                        <RemoveCircleOutline />
+                                                                        {/* Remove */}
+                                                                        <DeleteIcon />
                                                                     </IconButton>
                                                                 </Grid>
                                                             </Grid>
                                                         </div>
                                                     ))}
-                                                    <Box display="flex" justifyContent="center" mt={2}>
-                                                        <IconButton
+                                                    {/* <Box display="flex" mt={2}> */}
+                                                    <Grid item xs={12} container justifyContent="flex-start" alignItems="center">
+                                                        <Button
                                                             aria-label="add product"
+
                                                             onClick={() => arrayHelpers.push({ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' })}
                                                         >
-                                                            <AddCircleOutline />
-                                                        </IconButton>
-                                                    </Box>
+                                                            Add product
+                                                        </Button>
+                                                    </Grid>
                                                 </div>
                                             )}
                                         />
                                     </Grid>
 
+
                                     <Grid item xs={12}>
-                                        <FormControl color='secondary' component="fieldset">
+                                        <FormControl component="fieldset">
                                             <FormLabel color='secondary' component="legend">Do you have a patent?</FormLabel>
                                             <RadioGroup
-                                                color='secondary'
                                                 aria-label="hasPatent"
                                                 name="hasPatent"
                                                 value={formik.values.hasPatent ? 'Yes' : 'No'}
                                                 onChange={(event) => formik.setFieldValue('hasPatent', event.target.value === 'Yes')}
                                             >
-                                                <FormControlLabel color='secondary' value="Yes" control={<Radio />} label="Yes" />
-                                                <FormControlLabel color='secondary' value="No" control={<Radio />} label="No" />
+                                                <FormControlLabel
+                                                    value="Yes"
+                                                    control={<Radio sx={{ color: '#CC4800', '&.Mui-checked': { color: '#CC4800' } }} />}
+                                                    label="Yes"
+                                                />
+                                                <FormControlLabel
+                                                    value="No"
+                                                    control={<Radio sx={{ color: '#CC4800', '&.Mui-checked': { color: '#CC4800' } }} />}
+                                                    label="No"
+                                                />
                                             </RadioGroup>
-
                                         </FormControl>
                                     </Grid>
                                 </>
