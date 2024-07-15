@@ -77,6 +77,7 @@ export class BoothService {
     }
     booth.status = 'Approved';
     console.log('booth status', booth.status);
+    booth.buttonsHidden = true;
     await booth.save();
     return booth;
   }
@@ -88,6 +89,7 @@ export class BoothService {
       throw new NotFoundException('Booth not found');
     }
     booth.status = 'Rejected';
+    booth.buttonsHidden = true;
     await booth.save();
     return booth;
   }

@@ -28,6 +28,7 @@ export const APIS = {
     GET_BOOTH: `${SERVER_URL}/booths`,
     APPROVE_BOOTH: `${SERVER_URL}/booths/approve`,
     REJECT_BOOTH: `${SERVER_URL}/booths/reject`,
+    UPDATE_BOOTH: `${SERVER_URL}/booths/update-buttons-hidden`,
 
 
 
