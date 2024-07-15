@@ -25,7 +25,12 @@ export class EmailService2 {
     });
   }
 
-  async sendEmail2(to: string, subject: string, exhibitionId: string, title:string) {
+  async sendEmail2(
+    to: string,
+    subject: string,
+    exhibitionId: string,
+    title: string,
+  ) {
     try {
       // Fetch user details from UsersService
       const user = await this.usersService.findByUsername(to);

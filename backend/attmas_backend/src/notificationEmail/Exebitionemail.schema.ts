@@ -23,9 +23,8 @@ export class Email extends Document {
   // exibitionId: Types.ObjectId;
 
   @Prop({ required: false })
-    // @Prop({ type: Types.ObjectId, ref: 'exhibitions', required: false })
-    // exibitionId: Types.ObjectId;
-
+  // @Prop({ type: Types.ObjectId, ref: 'exhibitions', required: false })
+  // exibitionId: Types.ObjectId;
   @Prop({ required: false })
   exhibitionId: string;
 
