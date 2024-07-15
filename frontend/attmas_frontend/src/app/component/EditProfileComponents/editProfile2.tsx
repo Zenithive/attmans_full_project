@@ -496,7 +496,7 @@ const EditProfile2: React.FC = () => {
                                 loading={loading}
                                 loadingIndicator={<CircularProgress size={24} />}
                             >
-                                Update Profile
+                                Update Work Experience
                             </LoadingButton>
                         </Box>
                     </Box>

@@ -21,7 +21,6 @@ import MailIcon from '@mui/icons-material/Mail';
 import DOMPurify from 'dompurify';
 import DoneIcon from '@mui/icons-material/Done';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
-import { title } from 'process';
 
 interface Email {
   _id: string;
@@ -31,6 +30,7 @@ interface Email {
   read: boolean;
   boothUsername?: string;
   title: string;
+  sentAt: Date;
 }
 
 function clearCookies() {
@@ -79,14 +79,17 @@ export default function MainNavBar() {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
-        console.log("API response:", response.data); // Log the response
-        setNotifications(response.data);
+        const notificationsWithTimestamp = response.data.map((notification: Email) => ({
+          ...notification,
+          sentAt: new Date(notification.sentAt), // Ensure sentAt is a Date object
+        })).sort((a: { sentAt: { getTime: () => number; }; }, b: { sentAt: { getTime: () => number; }; }) => b.sentAt.getTime() - a.sentAt.getTime());
+        setNotifications(notificationsWithTimestamp);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
     };
     fetchNotifications();
-  }, []);
+  }, [userDetails.username]);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -116,9 +119,11 @@ export default function MainNavBar() {
   const handleNotificationClick = async (notificationId: string) => {
     try {
       await axios.post(`${APIS.MARK_AS_READ}`, { id: notificationId });
-      setNotifications(notifications.map(notification =>
-        notification._id === notificationId ? { ...notification, read: true } : notification
-      ));
+      setNotifications(prevNotifications => {
+        return prevNotifications.map(notification =>
+          notification._id === notificationId ? { ...notification, read: true } : notification
+        ).sort((a, b) => b.sentAt.getTime() - a.sentAt.getTime());
+      });
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -143,20 +148,18 @@ export default function MainNavBar() {
   };
 
   const generateNotificationHtml = (notification: Email) => {
-    console.log('notification', notification.boothUsername)
     if (notification.boothUsername) {
       return `
         Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-        You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a>  to approve/reject.
-    `;
+        You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to approve/reject.
+      `;
     } else {
       return `
-      Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-    You have been invited to participate in the exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
-  `;
+        Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+        You have been invited to participate in the exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
+      `;
     }
-  }
-
+  };
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -186,7 +189,6 @@ export default function MainNavBar() {
 
   const notificationMenuId = 'primary-notification-menu';
 
-
   const renderNotificationMenu = (
     <Menu
       anchorEl={notificationAnchorEl}
@@ -203,7 +205,7 @@ export default function MainNavBar() {
       open={isNotificationMenuOpen}
       onClose={handleNotificationMenuClose}
     >
-      <Box sx={{ width: 300 }}>
+      <Box sx={{ width: 400 }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', px: 2, py: 1 }}>
           Notifications
         </Typography>
@@ -220,7 +222,7 @@ export default function MainNavBar() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
-                    backgroundColor: 'grey.200' // Grey background for unread notifications
+                    backgroundColor: 'grey.200', // Grey background for unread notifications
                   }}
                 >
                   <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
@@ -246,7 +248,6 @@ export default function MainNavBar() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
-                    backgroundColor: 'white' // White background for read notifications
                   }}
                 >
                   <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
@@ -259,11 +260,18 @@ export default function MainNavBar() {
             ))}
           </Box>
         )}
+
+        {/* No Notifications */}
+        {notifications.length === 0 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+            <Typography variant="body2" sx={{ py: 1 }}>
+              No new notifications.
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Menu>
   );
-
-
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
@@ -282,20 +290,8 @@ export default function MainNavBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
       <MenuItem onClick={handleNotificationMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label={`show ${notifications.length} new notifications`}
-          color="inherit"
-        >
+        <IconButton size="large" aria-label="show notifications" color="inherit">
           <Badge badgeContent={notifications.filter(notification => !notification.read).length} color="error">
             <NotificationsIcon />
           </Badge>
@@ -310,11 +306,7 @@ export default function MainNavBar() {
           aria-haspopup="true"
           color="inherit"
         >
-          {profilePhoto ? (
-            <Avatar src={`${SERVER_URL}/${profilePhoto}`} />
-          ) : (
-            <AccountCircle />
-          )}
+          {profilePhoto ? <Avatar src={`${SERVER_URL}${profilePhoto}`} /> : <AccountCircle />}
         </IconButton>
         <p>Profile</p>
       </MenuItem>
@@ -337,7 +329,7 @@ export default function MainNavBar() {
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton
               size="large"
-              aria-label={`show ${notifications.filter(notification => !notification.read).length} new notifications`}
+              aria-label="show notifications"
               color="inherit"
               onClick={handleNotificationMenuOpen}
             >

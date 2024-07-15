@@ -167,7 +167,7 @@ const EditProfile1: React.FC = () => {
 
                 <ProfileFormFields />
 
-                <LoadingButton
+                {/* <LoadingButton
                   type="submit"
                   variant="contained"
                   size='small'
@@ -176,7 +176,21 @@ const EditProfile1: React.FC = () => {
                   sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
                 >
                   Save
-                </LoadingButton>
+                </LoadingButton> */}
+
+                <Box mt={3} display="flex" justifyContent="center">
+                  <LoadingButton
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    loading={loading}
+                    loadingIndicator={<CircularProgress size={24} />}
+                  >
+                    Update Personal Details 
+                  </LoadingButton>
+                </Box>
+
+
               </Form>
             );
           }}

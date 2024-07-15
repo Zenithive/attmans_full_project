@@ -39,7 +39,7 @@ export class BoothService {
         'New Booth Created',
         exhibitionId.toHexString(),
         booth.username,
-        booth.title
+        exhibition.title
       );
     }
 

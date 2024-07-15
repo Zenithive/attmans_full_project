@@ -19,7 +19,7 @@ type Option = {
 
 const industryOptions = [
   "Chemicals",
-  "Agriculture",
+  "Agriculture",  
   "Electronics",
   "Energy",
   "Environmental and waste management",
@@ -267,8 +267,8 @@ const EditProfile3: React.FC = () => {
 
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-            <LoadingButton
+          {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}> */}
+            {/* <LoadingButton
               type="submit"
               variant="contained"
               size="small"
@@ -278,82 +278,100 @@ const EditProfile3: React.FC = () => {
               color="secondary"
             >
               Save
-            </LoadingButton>
+            </LoadingButton> */}
+
+            <Box mt={3} display="flex" justifyContent="center">
+              <LoadingButton
+                type="submit"
+                variant="contained"
+                color="primary"
+                loading={loading}
+                loadingIndicator={<CircularProgress size={24} />}
+              >
+                Update Subject matter expertise
+              </LoadingButton>
+            {/* </Box> */}
           </Box>
         </Box>
       </Box>
 
-      <style jsx>{`
-        .nested-multiselect-dropdown {
-          position: relative;
-          display: inline-block;
-          width: 560px;
-        }
+      
+  <style jsx>{`
+    .nested-multiselect-dropdown {
+      position: relative;
+      display: inline-block;
+      width: 560px;
+    }
 
-        .dropdown-content {
-          display: block;
-          position: absolute;
-          background-color: #f9f9f9;
-          min-width: 560px;
-          max-height: 300px;
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-          padding: 12px 16px;
-          z-index: 1;
-          border: 1px solid #ccc;
-          overflow-y: auto;
-        }
+    .dropdown-content {
+      display: block;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 560px;
+      max-height: 300px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      padding: 12px 16px;
+      z-index: 1;
+      border: 1px solid #ccc;
+      overflow-y: auto;
+    }
 
-        .options-container {
-          max-height: 200px;
-          overflow-y: auto;
-        }
+    .options-container {
+      max-height: 200px;
+      overflow-y: auto;
+    }
 
-        .nested-multiselect-dropdown label {
-          display: block;
-          margin-bottom: 5px;
-        }
+    .nested-multiselect-dropdown label {
+      display: block;
+      margin-bottom: 5px;
+    }
 
-        .parent-option {
-          cursor: pointer;
-        }
+    .parent-option {
+      cursor: pointer;
+    }
 
-        .parent-option:hover {
-          background-color: #f1f1f1;
-        }
+    .parent-option:hover {
+      background-color: #f1f1f1;
+    }
 
-        .selected-values {
-          margin-bottom: 10px;
-        }
+    .selected-values {
+      margin-bottom: 10px;
+    }
 
-        .selected-values strong {
-          display: inline-block;
-          margin-right: 5px;
-        }
+    .selected-values strong {
+      display: inline-block;
+      margin-right: 5px;
+    }
 
-        button {
-          margin-right: 10px;
-          width: 570px;
-          border-radius: 20px;
-          background-color:white;
-          height: 57px;
-          padding: 10px 20px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          flex-wrap: wrap;
-        }
+    button {
+      margin-right: 10px;
+      width: 514px; /* Decrease width */
+      border-radius: 20px;
+      background-color: white;
+      height: 57px; /* Increase height */
+      padding: 10px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      border: 1px solid #ccc; /* Thin border */
+    }
 
-        .dropdown-content input {
-          width: 100%;
-          padding: 5px;
-          margin-bottom: 10px;
-          border: 1px solid #ccc;
-          box-sizing: border-box;
-        }
-      `}</style>
+    .dropdown-content input {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+  `}</style>
+
     </Container>
   );
 };
 
 export default EditProfile3;
+
+
+

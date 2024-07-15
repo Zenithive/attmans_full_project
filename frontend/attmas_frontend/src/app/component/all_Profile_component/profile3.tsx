@@ -445,7 +445,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         formik.setValues({
           ...formik.values,
           subcategories: userData.subcategories || [],
-          categories: userData.categories || [], // Changed preferredIndustries to categories
+          categories: userData.categories || [], 
         });
         setSelectedValues(userData.subcategories || []);
       } catch (error) {
