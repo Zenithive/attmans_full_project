@@ -216,7 +216,7 @@ const ExhibitionsPage: React.FC = () => {
         <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "29px",height:'6%' }}>
           <h1 style={{ position: 'relative', top: "15%" ,left:'30px'}}>Exhibition</h1>
           {(userDetails && userType === 'Innovators') && (
-            <Button variant="contained" color="primary" onClick={openModal} style={{ position: 'relative', float: "right", bottom: '60px', right: '5%', background: '#757575', fontWeight: 'bolder', color: 'white', height: '32px', backgroundColor: '#CC4800' }}>
+            <Button variant="contained" color="primary" onClick={openModal} style={{ position: 'relative', float: "right", bottom: '51px', right: '5%', background: '#757575', fontWeight: 'bolder', color: 'white', height: '32px', backgroundColor: '#CC4800' }}>
               Participate
             </Button>
           )}
