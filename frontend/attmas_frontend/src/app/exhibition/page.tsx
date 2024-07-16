@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField, Tooltip, ToggleButton, ToggleButtonGroup} from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField, Tooltip, ToggleButton, ToggleButtonGroup, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -15,8 +15,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useMemo,useCallback } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import ExhibitionDetails from '../component/viewonly/viewonly';
-import Link from 'next/link';
+import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 
 interface Exhibition {
   _id?: string;
@@ -194,7 +193,7 @@ const Exhibition = () => {
   const [hasMore,setHasMore]=useState(true);
   const [page, setPage] = useState(1);
   const [filterType, setFilterType] = useState('all');
-  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null); 
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; exhibition: Exhibition | null }>({ open: false, exhibition: null });
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const { userType, _id: userId, username } = userDetails;
@@ -273,15 +272,19 @@ const Exhibition = () => {
     setEditingExhibition(null);
   },[]);
 
-  const handleDeleteExhibition =useCallback(async (editingExhibition: Exhibition) => {
-    try {
-      await axios.delete(`${APIS.EXHIBITION}/${editingExhibition._id}`);
-      setExhibitions(exhibitions.filter(exhibition => exhibition._id !== editingExhibition._id));
-      pubsub.publish('ExhibitionDeleted', { message: 'Exhibition Deleted' });
-    } catch (error) {
-      console.error('Error deleting exhibition:', error);
+  const handleDeleteExhibition = useCallback(async () => {
+    if (confirmDelete.exhibition) {
+      try {
+        await axios.delete(`${APIS.EXHIBITION}/${confirmDelete.exhibition._id}`);
+        setExhibitions(exhibitions.filter(exhibition => exhibition._id !== confirmDelete.exhibition!._id));
+        pubsub.publish('ExhibitionDeleted', { message: 'Exhibition Deleted' });
+      } catch (error) {
+        console.error('Error deleting exhibition:', error);
+      } finally {
+        setConfirmDelete({ open: false, exhibition: null });
+      }
     }
-  },[exhibitions]);
+  }, [confirmDelete, exhibitions]);
 
   const handleSendInnovators =useCallback((exhibition: Exhibition) => {
     setSendingExhibition(exhibition);
@@ -299,6 +302,15 @@ const Exhibition = () => {
     if (newFilterType !== null) {
       setFilterType(newFilterType);
     }
+  };
+
+
+  const handleConfirmDelete = (exhibition: Exhibition) => {
+    setConfirmDelete({ open: true, exhibition });
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDelete({ open: false, exhibition: null });
   };
 
 
@@ -390,11 +402,11 @@ const Exhibition = () => {
                 </IconButton>
                  )}
                 {userType === "Admin" && (
-                <IconButton onClick={() => handleDeleteExhibition(exhibition)}>
-                <Tooltip title="Delete">
-                  <DeleteRoundedIcon />
-                  </Tooltip>
-                </IconButton>
+                    <IconButton onClick={() => handleConfirmDelete(exhibition)}>
+                      <Tooltip title="Delete">
+                        <DeleteRoundedIcon />
+                      </Tooltip>
+                    </IconButton>
                   )}
                 <IconButton onClick={() => handleSendInnovators(exhibition)}>
                 <Tooltip title="innovators">
@@ -410,6 +422,12 @@ const Exhibition = () => {
       {sendingExhibition && (
         <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
       )}
+      <DeleteConfirmationDialog
+      open={confirmDelete.open}
+      onCancel={handleCancelDelete}
+      onConfirm={handleDeleteExhibition}
+      title={confirmDelete.exhibition?.title || ''}
+/>
     </Box>
   );
 };
