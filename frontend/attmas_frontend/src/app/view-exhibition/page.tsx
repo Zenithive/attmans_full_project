@@ -357,7 +357,7 @@ const ExhibitionsPage: React.FC = () => {
               <DialogTitle>Approve Booth</DialogTitle>
               <DialogContent dividers>
                 <Typography>
-                  Are you sure you want to approve this booth "{approveDialogOpen.booth?.title}?"
+                  Are you sure you want to approve this booth "{approveDialogOpen.booth?.title}"?
                 </Typography>
               </DialogContent>
               <DialogActions>
@@ -376,7 +376,7 @@ const ExhibitionsPage: React.FC = () => {
               <DialogTitle>Reject Booth</DialogTitle>
               <DialogContent dividers>
                 <Typography>
-                  Are you sure you want to reject this booth "{rejectDialogOpen.booth?.title}?"
+                  Are you sure you want to reject this booth "{rejectDialogOpen.booth?.title}"?
                 </Typography>
               </DialogContent>
               <DialogActions>
