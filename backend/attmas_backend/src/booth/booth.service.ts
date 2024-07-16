@@ -71,27 +71,52 @@ export class BoothService {
   }
 
   async approveBooth(id: string): Promise<Booth> {
-    const booth = await this.boothModel.findById({ _id: id });
-    console.log('boothId for approve', booth);
+    const booth = await this.boothModel.findById(id);
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
     booth.status = 'Approved';
-    console.log('booth status', booth.status);
     booth.buttonsHidden = true;
     await booth.save();
+
+    const exhibition = await this.exhibitionModel.findById(booth.exhibitionId);
+    if (exhibition) {
+      const exhibitionUser = await this.userModel.findById(exhibition.userId);
+      await this.emailService.sendBoothStatusEmail(
+        exhibitionUser.username,
+        'Booth Approved',
+        (exhibition._id as Types.ObjectId).toHexString(),
+        booth.username,
+        exhibition.title,
+        'approved',
+      );
+    }
+
     return booth;
   }
 
   async rejectBooth(id: string): Promise<Booth> {
-    const booth = await this.boothModel.findById({ _id: id });
-    console.log('boothId for reject', booth);
+    const booth = await this.boothModel.findById(id);
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
     booth.status = 'Rejected';
     booth.buttonsHidden = true;
     await booth.save();
+
+    const exhibition = await this.exhibitionModel.findById(booth.exhibitionId);
+    if (exhibition) {
+      const exhibitionUser = await this.userModel.findById(exhibition.userId);
+      await this.emailService.sendBoothStatusEmail(
+        exhibitionUser.username,
+        'Booth Rejected',
+        (exhibition._id as Types.ObjectId).toHexString(),
+        booth.username,
+        exhibition.title,
+        'rejected',
+      );
+    }
+
     return booth;
   }
 

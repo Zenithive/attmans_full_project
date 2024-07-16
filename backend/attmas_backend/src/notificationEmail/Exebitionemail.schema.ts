@@ -32,6 +32,9 @@ export class Email extends Document {
   title: string;
 
   @Prop({ ref: 'booths', required: false })
+  status: string;
+
+  @Prop({ ref: 'booths', required: false })
   boothUsername: string;
 }
 
