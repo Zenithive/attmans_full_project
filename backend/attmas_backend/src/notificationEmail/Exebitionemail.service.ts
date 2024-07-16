@@ -129,7 +129,7 @@ export class EmailService2 {
       }
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        The booth request from ${boothUsername} has been ${status} for the exhibition "${title}". Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> for more details.
+        The booth request from ${boothUsername} has been ${status} for the exhibition "${title}". Click <a href="https://attmans.netlify.app/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> for more details.
       `;
 
       await this.transporter.sendMail({
