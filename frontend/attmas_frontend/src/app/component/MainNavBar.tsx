@@ -167,11 +167,6 @@ export default function MainNavBar() {
         You have been invited to participate in the exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
       `;
     }
-    return `
-      Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-      You have been notified that ${notification.boothUsername || ''} has ${notification.boothUsername ? 'requested to participate in' : 'invited to participate in'} the exhibition "${notification.title}". 
-      <span style="color:blue; cursor:pointer;" onclick="window.open('/view-exhibition?exhibitionId=${notification.exhibitionId}', '_blank')">Click here</span> to ${notification.boothUsername ? 'approve/reject' : 'participate'}.
-    `;
   };
 
   const menuId = 'primary-search-account-menu';
