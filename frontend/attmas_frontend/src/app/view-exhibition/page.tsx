@@ -213,7 +213,7 @@ const ExhibitionsPage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column',overflowX:'hidden'}}>
     <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
       <h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1>
       {(userDetails && userType === 'Innovators') && (
