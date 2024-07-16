@@ -17,10 +17,10 @@ import { Avatar } from '@mui/material';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
-import MailIcon from '@mui/icons-material/Mail';
 import DOMPurify from 'dompurify';
 import DoneIcon from '@mui/icons-material/Done';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import CircleIcon from '@mui/icons-material/Circle';
 
 interface Email {
   _id: string;
@@ -117,7 +117,7 @@ export default function MainNavBar() {
     setNotificationAnchorEl(null);
   };
 
-  const handleNotificationClick = async (notificationId: string) => {
+  const handleNotificationClick = async (notificationId: string, exhibitionId: string) => {
     try {
       await axios.post(`${APIS.MARK_AS_READ}`, { id: notificationId });
       setNotifications(prevNotifications => {
@@ -125,6 +125,7 @@ export default function MainNavBar() {
           notification._id === notificationId ? { ...notification, read: true } : notification
         ).sort((a, b) => b.sentAt.getTime() - a.sentAt.getTime());
       });
+      window.open(`/view-exhibition?exhibitionId=${exhibitionId}`, '_blank');
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -166,6 +167,11 @@ export default function MainNavBar() {
         You have been invited to participate in the exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
       `;
     }
+    return `
+      Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+      You have been notified that ${notification.boothUsername || ''} has ${notification.boothUsername ? 'requested to participate in' : 'invited to participate in'} the exhibition "${notification.title}". 
+      <span style="color:blue; cursor:pointer;" onclick="window.open('/view-exhibition?exhibitionId=${notification.exhibitionId}', '_blank')">Click here</span> to ${notification.boothUsername ? 'approve/reject' : 'participate'}.
+    `;
   };
 
   const menuId = 'primary-search-account-menu';
@@ -182,7 +188,7 @@ export default function MainNavBar() {
         vertical: 'top',
         horizontal: 'right',
       }}
-      open={isMenuOpen}
+      open={Boolean(anchorEl)}
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>
@@ -209,7 +215,7 @@ export default function MainNavBar() {
         vertical: 'top',
         horizontal: 'right',
       }}
-      open={isNotificationMenuOpen}
+      open={Boolean(notificationAnchorEl)}
       onClose={handleNotificationMenuClose}
     >
       <Box sx={{ width: 400 }}>
@@ -217,24 +223,24 @@ export default function MainNavBar() {
           Notifications
         </Typography>
 
-        {/* Unread Notifications Section */}
         {notifications.filter(notification => !notification.read).length > 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
             {notifications.filter(notification => !notification.read).map((notification, index) => (
               <React.Fragment key={notification._id}>
                 <MenuItem
-                  onClick={() => handleNotificationClick(notification._id)}
+                  onClick={() => handleNotificationClick(notification._id, notification.exhibitionId)}
                   sx={{
                     whiteSpace: 'normal',
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
-                    backgroundColor: 'grey.200', // Grey background for unread notifications
+                    backgroundColor: 'grey.200',
                   }}
                 >
-                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
+                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
                   <IconButton size="small" color="inherit">
-                    <DoneIcon fontSize="small" />
+                    {/* <CircleIcon fontSize="small" /> */}
+                    <CircleIcon fontSize="inherit" sx={{ fontSize: '0.6rem' }} />
                   </IconButton>
                 </MenuItem>
                 {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
@@ -243,13 +249,12 @@ export default function MainNavBar() {
           </Box>
         )}
 
-        {/* Read Notifications Section */}
         {notifications.filter(notification => notification.read).length > 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
             {notifications.filter(notification => notification.read).map((notification, index) => (
               <React.Fragment key={notification._id}>
                 <MenuItem
-                  onClick={() => handleNotificationClick(notification._id)}
+                  onClick={() => handleNotificationClick(notification._id, notification.exhibitionId)}
                   sx={{
                     whiteSpace: 'normal',
                     display: 'flex',
@@ -257,7 +262,7 @@ export default function MainNavBar() {
                     width: '100%',
                   }}
                 >
-                  <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
+                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
                   <IconButton size="small" color="inherit">
                     <DoneAllIcon fontSize="small" />
                   </IconButton>
@@ -268,10 +273,9 @@ export default function MainNavBar() {
           </Box>
         )}
 
-        {/* No Notifications */}
         {notifications.length === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-            <Typography variant="body2" sx={{ py: 1 }}>
+            <Typography variant="body2" sx={{ fontSize: '0.875rem', py: 1 }}>
               No new notifications.
             </Typography>
           </Box>
@@ -294,7 +298,7 @@ export default function MainNavBar() {
         vertical: 'top',
         horizontal: 'right',
       }}
-      open={isMobileMenuOpen}
+      open={Boolean(mobileMoreAnchorEl)}
       onClose={handleMobileMenuClose}
     >
       <MenuItem onClick={handleNotificationMenuOpen}>
@@ -309,7 +313,7 @@ export default function MainNavBar() {
         <IconButton
           size="large"
           aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
+          aria-controls={menuId}
           aria-haspopup="true"
           color="inherit"
         >

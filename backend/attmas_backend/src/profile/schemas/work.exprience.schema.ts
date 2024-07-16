@@ -19,8 +19,7 @@ export class ProductInfo {
   @Prop({ required: false })
   currency: string;
 
-  @Prop({ required: false })
-  productToMarket: string;
+
 }
 
 export const ProductInfoSchema = SchemaFactory.createForClass(ProductInfo);
@@ -30,6 +29,9 @@ export const ProductInfoSchema = SchemaFactory.createForClass(ProductInfo);
 export class WorkExprience extends Document {
   @Prop({ required: false })
   workAddress: string;
+
+  @Prop({ required: false })
+  productToMarket: string;
 
   @Prop({ required: false })
   qualification: string;
