@@ -221,7 +221,7 @@ const ExhibitionsPage: React.FC = () => {
           variant="contained"
           color="primary"
           onClick={openModal}
-          style={{ position: 'absolute', right: '20px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+          style={{ position: 'absolute', right: '80px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
         >
           Participate
         </Button>
