@@ -274,7 +274,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                   ))
                 ) : (
                   !buttonClicked && (
-                    <span style={{ color: '#666666', fontSize: '1.2rem' }}>Subject Matter Expertise</span>
+                    <span style={{ color: '#666666', fontSize: '1.2 rem' }}>Subject Matter Expertise</span>
                   )
                 )}
               </button>
