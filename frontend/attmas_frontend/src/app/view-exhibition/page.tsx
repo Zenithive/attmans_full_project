@@ -4,10 +4,11 @@ import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip } from '@mui/material';
 import BoothDetailsModal from '../component/booth/booth';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface Exhibition {
   _id?: string;
@@ -32,6 +33,7 @@ interface Booth {
   };
   status: string;
   exhibitionId: string;
+  createdAt: string;
 }
 
 const ExhibitionsPage: React.FC = () => {
@@ -262,15 +264,17 @@ const ExhibitionsPage: React.FC = () => {
               .map(booth => (
                 <Card key={booth._id} sx={{ flex: '1 1 calc(33.333% - 10px)', boxSizing: 'border-box', marginBottom: '10px' }}>
                   <CardContent>
+                  <Tooltip title="Click here to see Booth details" arrow placement="top">
                     <Typography
                       onClick={() => {
                         setSelectedBooth(booth);
                         setDialogOpen(true);
                       }}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer' ,width:'25px'}}
                     >
                       {booth.title}
                     </Typography>
+                  </Tooltip>
                     <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                     <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '24px' }}>
                       <Chip
@@ -328,35 +332,64 @@ const ExhibitionsPage: React.FC = () => {
                 </Card>
               ))}
           </Box>
-          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-            {selectedBooth && (
-              <>
-                <DialogTitle><h1>Booth Details</h1></DialogTitle>
-                <DialogContent>
-                <Typography><h2>Title :- {selectedBooth.title}</h2></Typography>
-                  <Typography><h2>Description :- {selectedBooth.description}</h2></Typography>
-                  <Typography><h2>Status :- {selectedBooth.status}</h2></Typography>
-                  <Typography><h2>Products :- </h2></Typography>
-                  <Typography>
-                      <ul>
-                        {selectedBooth.products.map(product => (
-                          <div key={product.name} style={{ margin: '20px' }}>
-                            <li><h2>
-                              {product.name} <br />
-                              {product.description} <br />
-                              {product.productType} <br />
-                              {product.price}
-                              </h2></li>
-                          </div>
-                        ))}
-                      </ul>
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => setDialogOpen(false)}>Close</Button>
-                </DialogActions>
-              </>
-            )}
+          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+            <DialogTitle sx={{ m: 0, p: 2 }}>
+              Booth Details
+              <IconButton
+                aria-label="close"
+                onClick={() => setDialogOpen(false)}
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+              {selectedBooth && (
+                <Box>
+                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
+                    Title: {selectedBooth.title}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    Description: {selectedBooth.description}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    Status: {selectedBooth.status}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                    Created at: {dayjs(selectedBooth.createdAt).format('DD-MM-YYYY')}
+                  </Typography>
+                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
+                    Products
+                  </Typography>
+                  {selectedBooth.products.map((product, index) => (
+                    <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: '8px' }}>
+                      <Typography variant="body2">
+                        <strong>Product Name:</strong> {product.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Product Description:</strong> {product.description}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Product Type:</strong> {product.productType}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Product Price:</strong> {product.price}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDialogOpen(false)} color="primary">
+                Close
+              </Button>
+            </DialogActions>
           </Dialog>
         </div>
       </div>
