@@ -234,7 +234,7 @@ const EditProfile3: React.FC = () => {
               style={{ width: '45%' }}
             />
             <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '50%' }}>
-              <button type="button" onClick={handleToggleDropdown}>
+              <button type="button" onClick={handleToggleDropdown} style={{ minHeight: '57.5px' }}>
                 {selectedValues.length > 0 ? (
                   selectedValues.map(value => (
                     <Chip
@@ -267,19 +267,6 @@ const EditProfile3: React.FC = () => {
 
           </Box>
 
-          {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}> */}
-            {/* <LoadingButton
-              type="submit"
-              variant="contained"
-              size="small"
-              loading={loading}
-              loadingIndicator={<CircularProgress size={24} />}
-              sx={{ mt: 2, mb: 2, ml: '90%', width: 100, borderRadius: 2 }}
-              color="secondary"
-            >
-              Save
-            </LoadingButton> */}
-
             <Box mt={3} display="flex" justifyContent="center">
               <LoadingButton
                 type="submit"
@@ -290,7 +277,6 @@ const EditProfile3: React.FC = () => {
               >
                 Update Subject matter expertise
               </LoadingButton>
-            {/* </Box> */}
           </Box>
         </Box>
       </Box>
@@ -348,7 +334,7 @@ const EditProfile3: React.FC = () => {
       width: 514px; /* Decrease width */
       border-radius: 20px;
       background-color: white;
-      height: 57px; /* Increase height */
+      min-height: 57px; /* Increase height */
       padding: 10px 20px;
       cursor: pointer;
       display: flex;
@@ -372,6 +358,5 @@ const EditProfile3: React.FC = () => {
 };
 
 export default EditProfile3;
-
 
 

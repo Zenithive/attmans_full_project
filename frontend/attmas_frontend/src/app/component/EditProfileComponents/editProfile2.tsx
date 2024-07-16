@@ -103,6 +103,9 @@ const EditProfile2: React.FC = () => {
                 const response = await axios.get(`${SERVER_URL}/profile/profileByUsername2?username=${userDetails.username}`); // Adjust endpoint as per your backend API
                 const userData = response.data; // Assuming your API returns user profile data
 
+                console.log("userData WorkWxperince ", userData);
+
+
                 // Update formik values with fetched data
                 formik.setValues({
                     ...formik.values,
@@ -130,7 +133,7 @@ const EditProfile2: React.FC = () => {
                     setShowProductDetails(false);
                 }
             } catch (error) {
-                console.error('Error fetching user profile:', error); 
+                console.error('Error fetching user profile:', error);
                 setFetchError('Failed to fetch user profile');
             } finally {
                 setLoading(false);
