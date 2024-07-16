@@ -25,7 +25,12 @@ export class EmailService2 {
     });
   }
 
-  async sendEmail2(to: string, subject: string, exhibitionId: string, title:string) {
+  async sendEmail2(
+    to: string,
+    subject: string,
+    exhibitionId: string,
+    title: string,
+  ) {
     try {
       // Fetch user details from UsersService
       const user = await this.usersService.findByUsername(to);
@@ -36,7 +41,7 @@ export class EmailService2 {
       // Customize email message with user's first name and last name
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        You have been invited to participate in the exhibition "${title}". Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
+        You have been invited to participate in the exhibition "${title}". Click <a href="https://attmans.netlify.app/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to participate.
       `;
 
       await this.transporter.sendMail({
@@ -83,7 +88,7 @@ export class EmailService2 {
 
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        You have been notified that the ${boothUsername} has reqested to participate in the Exhibition "${title}" Click <a href="http://localhost:4200/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to approve/reject.
+        You have been notified that the ${boothUsername} has reqested to participate in the Exhibition "${title}" Click <a href="https://attmans.netlify.app/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> to approve/reject.
       `;
 
       await this.transporter.sendMail({

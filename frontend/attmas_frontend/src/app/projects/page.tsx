@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -14,6 +14,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
+import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 
 interface Job {
     _id?: string;
@@ -207,6 +208,7 @@ const Jobs = () => {
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [filterType, setFilterType] = useState("all");
+    const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; jobs: Job | null }>({ open: false, jobs: null });
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
@@ -282,15 +284,28 @@ const Jobs = () => {
         setEditingJob(null);
     }, []);
 
-    const handleDeleteJob = useCallback(async (jobToDelete: Job) => {
-        try {
-            await axios.delete(`${APIS.JOBS}/${jobToDelete._id}`);
-            setJobs(jobs.filter(job => job._id !== jobToDelete._id));
+    const handleDeleteJob = useCallback(async () => {
+        if (confirmDelete.jobs) {
+          try {
+            await axios.delete(`${APIS.JOBS}/${confirmDelete.jobs._id}`);
+            setJobs(jobs.filter(job => job._id !== confirmDelete.jobs!._id));
             pubsub.publish('JobDeleted', {});
-        } catch (error) {
+          } catch (error) {
             console.error('Error deleting job:', error);
+          } finally {
+            setConfirmDelete({ open: false, jobs: null });
+          }
         }
-    }, [jobs]);
+      }, [confirmDelete, jobs]);
+
+
+  const handleConfirmDelete = (jobs: Job) => {
+    setConfirmDelete({ open: true, jobs });
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDelete({ open: false, jobs: null });
+  };
 
     const handleApplyClick = useCallback((title: string) => {
         setApplyOpen(true);
@@ -415,7 +430,7 @@ const Jobs = () => {
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Delete" arrow>
-                                        <IconButton onClick={() => handleDeleteJob(job)}>
+                                        <IconButton onClick={() => handleConfirmDelete(job)}>
                                             <DeleteRoundedIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -426,6 +441,12 @@ const Jobs = () => {
                 </Box>
             </InfiniteScroll>
             <AddApply open={applyOpen} setOpen={setApplyOpen} jobTitle={jobTitle} />
+          <DeleteConfirmationDialog
+            open={confirmDelete.open}
+            onCancel={handleCancelDelete}
+            onConfirm={handleDeleteJob}
+            title={confirmDelete.jobs?.title || ''}
+/>
         </Box>
     );
 };

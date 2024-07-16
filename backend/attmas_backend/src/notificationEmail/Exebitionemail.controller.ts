@@ -12,10 +12,8 @@ export class EmailController {
   }
 
   // email.controller.ts
-@Post('/markasread')
-async markAsRead(@Body('id') id: string): Promise<void> {
-  await this.emailService.markAsRead(id);
-}
-
-
+  @Post('/markasread')
+  async markAsRead(@Body('id') id: string): Promise<void> {
+    await this.emailService.markAsRead(id);
+  }
 }
