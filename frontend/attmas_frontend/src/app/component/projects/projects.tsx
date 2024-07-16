@@ -11,12 +11,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import {pubsub} from '@/app/services/pubsub.service';
+import { pubsub } from '@/app/services/pubsub.service';
 import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { useCallback,useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 
 interface Jobs {
@@ -32,10 +32,10 @@ interface Jobs {
     TimeFrame: string | null;
     Category: string[];
     Subcategorys: string[];
-    SelectService:string; 
-    Objective:string;
-    Expectedoutcomes:string;
-    IPRownership:string;
+    SelectService: string;
+    Objective: string;
+    Expectedoutcomes: string;
+    IPRownership: string;
 }
 
 interface AddJobsProps {
@@ -49,13 +49,13 @@ const validationSchema = Yup.object().shape({
     description: Yup.string().required('Description is required'),
     SelectService: Yup.string().required('Select-Service is required'),
     Expertiselevel: Yup.string(),
-    Objective:Yup.string().required('Objective is required'),
-    IPRownership:Yup.string().required('IPR-ownerShip is required'),
-    Expectedoutcomes:Yup.string().required('Expected out comes is required'),
-    DetailsOfInnovationChallenge:Yup.string(),
-    ProductDescription:Yup.string(),
-    AreaOfProduct:Yup.string(),
-    Sector:Yup.string(),
+    Objective: Yup.string().required('Objective is required'),
+    IPRownership: Yup.string().required('IPR-ownerShip is required'),
+    Expectedoutcomes: Yup.string().required('Expected out comes is required'),
+    DetailsOfInnovationChallenge: Yup.string(),
+    ProductDescription: Yup.string(),
+    AreaOfProduct: Yup.string(),
+    Sector: Yup.string(),
     Budget: Yup.number().required("Budget is required"),
     TimeFrame: Yup.date().nullable('Date & Time is required'),
     categoryforCategory: Yup.array().of(Yup.string()),
@@ -67,25 +67,25 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-    const initialValues =React.useMemo(()=>({
+    const initialValues = React.useMemo(() => ({
         title: '',
         description: '',
-        SelectService:"",
+        SelectService: "",
         Expertiselevel: '',
         Budget: 0,
-        Expectedoutcomes:'',
+        Expectedoutcomes: '',
         TimeFrame: null as Dayjs | null,
         categoryforCategory: [],
         Subcategory: [],
-        Objective:'',
-        IPRownership:'',
+        Objective: '',
+        IPRownership: '',
         DetailsOfInnovationChallenge: '',
         Sector: '',
         AreaOfProduct: '',
         ProductDescription: '',
         // username: userDetails.username
 
-    }),[]);
+    }), []);
 
     React.useEffect(() => {
         if (editingJobs) {
@@ -93,7 +93,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         }
     }, [editingJobs]);
 
-    const Category =React.useMemo(()=>[
+    const Category = React.useMemo(() => [
         "Agriculture",
         "Chemicals",
         "Electronics",
@@ -103,11 +103,11 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         "Healthcare",
         "Medical devices and equipment",
         "Mining and metals",
-        "Real estate and construction", 
+        "Real estate and construction",
         "Textiles"
-    ],[]);
+    ], []);
 
-    const Subcategorys =React.useMemo(()=>[
+    const Subcategorys = React.useMemo(() => [
         {
             category: "Chemistry",
             items: [
@@ -240,19 +240,19 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 "Applied Chemistry",
             ]
         },
-    ],[]);
+    ], []);
 
-    const allSubcategoryItems =React.useMemo(()=>Subcategorys.flatMap(Subcategory => Subcategory.items.map(item => ({
+    const allSubcategoryItems = React.useMemo(() => Subcategorys.flatMap(Subcategory => Subcategory.items.map(item => ({
         category: Subcategory.category,
         label: item
-    }))),[]);
+    }))), []);
 
 
-    const handleSubmit =React.useCallback(async (values: { title: string; description: string;SelectService:string;DetailsOfInnovationChallenge:string; Sector:string;ProductDescription:string;AreaOfProduct:string;Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[];Objective:string;Expectedoutcomes:string,IPRownership:string;}, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,
             description: values.description,
-            SelectService:values.SelectService,
+            SelectService: values.SelectService,
             TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
             Expertiselevel: values.Expertiselevel,
             Budget: values.Budget,
@@ -262,10 +262,10 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             Sector: values.Sector,
             AreaOfProduct: values.AreaOfProduct,
             ProductDescription: values.ProductDescription,
-            Objective:values.Objective,
-            Expectedoutcomes:values.Expectedoutcomes,
-            IPRownership:values.IPRownership,
-            userId:userDetails._id,
+            Objective: values.Objective,
+            Expectedoutcomes: values.Expectedoutcomes,
+            IPRownership: values.IPRownership,
+            userId: userDetails._id,
         };
 
         try {
@@ -289,7 +289,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         } finally {
             setSubmitting(false);
         }
-    },[editingJobs,userDetails,onCancelEdit]);
+    }, [editingJobs, userDetails, onCancelEdit]);
 
     return (
         <>
@@ -306,19 +306,19 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                     initialValues={editingJobs ? {
                         title: editingJobs.title || '',
                         description: editingJobs.description || '',
-                        SelectService:editingJobs.SelectService || '',
+                        SelectService: editingJobs.SelectService || '',
                         Expertiselevel: editingJobs.Expertiselevel || '',
                         Budget: editingJobs.Budget || 0,
                         TimeFrame: editingJobs.TimeFrame ? dayjs(editingJobs.TimeFrame) : null,
                         categoryforCategory: editingJobs.Category || [],
                         Subcategory: editingJobs.Subcategorys || [],
                         DetailsOfInnovationChallenge: editingJobs.DetailsOfInnovationChallenge || '',
-                        Sector:editingJobs.Sector || '',
-                        AreaOfProduct:editingJobs.AreaOfProduct || "",
-                        ProductDescription:editingJobs.ProductDescription || "",
-                        Expectedoutcomes:editingJobs.Expectedoutcomes || '',
-                        Objective:editingJobs.Objective || '',
-                        IPRownership:editingJobs.IPRownership || '',
+                        Sector: editingJobs.Sector || '',
+                        AreaOfProduct: editingJobs.AreaOfProduct || "",
+                        ProductDescription: editingJobs.ProductDescription || "",
+                        Expectedoutcomes: editingJobs.Expectedoutcomes || '',
+                        Objective: editingJobs.Objective || '',
+                        IPRownership: editingJobs.IPRownership || '',
                     } : initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
@@ -352,7 +352,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
-                                 <FormControl fullWidth>
+                                <FormControl fullWidth>
                                     <InputLabel color='secondary' id="SelectService-label">Select Service</InputLabel>
                                     <Select
                                         labelId="SelectService-label"
@@ -369,59 +369,76 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     </Select>
                                     {values.SelectService === 'Innovative product' && (
 
-                                    <Box style={{ padding: 4}}>
-                                        <TextField
-                                        label="Details of Innovation Challenge"
-                                        name="DetailsOfInnovationChallenge"
-                                        color='secondary'
-                                        variant="outlined"
-                                        value={values.DetailsOfInnovationChallenge}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        fullWidth
-                                        error={!!(errors.DetailsOfInnovationChallenge && touched.DetailsOfInnovationChallenge)}
-                                        helperText={<ErrorMessage name="DetailsOfInnovationChallenge" />}
-                                        />
-                                        <TextField
-                                        label="Sector"
-                                        name="Sector"
-                                        color='secondary'
-                                        variant="outlined"
-                                        value={values.Sector}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        fullWidth
-                                        error={!!(errors.Sector && touched.Sector)}
-                                        helperText={<ErrorMessage name="Sector" />}
-                                        />
-                                        <TextField
-                                        label="Area of Product"
-                                        name="AreaOfProduct"
-                                        color='secondary'
-                                        variant="outlined"
-                                        value={values.AreaOfProduct}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        fullWidth
-                                        error={!!(errors.AreaOfProduct && touched.AreaOfProduct)}
-                                        helperText={<ErrorMessage name="AreaOfProduct" />}
-                                        />
-                                        <TextField
-                                        label="Product Description"
-                                        name="ProductDescription"
-                                        color='secondary'
-                                        variant="outlined"
-                                        value={values.ProductDescription}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        fullWidth
-                                        error={!!(errors.ProductDescription && touched.ProductDescription)}
-                                        helperText={<ErrorMessage name="ProductDescription" />}
-                                        />
-                                    </Box>
+                                        <Box sx={{ padding: 2 }}>
+
+                                            <Box style={{ padding: 4 }}>
+                                                <Box sx={{ mb: 2 }}>
+
+                                                    <TextField
+                                                        label="Details of Innovation Challenge"
+                                                        name="DetailsOfInnovationChallenge"
+                                                        color='secondary'
+                                                        variant="outlined"
+                                                        value={values.DetailsOfInnovationChallenge}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        fullWidth
+                                                        error={!!(errors.DetailsOfInnovationChallenge && touched.DetailsOfInnovationChallenge)}
+                                                        helperText={<ErrorMessage name="DetailsOfInnovationChallenge" />}
+                                                    />
+                                                </Box>
+
+                                                <Box sx={{ mb: 2 }}>
+                                                    <TextField
+                                                        label="Sector"
+                                                        name="Sector"
+                                                        color='secondary'
+                                                        variant="outlined"
+                                                        value={values.Sector}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        fullWidth
+                                                        error={!!(errors.Sector && touched.Sector)}
+                                                        helperText={<ErrorMessage name="Sector" />}
+                                                    />
+                                                </Box>
+
+                                                <Box sx={{ mb: 2 }}>
+                                                    <TextField
+                                                        label="Area of Product"
+                                                        name="AreaOfProduct"
+                                                        color='secondary'
+                                                        variant="outlined"
+                                                        value={values.AreaOfProduct}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        fullWidth
+                                                        error={!!(errors.AreaOfProduct && touched.AreaOfProduct)}
+                                                        helperText={<ErrorMessage name="AreaOfProduct" />}
+                                                    />
+                                                </Box>
+
+                                                <Box sx={{ mb: 2 }}>
+                                                    <TextField
+                                                        label="Product Description"
+                                                        name="ProductDescription"
+                                                        color='secondary'
+                                                        variant="outlined"
+                                                        value={values.ProductDescription}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        fullWidth
+                                                        error={!!(errors.ProductDescription && touched.ProductDescription)}
+                                                        helperText={<ErrorMessage name="ProductDescription" />}
+                                                    />
+
+                                                </Box>
+                                            </Box>
+                                        </Box>
+
                                     )}
                                 </FormControl>
-                                  <FormControl fullWidth>
+                                <FormControl fullWidth>
                                     <InputLabel color='secondary' id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
                                         labelId="Expertiselevel-label"
@@ -452,6 +469,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={touched.Budget && errors.Budget}
                                     margin="normal"
                                 />
+
+
                                 <Autocomplete
                                     multiple
                                     options={Category}
@@ -530,7 +549,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         </li>
                                     )}
                                 />
-                                    <TextField
+                                <TextField
                                     label="Objective"
                                     name="Objective"
                                     color='secondary'
@@ -556,7 +575,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     error={!!(errors.Expectedoutcomes && touched.Expectedoutcomes)}
                                     helperText={<ErrorMessage name="Expectedoutcomes" />}
                                 />
-                                 <TextField
+                                <TextField
                                     label="IPR ownership"
                                     name="IPRownership"
                                     color='secondary'
@@ -569,7 +588,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     error={!!(errors.IPRownership && touched.IPRownership)}
                                     helperText={<ErrorMessage name="IPRownership" />}
                                 />
-                                <LocalizationProvider  dateAdapter={AdapterDayjs}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DateTimePicker
                                         label="Time Frame"
                                         // color='secondary'
@@ -577,13 +596,13 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                                         slotProps={{
                                             textField: {
-                                                color:'secondary'      
+                                                color: 'secondary'
                                             },
                                         }}
                                     />
                                 </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                                    <Button variant="contained" sx={{bgcolor: '#616161', ':hover': {bgcolor: '#616161'} }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+                                    <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
                                     <Button variant="contained" type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>

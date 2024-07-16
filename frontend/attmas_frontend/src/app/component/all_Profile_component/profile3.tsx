@@ -1,10 +1,10 @@
-"use client"
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack, Autocomplete, TextField, Checkbox, Button } from '@mui/material';
+import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Autocomplete, TextField, Checkbox, Button } from '@mui/material';
 import { useFormik } from 'formik';
 import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useRouter } from 'next/navigation'; // Assuming it's next/router for routing
+import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
@@ -16,11 +16,11 @@ interface ProfileForm3Props {
   onPrevious: () => void;
 }
 
-type Option = {
+interface Option {
   label: string;
   value: string;
   children?: Option[];
-};
+}
 
 const industryOptions = [
   "Chemicals",
@@ -37,12 +37,12 @@ const industryOptions = [
 ];
 
 const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
-  // const ProfileForm3: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [buttonClicked, setButtonClicked] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -52,7 +52,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
       username: userDetails.username,
       userId: userDetails._id,
       subcategories: [] as string[],
-      categories: [] as string[], // Changed preferredIndustries to categories
+      categories: [] as string[],
     },
     onSubmit: async (values) => {
       setLoading(true);
@@ -86,7 +86,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         formik.setValues({
           ...formik.values,
           subcategories: userData.subcategories || [],
-          categories: userData.categories || [], 
+          categories: [],
         });
         setSelectedValues(userData.subcategories || []);
       } catch (error) {
@@ -111,6 +111,16 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     formik.setFieldValue('subcategories', updatedSelectedValues);
   };
 
+  // const handleCategoryCheckboxChange = (value: string, isChecked: boolean) => {
+  //   let updatedCategories = [...formik.values.categories];
+  //   if (isChecked) {
+  //     updatedCategories.push(value);
+  //   } else {
+  //     updatedCategories = updatedCategories.filter(v => v !== value);
+  //   }
+  //   formik.setFieldValue('categories', updatedCategories);
+  // };
+
   const handleCategoryCheckboxChange = (value: string, isChecked: boolean) => {
     let updatedCategories = [...formik.values.categories];
     if (isChecked) {
@@ -120,6 +130,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     }
     formik.setFieldValue('categories', updatedCategories);
   };
+
 
   const filterOptions = (options: Option[], searchTerm: string): Option[] => {
     return options.reduce<Option[]>((acc, option) => {
@@ -159,6 +170,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
 
   const handleToggleDropdown = () => {
     setIsOpen(!isOpen);
+    setButtonClicked(true); // Set buttonClicked to true when the button is clicked
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -183,7 +195,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         sx={{
           marginTop: 8,
           padding: 4,
-          border: '1px solid #ccc',
+          border: '1px solid #616161',
           borderRadius: 2,
           width: '142.5%',
           position: 'relative',
@@ -240,7 +252,16 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             />
 
             <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '50%' }}>
-              <button type="button" onClick={handleToggleDropdown}>
+              <button
+                type="button"
+                onClick={handleToggleDropdown}
+                className="button-with-label"
+                style={{ minHeight: '57.5px', borderWidth: isOpen ? '2px' : '1px' }}
+              >
+                {isOpen && (
+                  <span className="button-label">Subject Matter Expertise</span>
+                )}
+
                 {selectedValues.length > 0 ? (
                   selectedValues.map(value => (
                     <Chip
@@ -252,9 +273,12 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                     />
                   ))
                 ) : (
-                  'Subject matter expertise'
+                  !buttonClicked && (
+                    <span style={{ color: '#666666', fontSize: '1.2 rem' }}>Subject Matter Expertise</span>
+                  )
                 )}
               </button>
+
               {isOpen && (
                 <div className="dropdown-content">
                   <input
@@ -273,18 +297,6 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
 
           </Box>
 
-          {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}> */}
-          {/* <LoadingButton
-              type="submit"
-              variant="contained"
-              size="small"
-              loading={loading}
-              loadingIndicator={<CircularProgress size={24} />}
-              sx={{ mt: 2, mb: 2, ml: '90%', width: 100, borderRadius: 2 }}
-              color="secondary"
-            >
-              Save
-            </LoadingButton> */}
           <Button
             type="button"
             variant="contained"
@@ -294,6 +306,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
           >
             Back
           </Button>
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
             <LoadingButton
               type="submit"
@@ -301,11 +314,10 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               size="small"
               loading={loading}
               loadingIndicator={<CircularProgress size={24} />}
-              sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
+              sx={{ mt: 2, mb: 2, ml: '84.5%', width: '10%', height: '40px' }}
             >
               Save
             </LoadingButton>
-            {/* </Box> */}
           </Box>
         </Box>
       </Box>
@@ -326,7 +338,8 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
           padding: 12px 16px;
           z-index: 1;
-          border: 1px solid #ccc;
+          border: 1px solid #fff;
+          border-radius: 16px;
           overflow-y: auto;
         }
 
@@ -348,38 +361,48 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
           background-color: #f1f1f1;
         }
 
-        .selected-values {
-          margin-bottom: 10px;
-        }
-
-        .selected-values strong {
-          display: inline-block;
-          margin-right: 5px;
-        }
-
-        button {
+        .button-with-label {
+          position: relative;
           margin-right: 10px;
-          width: 570px;
+          width: 514px;
           border-radius: 20px;
-          background-color:white;
-          height: 57px;
+          background-color: white;
+          min-height: 57px;
           padding: 10px 20px;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: flex-start;
           flex-wrap: wrap;
+          border: 1px solid #616161;
+          transition: border-width 0.2s;
+        }
+
+        .button-with-label:hover {
+          border-width: 2px;
+        }
+
+        .button-label {
+          position: absolute;
+          top: -10px;
+          left: 10px;
+          background: white;
+          padding: 0 5px;
+          color: #000;
+          font-weight: normal;
+          z-index: 1;
         }
 
         .dropdown-content input {
           width: 100%;
           padding: 5px;
           margin-bottom: 10px;
-          border: 1px solid #ccc;
+          border: 1px solid #616161;
           box-sizing: border-box;
         }
       `}</style>
-    </Container>
+
+    </Container >
   );
 };
 

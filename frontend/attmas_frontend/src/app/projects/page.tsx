@@ -29,10 +29,10 @@ interface Job {
     AreaOfProduct: string;
     ProductDescription: string;
     DetailsOfInnovationChallenge: string;
-    SelectService:string; 
-    Objective:string;
-    Expectedoutcomes:string;
-    IPRownership:string;
+    SelectService: string;
+    Objective: string;
+    Expectedoutcomes: string;
+    IPRownership: string;
 }
 
 const Category = [
@@ -216,8 +216,9 @@ const Jobs = () => {
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
         try {
             const response = await axios.get(APIS.JOBS, {
-                params: { page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','), 
-                    userId:filterType === "mine" ?userId:undefined
+                params: {
+                    page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
+                    userId: filterType === "mine" ? userId : undefined
                 }
             });
             if (response.data.length === 0) {
@@ -345,7 +346,13 @@ const Jobs = () => {
                         </IconButton>
                     </Tooltip>
                 </Box>
+
+                {/*                 
                 <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+            </Box> */}
+                {userDetails.userType === 'Project Owner' && (
+                    <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                )}
             </Box>
             {filterOpen && (
                 <Box sx={{ mt: 2, display: "flex", gap: 3, alignItems: 'center' }}>
@@ -400,7 +407,7 @@ const Jobs = () => {
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
                                         {job.Expertiselevel}
                                     </span>
-                                    <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right",position:"relative",right:"20px",bottom:"8px"}}>
+                                    <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right", position: "relative", right: "20px", bottom: "8px" }}>
                                         <Chip
                                             label={job.SelectService}
                                             variant="outlined"
@@ -408,7 +415,7 @@ const Jobs = () => {
                                         />
                                     </span>
 
-                                  
+
                                 </Typography>
                                 <Typography variant="body2">{job.description}</Typography>
                                 <Typography variant="body2">{job.Budget}</Typography>

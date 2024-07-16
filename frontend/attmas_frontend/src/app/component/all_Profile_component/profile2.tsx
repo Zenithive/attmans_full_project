@@ -91,6 +91,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                     message: 'Profile updated successfully!',
                     severity: 'success',
                 });
+                onNext();
             } catch (error) {
                 console.error('Error submitting form:', error);
                 setLoading(false);
