@@ -32,6 +32,8 @@ interface Email {
   title: string;
   sentAt: Date;
   status?: string;
+  exhibitionUserFirstName?: string;
+  exhibitionUserLastName?: string;
 }
 
 function clearCookies() {
@@ -154,7 +156,7 @@ export default function MainNavBar() {
     if (notification.status) {
       return `
         Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-        The booth request from ${notification.boothUsername} has been ${notification.status} for the exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> for more details.
+        your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> for more details.
       `;
     } else if (notification.boothUsername) {
       return `

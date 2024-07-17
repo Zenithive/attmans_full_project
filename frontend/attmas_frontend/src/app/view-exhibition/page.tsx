@@ -37,6 +37,7 @@ interface Booth {
   status: string;
   exhibitionId: string;
   createdAt: string;
+  videoUrl:string;
 }
 
 const ExhibitionsPage: React.FC = () => {
@@ -151,11 +152,11 @@ const ExhibitionsPage: React.FC = () => {
     setStatusFilter(newStatus);
   };
 
-  const renderVideo = (url: string) => {
+  const renderVideo = (url: string, width: number = 800, height: number = 500) => {
     if (!url) {
       return null;
     }
-
+  
     const platforms = [
       {
         name: 'YouTube',
@@ -187,13 +188,13 @@ const ExhibitionsPage: React.FC = () => {
         embedUrl: (url: string) => url
       }
     ];
-
+  
     const platform = platforms.find(p => p.check(url));
     const embedUrl = platform?.embedUrl(url);
-
+  
     if (platform?.name === 'Default') {
       return (
-        <video width="1100" controls>
+        <video width={width} height={height} controls>
           <source src={embedUrl} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -201,8 +202,8 @@ const ExhibitionsPage: React.FC = () => {
     } else {
       return (
         <iframe
-          width="750"
-          height="500"
+          width={width}
+          height={height}
           style={{ borderRadius: "30px" }}
           src={embedUrl}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -211,6 +212,7 @@ const ExhibitionsPage: React.FC = () => {
       );
     }
   };
+  
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column',overflowX:'hidden'}}>
@@ -252,6 +254,7 @@ const ExhibitionsPage: React.FC = () => {
         <div>
           <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px' }}>
             <h1>Booth Details</h1>
+            {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
             <ToggleButtonGroup
               value={statusFilter}
               exclusive
@@ -271,7 +274,7 @@ const ExhibitionsPage: React.FC = () => {
                 Rejected
               </ToggleButton>
             </ToggleButtonGroup>
-
+            )}
           </Box>
           <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
             {booths
@@ -304,13 +307,15 @@ const ExhibitionsPage: React.FC = () => {
                             setDialogOpen(true);
                           }}
                           style={{ cursor: 'pointer', display: 'inline-block' }}
-                        >
+                          >
+                          
                           <h2>{booth.title}</h2>
                         </Typography>
                       </Tooltip>
                       <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                       <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                       <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '102px' }}>
+                      {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
                         <Chip
                           label={
                             booth.status === 'Approved' ? 'Approved' :
@@ -324,6 +329,7 @@ const ExhibitionsPage: React.FC = () => {
                                 'default'
                           }
                         />
+                      )}
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginLeft: '48%' }}>
                       {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
@@ -371,7 +377,12 @@ const ExhibitionsPage: React.FC = () => {
             onRemove={handleReject}
             booth={rejectDialogOpen.booth}
           />
-          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+          {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
+          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth   sx={{ 
+            '& .MuiDialog-paper': { 
+              maxWidth: '700px',  
+            } 
+          }}>
             <DialogTitle sx={{ m: 0, p: 2 }}>
               Booth Details
               <IconButton
@@ -390,6 +401,9 @@ const ExhibitionsPage: React.FC = () => {
             <DialogContent dividers>
               {selectedBooth && (
                 <Box>
+                   <Typography sx={{position:'relative',float:'right'}}>
+                    {renderVideo(selectedBooth.videoUrl,400, 250)}
+                  </Typography>
                   <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
                     Title: {selectedBooth.title}
                   </Typography>
@@ -402,7 +416,7 @@ const ExhibitionsPage: React.FC = () => {
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                     Date: {dayjs(selectedBooth.createdAt).format('MMMM D, YYYY h:mm A')}
                   </Typography>
-                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
+                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', position:'relative',top:'30px' }}>
                     Products
                   </Typography>
                   <TableContainer component={Paper}>
@@ -436,6 +450,7 @@ const ExhibitionsPage: React.FC = () => {
               </Button>
             </DialogActions>
           </Dialog>
+          )}
         </div>
       </div>
   );
