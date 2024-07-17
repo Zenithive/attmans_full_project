@@ -81,7 +81,7 @@ export default function MainNavBar() {
         const response = await axios.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
         const notificationsWithTimestamp = response.data.map((notification: Email) => ({
           ...notification,
-          sentAt: new Date(notification.sentAt), // Ensure sentAt is a Date object
+          sentAt: new Date(notification.sentAt),
         })).sort((a: { sentAt: { getTime: () => number; }; }, b: { sentAt: { getTime: () => number; }; }) => b.sentAt.getTime() - a.sentAt.getTime());
         setNotifications(notificationsWithTimestamp);
       } catch (error) {
@@ -148,13 +148,24 @@ export default function MainNavBar() {
     router.push('/editprofile');
   };
 
+
   const generateNotificationHtml = (notification: Email) => {
+    const baseUrl = 'http://localhost:4200/projects';
+    if (notification.subject === 'New Project Created') { 
+      return `
+        Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+        You have been notified that someone has created a project. 
+        <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
+      `;
+    }else {
     return `
       Dear ${userDetails.firstName} ${userDetails.lastName},<br>
       You have been notified that ${notification.boothUsername || ''} has ${notification.boothUsername ? 'requested to participate in' : 'invited to participate in'} the exhibition "${notification.title}". 
       <span style="color:blue; cursor:pointer;" onclick="window.open('/view-exhibition?exhibitionId=${notification.exhibitionId}', '_blank')">Click here</span> to ${notification.boothUsername ? 'approve/reject' : 'participate'}.
     `;
+    }
   };
+  
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -221,7 +232,6 @@ export default function MainNavBar() {
                 >
                   <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
                   <IconButton size="small" color="inherit">
-                    {/* <CircleIcon fontSize="small" /> */}
                     <CircleIcon fontSize="inherit" sx={{ fontSize: '0.6rem' }} />
                   </IconButton>
                 </MenuItem>
