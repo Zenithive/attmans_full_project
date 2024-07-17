@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from '@mui/material';
+import { useFormik } from 'formik';
 
 interface Booth {
     _id: string;
@@ -18,14 +19,28 @@ interface Booth {
 interface RemoveDialogProps {
   open: boolean;
   onClose: () => void;
-  onRemove: () => void;
+  onRemove: () => Promise<void>;
   booth: Booth | null;
 }
 
 const RemoveDialog: React.FC<RemoveDialogProps> = ({ open, onClose, onRemove, booth }) => {
+  const formik = useFormik({
+    initialValues: {},
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        await onRemove();
+        onClose(); 
+      } catch (error) {
+        console.error("Removel failed:", error);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Reject Booth</DialogTitle>
+    <form onSubmit={formik.handleSubmit}>
+      <DialogTitle>Approve Booth</DialogTitle>
       <DialogContent dividers>
         <p>Are you sure you want to Reject this booth "{booth?.title}"?</p>
       </DialogContent>
@@ -33,11 +48,12 @@ const RemoveDialog: React.FC<RemoveDialogProps> = ({ open, onClose, onRemove, bo
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={onRemove} color="primary" autoFocus>
-          Reject
+        <Button type="submit" color="primary" autoFocus>
+        {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Reject'}
         </Button>
       </DialogActions>
-    </Dialog>
+    </form>
+  </Dialog>
   );
 };
 
