@@ -291,27 +291,36 @@ const ExhibitionsPage: React.FC = () => {
                 <Grid item xs={12} sm={6} md={4} key={booth._id}>
                   <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
                     <CardContent>
-                      <Tooltip title="Click here to see Booth details" arrow placement="top" PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -20],
-                            },
-                          },
-                        ],
-                      }}>
-                        <Typography
-                          onClick={() => {
-                            setSelectedBooth(booth);
-                            setDialogOpen(true);
+                    <Typography
+                      onClick={() => {
+                        setSelectedBooth(booth);
+                        setDialogOpen(true);
+                      }}
+                      style={{ cursor: 'pointer', display: 'inline-block' }}
+                    >
+                      {(userDetails && (userType === 'Admin' || userType === 'Innovators')) ? (
+                        <Tooltip
+                          title="Click here to see Booth details"
+                          arrow
+                          placement="top"
+                          PopperProps={{
+                            modifiers: [
+                              {
+                                name: 'offset',
+                                options: {
+                                  offset: [0, -10],
+                                },
+                              },
+                            ],
                           }}
-                          style={{ cursor: 'pointer', display: 'inline-block' }}
-                          >
-                          
+                        >
                           <h2>{booth.title}</h2>
-                        </Typography>
-                      </Tooltip>
+                        </Tooltip>
+                      ) : (
+                        <h2>{booth.title}</h2>
+                      )}
+                    </Typography>
+
                       <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                       <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                       <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '102px' }}>
