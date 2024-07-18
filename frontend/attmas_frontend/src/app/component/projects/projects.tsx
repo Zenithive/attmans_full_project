@@ -3,7 +3,7 @@ import * as React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import { CircularProgress, MenuItem } from '@mui/material';
+import { CircularProgress, InputAdornment, MenuItem } from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, Select, TextField, Autocomplete } from '@mui/material';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -17,6 +17,10 @@ import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { useCallback, useMemo } from 'react';
+import { Category , Subcategorys} from '@/app/constants/categories';
+
+
+
 
 
 interface Jobs {
@@ -64,6 +68,8 @@ const validationSchema = Yup.object().shape({
 
 export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     const [open, toggleDrawer] = React.useState(false);
+    const [currency, setCurrency] = React.useState('INR');
+
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -93,159 +99,18 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         }
     }, [editingJobs]);
 
-    const Category = React.useMemo(() => [
-        "Agriculture",
-        "Chemicals",
-        "Electronics",
-        "Energy",
-        "Environmental and waste management",
-        "Food and beverage",
-        "Healthcare",
-        "Medical devices and equipment",
-        "Mining and metals",
-        "Real estate and construction",
-        "Textiles"
-    ], []);
 
-    const Subcategorys = React.useMemo(() => [
-        {
-            category: "Chemistry",
-            items: [
-                "Chemical Reagent Development",
-                "Dewatering & Drying Technology",
-                "Electronics",
-                "Catalysis",
-                "Trace Elements",
-                "Mathematical Chemistry",
-                "Dispersion Chemistry",
-                "Surface Science"
-            ]
-        },
-        {
-            category: "Materials Science & Engineering",
-            items: [
-                "Nanotechnology & Nanomaterials",
-                "Surface Chemistry",
-                "Metallurgy",
-                "Glass Science",
-                "Ceramic Engineering",
-                "Corrosion",
-                "Structural Chemistry",
-                "Microencapsulation",
-                "Supramolecular Chemistry",
-                "Fiber & Textile Engineering",
-                "Carbon Materials",
-                "Nanotechnology"
-            ]
-        },
-        {
-            category: "Biomaterials",
-            items: [
-                "Collagen",
-                "Bioplastics",
-                "Powder Metallurgy",
-                "Powders & Bulk Materials",
-                "Refractory Materials",
-                "Composite Materials",
-                "Electronic, Optical & Magnetic Materials",
-                "Dental Materials",
-                "Biocatalysis",
-                "Marine Chemistry",
-                "Coordination Compounds",
-                "Inorganic Chemistry",
-                "Natural Product Chemistry",
-                "Molecular Engineering",
-                "Physical Chemistry"
-            ]
-        },
-        {
-            category: "Physical Chemistry",
-            items: [
-                "Molecular Docking",
-                "Chemoinformatics",
-                "Biopolymers",
-                "Polymer Chemistry"
-            ]
-        },
-        {
-            category: "Analytical Chemistry",
-            items: [
-                "Deformulation",
-                "Separation & Purification Crystallography",
-                "X-Ray Crystallography Spectroscopy",
-                'Atomic Absorption Spectroscopy',
-                'Atomic Emission Spectroscopy',
-                'UV Spectroscopy ',
-                'Fluorescence Spectroscopy',
-                'Raman Spectroscopy',
-                'NMR Spectroscopy',
-                'Circular Dichroism Spectroscopy',
-                'Spectrophotometry',
-                'Mass Spectrometry',
-                'Molecular Imaging',
-                'Liquid Chromatography/HPLC',
-                'Thermal Analysis',
-                'Microcalorimetry',
-                'Gas Chromatography',
-                'Optical Rotation',
-                'Particle Size Distribution',
-                'Stable Isotope Analysis',
-                'Particle-Induced X-Ray Emission',
-                'Electrochemistry',
-                'Agricultural Chemistry',
-                "Cosmochemistry",
-                "Radiochemistry",
-                "Astrochemistry",
-                "Petrochemistry",
-            ]
-        },
-        {
-            category: "Solid State Sciences",
-            items: [
-                "Condensed Matter Physics",
-                "Solid-State Chemistry",
-                "Flow Chemistry",
-                "Green Chemistry",
-                "Refractory Materials",
-                "Organometallic Chemistry",
-                "Photochemistry",
-                "Quantum Chemistry",
-            ]
-        },
-        {
-            category: "Organic Chemistry",
-            items: [
-                "Retrosynthesis",
-                "Thermochemistry",
-                "Computational Chemistry",
-                "Mechanochemistry",
-                "Sonochemistry",
-                "Peptide Synthesis",
-                "Physical Organic Chemistry",
-                "Adhesion Technology",
-                "Applied Chemistry",
-            ]
-        },
-        {
-            category: "Agriculture",
-            items: [
-                "Plant Science:",
-                "Agronomy:",
-                "Plant Breeding:",
-                "Mechanochemistry",
-                "Sonochemistry",
-                "Peptide Synthesis",
-                "Physical Organic Chemistry",
-                "Adhesion Technology",
-                "Applied Chemistry",
-            ]
-        },
-    ], []);
 
-    const allSubcategoryItems = React.useMemo(() => Subcategorys.flatMap(Subcategory => Subcategory.items.map(item => ({
-        category: Subcategory.category,
-        label: item
-    }))), []);
+   
+
+    const allSubcategoryItems = React.useMemo(() => 
+        Subcategorys().flatMap((subcategory) =>
+            subcategory.items.map((item) => ({
+                category: subcategory.category,
+                label: item,
+            }))
+        ), []);
+    
 
 
     const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; }, { setSubmitting, resetForm }: any) => {
@@ -290,6 +155,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             setSubmitting(false);
         }
     }, [editingJobs, userDetails, onCancelEdit]);
+
 
     return (
         <>
@@ -438,6 +304,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
                                     )}
                                 </FormControl>
+
+                                
                                 <FormControl fullWidth>
                                     <InputLabel color='secondary' id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
@@ -456,24 +324,41 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         <MenuItem value="Phd">Phd</MenuItem>
                                     </Select>
                                 </FormControl>
-                                <TextField
-                                    fullWidth
-                                    name="Budget"
-                                    color='secondary'
-                                    label="BUDGET"
-                                    type="number"
-                                    value={values.Budget}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={touched.Budget && Boolean(errors.Budget)}
-                                    helperText={touched.Budget && errors.Budget}
-                                    margin="normal"
-                                />
+                                
+
+                                <Box display="flex" alignItems="center" gap={2}>
+                                    <TextField
+                                        fullWidth
+                                        id="Budget"
+                                        name="Budget"
+                                        label="Budget"
+                                        type="number"
+                                        value={values.Budget}
+                                        onChange={handleChange}
+                                        error={touched.Budget && Boolean(errors.Budget)}
+                                        helperText={touched.Budget && errors.Budget}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <FormControl variant="standard">
+                                                        <Select
+                                                            value={currency}
+                                                            onChange={(e) => setCurrency(e.target.value as string)}
+                                                        >
+                                                            <MenuItem value="INR">INR</MenuItem>
+                                                            <MenuItem value="USD">USD</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Box>
 
 
                                 <Autocomplete
                                     multiple
-                                    options={Category}
+                                    options={Category()}
                                     value={values.categoryforCategory}
 
                                     onChange={(event, value) => setFieldValue('categoryforCategory', value)}
@@ -570,6 +455,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     value={values.Expectedoutcomes}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
+                                    rows={4}
                                     multiline
                                     fullWidth
                                     error={!!(errors.Expectedoutcomes && touched.Expectedoutcomes)}

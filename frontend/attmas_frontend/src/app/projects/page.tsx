@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -15,6 +15,12 @@ import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
+import { Drawer } from '@mui/material';
+import { Divider } from '@mui/material'; // Import Divider
+import { Category , Subcategorys} from '@/app/constants/categories';
+
+
+
 
 interface Job {
     _id?: string;
@@ -35,19 +41,7 @@ interface Job {
     IPRownership: string;
 }
 
-const Category = [
-    "Agriculture",
-    "Chemicals",
-    "Electronics",
-    "Energy",
-    "Environmental and waste management",
-    "Food and beverage",
-    "Healthcare",
-    "Medical devices and equipment",
-    "Mining and metals",
-    "Real estate and construction",
-    "Textiles"
-];
+
 
 const Expertiselevel = [
     "Beginner",
@@ -55,143 +49,6 @@ const Expertiselevel = [
     "Expert",
     "Phd"
 ];
-
-const Subcategorys = [
-    {
-        category: "Chemistry",
-        items: [
-            "Chemical Reagent Development",
-            "Dewatering & Drying Technology",
-            "Electronics",
-            "Catalysis",
-            "Trace Elements",
-            "Mathematical Chemistry",
-            "Dispersion Chemistry",
-            "Surface Science"
-        ]
-    },
-    {
-        category: "Materials Science & Engineering",
-        items: [
-            "Nanotechnology & Nanomaterials",
-            "Surface Chemistry",
-            "Metallurgy",
-            "Glass Science",
-            "Ceramic Engineering",
-            "Corrosion",
-            "Structural Chemistry",
-            "Microencapsulation",
-            "Supramolecular Chemistry",
-            "Fiber & Textile Engineering",
-            "Carbon Materials",
-            "Nanotechnology"
-        ]
-    },
-    {
-        category: "Biomaterials",
-        items: [
-            "Collagen",
-            "Bioplastics",
-            "Powder Metallurgy",
-            "Powders & Bulk Materials",
-            "Refractory Materials",
-            "Composite Materials",
-            "Electronic, Optical & Magnetic Materials",
-            "Dental Materials",
-            "Biocatalysis",
-            "Marine Chemistry",
-            "Coordination Compounds",
-            "Inorganic Chemistry",
-            "Natural Product Chemistry",
-            "Molecular Engineering",
-            "Physical Chemistry"
-        ]
-    },
-    {
-        category: "Physical Chemistry",
-        items: [
-            "Molecular Docking",
-            "Chemoinformatics",
-            "Biopolymers",
-            "Polymer Chemistry"
-        ]
-    },
-    {
-        category: "Analytical Chemistry",
-        items: [
-            "Deformulation",
-            "Separation & Purification Crystallography",
-            "X-Ray Crystallography Spectroscopy",
-            'Atomic Absorption Spectroscopy',
-            'Atomic Emission Spectroscopy',
-            'UV Spectroscopy ',
-            'Fluorescence Spectroscopy',
-            'Raman Spectroscopy',
-            'NMR Spectroscopy',
-            'Circular Dichroism Spectroscopy',
-            'Spectrophotometry',
-            'Mass Spectrometry',
-            'Molecular Imaging',
-            'Liquid Chromatography/HPLC',
-            'Thermal Analysis',
-            'Microcalorimetry',
-            'Gas Chromatography',
-            'Optical Rotation',
-            'Particle Size Distribution',
-            'Stable Isotope Analysis',
-            'Particle-Induced X-Ray Emission',
-            'Electrochemistry',
-            'Agricultural Chemistry',
-            "Cosmochemistry",
-            "Radiochemistry",
-            "Astrochemistry",
-            "Petrochemistry",
-        ]
-    },
-    {
-        category: "Solid State Sciences",
-        items: [
-            "Condensed Matter Physics",
-            "Solid-State Chemistry",
-            "Flow Chemistry",
-            "Green Chemistry",
-            "Refractory Materials",
-            "Organometallic Chemistry",
-            "Photochemistry",
-            "Quantum Chemistry",
-        ]
-    },
-    {
-        category: "Organic Chemistry",
-        items: [
-            "Retrosynthesis",
-            "Thermochemistry",
-            "Computational Chemistry",
-            "Mechanochemistry",
-            "Sonochemistry",
-            "Peptide Synthesis",
-            "Physical Organic Chemistry",
-            "Adhesion Technology",
-            "Applied Chemistry",
-        ]
-    },
-    {
-        category: "Agriculture",
-        items: [
-            "Plant Science:",
-            "Agronomy:",
-            "Plant Breeding:",
-            "Mechanochemistry",
-            "Sonochemistry",
-            "Peptide Synthesis",
-            "Physical Organic Chemistry",
-            "Adhesion Technology",
-            "Applied Chemistry",
-        ]
-    },
-];
-
-
 
 
 const getSubcategorys = (Subcategorys: any[]) => Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
@@ -212,6 +69,11 @@ const Jobs = () => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
+
+    const [viewingJob, setViewingJob] = useState<Job | null>(null);
+
+
+
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
         try {
@@ -286,26 +148,26 @@ const Jobs = () => {
 
     const handleDeleteJob = useCallback(async () => {
         if (confirmDelete.jobs) {
-          try {
-            await axios.delete(`${APIS.JOBS}/${confirmDelete.jobs._id}`);
-            setJobs(jobs.filter(job => job._id !== confirmDelete.jobs!._id));
-            pubsub.publish('JobDeleted', {});
-          } catch (error) {
-            console.error('Error deleting job:', error);
-          } finally {
-            setConfirmDelete({ open: false, jobs: null });
-          }
+            try {
+                await axios.delete(`${APIS.JOBS}/${confirmDelete.jobs._id}`);
+                setJobs(jobs.filter(job => job._id !== confirmDelete.jobs!._id));
+                pubsub.publish('JobDeleted', {});
+            } catch (error) {
+                console.error('Error deleting job:', error);
+            } finally {
+                setConfirmDelete({ open: false, jobs: null });
+            }
         }
-      }, [confirmDelete, jobs]);
+    }, [confirmDelete, jobs]);
 
 
-  const handleConfirmDelete = (jobs: Job) => {
-    setConfirmDelete({ open: true, jobs });
-  };
+    const handleConfirmDelete = (jobs: Job) => {
+        setConfirmDelete({ open: true, jobs });
+    };
 
-  const handleCancelDelete = () => {
-    setConfirmDelete({ open: false, jobs: null });
-  };
+    const handleCancelDelete = () => {
+        setConfirmDelete({ open: false, jobs: null });
+    };
 
     const handleApplyClick = useCallback((title: string) => {
         setApplyOpen(true);
@@ -320,6 +182,12 @@ const Jobs = () => {
             setFilterType(newFilterType);
         }
     }
+
+    // Function to handle viewing job details
+    const handleViewJob = (job: Job) => {
+        setViewingJob(job);
+        // setApplyOpen(true); // Optionally reuse this state for opening the drawer
+    };
 
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important", overflowX: "hidden !important" }}>
@@ -370,7 +238,7 @@ const Jobs = () => {
                         sx={{ flex: 1 }}
                         multiple
                         size='small'
-                        options={Category}
+                        options={Category()}
                         value={selectedCategory}
                         onChange={(event, value) => setSelectedCategory(value)}
                         renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' />}
@@ -380,7 +248,7 @@ const Jobs = () => {
                         sx={{ flex: 1 }}
                         multiple
                         size='small'
-                        options={getSubcategorys(Subcategorys)}
+                        options={getSubcategorys(Subcategorys())}
                         value={selectedSubcategory}
                         onChange={(event, value) => setSelectedSubcategory(value)}
                         renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' />}
@@ -388,6 +256,9 @@ const Jobs = () => {
                     <Button onClick={handleFilterChange} variant="contained" color="primary">Apply Filters</Button>
                 </Box>
             )}
+
+
+
             <InfiniteScroll
                 dataLength={jobs.length}
                 next={() => setPage(prev => prev + 1)}
@@ -400,7 +271,10 @@ const Jobs = () => {
                         <Card key={job._id} sx={{ mb: 2 }}>
                             <CardContent>
                                 <Typography variant="h5">
-                                    {job.title}
+
+                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
+                                        {job.title}
+                                    </a>
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
                                     </span>
@@ -417,10 +291,13 @@ const Jobs = () => {
 
 
                                 </Typography>
-                                <Typography variant="body2">{job.description}</Typography>
+                                <Typography variant="body2" sx={{ mb: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
+                                    {job.description}
+                                </Typography>
+
                                 <Typography variant="body2">{job.Budget}</Typography>
                                 <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                <Box sx={{ float: "right" }}>
+                                {/* <Box sx={{ float: "right" }}>
                                     <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
                                         Apply
                                     </Button>
@@ -434,19 +311,115 @@ const Jobs = () => {
                                             <DeleteRoundedIcon />
                                         </IconButton>
                                     </Tooltip>
+                                </Box> */}
+
+                                <Box sx={{ float: "right" }}>
+                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
+                                        Apply
+                                    </Button>
+                                    {userDetails.userType === 'Project Owner' && (
+                                        <>
+                                            <Tooltip title="Edit" arrow>
+                                                <IconButton onClick={() => handleEditJob(job)}>
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete" arrow>
+                                                <IconButton onClick={() => handleConfirmDelete(job)}>
+                                                    <DeleteRoundedIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </>
+                                    )}
                                 </Box>
+
                             </CardContent>
                         </Card>
                     ))}
                 </Box>
             </InfiniteScroll>
             <AddApply open={applyOpen} setOpen={setApplyOpen} jobTitle={jobTitle} />
-          <DeleteConfirmationDialog
-            open={confirmDelete.open}
-            onCancel={handleCancelDelete}
-            onConfirm={handleDeleteJob}
-            title={confirmDelete.jobs?.title || ''}
-/>
+            <DeleteConfirmationDialog
+                open={confirmDelete.open}
+                onCancel={handleCancelDelete}
+                onConfirm={handleDeleteJob}
+                title={confirmDelete.jobs?.title || ''}
+            />
+
+
+
+
+
+
+
+            <Drawer
+                anchor="right" // Set anchor to "right"
+                open={!!viewingJob}
+                onClose={() => setViewingJob(null)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px 0px 0px 20px',
+                        width: '600px',
+                        p: 2,
+                        backgroundColor: '#f9f9f9'
+                    }
+                }}
+
+                BackdropProps={{
+                    sx: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adjust the opacity as needed
+                    }
+                }}
+            >
+                {viewingJob && (
+                    <Box p={2}>
+                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
+                        <Typography variant="h5" sx={{ mb: 1 }}>{viewingJob.title}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Description:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.description}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Select Service:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.SelectService}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Expertise Level:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expertiselevel}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Budget:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>${viewingJob.Budget}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Category:</b></Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                            {viewingJob.Category.map((category, index) => (
+                                <Chip
+                                    key={index}
+                                    label={category}
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{ fontSize: '0.75rem', height: 'auto', py: 0.5 }}
+                                />
+                            ))}
+                        </Box>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Subcategories:</b></Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                            {viewingJob.Subcategorys.map((subcategory, index) => (
+                                <Chip
+                                    key={index}
+                                    label={subcategory}
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{ fontSize: '0.75rem', height: 'auto', py: 0.5 }}
+                                />
+                            ))}
+                        </Box>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Objective:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Objective}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>Expected Outcomes:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expectedoutcomes}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}><b>IPR Ownership:</b></Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.IPRownership}</Typography>
+                    </Box>
+                )}
+            </Drawer>
+
+
+
+
         </Box>
     );
 };
