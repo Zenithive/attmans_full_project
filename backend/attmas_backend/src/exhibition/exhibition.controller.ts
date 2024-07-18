@@ -96,14 +96,22 @@ export class ExhibitionController {
     return deletedExhibition;
   }
   @Get(':id')
-  async findOneExhibition(@Param('id') id: string): Promise<Exhibition> {
+  async findOne(@Param('id') id: string): Promise<any> {
     try {
       const exhibition = await this.exhibitionService.findOneExhibition(id);
-      console.log('exhibition', exhibition);
       if (!exhibition) {
         throw new NotFoundException(`Exhibition with id ${id} not found`);
       }
-      return exhibition;
+
+      const serverDate = new Date();
+      const exhibitionObject = exhibition.toObject();
+
+      const mergedData = {
+        ...exhibitionObject,
+        serverDate,
+      };
+      console.log('merged', mergedData);
+      return mergedData;
     } catch (error) {
       throw new NotFoundException(
         `Error retrieving exhibition: ${error.message}`,
