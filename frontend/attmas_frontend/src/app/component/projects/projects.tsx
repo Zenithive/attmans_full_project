@@ -101,7 +101,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
 
 
-   
 
     const allSubcategoryItems = React.useMemo(() => 
         Subcategorys().flatMap((subcategory) =>
@@ -111,8 +110,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             }))
         ), []);
     
-
-
     const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,

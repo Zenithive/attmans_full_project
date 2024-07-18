@@ -53,7 +53,7 @@ const ExhibitionsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState<{ open: boolean; booth: Booth | null }>({ open: false, booth: null });
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; booth: Booth | null }>({ open: false, booth: null });
-  const [currentDate, setCurrentDate] = useState<string>('');
+  
   useEffect(() => {
     const fetchExhibitions = async () => {
       try {
