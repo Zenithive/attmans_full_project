@@ -51,4 +51,6 @@ export const APIS = {
 
     MARK_AS_READ: `${SERVER_URL}/emails/markasread`,
 
+    GET_CURRENT_DATE: `${SERVER_URL}/exhibitions/current-date`,
+
 }
