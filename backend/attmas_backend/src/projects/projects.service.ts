@@ -112,10 +112,12 @@ export class JobsService {
     const adminUsers = await this.usersService.findUsersByUserType1('Admin'); // Adjust this method as needed
     const subject = 'New Project Created';
     const jobId = savedJob._id.toString();
+    const first = savedJob.firstName;
+    const last = savedJob.lastName;
     const title = savedJob.title;
 
     for (const admin of adminUsers) {
-      await this.emailService.sendEmailProject(admin.username, subject, jobId, title);
+      await this.emailService.sendEmailProject(admin.username, subject, jobId, title, first, last);
     }
 
     return savedJob;

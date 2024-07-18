@@ -17,6 +17,10 @@ import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { useMemo, useCallback } from 'react';
 import { PubSub, pubsub } from '@/app/services/pubsub.service';
+import SubjectMatterExpertise from '../SubjectMatterExpertise';
+import { options } from '@/app/constants/categories';
+
+
 interface Exhibition {
     _id?: string;
     title: string;
@@ -46,17 +50,17 @@ const validationSchema = Yup.object().shape({
     subject: Yup.array().of(Yup.string())
 });
 
-export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionProps) => {
+export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
     const [usernames, setUsernames] = React.useState<string[]>([]);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
-    const {userType} = userDetails;
+    const { userType } = userDetails;
 
     const initialValues = React.useMemo(() => ({
         title: '',
         description: '',
-        status:'',
+        status: '',
         videoUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
@@ -75,7 +79,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
             try {
                 const response = await axios.get(`${APIS.INNOVATORSFOREXIBITION}`);
                 console.log("response", response);
-                
+
                 setUsernames(response.data);
             } catch (error) {
                 console.error('Error fetching usernames:', error);
@@ -238,20 +242,20 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
         label: item
     }))), [subjects]);
 
-    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[];videoUrl:string; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = React.useCallback(async (values: { title: string; description: string; status: string; dateTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; videoUrl: string; }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
             dateTime: values.dateTime ? values.dateTime.toISOString() : null,
-            status:values.status,
-            videoUrl:values.videoUrl,
+            status: values.status,
+            videoUrl: values.videoUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId: userDetails._id,
-            username:userDetails.username
+            username: userDetails.username
         };
 
-        console.log("wee",exhibitionData);
+        console.log("wee", exhibitionData);
 
         try {
             if (editingExhibition) {
@@ -277,11 +281,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
 
     return (
         <>
-        {userType === "Admin" && (
-            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
-                borderRadius: 3, backgroundColor:'#CC4800', color: "white"
-            }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
-        )}
+            {userType === "Admin" && (
+                <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
+                    borderRadius: 3, backgroundColor: '#CC4800', color: "white"
+                }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+            )}
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
                     <h2>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
@@ -294,15 +298,15 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                     initialValues={editingExhibition ? {
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
-                        status:editingExhibition.status || '',
-                        videoUrl:editingExhibition.videoUrl || '',
+                        status: editingExhibition.status || '',
+                        videoUrl: editingExhibition.videoUrl || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
                     } : initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
-                    
+
                 >
                     {({ values, setFieldValue, handleChange, handleBlur, handleSubmit, isSubmitting, errors, touched }) => (
                         <Form onSubmit={handleSubmit}>
@@ -333,7 +337,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                     error={!!(errors.description && touched.description)}
                                     helperText={<ErrorMessage name="description" />}
                                 />
-                                 <TextField
+                                <TextField
                                     label="Video Url"
                                     name="videoUrl"
                                     variant="outlined"
@@ -401,48 +405,18 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                         />
                                     )}
                                 />
-                                <Autocomplete
-                                    multiple
-                                    options={allSubjectItems}
-                                    groupBy={(option) => option.category}
-                                    getOptionLabel={(option) => option.label}
-                                    value={values.subject.map((label: string) => allSubjectItems.find(item => item.label === label)!)}
-                                    onChange={(event, value) => setFieldValue('subject', value.map(item => item.label))}
-                                    renderTags={(value, getTagProps) => (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {value.map((option, index) => (
-                                                <Chip
-                                                    label={option.label}
-                                                    color='secondary'
-                                                    {...getTagProps({ index })}
-                                                    onDelete={() => setFieldValue('subject', values.subject.filter((sub: any) => sub !== option.label))}
-                                                    key={option.label}
-                                                />
-                                            ))}
-                                        </Box>
-                                    )}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            label="Subject matter expertise"
-                                            color='secondary'
-                                            placeholder="Select subjects"
-                                            error={!!(errors.subject && touched.subject)}
-                                            helperText={
-                                                typeof errors.subject === 'string' && touched.subject
-                                                    ? errors.subject
-                                                    : undefined
-                                            }
-                                        />
-                                    )}
-                                    renderGroup={(params) => (
-                                        <li key={params.key}>
-                                            <span style={{ fontWeight: 'bold' }}>{params.group}</span>
-                                            {params.children}
-                                        </li>
-                                    )}
-                                />
+                                
+
+                                <SubjectMatterExpertise
+                                    selectedValues={values.subject}
+                                    setSelectedValues={(values) => setFieldValue('subject', values)}
+                                    options={options} // Pass the options array here
+                                    Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
+                                        throw new Error('Function not implemented.');
+                                    } }                                />
+
+
+                                    
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DateTimePicker
                                         label="Date & Time"
@@ -450,8 +424,16 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit}:AddExhibitionPr
                                         onChange={(newValue) => setFieldValue('dateTime', newValue)}
                                     />
                                 </LocalizationProvider>
+
+
+
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+
+
+
                                     <Button variant="contained" style={{ background: "#616161", color: "white" }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+
+
                                     <Button variant="contained" color='primary' type="submit" disabled={isSubmitting} > {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingExhibition ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>

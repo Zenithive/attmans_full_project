@@ -33,6 +33,8 @@ interface Email {
   status?: string;
   exhibitionUserFirstName?: string;
   exhibitionUserLastName?: string;
+  firstName: string;
+  lastName: string;
 }
 
 function clearCookies() {

@@ -17,7 +17,7 @@ import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 import { Drawer } from '@mui/material';
 import { Divider } from '@mui/material'; // Import Divider
-import { Category , Subcategorys} from '@/app/constants/categories';
+import { Category, Subcategorys } from '@/app/constants/categories';
 
 
 
@@ -39,6 +39,7 @@ interface Job {
     Objective: string;
     Expectedoutcomes: string;
     IPRownership: string;
+    currency: string
 }
 
 
@@ -382,7 +383,7 @@ const Jobs = () => {
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Expertise Level:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expertiselevel}</Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Budget:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>${viewingJob.Budget}</Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.currency} {viewingJob.Budget}</Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Category:</b></Typography>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                             {viewingJob.Category.map((category, index) => (

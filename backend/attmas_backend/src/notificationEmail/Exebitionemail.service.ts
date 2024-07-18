@@ -74,6 +74,8 @@ export class EmailService2 {
     subject: string,
     exhibitionId: string,
     title: string,
+    first: string,
+    last: string,
   ) {
     try {
       // Fetch user details from UsersService
@@ -85,7 +87,8 @@ export class EmailService2 {
       // Customize email message with user's first name and last name
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        You have been notified that  someone had created  the Project "${title}".
+        You have been notified that ${first} ${last}  had created  the Project "${title}".<br>
+
       `;
 
       await this.transporter.sendMail({

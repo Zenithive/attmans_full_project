@@ -17,7 +17,8 @@ import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { useCallback, useMemo } from 'react';
-import { Category , Subcategorys} from '@/app/constants/categories';
+import { Category, options, Subcategorys } from '@/app/constants/categories';
+import SubjectMatterExpertise from '../SubjectMatterExpertise';
 
 
 
@@ -71,6 +72,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     const [currency, setCurrency] = React.useState('INR');
 
 
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const initialValues = React.useMemo(() => ({
@@ -89,7 +91,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         Sector: '',
         AreaOfProduct: '',
         ProductDescription: '',
-        // username: userDetails.username
 
     }), []);
 
@@ -101,16 +102,16 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
 
 
-   
 
-    const allSubcategoryItems = React.useMemo(() => 
+
+    const allSubcategoryItems = React.useMemo(() =>
         Subcategorys().flatMap((subcategory) =>
             subcategory.items.map((item) => ({
                 category: subcategory.category,
                 label: item,
             }))
         ), []);
-    
+
 
 
     const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; }, { setSubmitting, resetForm }: any) => {
@@ -131,6 +132,9 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             Expectedoutcomes: values.Expectedoutcomes,
             IPRownership: values.IPRownership,
             userId: userDetails._id,
+            firstName: userDetails.firstName,
+            lastName: userDetails.lastName,
+            currency: currency,
         };
 
         try {
@@ -305,7 +309,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     )}
                                 </FormControl>
 
-                                
+
                                 <FormControl fullWidth>
                                     <InputLabel color='secondary' id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
@@ -324,7 +328,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         <MenuItem value="Phd">Phd</MenuItem>
                                     </Select>
                                 </FormControl>
-                                
+
 
                                 <Box display="flex" alignItems="center" gap={2}>
                                     <TextField
@@ -348,6 +352,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                                             <MenuItem value="INR">INR</MenuItem>
                                                             <MenuItem value="USD">USD</MenuItem>
                                                         </Select>
+
                                                     </FormControl>
                                                 </InputAdornment>
                                             ),
@@ -392,48 +397,17 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         />
                                     )}
                                 />
-                                <Autocomplete
-                                    multiple
-                                    options={allSubcategoryItems}
-                                    groupBy={(option) => option.category}
-                                    getOptionLabel={(option) => option.label}
-                                    value={values.Subcategory.map((label: string) => allSubcategoryItems.find(item => item.label === label)!)}
-                                    onChange={(event, value) => setFieldValue('Subcategory', value.map(item => item.label))}
-                                    renderTags={(value, getTagProps) => (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {value.map((option, index) => (
-                                                <Chip
-                                                    label={option.label}
-                                                    color='secondary'
-                                                    {...getTagProps({ index })}
-                                                    onDelete={() => setFieldValue('subject', values.Subcategory.filter((sub: any) => sub !== option.label))}
-                                                    key={option.label}
-                                                />
-                                            ))}
-                                        </Box>
-                                    )}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            label="Subcategory matter expertise"
-                                            color='secondary'
-                                            placeholder="Select Subcategorys"
-                                            error={!!(errors.Subcategory && touched.Subcategory)}
-                                            helperText={
-                                                typeof errors.Subcategory === 'string' && touched.Subcategory
-                                                    ? errors.Subcategory
-                                                    : undefined
-                                            }
-                                        />
-                                    )}
-                                    renderGroup={(params) => (
-                                        <li key={params.key}>
-                                            <span style={{ fontWeight: 'bold' }}>{params.group}</span>
-                                            {params.children}
-                                        </li>
-                                    )}
-                                />
+
+
+
+                                <SubjectMatterExpertise
+                                    selectedValues={values.Subcategory}
+                                    setSelectedValues={(val) => setFieldValue('Subcategory', val)}
+                                    options={options} // Pass the options array here
+                                    Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
+                                        throw new Error('Function not implemented.');
+                                    }} />
+
                                 <TextField
                                     label="Objective"
                                     name="Objective"
@@ -474,6 +448,10 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     error={!!(errors.IPRownership && touched.IPRownership)}
                                     helperText={<ErrorMessage name="IPRownership" />}
                                 />
+
+
+
+
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DateTimePicker
                                         label="Time Frame"
