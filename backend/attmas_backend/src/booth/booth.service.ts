@@ -30,8 +30,6 @@ export class BoothService {
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
-    console.log('exhibition', exhibition);
-    console.log('booth', booth);
     if (exhibition) {
       const { username } = exhibition;
       await this.emailService.sendEmailtoExhibition(
@@ -71,27 +69,71 @@ export class BoothService {
   }
 
   async approveBooth(id: string): Promise<Booth> {
-    const booth = await this.boothModel.findById({ _id: id });
-    console.log('boothId for approve', booth);
+    const booth = await this.boothModel.findById(id);
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
     booth.status = 'Approved';
-    console.log('booth status', booth.status);
     booth.buttonsHidden = true;
     await booth.save();
+
+    const exhibitionId = new Types.ObjectId(booth.exhibitionId);
+
+    const exhibition: any = await this.exhibitionModel
+      .findById(exhibitionId)
+      .populate('userId', 'firstName lastName username', this.userModel)
+      .exec();
+    if (exhibition) {
+      const innovator = await this.userModel.findById(booth.userId);
+      if (innovator) {
+        await this.emailService.sendBoothStatusEmail(
+          innovator.username,
+          'Booth Approved',
+          (exhibition._id as Types.ObjectId).toHexString(),
+          booth.title,
+          'approved',
+          booth.username,
+          exhibition.userId.firstName,
+          exhibition.userId.lastName,
+        );
+      }
+    }
+
+    console.log('booth reject', booth);
     return booth;
   }
 
   async rejectBooth(id: string): Promise<Booth> {
-    const booth = await this.boothModel.findById({ _id: id });
-    console.log('boothId for reject', booth);
+    const booth = await this.boothModel.findById(id);
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
     booth.status = 'Rejected';
     booth.buttonsHidden = true;
     await booth.save();
+
+    const exhibitionId = new Types.ObjectId(booth.exhibitionId);
+
+    const exhibition: any = await this.exhibitionModel
+      .findById(exhibitionId)
+      .populate('userId', 'firstName lastName username', this.userModel)
+      .exec();
+    if (exhibition) {
+      const innovator = await this.userModel.findById(booth.userId);
+      if (innovator) {
+        await this.emailService.sendBoothStatusEmail(
+          innovator.username,
+          'Booth Rejected',
+          (exhibition._id as Types.ObjectId).toHexString(),
+          booth.title,
+          'rejected',
+          booth.username,
+          exhibition.userId.firstName,
+          exhibition.userId.lastName,
+        );
+      }
+    }
+    console.log('booth reject', booth);
     return booth;
   }
 

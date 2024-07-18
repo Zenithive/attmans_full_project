@@ -158,6 +158,58 @@ export class EmailService2 {
     }
   }
 
+  async sendBoothStatusEmail(
+    to: string,
+    subject: string,
+    exhibitionId: string,
+    title: string,
+    status: string,
+    boothUsername: string,
+    exhibitionUserFirstName: string,
+    exhibitionUserLastName: string,
+  ) {
+    try {
+      // const exhibition =
+      //   await this.usersService.findByUsername(exhibitionUsername);
+      // if (!exhibition) {
+      //   throw new Error(`User with username ${exhibitionUsername} not founds`);
+      // }
+
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`User with username ${to} not found`);
+      }
+
+      const html = `
+        Dear ${user.firstName} ${user.lastName},<br>
+        your booth "${title}" request for exhibition is ${status} by "${exhibitionUserFirstName} ${exhibitionUserLastName}". Click <a href="https://attmans.netlify.app/view-exhibition?exhibitionId=${exhibitionId}" target="_blank">here</a> for more details.
+      `;
+
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to,
+        subject,
+        sentAt: new Date(),
+        read: false,
+        exhibitionId,
+        title,
+        status,
+        boothUsername,
+        exhibitionUserFirstName,
+        exhibitionUserLastName,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to ${to}:`, error);
+    }
+  }
+
   async findEmailsByUsername(to: string): Promise<Email[]> {
     return this.emailModel.find({ to }).exec();
   }

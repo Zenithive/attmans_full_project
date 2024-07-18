@@ -18,7 +18,6 @@ import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
 import DOMPurify from 'dompurify';
-import DoneIcon from '@mui/icons-material/Done';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CircleIcon from '@mui/icons-material/Circle';
 
@@ -31,6 +30,9 @@ interface Email {
   boothUsername?: string;
   title: string;
   sentAt: Date;
+  status?: string;
+  exhibitionUserFirstName?: string;
+  exhibitionUserLastName?: string;
 }
 
 function clearCookies() {
@@ -149,23 +151,73 @@ export default function MainNavBar() {
   };
 
 
+  // const generateNotificationHtml = (notification: Email) => {
+  //   const baseUrl = 'http://localhost:4200/projects';
+  //   if (notification.subject === 'New Project Created') { 
+  //     return `
+  //       Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+  //       You have been notified that someone has created a project. 
+  //       <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
+  //     `;
+  //   }else {
+  //   return `
+  //     Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+  //     You have been notified that ${notification.boothUsername || ''} has ${notification.boothUsername ? 'requested to participate in' : 'invited to participate in'} the exhibition "${notification.title}". 
+  //     <span style="color:blue; cursor:pointer;" onclick="window.open('/view-exhibition?exhibitionId=${notification.exhibitionId}', '_blank')">Click here</span> to ${notification.boothUsername ? 'approve/reject' : 'participate'}.
+  //   `;
+  //   console.log('notificati of stauts',notification.status);
+  //   if (notification.status) {
+  //     return `
+  //       Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+  //       your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> for more details.
+  //     `;
+  //   } else if (notification.boothUsername) {
+  //     return `
+  //       Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+  //       You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to approve/reject.
+  //     `;
+  //   } else {
+  //     return `
+  //       Dear ${userDetails.firstName} ${userDetails.lastName},<br>
+  //       You have been invited to participate in the exhibition "${notification.title}". Click <a href="/view-exhibition?exhibitionId=${notification.exhibitionId}" target="_blank">here</a> to participate.
+  //     `;
+  //   }
+  // };
+
+
   const generateNotificationHtml = (notification: Email) => {
     const baseUrl = 'http://localhost:4200/projects';
-    if (notification.subject === 'New Project Created') { 
+    const userName = `${userDetails.firstName} ${userDetails.lastName}`;
+    const viewExhibitionUrl = `/view-exhibition?exhibitionId=${notification.exhibitionId}`;
+
+    if (notification.subject === 'New Project Created') {
       return `
-        Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-        You have been notified that someone has created a project. 
-        <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
-      `;
-    }else {
-    return `
-      Dear ${userDetails.firstName} ${userDetails.lastName},<br>
-      You have been notified that ${notification.boothUsername || ''} has ${notification.boothUsername ? 'requested to participate in' : 'invited to participate in'} the exhibition "${notification.title}". 
-      <span style="color:blue; cursor:pointer;" onclick="window.open('/view-exhibition?exhibitionId=${notification.exhibitionId}', '_blank')">Click here</span> to ${notification.boothUsername ? 'approve/reject' : 'participate'}.
-    `;
+            Dear ${userName},<br>
+            You have been notified that someone has created a project. 
+            <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
+        `;
     }
+
+    if (notification.status) {
+      return `
+            Dear ${userName},<br>
+            Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+        `;
+    }
+
+    if (notification.boothUsername) {
+      return `
+            Dear ${userName},<br>
+            You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to approve/reject.
+        `;
+    }
+
+    return `
+        Dear ${userName},<br>
+        You have been invited to participate in the exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to participate.
+    `;
   };
-  
+
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (

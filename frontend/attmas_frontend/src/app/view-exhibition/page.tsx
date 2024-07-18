@@ -10,6 +10,8 @@ import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
+import ApproveDialog from '../component/approvedilog/approvedilog';
+import RemoveDialog from '../component/removedilog/removedilog';
 
 interface Exhibition {
   _id?: string;
@@ -35,6 +37,7 @@ interface Booth {
   status: string;
   exhibitionId: string;
   createdAt: string;
+  videoUrl:string;
 }
 
 const ExhibitionsPage: React.FC = () => {
@@ -114,7 +117,7 @@ const ExhibitionsPage: React.FC = () => {
           b._id === booth._id ? { ...b, status: 'Approved' } : b
         )
       );
-      setStatusFilter('Approved'); 
+      setStatusFilter('Approved');
     } catch (error) {
       console.error('Error approving booth:', error);
     } finally {
@@ -149,11 +152,11 @@ const ExhibitionsPage: React.FC = () => {
     setStatusFilter(newStatus);
   };
 
-  const renderVideo = (url: string) => {
+  const renderVideo = (url: string, width: number = 800, height: number = 500) => {
     if (!url) {
       return null;
     }
-
+  
     const platforms = [
       {
         name: 'YouTube',
@@ -185,13 +188,13 @@ const ExhibitionsPage: React.FC = () => {
         embedUrl: (url: string) => url
       }
     ];
-
+  
     const platform = platforms.find(p => p.check(url));
     const embedUrl = platform?.embedUrl(url);
-
+  
     if (platform?.name === 'Default') {
       return (
-        <video width="1100" controls>
+        <video width={width} height={height} controls>
           <source src={embedUrl} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
@@ -199,8 +202,8 @@ const ExhibitionsPage: React.FC = () => {
     } else {
       return (
         <iframe
-          width="750"
-          height="500"
+          width={width}
+          height={height}
           style={{ borderRadius: "30px" }}
           src={embedUrl}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -209,19 +212,24 @@ const ExhibitionsPage: React.FC = () => {
       );
     }
   };
+  
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: 1, marginRight: '20px' }}>
-        <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "29px",height:'6%' }}>
-          <h1 style={{ position: 'relative', top: "15%" ,left:'30px'}}>Exhibition</h1>
-          {(userDetails && userType === 'Innovators') && (
-            <Button variant="contained" color="primary" onClick={openModal} style={{ position: 'relative', float: "right", bottom: '60px', right: '5%', background: '#757575', fontWeight: 'bolder', color: 'white', height: '32px', backgroundColor: '#CC4800' }}>
-              Participate
-            </Button>
-          )}
-          <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column',overflowX:'hidden'}}>
+    <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
+      <h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1>
+      {(userDetails && userType === 'Innovators') && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={openModal}
+          style={{ position: 'absolute', right: '80px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+        >
+          Participate
+        </Button>
+      )}
+      <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
+    </div>
         <div>
           {exhibitions.map((exhibition) => (
             <Box key={exhibition._id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
@@ -246,6 +254,7 @@ const ExhibitionsPage: React.FC = () => {
         <div>
           <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px' }}>
             <h1>Booth Details</h1>
+            {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
             <ToggleButtonGroup
               value={statusFilter}
               exclusive
@@ -265,46 +274,57 @@ const ExhibitionsPage: React.FC = () => {
                 Rejected
               </ToggleButton>
             </ToggleButtonGroup>
-
+            )}
           </Box>
           <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
             {booths
               .filter(booth => booth.exhibitionId === exhibitionId)
               .filter(booth => {
                 if (statusFilter === 'All') {
-                  return true; 
+                  return true;
                 } else {
-                  return booth.status === statusFilter; 
+                  return booth.status === statusFilter;
                 }
               })
               .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
               .map(booth => (
                 <Grid item xs={12} sm={6} md={4} key={booth._id}>
-                  <Card sx={{ boxSizing: 'border-box', marginBottom: '10px' }}>
+                  <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
                     <CardContent>
-                      <Tooltip title="Click here to see Booth details" arrow placement="top" PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -20],
-                            },
-                          },
-                        ],
-                      }}>
-                        <Typography
-                          onClick={() => {
-                            setSelectedBooth(booth);
-                            setDialogOpen(true);
+                    <Typography
+                      onClick={() => {
+                        setSelectedBooth(booth);
+                        setDialogOpen(true);
+                      }}
+                      style={{ cursor: 'pointer', display: 'inline-block' }}
+                    >
+                      {(userDetails && (userType === 'Admin' || userType === 'Innovators')) ? (
+                        <Tooltip
+                          title="Click here to see Booth details"
+                          arrow
+                          placement="top"
+                          PopperProps={{
+                            modifiers: [
+                              {
+                                name: 'offset',
+                                options: {
+                                  offset: [0, -10],
+                                },
+                              },
+                            ],
                           }}
-                          style={{ cursor: 'pointer', display: 'inline-block' }}
                         >
                           <h2>{booth.title}</h2>
-                        </Typography>
-                      </Tooltip>
+                        </Tooltip>
+                      ) : (
+                        <h2>{booth.title}</h2>
+                      )}
+                    </Typography>
+
                       <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                       <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                       <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '102px' }}>
+                      {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
                         <Chip
                           label={
                             booth.status === 'Approved' ? 'Approved' :
@@ -318,27 +338,28 @@ const ExhibitionsPage: React.FC = () => {
                                 'default'
                           }
                         />
+                      )}
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginLeft: '48%' }}>
-                        {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
+                      {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
                           <>
-                          <Button
-                          onClick={() =>
-                            setApproveDialogOpen({ open: true, booth: booth })
-                          }
-                          variant="contained"
-                          style={{ marginRight: '10px'}}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            setRejectDialogOpen({ open: true, booth: booth })
-                          }
-                          variant="contained"
-                        >
-                          Reject
-                    </Button>
+                            <Button
+                              onClick={() =>
+                                setApproveDialogOpen({ open: true, booth: booth })
+                              }
+                              variant="contained"
+                              style={{ marginRight: '10px' }}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                setRejectDialogOpen({ open: true, booth: booth })
+                              }
+                              variant="contained"
+                            >
+                              Reject
+                            </Button>
                           </>
                         )}
                       </Box>
@@ -347,50 +368,30 @@ const ExhibitionsPage: React.FC = () => {
                 </Grid>
               ))}
           </Grid>
-          <Box sx={{textAlign:'center',position:'relative'}}>
-          {booths.filter(booth => booth.exhibitionId === exhibitionId).length === 0 && (
-              <Typography variant="h6" style={{ marginTop: '20px'}}>No booths to display</Typography>
+          <Box sx={{ textAlign: 'center', position: 'relative' }}>
+            {booths.filter(booth => booth.exhibitionId === exhibitionId).length === 0 && (
+              <Typography variant="h6" style={{ marginTop: '20px' }}>No booths to display</Typography>
             )}
           </Box>
 
-          <Dialog open={approveDialogOpen.open} onClose={() => setApproveDialogOpen({ open: false, booth: null })}>
-              <DialogTitle>Approve Booth</DialogTitle>
-              <DialogContent dividers>
-                <Typography>
-                  Are you sure you want to approve this booth "{approveDialogOpen.booth?.title}"?
-                </Typography>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setApproveDialogOpen({ open: false, booth: null })} sx={{background:'grey',"&:hover": {
-                background: 'grey'
-                },}}>
-                  Cancel
-                </Button>
-                <Button onClick={handleApprove} color="primary" autoFocus>
-                  Approve
-                </Button>
-              </DialogActions>
-            </Dialog>
-
-            <Dialog open={rejectDialogOpen.open} onClose={() => setRejectDialogOpen({ open: false, booth: null })}>
-              <DialogTitle>Reject Booth</DialogTitle>
-              <DialogContent dividers>
-                <Typography>
-                  Are you sure you want to reject this booth "{rejectDialogOpen.booth?.title}"?
-                </Typography>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setRejectDialogOpen({ open: false, booth: null })} sx={{background:'grey',"&:hover": {
-                background: 'grey'
-                },}}>
-                  Cancel
-                </Button>
-                <Button onClick={handleReject} color="primary" autoFocus>
-                  Reject
-                </Button>
-              </DialogActions>
-            </Dialog>
-          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+          <ApproveDialog
+            open={approveDialogOpen.open}
+            onClose={() => setApproveDialogOpen({ open: false, booth: null })}
+            onApprove={handleApprove}
+            booth={approveDialogOpen.booth}
+          />
+          <RemoveDialog
+            open={rejectDialogOpen.open}
+            onClose={() => setRejectDialogOpen({ open: false, booth: null })}
+            onRemove={handleReject}
+            booth={rejectDialogOpen.booth}
+          />
+          {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
+          <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth   sx={{ 
+            '& .MuiDialog-paper': { 
+              maxWidth: '700px',  
+            } 
+          }}>
             <DialogTitle sx={{ m: 0, p: 2 }}>
               Booth Details
               <IconButton
@@ -409,6 +410,9 @@ const ExhibitionsPage: React.FC = () => {
             <DialogContent dividers>
               {selectedBooth && (
                 <Box>
+                   <Typography sx={{position:'relative',float:'right'}}>
+                    {renderVideo(selectedBooth.videoUrl,400, 250)}
+                  </Typography>
                   <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
                     Title: {selectedBooth.title}
                   </Typography>
@@ -421,7 +425,7 @@ const ExhibitionsPage: React.FC = () => {
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                     Date: {dayjs(selectedBooth.createdAt).format('MMMM D, YYYY h:mm A')}
                   </Typography>
-                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
+                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', position:'relative',top:'30px' }}>
                     Products
                   </Typography>
                   <TableContainer component={Paper}>
@@ -455,9 +459,9 @@ const ExhibitionsPage: React.FC = () => {
               </Button>
             </DialogActions>
           </Dialog>
+          )}
         </div>
       </div>
-    </div>
   );
 };
 

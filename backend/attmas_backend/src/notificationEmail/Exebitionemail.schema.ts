@@ -32,7 +32,16 @@ export class Email extends Document {
   title: string;
 
   @Prop({ ref: 'booths', required: false })
+  status: string;
+
+  @Prop({ ref: 'booths', required: false })
   boothUsername: string;
+
+  @Prop({ ref: 'exhibitions', required: false })
+  exhibitionUserFirstName: string;
+
+  @Prop({ ref: 'exhibitions', required: false })
+  exhibitionUserLastName: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);
