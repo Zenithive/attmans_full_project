@@ -358,7 +358,7 @@ const Jobs = () => {
                 onClose={() => setViewingJob(null)}
                 PaperProps={{
                     sx: {
-                        borderRadius: '20px 20px 20px 20px',
+                        borderRadius: '20px 0px 0px 20px',
                         width: '600px',
                         p: 2,
                         backgroundColor: '#f9f9f9'
