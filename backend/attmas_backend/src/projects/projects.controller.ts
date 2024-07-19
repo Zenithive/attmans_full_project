@@ -70,4 +70,14 @@ export class JobsController {
     }
     return deletedJob;
   }
+
+  @Post('approve/:id')
+  async approveProject(@Param('id') id: string): Promise<Jobs> {
+    return this.jobsService.approveProject(id);
+  }
+
+  @Post('reject/:id')
+  async rejectProject(@Param('id') id: string): Promise<Jobs> {
+    return this.jobsService.rejectProject(id);
+  }
 }

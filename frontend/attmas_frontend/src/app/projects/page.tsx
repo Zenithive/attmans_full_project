@@ -17,7 +17,10 @@ import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 import { Drawer } from '@mui/material';
 import { Divider } from '@mui/material'; // Import Divider
-import { Category , Subcategorys} from '@/app/constants/categories';
+import { Category, Subcategorys } from '@/app/constants/categories';
+import ApproveDialogForProject from '../component/approveforproject/approveforproject';
+import RejectDialogForProject from '../component/rejectforproject/rejectforproject';
+import { styled } from '@mui/material/styles';
 
 
 
@@ -34,11 +37,13 @@ interface Job {
     Sector: string;
     AreaOfProduct: string;
     ProductDescription: string;
+    username: string;
     DetailsOfInnovationChallenge: string;
     SelectService: string;
     Objective: string;
     Expectedoutcomes: string;
     IPRownership: string;
+    status: string;
 }
 
 
@@ -49,7 +54,6 @@ const Expertiselevel = [
     "Expert",
     "Phd"
 ];
-
 
 const getSubcategorys = (Subcategorys: any[]) => Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
 
@@ -66,12 +70,34 @@ const Jobs = () => {
     const [page, setPage] = useState(1);
     const [filterType, setFilterType] = useState("all");
     const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; jobs: Job | null }>({ open: false, jobs: null });
+    const [approveDialogOpen, setApproveDialogOpen] = useState<{
+        open: boolean;
+        job: Job | null;
+      }>({ open: false, job: null });
+    const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; job: Job | null }>({ open: false, job: null });
+    const [isApproved, setIsApproved] = useState(false);
+    const [isRejected, setIsRejected] = useState(false);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
 
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
 
+    const handleApproveDialogOpen = (job: Job) => {
+        setApproveDialogOpen({ open: true, job });
+      };
+    
+      const handleApproveDialogClose = () => {
+        setApproveDialogOpen({ open: false, job: null });
+      };
+
+      const handleRejectDialogOpen = (job: Job) => {
+        setRejectDialogOpen({ open: true, job });
+      };
+    
+      const handleRejectDialogClose = () => {
+        setRejectDialogOpen({ open: false, job: null });
+      };
 
 
 
@@ -186,8 +212,78 @@ const Jobs = () => {
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
+        setIsApproved(job.status === 'Approved'); 
+        setIsRejected(job.status === 'Rejected');
+        setApplyOpen(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
+
+    const handleApprove = useCallback(async (job: Job | null) => {
+        if (!job) {
+            return;
+        }
+        try {
+            await axios.post(`${APIS.APPROVE_PROJECT}/${job._id}`);
+            setJobs(prevJobs =>
+                prevJobs.map(prevJob =>
+                    prevJob._id === job._id ? { ...prevJob, status: 'Approved' } : prevJob
+                )
+            );
+            if (viewingJob && viewingJob._id === job._id) {
+                setViewingJob(prevViewingJob => ({
+                    ...prevViewingJob!,
+                    status: 'Approved'
+                }));
+            }
+            setViewingJob(null);
+            handleApproveDialogClose();
+            refetch();
+        } catch (error) {
+            console.error('Error approving job:', error);
+        }
+    }, [refetch, viewingJob]);
+    
+    const handleReject = useCallback(async (job: Job | null) => {
+        if (!job) {
+            return;
+        }
+        try {
+            await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`);
+            setJobs(prevJobs =>
+                prevJobs.map(prevJob =>
+                    prevJob._id === job._id ? { ...prevJob, status: 'Rejected' } : prevJob
+                )
+            );
+            if (viewingJob && viewingJob._id === job._id) {
+                setViewingJob(prevViewingJob => ({
+                    ...prevViewingJob!,
+                    status: 'Rejected'
+                }));
+            }
+            setViewingJob(null);
+            handleRejectDialogClose();
+            refetch();
+        } catch (error) {
+            console.error('Error rejecting job:', error);
+        }
+    }, [refetch, viewingJob]);
+
+    const CustomChip = styled(Chip)(({ theme }) => ({
+        borderRadius: '16px', 
+        border: `1px solid ${theme.palette.success.main}`, 
+        backgroundColor: 'transparent', 
+        color: theme.palette.success.main, 
+        '&.MuiChip-colorError': {
+          border: `1px solid ${theme.palette.error.main}`,
+          color: theme.palette.error.main,
+        },
+        '&.MuiChip-colorDefault': {
+          border: `1px solid ${theme.palette.grey[400]}`,
+          color: theme.palette.text.primary,
+        },
+      }));
+      
+    
 
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important", overflowX: "hidden !important" }}>
@@ -277,6 +373,11 @@ const Jobs = () => {
                                     </a>
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                        <CustomChip
+                                            sx={{position:'relative',left:'10px'}}
+                                            label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                            color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+                                            />
                                     </span>
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
                                         {job.Expertiselevel}
@@ -347,13 +448,8 @@ const Jobs = () => {
             />
 
 
-
-
-
-
-
             <Drawer
-                anchor="right" // Set anchor to "right"
+                anchor="right"
                 open={!!viewingJob}
                 onClose={() => setViewingJob(null)}
                 PaperProps={{
@@ -364,16 +460,18 @@ const Jobs = () => {
                         backgroundColor: '#f9f9f9'
                     }
                 }}
-
                 BackdropProps={{
                     sx: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adjust the opacity as needed
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     }
                 }}
             >
                 {viewingJob && (
                     <Box p={2}>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
+                        
+                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px',float:'right' }} />}
+                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float:'right' }} />}
                         <Typography variant="h5" sx={{ mb: 1 }}>{viewingJob.title}</Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Description:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.description}</Typography>
@@ -395,6 +493,7 @@ const Jobs = () => {
                                 />
                             ))}
                         </Box>
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Subcategories:</b></Typography>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                             {viewingJob.Subcategorys.map((subcategory, index) => (
@@ -407,18 +506,45 @@ const Jobs = () => {
                                 />
                             ))}
                         </Box>
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Objective:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Objective}</Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Expected Outcomes:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expectedoutcomes}</Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}><b>IPR Ownership:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.IPRownership}</Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                            {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
+                                <>
+                                    <Button onClick={() => handleApproveDialogOpen(viewingJob)}>
+                                    Approve
+                                </Button>
+
+                                <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
+                                    Reject
+                                </Button>
+                                  
+                                </>
+                            )}
+                        </Box>
                     </Box>
                 )}
             </Drawer>
 
+            <ApproveDialogForProject
+                        open={approveDialogOpen.open}
+                        onClose={handleApproveDialogClose}
+                        onApprove={() => handleApprove(approveDialogOpen.job)}
+                        job={approveDialogOpen.job}
+              />
 
-
+                 <RejectDialogForProject
+                        open={rejectDialogOpen.open}
+                        onClose={handleApproveDialogClose}
+                        onReject={() => handleReject(rejectDialogOpen.job)}
+                        job={rejectDialogOpen.job}
+              />
 
         </Box>
     );

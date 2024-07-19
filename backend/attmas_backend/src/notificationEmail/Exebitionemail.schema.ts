@@ -38,6 +38,24 @@ export class Email extends Document {
   boothUsername: string;
 
   @Prop({ ref: 'exhibitions', required: false })
+  adminFirstName: string;
+
+  @Prop({ ref: 'exhibitions', required: false })
+  adminLastName: string;
+
+  @Prop({ ref: 'jobs', required: false })
+  jobsUsername: string;
+
+  @Prop({ ref: 'jobs', required: false })
+  projectId: string;
+
+  @Prop({ ref: 'jobs', required: false })
+  jobId: string;
+
+  @Prop({ ref: 'jobs', required: false })
+  status2: string;
+
+  @Prop({ ref: 'exhibitions', required: false })
   exhibitionUserFirstName: string;
 
   @Prop({ ref: 'exhibitions', required: false })

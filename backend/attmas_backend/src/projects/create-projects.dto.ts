@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 // import { Types } from 'mongoose';
 
@@ -66,6 +66,10 @@ export class CreateJobsDto {
   @IsNotEmpty()
   @IsString()
   Budget: number;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 }
 
 export class UpdateJobsDto {
@@ -128,4 +132,8 @@ export class UpdateJobsDto {
   @IsNotEmpty()
   @IsString()
   Budget?: number;
+
+  @IsNotEmpty()
+  @IsString()
+  username: string;
 }

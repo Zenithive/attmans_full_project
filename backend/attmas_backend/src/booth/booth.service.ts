@@ -99,7 +99,6 @@ export class BoothService {
       }
     }
 
-    console.log('booth reject', booth);
     return booth;
   }
 
@@ -133,7 +132,7 @@ export class BoothService {
         );
       }
     }
-    console.log('booth reject', booth);
+
     return booth;
   }
 
