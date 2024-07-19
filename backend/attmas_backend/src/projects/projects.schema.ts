@@ -69,11 +69,14 @@ export class Jobs {
   @Prop({ default: false })
   buttonsHidden: boolean;
 
-  @Prop({ ref: 'User', required: false })
+  @Prop({ ref: 'User', required: true })
   username: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Exhibition', required: false })
   exhibitionId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'jobs', required: false })
+  projectId: Types.ObjectId;
 }
 
 export const JobsSchema = SchemaFactory.createForClass(Jobs);

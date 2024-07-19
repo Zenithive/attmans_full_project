@@ -208,15 +208,18 @@ export class EmailService2 {
     }
   }
 
+  async findEmailsByUsername(to: string): Promise<Email[]> {
+    return this.emailModel.find({ to }).exec();
+  }
+
   async sendProjectStatusEmail(
     to: string,
     subject: string,
-    exhibitionId: string,
+    jobId: string,
     title: string,
-    status: string,
-    jobsUsername: string,
-    exhibitionUserFirstName: string,
-    exhibitionUserLastName: string,
+    status2: string,
+    adminFirstName: string,
+    adminLastName: string,
   ) {
     try {
       const user = await this.usersService.findByUsername(to);
@@ -226,8 +229,7 @@ export class EmailService2 {
 
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        Your project "${title}" has been "${status}" by "${exhibitionUserFirstName} ${exhibitionUserLastName}".
-        Click <a href="http://localhost:4200/projects" target="_blank">here</a> for more details.
+        Your project "${title}" has been ${status2} by ${adminFirstName} ${adminLastName}.
       `;
 
       await this.transporter.sendMail({
@@ -242,21 +244,16 @@ export class EmailService2 {
         subject,
         sentAt: new Date(),
         read: false,
-        exhibitionId,
+        jobId,
         title,
-        status,
-        jobsUsername,
-        exhibitionUserFirstName,
-        exhibitionUserLastName,
+        status2,
+        adminFirstName,
+        adminLastName,
       });
       await email.save();
     } catch (error) {
       console.error(`Error sending email to ${to}:`, error);
     }
-  }
-
-  async findEmailsByUsername(to: string): Promise<Email[]> {
-    return this.emailModel.find({ to }).exec();
   }
 
   // email.service2.ts

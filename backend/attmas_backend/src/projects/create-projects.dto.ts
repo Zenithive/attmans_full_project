@@ -132,4 +132,8 @@ export class UpdateJobsDto {
   @IsNotEmpty()
   @IsString()
   Budget?: number;
+
+  @IsNotEmpty()
+  @IsString()
+  username: string;
 }
