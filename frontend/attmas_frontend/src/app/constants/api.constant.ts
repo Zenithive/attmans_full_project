@@ -47,6 +47,7 @@ export const APIS = {
 
 
     NOTIFICATIONS: `${SERVER_URL}/emails`,
+    NOTIFICATIONSPROJECT: `${SERVER_URL}/jobs`,
 
 
     MARK_AS_READ: `${SERVER_URL}/emails/markasread`,

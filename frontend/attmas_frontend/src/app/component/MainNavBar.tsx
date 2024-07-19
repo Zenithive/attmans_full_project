@@ -26,6 +26,7 @@ interface Email {
   to: string;
   subject: string;
   exhibitionId: string;
+  projectId: string;
   read: boolean;
   boothUsername?: string;
   title: string;
@@ -33,8 +34,8 @@ interface Email {
   status?: string;
   exhibitionUserFirstName?: string;
   exhibitionUserLastName?: string;
-  firstName: string;
-  lastName: string;
+  first: string;
+  last: string;
 }
 
 function clearCookies() {
@@ -195,7 +196,7 @@ export default function MainNavBar() {
     if (notification.subject === 'New Project Created') {
       return `
             Dear ${userName},<br>
-            You have been notified that someone has created a project. 
+            You have been notified that ${notification.first} ${notification.last} has created a project. 
             <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
         `;
     }

@@ -16,7 +16,6 @@ import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 import { Drawer } from '@mui/material';
-import { Divider } from '@mui/material'; // Import Divider
 import { Category, Subcategorys } from '@/app/constants/categories';
 
 
@@ -31,15 +30,21 @@ interface Job {
     TimeFrame: string | null;
     Category: string[];
     Subcategorys: string[];
+
+    // ******** op ******** //
+    DetailsOfInnovationChallenge: string;
     Sector: string;
     AreaOfProduct: string;
     ProductDescription: string;
-    DetailsOfInnovationChallenge: string;
+
+
     SelectService: string;
     Objective: string;
     Expectedoutcomes: string;
     IPRownership: string;
-    currency: string
+    currency: string;
+    Status: string;
+
 }
 
 
@@ -84,6 +89,9 @@ const Jobs = () => {
                     userId: filterType === "mine" ? userId : undefined
                 }
             });
+
+            console.log("Project response", response);
+
             if (response.data.length === 0) {
                 setHasMore(false);
             } else {
@@ -193,8 +201,14 @@ const Jobs = () => {
     return (
         <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important", overflowX: "hidden !important" }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography component="h2" sx={{ marginY: 0 }}>Post Jobs</Typography>
+
+
+                <Typography component="h2" sx={{ marginY: 0 }}>Post Project</Typography>
+
+
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+
+
                     <ToggleButtonGroup
                         value={filterType}
                         exclusive
@@ -209,16 +223,18 @@ const Jobs = () => {
                             My Projects
                         </ToggleButton>
                     </ToggleButtonGroup>
+
+
                     <Tooltip title="Filter" arrow>
                         <IconButton onClick={() => setFilterOpen(prev => !prev)}>
                             <FilterAltIcon />
                         </IconButton>
                     </Tooltip>
+
+
                 </Box>
 
-                {/*                 
-                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-            </Box> */}
+
                 {userDetails.userType === 'Project Owner' && (
                     <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
                 )}
@@ -267,6 +283,9 @@ const Jobs = () => {
                 loader={<Typography>Loading...</Typography>}
                 endMessage={<Typography>No more Projects</Typography>}
             >
+
+
+
                 <Box sx={{ mt: 2 }}>
                     {jobs.map((job) => (
                         <Card key={job._id} sx={{ mb: 2 }}>
@@ -279,9 +298,30 @@ const Jobs = () => {
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
                                     </span>
+
+                                    {/* <span style={{ fontSize: 'small', fontWeight: "bolder", marginLeft: '10px'   }}>
+                                     {job.Status} 
+                                    </span> */}
+
+                                    <Chip
+                                        label={job.Status}
+                                        sx={{
+                                            fontSize: 'small',
+                                            fontWeight: 'bold',
+                                            marginLeft: '10px',
+                                        }}
+                                    />
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
                                         {job.Expertiselevel}
                                     </span>
+
+                                    {/* <span style={{ fontSize: 'small', fontWeight: "bolder" }}>
+                                            {job.Expertiselevel}
+                                        </span>
+                                        <span style={{ fontSize: 'small', fontWeight: "bolder", marginLeft: '10px' }}>
+                                            {job.Status}
+                                        </span> */}
+
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right", position: "relative", right: "20px", bottom: "8px" }}>
                                         <Chip
                                             label={job.SelectService}
@@ -375,15 +415,52 @@ const Jobs = () => {
                 {viewingJob && (
                     <Box p={2}>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
+
+
                         <Typography variant="h5" sx={{ mb: 1 }}>{viewingJob.title}</Typography>
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Description:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.description}</Typography>
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Select Service:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.SelectService}</Typography>
+
+
+
+
+                        {viewingJob.SelectService === 'Innovative product' && (
+                            <>
+
+                                <Typography variant="body2" sx={{ mb: 1 }}><b>Details Of Innovation Challenge:</b></Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.DetailsOfInnovationChallenge}</Typography>
+
+                                <Typography variant="body2" sx={{ mb: 1 }}><b>Sector:</b></Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Sector}</Typography>
+
+                                <Typography variant="body2" sx={{ mb: 1 }}><b>Area Of Product:</b></Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.AreaOfProduct}</Typography>
+
+                                <Typography variant="body2" sx={{ mb: 1 }}><b>Product Description:</b></Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.ProductDescription}</Typography>
+
+                            </>
+                        )}
+
+
+
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Expertise Level:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expertiselevel}</Typography>
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Budget:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.currency} {viewingJob.Budget}</Typography>
+
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Category:</b></Typography>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                             {viewingJob.Category.map((category, index) => (
@@ -396,6 +473,9 @@ const Jobs = () => {
                                 />
                             ))}
                         </Box>
+
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Subcategories:</b></Typography>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                             {viewingJob.Subcategorys.map((subcategory, index) => (

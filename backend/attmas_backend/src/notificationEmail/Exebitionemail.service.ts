@@ -72,7 +72,7 @@ export class EmailService2 {
   async sendEmailProject(
     to: string,
     subject: string,
-    exhibitionId: string,
+    projectId: string,
     title: string,
     first: string,
     last: string,
@@ -103,10 +103,12 @@ export class EmailService2 {
       const email = new this.emailModel({
         to,
         subject,
-        exhibitionId,
+        projectId,
         read: false,
         sentAt: new Date(),
         title,
+        first,
+        last
       });
       await email.save();
     } catch (error) {
