@@ -43,7 +43,7 @@ interface Job {
     Expectedoutcomes: string;
     IPRownership: string;
     currency: string;
-    Status: string;
+    // Status: string;
 
 }
 
@@ -299,29 +299,21 @@ const Jobs = () => {
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
                                     </span>
 
-                                    {/* <span style={{ fontSize: 'small', fontWeight: "bolder", marginLeft: '10px'   }}>
-                                     {job.Status} 
-                                    </span> */}
+                                    
 
-                                    <Chip
+                                    {/* <Chip
                                         label={job.Status}
                                         sx={{
                                             fontSize: 'small',
                                             fontWeight: 'bold',
                                             marginLeft: '10px',
                                         }}
-                                    />
+                                    /> */}
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
                                         {job.Expertiselevel}
                                     </span>
 
-                                    {/* <span style={{ fontSize: 'small', fontWeight: "bolder" }}>
-                                            {job.Expertiselevel}
-                                        </span>
-                                        <span style={{ fontSize: 'small', fontWeight: "bolder", marginLeft: '10px' }}>
-                                            {job.Status}
-                                        </span> */}
-
+                                  
                                     <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right", position: "relative", right: "20px", bottom: "8px" }}>
                                         <Chip
                                             label={job.SelectService}
@@ -490,16 +482,19 @@ const Jobs = () => {
                         </Box>
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Objective:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Objective}</Typography>
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>Expected Outcomes:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expectedoutcomes}</Typography>
+
+
                         <Typography variant="body2" sx={{ mb: 1 }}><b>IPR Ownership:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.IPRownership}</Typography>
+
+
                     </Box>
                 )}
             </Drawer>
-
-
-
 
         </Box>
     );
