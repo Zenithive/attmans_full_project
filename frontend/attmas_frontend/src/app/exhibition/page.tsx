@@ -377,9 +377,9 @@ const Exhibition = () => {
           <Card key={exhibition._id} sx={{ mb: 2 }}>
             <CardContent>
               <Typography variant="h5">
-              <span style={{ cursor: 'pointer', textDecoration: 'underline' }}>
-                <a href={`/view-exhibition?exhibitionId=${exhibition._id}`} target="_blank" rel="noopener noreferrer">
-                  <Typography variant="h5" component="span">
+              <span style={{ cursor: 'pointer', marginRight: 10 }}>
+                <a href={`/view-exhibition?exhibitionId=${exhibition._id}`} target="_blank" rel="noopener noreferrer" style={{color: 'black', textDecoration: 'none'}}>
+                  <Typography variant="h6" component="span">
                     {exhibition.title}
                   </Typography>
                 </a>
