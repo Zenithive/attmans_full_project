@@ -64,8 +64,8 @@ export const SignUp = () => {
         });
         setStatus({ success: 'Successfully signed up!' });
         router.push('/');
-      } catch (error) {
-        setStatus({ error: 'Failed to sign up. Please try again.' });
+      } catch (error: any) {
+        setStatus({ error: error.response.data.message });
       }
     },
   });

@@ -66,19 +66,19 @@ export default function MainSideBar() {
       Name: "Project Owner"
     },
     {
+      path: '/projects',
+      icon: () => (
+        <WorkIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Projects"
+    },
+    {
       path: '/exhibition',
       icon: () => (
         <Diversity1Icon sx={{ fontSize: 22 }} />
       ),
       Name: "Exhibition"
     },
-    {
-      path: '/projects',
-      icon: () => (
-        <WorkIcon sx={{ fontSize: 22 }} />
-      ),
-      Name: "Projects"
-    }
   ];
 
   const filteredNavs = userDetails.userType === 'Freelancer'
