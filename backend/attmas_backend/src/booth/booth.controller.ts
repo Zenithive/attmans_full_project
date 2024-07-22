@@ -41,7 +41,10 @@ export class BoothController {
   }
 
   @Post('reject/:id')
-  async rejectBooth(@Param('id') id: string): Promise<Booth> {
-    return this.boothService.rejectBooth(id);
+  async rejectBooth(
+    @Param('id') id: string,
+    @Body() body: { comment: string },
+  ): Promise<Booth> {
+    return this.boothService.rejectBooth(id, body.comment);
   }
 }

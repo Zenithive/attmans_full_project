@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import ApproveDialog from '../component/approvedilog/approvedilog';
 import RemoveDialog from '../component/removedilog/removedilog';
 import BoothDetailsDialog from '../component/boothdetailsdilogbox/boothdetailsdilogbox';
+import Head from 'next/head';
 import IntrestedModal from '../component/booth/intrested';
 
 interface Exhibition {
@@ -30,7 +31,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { name: string; description: string; productType: string; price: number; currency: string; }[];
+  products: { name: string; description: string; productType: string; price: number; currency: string;  videourlForproduct: string; }[];
   userId: {
     firstName: string;
     lastName: string;
@@ -39,6 +40,7 @@ interface Booth {
   exhibitionId: string;
   createdAt: string;
   videoUrl: string;
+  rejectComment?:string;
 }
 
 const ExhibitionsPage: React.FC = () => {
@@ -129,14 +131,14 @@ const ExhibitionsPage: React.FC = () => {
     }
   };
 
-  const handleReject = async () => {
+  const handleReject = async (boothId: string, comment: string, _id: string) => {
     try {
       const { booth } = rejectDialogOpen;
       if (!booth) return;
-      await axios.post(`${APIS.REJECT_BOOTH}/${booth._id}`);
+      await axios.post(`${APIS.REJECT_BOOTH}/${booth._id}`, { comment });
       setBooths(prevBooths =>
         prevBooths.map(b =>
-          b._id === booth._id ? { ...b, status: 'Rejected' } : b
+          b._id === booth._id ? { ...b, status: 'Rejected', rejectComment: comment  } : b
         )
       );
       setStatusFilter('Rejected');
@@ -163,7 +165,7 @@ const ExhibitionsPage: React.FC = () => {
     if (!url) {
       return null;
     }
-
+  
     const platforms = [
       {
         name: 'YouTube',
@@ -211,7 +213,7 @@ const ExhibitionsPage: React.FC = () => {
         <iframe
           width={width}
           height={height}
-          style={{ borderRadius: "30px" }}
+          style={{ borderRadius: "30px"}}
           src={embedUrl}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -221,7 +223,13 @@ const ExhibitionsPage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+    <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden','@media (max-width: 767px)':{
+       overflowX: 'hidden'
+    } }}>
       <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
         <h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1>
         {(userDetails && userType === 'Innovators') && (
@@ -249,27 +257,48 @@ const ExhibitionsPage: React.FC = () => {
       </div>
       <div>
         {exhibitions.map((exhibition) => (
-          <Box key={exhibition._id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-            <Card sx={{ flex: 1, marginRight: '10px' }}>
+          <Box
+            key={exhibition._id}
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: 'center',
+              marginBottom: '20px',
+            }}
+          >
+            <Card sx={{ flex: 1, marginBottom: '10px', '@media (max-width: 767px)': { marginBottom: '10px' } }}>
               <CardContent>
                 {renderVideo(exhibition.videoUrl)}
               </CardContent>
             </Card>
-            <Divider orientation="vertical" flexItem />
-            <Card sx={{ flex: 1, marginLeft: '10px', marginBottom: '20%' }}>
+            <Card
+              sx={{
+                flex: 1,
+                marginLeft: { xs: '0', sm: '10px' }, 
+                marginBottom: '20%',
+                '@media (max-width: 767px)': { marginLeft: '0' ,width:'80%'},
+              }}
+            >
               <CardContent>
-                <Typography variant="h6">{exhibition.title}, ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})</Typography>
+                <Typography variant="h6">
+                  {exhibition.title}, ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
+                </Typography>
                 <Typography variant="h6">{exhibition.description}</Typography>
-                <Typography variant="h6"> {exhibition.industries}</Typography>
+                <Typography variant="h6">{exhibition.industries}</Typography>
                 <Typography variant="h6">{exhibition.subjects}</Typography>
               </CardContent>
             </Card>
           </Box>
         ))}
       </div>
+
       <Divider orientation="horizontal" flexItem />
       <div>
-        <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px' }}>
+        <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px','@media (max-width: 767px)':{
+          position:'relative',
+          width:'100%',
+          top:'-10px'
+        } }}>
           <h1>Booth Details</h1>
           {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
             <ToggleButtonGroup
@@ -277,7 +306,11 @@ const ExhibitionsPage: React.FC = () => {
               exclusive
               onChange={handleStatusFilterChange}
               aria-label="status filter"
-              sx={{ position: 'relative', left: '40%', bottom: '63px' }}
+              sx={{ position: 'relative', left: '40%', bottom: '63px','@media (max-width: 767px)':{
+                position:'relative',
+                top:'10px',
+                left:'-38px'
+              } }}
             >
               <ToggleButton value="All" aria-label="all">All
               </ToggleButton>
@@ -315,7 +348,7 @@ const ExhibitionsPage: React.FC = () => {
                       } : undefined}
                       style={{
                         cursor: userDetails && (userType === 'Admin' || userType === 'Innovators') ? 'pointer' : 'default',
-                        display: 'inline-block'
+                        display: 'inline-block',
                       }}
                     >
                       {(userDetails && (userType === 'Admin' || userType === 'Innovators')) ? (
@@ -358,7 +391,8 @@ const ExhibitionsPage: React.FC = () => {
                     ))}
                     <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                     <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
-                    <Box sx={{ position: 'relative', left: '70%', width: '48%', bottom: '102px' }}>
+                    <Box sx={{ position: 'relative', left: '76%', width: '48%', bottom: '45px','@media (max-width: 767px)': {
+              position:'relative',top:'-60px',left:'71%'} }}>
                       {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
                         <Chip
                           label={
@@ -375,7 +409,7 @@ const ExhibitionsPage: React.FC = () => {
                         />
                       )}
                     </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', marginLeft: '48%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' ,float:'left'}}>
                       {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
                         <>
                           <Button
@@ -398,6 +432,8 @@ const ExhibitionsPage: React.FC = () => {
                         </>
                       )}
                     </Box>
+                    <Box>
+                    </Box>
                   </CardContent>
                 </Card>
               </Grid>
@@ -415,12 +451,16 @@ const ExhibitionsPage: React.FC = () => {
           onApprove={handleApprove}
           booth={approveDialogOpen.booth}
         />
-        <RemoveDialog
-          open={rejectDialogOpen.open}
-          onClose={() => setRejectDialogOpen({ open: false, booth: null })}
-          onRemove={handleReject}
-          booth={rejectDialogOpen.booth}
-        />
+       <RemoveDialog
+        open={rejectDialogOpen.open}
+        onClose={() => setRejectDialogOpen({ open: false, booth: null })}
+        onRemove={async (boothId:string,comment: string) => {
+          if (rejectDialogOpen.booth) {
+            await handleReject(boothId,comment,rejectDialogOpen.booth._id );
+          }
+        }}
+        booth={rejectDialogOpen.booth}
+      />
         {selectedBooth &&(
           <BoothDetailsDialog
             open={dialogOpen}
@@ -430,7 +470,8 @@ const ExhibitionsPage: React.FC = () => {
           />
         )}
       </div>
-    </div>
+    </Box>
+    </>
   );
 };
 

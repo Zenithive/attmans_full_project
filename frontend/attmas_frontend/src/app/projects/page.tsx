@@ -50,6 +50,7 @@ interface Job {
     // Status: string;
 
     status: string;
+    rejectComment?: string;
 }
 
 
@@ -252,30 +253,34 @@ const Jobs = () => {
         }
     }, [refetch, viewingJob]);
     
-    const handleReject = useCallback(async (job: Job | null) => {
+    const handleReject = useCallback(async (jobId: string,comment: string, job: Job | null) => {
         if (!job) {
-            return;
+          return;
         }
         try {
-            await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`);
-            setJobs(prevJobs =>
-                prevJobs.map(prevJob =>
-                    prevJob._id === job._id ? { ...prevJob, status: 'Rejected' } : prevJob
-                )
-            );
-            if (viewingJob && viewingJob._id === job._id) {
-                setViewingJob(prevViewingJob => ({
-                    ...prevViewingJob!,
-                    status: 'Rejected'
-                }));
-            }
-            setViewingJob(null);
-            handleRejectDialogClose();
-            refetch();
+          console.log('Rejecting job with comment:', comment);
+          await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
+          setJobs(prevJobs =>
+            prevJobs.map(prevJob =>
+              prevJob._id === job._id ? { ...prevJob, status: 'Rejected', rejectComment: comment } : prevJob
+            )
+          );
+          if (viewingJob && viewingJob._id === job._id) {
+            setViewingJob(prevViewingJob => ({
+              ...prevViewingJob!,
+              status: 'Rejected',
+              rejectComment: comment
+            }));
+          }
+          setViewingJob(null);
+          handleRejectDialogClose();
+          refetch();
         } catch (error) {
-            console.error('Error rejecting job:', error);
+          console.error('Error rejecting job:', error);
         }
-    }, [refetch, viewingJob]);
+      }, [refetch, viewingJob]);
+      
+      
 
     const CustomChip = styled(Chip)(({ theme }) => ({
         borderRadius: '16px', 
@@ -590,6 +595,29 @@ const Jobs = () => {
                         <Typography variant="body2" sx={{ mb: 1 }}><b>IPR Ownership:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.IPRownership}</Typography>
 
+                        
+                            {viewingJob.rejectComment && (
+                             <Box sx={{borderRadius:'5px',position:'relative',top:'20px'}}> 
+                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'error.main' }}>
+                                <b>Rejection Comment:</b> {viewingJob.rejectComment}
+                            </Typography>
+                            </Box>  
+                            )}
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                            {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
+                                <>
+                                    <Button onClick={() => handleApproveDialogOpen(viewingJob)}>
+                                    Approve
+                                </Button>
+
+                                <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
+                                    Reject
+                                </Button>
+                                  
+                                </>
+                            )}
+                        </Box>
                     </Box>
                 )}
             </Drawer>
@@ -601,12 +629,12 @@ const Jobs = () => {
                         job={approveDialogOpen.job}
               />
 
-                 <RejectDialogForProject
-                        open={rejectDialogOpen.open}
-                        onClose={handleApproveDialogClose}
-                        onReject={() => handleReject(rejectDialogOpen.job)}
-                        job={rejectDialogOpen.job}
-              />
+            <RejectDialogForProject
+                open={rejectDialogOpen.open}
+                onClose={handleRejectDialogClose}
+                onReject={(jonId, comment) => handleReject(jonId,comment, rejectDialogOpen.job)}
+                job={rejectDialogOpen.job}
+            />
 
         </Box>
     );

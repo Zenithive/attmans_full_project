@@ -19,6 +19,9 @@ class Product {
 
   @Prop({ required: true })
   currency: string;
+
+  @Prop({ required: true })
+  videourlForproduct: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
@@ -54,6 +57,9 @@ export class Booth {
 
   @Prop({ default: false })
   buttonsHidden: boolean;
+
+  @Prop({ required: false })
+  rejectComment: string;
 }
 
 export const BoothSchema = SchemaFactory.createForClass(Booth);

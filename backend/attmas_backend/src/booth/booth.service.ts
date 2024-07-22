@@ -102,13 +102,14 @@ export class BoothService {
     return booth;
   }
 
-  async rejectBooth(id: string): Promise<Booth> {
+  async rejectBooth(id: string, comment: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id);
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
     booth.status = 'Rejected';
     booth.buttonsHidden = true;
+    booth.rejectComment = comment;
     await booth.save();
 
     const exhibitionId = new Types.ObjectId(booth.exhibitionId);

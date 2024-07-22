@@ -151,4 +151,8 @@ export class UpdateJobsDto {
   @IsNotEmpty()
   @IsString()
   username: string;
+
+  @IsString()
+  @IsOptional()
+  rejectComment?: string;
 }

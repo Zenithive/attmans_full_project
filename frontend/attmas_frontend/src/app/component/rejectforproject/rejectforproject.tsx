@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   CircularProgress,
+  TextField,
 } from '@mui/material';
 import { useFormik } from 'formik';
 
@@ -23,12 +24,13 @@ interface Job {
   Expectedoutcomes: string;
   IPRownership: string;
   status: string;
+  rejectComment?:string;
 }
 
 interface RejectDialogProps {
   open: boolean;
   onClose: () => void;
-  onReject: () => Promise<void>;
+  onReject: (jobId: string, comment: string) => Promise<void>;
   job: Job | null;
 }
 
@@ -39,13 +41,18 @@ const RejectDialogForProject: React.FC<RejectDialogProps> = ({
   job,
 }) => {
   const formik = useFormik({
-    initialValues: {},
+    initialValues: {
+      comment: '',
+    },
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await onReject();
-        onClose();
+        if (job?._id) {
+          console.log('Submitting comment:', values.comment);
+          await onReject(job._id, values.comment);
+          onClose();
+        }
       } catch (error) {
-        console.error('Approval failed:', error);
+        console.error('Rejection failed:', error);
       } finally {
         setSubmitting(false);
       }
@@ -58,14 +65,34 @@ const RejectDialogForProject: React.FC<RejectDialogProps> = ({
         <DialogTitle>Reject Project</DialogTitle>
         <DialogContent dividers>
           <p>
-            Are you sure you want to Reject this Project "{job?.title}"?
+            Are you sure you want to reject this project "{job?.title}"?
           </p>
+          <TextField
+            id="comment"
+            name="comment"
+            label="Comment"
+            color='secondary' 
+            variant="outlined"
+            fullWidth
+            multiline
+            rows={4}
+            value={formik.values.comment}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            margin="normal"
+            aria-label="Rejection comment"
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="primary">
+          <Button onClick={onClose} aria-label="Cancel rejection">
             Cancel
           </Button>
-          <Button type="submit" color="primary" autoFocus>
+          <Button 
+            type="submit" 
+            color="primary" 
+            autoFocus 
+            aria-label="Reject project"
+          >
             {formik.isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
