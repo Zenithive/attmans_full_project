@@ -49,8 +49,8 @@ export class Email extends Document {
   @Prop({ ref: 'jobs', required: false })
   jobsUsername: string;
 
-  @Prop({ ref: 'jobs', required: false })
-  projectId: string;
+  // @Prop({ ref: 'jobs', required: false })
+  // projectId: string;
 
   @Prop({ ref: 'jobs', required: false })
   jobId: string;
