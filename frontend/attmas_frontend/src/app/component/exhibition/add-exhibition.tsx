@@ -17,7 +17,7 @@ import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { useMemo, useCallback } from 'react';
 import { PubSub, pubsub } from '@/app/services/pubsub.service';
-import { Industry, Subjects } from '@/app/constants/categories';
+import { Industry, options, Subjects } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise';
 interface Exhibition {
     _id?: string;
