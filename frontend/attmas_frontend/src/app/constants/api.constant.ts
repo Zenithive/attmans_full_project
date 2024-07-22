@@ -16,6 +16,14 @@ export const APIS = {
     CHECK_PROFILE: `${SERVER_URL}/profile/check`,
 
 
+    CHECKINTRESTEDUSER: `${SERVER_URL}/interested-users`,
+
+
+
+
+    
+
+
 
 
 
@@ -50,6 +58,7 @@ export const APIS = {
 
 
     NOTIFICATIONS: `${SERVER_URL}/emails`,
+    NOTIFICATIONSPROJECT: `${SERVER_URL}/jobs`,
 
 
     MARK_AS_READ: `${SERVER_URL}/emails/markasread`,

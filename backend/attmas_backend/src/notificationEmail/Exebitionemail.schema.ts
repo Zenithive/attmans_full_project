@@ -29,6 +29,9 @@ export class Email extends Document {
   exhibitionId: string;
 
   @Prop({ required: false })
+  projectId: string;
+
+  @Prop({ required: false })
   title: string;
 
   @Prop({ ref: 'booths', required: false })
@@ -46,8 +49,8 @@ export class Email extends Document {
   @Prop({ ref: 'jobs', required: false })
   jobsUsername: string;
 
-  @Prop({ ref: 'jobs', required: false })
-  projectId: string;
+  // @Prop({ ref: 'jobs', required: false })
+  // projectId: string;
 
   @Prop({ ref: 'jobs', required: false })
   jobId: string;
@@ -60,6 +63,12 @@ export class Email extends Document {
 
   @Prop({ ref: 'exhibitions', required: false })
   exhibitionUserLastName: string;
+
+  @Prop({ ref: 'exhibitions', required: false })
+  last: string;
+
+  @Prop({ ref: 'exhibitions', required: false })
+  first: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);

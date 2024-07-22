@@ -13,6 +13,9 @@ export class Jobs {
   title: string;
 
   @Prop({ required: true })
+  currency: string;
+
+  @Prop({ required: true })
   description: string;
 
   @Prop({ required: true })
@@ -32,6 +35,12 @@ export class Jobs {
 
   @Prop({ required: false })
   Sector: string;
+
+  @Prop({ required: false })
+  firstName: string;
+
+  @Prop({ required: false })
+  lastName: string;
 
   @Prop({ required: false })
   AreaOfProduct: string;

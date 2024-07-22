@@ -70,8 +70,10 @@ export class EmailService2 {
   async sendEmailProject(
     to: string,
     subject: string,
-    exhibitionId: string,
+    projectId: string,
     title: string,
+    first: string,
+    last: string,
   ) {
     try {
       // Fetch user details from UsersService
@@ -83,7 +85,8 @@ export class EmailService2 {
       // Customize email message with user's first name and last name
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        You have been notified that  someone had created  the Project "${title}".
+        You have been notified that ${first} ${last}  had created  the Project "${title}".<br>
+
       `;
 
       await this.transporter.sendMail({
@@ -98,10 +101,12 @@ export class EmailService2 {
       const email = new this.emailModel({
         to,
         subject,
-        exhibitionId,
+        projectId,
         read: false,
         sentAt: new Date(),
         title,
+        first,
+        last
       });
       await email.save();
     } catch (error) {

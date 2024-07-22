@@ -7,6 +7,8 @@ import {
   Categories,
   CategorySchema,
 } from 'src/profile/schemas/category.schema';
+import { MailerService } from 'src/common/service/UserEmailSend';
+
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import {
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService,MailerService],
   exports: [UsersService, MongooseModule],
 })
 export class UsersModule {}

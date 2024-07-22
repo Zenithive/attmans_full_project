@@ -11,6 +11,10 @@ export class CreateJobsDto {
   @IsString()
   description: string;
 
+
+  @IsString()
+  currency: string;
+
   @IsNotEmpty()
   @IsString()
   Objective: string;
@@ -42,6 +46,14 @@ export class CreateJobsDto {
   @IsNotEmpty()
   @IsString()
   Sector: string;
+
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
 
   @IsNotEmpty()
   @IsString()
@@ -80,6 +92,9 @@ export class UpdateJobsDto {
   @IsNotEmpty()
   @IsString()
   description?: string;
+
+  @IsString()
+  currency: string;
 
   @IsNotEmpty()
   @IsString()
