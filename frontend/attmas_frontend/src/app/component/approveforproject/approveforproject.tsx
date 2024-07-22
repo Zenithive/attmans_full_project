@@ -62,7 +62,7 @@ const ApproveDialogForProject: React.FC<ApproveDialogProps> = ({
           </p>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="primary">
+          <Button onClick={onClose} sx={{background:'grey'}}>
             Cancel
           </Button>
           <Button type="submit" color="primary" autoFocus>

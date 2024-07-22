@@ -38,6 +38,7 @@ interface Product {
   productType: string;
   price: string;
   currency: string;
+  videourlForproduct: string;
 }
 
 const CustomPriceField = ({ field, form, index }: { field: any; form: any; index: number }) => {
@@ -98,7 +99,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
     title: '',
     description: '',
     videoUrl: '',
-    products: [{ name: '', description: '', productType: '', price: '', currency: 'INR' }] as Product[],
+    products: [{ name: '', description: '', productType: '', price: '', currency: 'INR' ,videourlForproduct:'',}] as Product[],
     userId: userDetails._id,
     username: userDetails.username,
     exhibitionId: exhibitionId || '',
@@ -115,6 +116,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
         productType: Yup.string().required('Product type is required'),
         price: Yup.number().required('Product price is required').min(0, 'Price cannot be negative'),
         currency: Yup.string().required('Currency is required'),
+        videourlForproduct: Yup.string().url('Invalid URL').required('Video URL is required'),
       })
     ),
   });
@@ -216,6 +218,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                           <TableCell>Description</TableCell>
                           <TableCell>Product Type</TableCell>
                           <TableCell>Price & Currency</TableCell>
+                          <TableCell>Video</TableCell>
                           <TableCell>Actions</TableCell>
                         </TableRow>
                       </TableHead>
@@ -282,6 +285,24 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                                 {({ field, form }: FieldProps) => (
                                   <CustomPriceField field={field} form={form} index={index} />
                                 )}
+                              </Field>
+                            </TableCell>
+                             <TableCell>
+                              <Field name={`products.${index}.videourlForproduct`}>
+                                {({ field, form }: FieldProps) => {
+                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                                  return (
+                                    <TextField
+                                      {...field}
+                                      fullWidth
+                                      label="Video"
+                                      color='secondary'
+                                      error={Boolean(productTouched && productErrors && productErrors.videourlForproduct)}
+                                      helperText={productTouched && productErrors && productErrors.videourlForproduct}
+                                    />
+                                  );
+                                }}
                               </Field>
                             </TableCell>
                             <TableCell>

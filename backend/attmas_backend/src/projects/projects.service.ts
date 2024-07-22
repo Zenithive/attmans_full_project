@@ -147,7 +147,7 @@ export class JobsService {
     }
   }
 
-  async rejectProject(id: string): Promise<Jobs> {
+  async rejectProject(id: string, comment: string): Promise<Jobs> {
     try {
       console.log(`Rejecting project with ID: ${id}`);
       const project = await this.jobsModel.findById(id);
@@ -156,6 +156,7 @@ export class JobsService {
       }
       project.status = 'Rejected';
       project.buttonsHidden = true;
+      project.rejectComment = comment;
       await project.save();
 
       const adminUsers = await this.usersService.findUsersByUserType1('Admin');

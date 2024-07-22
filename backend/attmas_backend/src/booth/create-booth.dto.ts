@@ -29,6 +29,10 @@ class ProductDto {
   @IsString()
   @IsNotEmpty()
   currency: string;
+
+  @IsString()
+  @IsNotEmpty()
+  videourlForproduct: string;
 }
 
 export class CreateBoothDto {
@@ -64,4 +68,8 @@ export class CreateBoothDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @IsString()
+  @IsOptional()
+  rejectComment?: string;
 }

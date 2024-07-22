@@ -77,6 +77,9 @@ export class Jobs {
 
   @Prop({ type: Types.ObjectId, ref: 'jobs', required: false })
   projectId: Types.ObjectId;
+
+  @Prop({ required: false })
+  rejectComment: string;
 }
 
 export const JobsSchema = SchemaFactory.createForClass(Jobs);

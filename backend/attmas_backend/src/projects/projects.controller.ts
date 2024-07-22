@@ -77,7 +77,11 @@ export class JobsController {
   }
 
   @Post('reject/:id')
-  async rejectProject(@Param('id') id: string): Promise<Jobs> {
-    return this.jobsService.rejectProject(id);
+  async rejectProject(
+    @Param('id') id: string,
+    @Body() body: { comment: string },
+  ): Promise<Jobs> {
+    console.log('Received body:', body);
+    return this.jobsService.rejectProject(id, body.comment);
   }
 }

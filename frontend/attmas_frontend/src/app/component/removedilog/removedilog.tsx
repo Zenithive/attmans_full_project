@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 
 interface Booth {
@@ -14,24 +14,30 @@ interface Booth {
     status: string;
     exhibitionId: string;
     createdAt: string;
+    rejectComment?:string;
   }
 
 interface RemoveDialogProps {
   open: boolean;
   onClose: () => void;
-  onRemove: () => Promise<void>;
+  onRemove: (boothId: string, comment: string) => Promise<void>;
   booth: Booth | null;
 }
 
 const RemoveDialog: React.FC<RemoveDialogProps> = ({ open, onClose, onRemove, booth }) => {
   const formik = useFormik({
-    initialValues: {},
+    initialValues: {
+      comment: '',
+    },
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await onRemove();
-        onClose(); 
+        if (booth?._id) {
+          console.log('Submitting comment:', values.comment);
+          await onRemove(booth._id, values.comment);
+          onClose();
+        }
       } catch (error) {
-        console.error("Removel failed:", error);
+        console.error('Rejection failed:', error);
       } finally {
         setSubmitting(false);
       }
@@ -40,16 +46,44 @@ const RemoveDialog: React.FC<RemoveDialogProps> = ({ open, onClose, onRemove, bo
   return (
     <Dialog open={open} onClose={onClose}>
     <form onSubmit={formik.handleSubmit}>
-      <DialogTitle>Approve Booth</DialogTitle>
+      <DialogTitle>Reject Booth</DialogTitle>
       <DialogContent dividers>
-        <p>Are you sure you want to Reject this booth "{booth?.title}"?</p>
+        <p>
+          Are you sure you want to reject this Booth "{booth?.title}"?
+        </p>
+        <TextField
+          id="comment"
+          name="comment"
+          label="Comment"
+          color='secondary' 
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={4}
+          value={formik.values.comment}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          margin="normal"
+          aria-label="Rejection comment"
+        />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onClose} sx={{background:'grey', '&:hover': {
+          background: 'grey' 
+        }}} aria-label="Cancel rejection">
           Cancel
         </Button>
-        <Button type="submit" color="primary" autoFocus>
-        {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Reject'}
+        <Button 
+          type="submit" 
+          color="primary" 
+          autoFocus 
+          aria-label="Reject booth"
+        >
+          {formik.isSubmitting ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            'Reject'
+          )}
         </Button>
       </DialogActions>
     </form>
