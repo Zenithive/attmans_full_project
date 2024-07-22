@@ -5,13 +5,19 @@ import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './user.schema';
 import { CreateUserDto } from './create-user.dto';
 import { Categories } from 'src/profile/schemas/category.schema';
+import { MailerService } from 'src/common/service/UserEmailSend';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Categories.name) private categoriesModel: Model<Categories>,
+    private mailerService: MailerService, // Inject MailerService
   ) {}
+
+ 
+
+
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
@@ -25,7 +31,16 @@ export class UsersService {
       password: hashedPassword,
       isAllProfileCompleted: false,
     });
-    return createdUser.save();
+    await createdUser.save();
+
+    // Send email
+    await this.mailerService.sendEmail(
+      createdUser.username,
+      'Welcome to Attmas Service',
+      `Hello ${createdUser.firstName},\n\nThank you for registering with Attmas!\n\nBest regards,\nAttmas Team`,
+    );
+
+    return createdUser;
   }
 
   async findByUsername(username: string): Promise<User> {
