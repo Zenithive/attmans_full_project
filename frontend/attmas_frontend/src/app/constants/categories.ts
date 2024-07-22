@@ -2652,3 +2652,155 @@ export const Subcategorys = () => [
       ]
   },
 ];
+
+
+export const Industry = () => [
+  "Agriculture",
+  "Chemicals",
+  "Electronics",
+  "Energy",
+  "Environmental and waste management",
+  "Food and beverage",
+  "Healthcare",
+  "Medical devices and equipment",
+  "Mining and metals",
+  "Real estate and construction",
+  "Textiles"
+];
+
+
+
+export const Subjects = () => [
+  {
+      category: "Chemistry",
+      items: [
+          "Chemical Reagent Development",
+          "Dewatering & Drying Technology",
+          "Electronics",
+          "Catalysis",
+          "Trace Elements",
+          "Mathematical Chemistry",
+          "Dispersion Chemistry",
+          "Surface Science"
+      ]
+  },
+  {
+      category: "Materials Science & Engineering",
+      items: [
+          "Nanotechnology & Nanomaterials",
+          "Surface Chemistry",
+          "Metallurgy",
+          "Glass Science",
+          "Ceramic Engineering",
+          "Corrosion",
+          "Structural Chemistry",
+          "Microencapsulation",
+          "Supramolecular Chemistry",
+          "Fiber & Textile Engineering",
+          "Carbon Materials",
+          "Nanotechnology"
+      ]
+  },
+  {
+      category: "Biomaterials",
+      items: [
+          "Collagen",
+          "Bioplastics",
+          "Powder Metallurgy",
+          "Powders & Bulk Materials",
+          "Refractory Materials",
+          "Composite Materials",
+          "Electronic, Optical & Magnetic Materials",
+          "Dental Materials",
+          "Biocatalysis",
+          "Marine Chemistry",
+          "Coordination Compounds",
+          "Inorganic Chemistry",
+          "Natural Product Chemistry",
+          "Molecular Engineering",
+          "Physical Chemistry"
+      ]
+  },
+  {
+      category: "Physical Chemistry",
+      items: [
+          "Molecular Docking",
+          "Chemoinformatics",
+          "Biopolymers",
+          "Polymer Chemistry"
+      ]
+  },
+  {
+      category: "Analytical Chemistry",
+      items: [
+          "Deformulation",
+          "Separation & Purification Crystallography",
+          "X-Ray Crystallography Spectroscopy",
+          'Atomic Absorption Spectroscopy',
+          'Atomic Emission Spectroscopy',
+          'UV Spectroscopy ',
+          'Fluorescence Spectroscopy',
+          'Raman Spectroscopy',
+          'NMR Spectroscopy',
+          'Circular Dichroism Spectroscopy',
+          'Spectrophotometry',
+          'Mass Spectrometry',
+          'Molecular Imaging',
+          'Liquid Chromatography/HPLC',
+          'Thermal Analysis',
+          'Microcalorimetry',
+          'Gas Chromatography',
+          'Optical Rotation',
+          'Particle Size Distribution',
+          'Stable Isotope Analysis',
+          'Particle-Induced X-Ray Emission',
+          'Electrochemistry',
+          'Agricultural Chemistry',
+          "Cosmochemistry",
+          "Radiochemistry",
+          "Astrochemistry",
+          "Petrochemistry",
+      ]
+  },
+  {
+      category: "Solid State Sciences",
+      items: [
+          "Condensed Matter Physics",
+          "Solid-State Chemistry",
+          "Flow Chemistry",
+          "Green Chemistry",
+          "Refractory Materials",
+          "Organometallic Chemistry",
+          "Photochemistry",
+          "Quantum Chemistry",
+      ]
+  },
+  {
+      category: "Organic Chemistry",
+      items: [
+          "Retrosynthesis",
+          "Thermochemistry",
+          "Computational Chemistry",
+          "Mechanochemistry",
+          "Sonochemistry",
+          "Peptide Synthesis",
+          "Physical Organic Chemistry",
+          "Adhesion Technology",
+          "Applied Chemistry",
+      ]
+  },
+  {
+      category: "Agriculture",
+      items: [
+          "Plant Science:",
+          "Agronomy:",
+          "Plant Breeding:",
+          "Mechanochemistry",
+          "Sonochemistry",
+          "Peptide Synthesis",
+          "Physical Organic Chemistry",
+          "Adhesion Technology",
+          "Applied Chemistry",
+      ]
+  },
+];
