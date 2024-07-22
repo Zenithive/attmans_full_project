@@ -8,10 +8,10 @@ import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton
 import BoothDetailsModal from '../component/booth/booth';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
-import CloseIcon from '@mui/icons-material/Close';
 import ApproveDialog from '../component/approvedilog/approvedilog';
 import RemoveDialog from '../component/removedilog/removedilog';
 import BoothDetailsDialog from '../component/boothdetailsdilogbox/boothdetailsdilogbox';
+import IntrestedModal from '../component/booth/intrested';
 
 interface Exhibition {
   _id?: string;
@@ -45,6 +45,7 @@ const ExhibitionsPage: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [booths, setBooths] = useState<Booth[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [showInterestedModal, setShowInterestedModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const searchParams = useSearchParams();
   const { userType } = userDetails;
@@ -86,6 +87,7 @@ const ExhibitionsPage: React.FC = () => {
     fetchExhibitions();
     fetchBooths();
   }, [userDetails?._id, searchParams, statusFilter]);
+  
 
   const handleCreateBooth = async (boothData: any) => {
     try {
@@ -147,6 +149,9 @@ const ExhibitionsPage: React.FC = () => {
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+
+  const openInterestedModal = () => setShowInterestedModal(true);
+  const closeInterestedModal = () => setShowInterestedModal(false);
 
   const exhibitionId = searchParams.get('exhibitionId');
 
@@ -220,7 +225,7 @@ const ExhibitionsPage: React.FC = () => {
       <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
         <h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1>
         {(userDetails && userType === 'Innovators') && (
-          <Button
+          <><Button
             variant="contained"
             color="primary"
             onClick={openModal}
@@ -228,8 +233,19 @@ const ExhibitionsPage: React.FC = () => {
           >
             Participate
           </Button>
+          
+          
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={openInterestedModal}
+            style={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+          >
+              Intrested
+            </Button></>
         )}
         <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
+        <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
       </div>
       <div>
         {exhibitions.map((exhibition) => (

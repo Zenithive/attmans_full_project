@@ -1,16 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Chip, Checkbox, TextField } from '@mui/material';
+import { options } from '@/app/constants/categories';
 
-interface Option {
+interface options {
   label: string;
   value: string;
-  children?: Option[];
+  children?: options[];
 }
 
 interface SubjectMatterExpertiseProps {
+  Option : string[];
   selectedValues: string[];
   setSelectedValues: (values: string[]) => void;
-  options: Option[];
+  options: options[];
+  value: string[];
+  onChange: (selectedSubjects: string[]) => void;
 }
 
 const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selectedValues, setSelectedValues, options }) => {
@@ -29,8 +33,8 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
     setSelectedValues(updatedSelectedValues);
   };
 
-  const filterOptions = (options: Option[], searchTerm: string): Option[] => {
-    return options.reduce<Option[]>((acc, option) => {
+  const filterOptions = (options: options[], searchTerm: string): options[] => {
+    return options.reduce<options[]>((acc, option) => {
       const match = option.label.toLowerCase().includes(searchTerm.toLowerCase());
       const children = option.children ? filterOptions(option.children, searchTerm) : [];
       if (match || children.length > 0) {
@@ -40,7 +44,7 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
     }, []);
   };
 
-  const renderOptions = (options: Option[], level: number = 0) => {
+  const renderOptions = (options: options[], level: number = 0) => {
     return options.map(option => (
       <div key={option.value} style={{ paddingLeft: `${level * 20}px` }}>
         {option.children ? (
@@ -132,18 +136,18 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
         .nested-multiselect-dropdown {
           position: relative;
           display: inline-block;
-          width: 50%;
+          width: 100%;
         }
 
         .dropdown-content {
           display: block;
           position: absolute;
-          background-color: #f9f9f9;
+          background-color: #ffffff;
           min-width: 100%;
           max-height: 300px;
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
           padding: 12px 16px;
-          z-index: 1;
+          z-index: 10;
           border: 1px solid #fff;
           border-radius: 16px;
           overflow-y: auto;

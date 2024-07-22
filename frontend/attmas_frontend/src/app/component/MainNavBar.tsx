@@ -27,6 +27,7 @@ interface Email {
   to: string;
   subject: string;
   exhibitionId: string;
+  projectId: string;
   read: boolean;
   boothUsername?: string;
   title: string;
@@ -199,7 +200,7 @@ export default function MainNavBar() {
     if (notification.subject === 'New Project Created') {
       return `
             Dear ${userName},<br>
-            You have been notified that someone has created a project. 
+            You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
             <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
         `;
     }

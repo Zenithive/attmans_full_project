@@ -167,9 +167,10 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               setSelectedValues={(values) => {
                 setSelectedValues(values);
                 formik.setFieldValue('subcategories', values);
-              }}
-              options={options}
-            />
+              } }
+              options={options} value={[]} onChange={function (selectedSubjects: string[]): void {
+                throw new Error('Function not implemented.');
+              } } Option={[]}            />
           </Box>
 
           <Button
