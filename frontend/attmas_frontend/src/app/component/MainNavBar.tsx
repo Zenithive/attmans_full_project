@@ -20,6 +20,7 @@ import { removeUser } from '../reducers/userReducer';
 import DOMPurify from 'dompurify';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CircleIcon from '@mui/icons-material/Circle';
+import Jobs from '../projects/page';
 
 interface Email {
   _id: string;
@@ -32,10 +33,13 @@ interface Email {
   title: string;
   sentAt: Date;
   status?: string;
+  status2?: string;
+  jobId?: StaticRange;
   exhibitionUserFirstName?: string;
   exhibitionUserLastName?: string;
-  first: string;
-  last: string;
+  adminFirstName?: string;
+  adminLastName?: string;
+
 }
 
 function clearCookies() {
@@ -196,23 +200,32 @@ export default function MainNavBar() {
     if (notification.subject === 'New Project Created') {
       return `
             Dear ${userName},<br>
-            You have been notified that ${notification.first} ${notification.last} has created a project. 
+            You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
             <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
         `;
     }
 
-    if (notification.status) {
+    else if (notification.status) {
       return `
             Dear ${userName},<br>
             Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
         `;
     }
 
-    if (notification.boothUsername) {
+    else if (notification.boothUsername) {
       return `
             Dear ${userName},<br>
             You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to approve/reject.
         `;
+    }
+
+    else if(notification.status2){
+      console.log('job',notification.status2)
+      return `
+       Dear ${userName},<br>
+        Your project "${notification.title}" has been ${notification.status2} by ${notification.adminFirstName} ${notification.adminLastName}. 
+        <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects.
+      `;
     }
 
     return `

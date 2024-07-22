@@ -32,6 +32,7 @@ interface Jobs {
     _id?: string;
     title: string;
     description: string;
+    username:string;
     Budget: number;
     Expertiselevel: string;
     TimeFrame: string | null;
@@ -90,6 +91,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         DetailsOfInnovationChallenge: '',
         Sector: '',
         AreaOfProduct: '',
+        username:userDetails.username,
         ProductDescription: '',
 
     }), []);
@@ -111,10 +113,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 label: item,
             }))
         ), []);
-
-
-
-    const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; }, { setSubmitting, resetForm }: any) => {
+    
+    const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string;}, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,
             description: values.description,
@@ -132,9 +132,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             Expectedoutcomes: values.Expectedoutcomes,
             IPRownership: values.IPRownership,
             userId: userDetails._id,
-            firstName: userDetails.firstName,
-            lastName: userDetails.lastName,
-            currency: currency,
+            username:userDetails.username
         };
 
         try {

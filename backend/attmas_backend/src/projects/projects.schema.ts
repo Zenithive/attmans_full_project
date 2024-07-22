@@ -71,6 +71,26 @@ export class Jobs {
 
   // @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   // user: Types.ObjectId;
+
+  @Prop({ default: 'Pending' })
+  status: string;
+
+  @Prop({ default: false })
+  buttonsHidden: boolean;
+
+  @Prop({ ref: 'User', required: true })
+  username: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Exhibition', required: false })
+  exhibitionId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'jobs', required: false })
+  projectId: Types.ObjectId;
 }
 
 export const JobsSchema = SchemaFactory.createForClass(Jobs);
+
+JobsSchema.post('save', async (doc, next) => {
+  await doc.populate('userId');
+  next();
+});

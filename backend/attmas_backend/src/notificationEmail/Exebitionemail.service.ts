@@ -67,8 +67,6 @@ export class EmailService2 {
     }
   }
 
-
-
   async sendEmailProject(
     to: string,
     subject: string,
@@ -217,6 +215,50 @@ export class EmailService2 {
 
   async findEmailsByUsername(to: string): Promise<Email[]> {
     return this.emailModel.find({ to }).exec();
+  }
+
+  async sendProjectStatusEmail(
+    to: string,
+    subject: string,
+    jobId: string,
+    title: string,
+    status2: string,
+    adminFirstName: string,
+    adminLastName: string,
+  ) {
+    try {
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`User with username ${to} not found`);
+      }
+
+      const html = `
+        Dear ${user.firstName} ${user.lastName},<br>
+        Your project "${title}" has been ${status2} by ${adminFirstName} ${adminLastName}.
+      `;
+
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to,
+        subject,
+        sentAt: new Date(),
+        read: false,
+        jobId,
+        title,
+        status2,
+        adminFirstName,
+        adminLastName,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to ${to}:`, error);
+    }
   }
 
   // email.service2.ts

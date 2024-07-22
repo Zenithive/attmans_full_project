@@ -6,6 +6,9 @@ export type ExhibitionDocument = Exhibition & Document;
 
 @Schema()
 export class Exhibition {
+  toObject(): Exhibition | PromiseLike<Exhibition> {
+    throw new Error('Method not implemented.');
+  }
   @Prop({ required: false })
   title: string;
 
