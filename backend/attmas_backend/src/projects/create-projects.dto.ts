@@ -11,7 +11,6 @@ export class CreateJobsDto {
   @IsString()
   description: string;
 
-
   @IsString()
   currency: string;
 

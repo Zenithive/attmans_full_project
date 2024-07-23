@@ -134,10 +134,14 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         <>
             {userType === "Admin" && (
                 <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
-                    borderRadius: 3, backgroundColor: '#CC4800', color: "white"
+                    borderRadius: 3, backgroundColor: '#CC4800', color: "white",'@media (max-width: 767px)':{
+                        position:'relative',width:'157%'
+                    }
                 }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
             )}
-            <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 } }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
+            <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 , '@media (max-width: 767px)':{
+                width:'116%'
+            }} }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
                     <h2>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
