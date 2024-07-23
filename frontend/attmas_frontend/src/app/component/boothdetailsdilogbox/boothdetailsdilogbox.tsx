@@ -220,7 +220,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                 height: 'auto',
               },
             }}>
-              {renderVideo(selectedVideoUrl, window.innerWidth < 768 ? window.innerWidth - 40 : 850, window.innerWidth < 768 ? window.innerHeight - 40 : 500)}
+                  {renderVideo(selectedVideoUrl, window.innerWidth < 768 ? window.innerWidth - 40 : 850, window.innerWidth < 768 ? 200 : 500)}
             </Box>
           )}
         </DialogContent>
