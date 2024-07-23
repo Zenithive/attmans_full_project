@@ -17,14 +17,16 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useMediaQuery, Theme } from '@mui/material';
 
 export const drawerWidth = 240;
 
 export default function MainSideBar() {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  console.log("userDetails",userDetails.userType);
+  console.log("userDetails", userDetails.userType);
   
   const [isClient, setIsClient] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
 
   React.useEffect(() => {
     setIsClient(true);
@@ -85,6 +87,8 @@ export default function MainSideBar() {
     ? SIDEBAR_LIST_NAVS.filter(nav => nav.Name !== "Freelancers" && nav.Name !== "Project Owner")
     : SIDEBAR_LIST_NAVS;
 
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+
   if (!isClient) {
     return null;
   }
@@ -92,15 +96,19 @@ export default function MainSideBar() {
   return (
     <Box component="nav"
       sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-      aria-label="mailbox folders">
+      aria-label="mailbox folders"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Drawer
         sx={{
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: drawerWidth,
+            width: isMobile && !isHovered ? 60 : drawerWidth,
             boxSizing: 'border-box',
             backgroundColor: "primary.main",
             color: 'white',
+            transition: 'width 0.3s',
           },
         }}
         variant="permanent"
@@ -119,7 +127,9 @@ export default function MainSideBar() {
                   <ListItemIcon sx={{ minWidth: 40 }}>
                     {navItem.icon()}
                   </ListItemIcon>
-                  <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
+                  {(!isMobile || isHovered) && (
+                    <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
+                  )}
                 </ListItemButton>
               </ListItem>
             ))}
