@@ -436,21 +436,7 @@ const Jobs = () => {
 
                                 <Typography variant="body2">{job.Budget}</Typography>
                                 <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                {/* <Box sx={{ float: "right" }}>
-                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
-                                        Apply
-                                    </Button>
-                                    <Tooltip title="Edit" arrow>
-                                        <IconButton onClick={() => handleEditJob(job)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete" arrow>
-                                        <IconButton onClick={() => handleConfirmDelete(job)}>
-                                            <DeleteRoundedIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Box> */}
+                           
 
                                 <Box sx={{ float: "right" }}>
                                     <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>

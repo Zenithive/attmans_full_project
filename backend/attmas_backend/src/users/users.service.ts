@@ -29,7 +29,7 @@ export class UsersService {
     const createdUser = new this.userModel({
       ...rest,
       password: hashedPassword,
-      isAllProfileCompleted: false,
+      // isAllProfileCompleted: false,
     });
     await createdUser.save();
 
