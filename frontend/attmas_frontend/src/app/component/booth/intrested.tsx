@@ -20,6 +20,7 @@ import { APIS } from '@/app/constants/api.constant';
 interface BoothDetailsModalProps {
     open: boolean;
     onClose: () => void;
+    createBooth: (boothData: any) => Promise<void>;
     exhibitionId: string | null;
 }
 

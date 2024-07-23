@@ -77,7 +77,7 @@ const DashBoard: React.FC = () => {
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="value"
-                            label={(entry) => entry.name}
+                            label={(entry: { name: any; }) => entry.name}
                         >
                             {
                                 pieChartData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)

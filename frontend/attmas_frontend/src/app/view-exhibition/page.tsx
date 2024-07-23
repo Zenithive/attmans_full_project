@@ -161,7 +161,7 @@ const ExhibitionsPage: React.FC = () => {
     setStatusFilter(newStatus);
   };
 
-  const renderVideo = (url: string, width: number = 800, height: number = 500) => {
+  const renderVideo = (url: string, width: number = 710, height: number = 500) => {
     if (!url) {
       return null;
     }
@@ -226,18 +226,24 @@ const ExhibitionsPage: React.FC = () => {
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Exhibitions and Booths</title>
       </Head>
     <Box sx={{ display: 'flex', flexDirection: 'column', overflowX: 'hidden','@media (max-width: 767px)':{
        overflowX: 'hidden'
     } }}>
-      <div style={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
-        <h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1>
+      <Box sx={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px'}}>
+        <Box sx={{'@media (max-width: 767px)':{position:'relative',right:'34px'}}}><h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1></Box>
         {(userDetails && userType === 'Innovators') && (
-          <><Button
+          <Box sx={{'@media (max-width: 767px)':{
+       position:'relative',left:'72px',top:'10px'
+
+    } }}><Button
             variant="contained"
             color="primary"
             onClick={openModal}
-            style={{ position: 'absolute', right: '80px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+            sx={{ position: 'absolute', right: '80px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold','@media (max-width: 767px)':{
+              position:'absolute',right:'95px'
+            } }}
           >
             Participate
           </Button>
@@ -247,14 +253,14 @@ const ExhibitionsPage: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={openInterestedModal}
-            style={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+            sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
           >
               Intrested
-            </Button></>
+            </Button></Box>
         )}
         <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
         <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
-      </div>
+      </Box>
       <div>
         {exhibitions.map((exhibition) => (
           <Box
@@ -266,9 +272,10 @@ const ExhibitionsPage: React.FC = () => {
               marginBottom: '20px',
             }}
           >
-            <Card sx={{ flex: 1, marginBottom: '10px', '@media (max-width: 767px)': { marginBottom: '10px' } }}>
+            <Card sx={{ flex: 1, marginBottom: '10px', '@media (max-width: 767px)': { marginBottom: '10px', width: '100%',
+                height: 'auto', } }}>
               <CardContent>
-                {renderVideo(exhibition.videoUrl)}
+                {renderVideo(exhibition.videoUrl,window.innerWidth < 768 ? window.innerWidth - 40 : 800, window.innerWidth < 768 ? 200 : 500)}
               </CardContent>
             </Card>
             <Card
@@ -276,7 +283,7 @@ const ExhibitionsPage: React.FC = () => {
                 flex: 1,
                 marginLeft: { xs: '0', sm: '10px' }, 
                 marginBottom: '20%',
-                '@media (max-width: 767px)': { marginLeft: '0' ,width:'80%'},
+                '@media (max-width: 767px)': { marginLeft: '-10px' ,width:'90%'},
               }}
             >
               <CardContent>
@@ -297,7 +304,7 @@ const ExhibitionsPage: React.FC = () => {
         <Box sx={{ width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px','@media (max-width: 767px)':{
           position:'relative',
           width:'100%',
-          top:'-10px'
+          top:'-10px',
         } }}>
           <h1>Booth Details</h1>
           {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
@@ -309,7 +316,7 @@ const ExhibitionsPage: React.FC = () => {
               sx={{ position: 'relative', left: '40%', bottom: '63px','@media (max-width: 767px)':{
                 position:'relative',
                 top:'10px',
-                left:'-38px'
+                left:'-24px'
               } }}
             >
               <ToggleButton value="All" aria-label="all">All
@@ -392,7 +399,7 @@ const ExhibitionsPage: React.FC = () => {
                     <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                     <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                     <Box sx={{ position: 'relative', left: '76%', width: '48%', bottom: '45px','@media (max-width: 767px)': {
-              position:'relative',top:'-60px',left:'71%'} }}>
+              position:'relative',top:'-65px',left:'71%'} }}>
                       {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
                         <Chip
                           label={

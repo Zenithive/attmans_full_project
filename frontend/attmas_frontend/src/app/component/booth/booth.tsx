@@ -28,7 +28,7 @@ import * as Yup from 'yup';
 interface BoothDetailsModalProps {
   open: boolean;
   onClose: () => void;
-  createBooth: (data: any) => void;
+  createBooth: (boothData: any) => Promise<void>;
   exhibitionId: string | null;
 }
 
