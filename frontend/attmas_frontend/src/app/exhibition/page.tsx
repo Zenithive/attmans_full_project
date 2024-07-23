@@ -403,7 +403,7 @@ const Exhibition = () => {
           flexDirection: 'column',
           width: '100%',
           gap: 1,
-          mt: 2, // Add some margin on top to separate it from the icon
+          mt: 2, 
         },
       }}
     >
@@ -447,7 +447,7 @@ const Exhibition = () => {
       sx={{
         '@media (max-width: 767px)': {
           position: 'absolute',
-          top:'7%',
+          top:'4.5%',
           right:'25%'
         },
       }}
