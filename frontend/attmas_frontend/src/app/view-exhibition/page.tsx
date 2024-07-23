@@ -272,10 +272,10 @@ const ExhibitionsPage: React.FC = () => {
               marginBottom: '20px',
             }}
           >
-            <Card sx={{ flex: 1, marginBottom: '10px', '@media (max-width: 767px)': { marginBottom: '10px', width: '100%',
-                height: 'auto', } }}>
+            <Card sx={{ flex: 1, marginBottom: '10px', '@media (max-width: 767px)': { marginBottom: '10px', width: '104%',
+                height: 'auto', marginRight:'26px'} }}>
               <CardContent>
-                {renderVideo(exhibition.videoUrl,window.innerWidth < 768 ? window.innerWidth - 40 : 800, window.innerWidth < 768 ? 200 : 500)}
+                {renderVideo(exhibition.videoUrl,window.innerWidth < 768 ? window.innerWidth - 10 : 850, window.innerWidth < 768 ? 300 : 500)}
               </CardContent>
             </Card>
             <Card
@@ -283,7 +283,7 @@ const ExhibitionsPage: React.FC = () => {
                 flex: 1,
                 marginLeft: { xs: '0', sm: '10px' }, 
                 marginBottom: '20%',
-                '@media (max-width: 767px)': { marginLeft: '-10px' ,width:'90%'},
+                '@media (max-width: 767px)': { marginLeft: '-20px' ,width:'100%'},
               }}
             >
               <CardContent>
@@ -346,7 +346,7 @@ const ExhibitionsPage: React.FC = () => {
             .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
             .map(booth => (
               <Grid item xs={12} sm={6} md={4} key={booth._id}>
-                <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
+                <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' ,'@media (max-width: 767px)':{width:'140%',position:'relative',right:'50px'}}}>
                   <CardContent>
                     <Typography
                       onClick={userDetails && (userType === 'Admin' || userType === 'Innovators') ? () => {

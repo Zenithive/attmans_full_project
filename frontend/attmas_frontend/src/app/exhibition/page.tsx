@@ -315,7 +315,9 @@ const Exhibition = () => {
 
 
   return (
-    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
+    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden",'@media (max-width: 767px)':{
+      position:'relative',left:'25px'
+    }}}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography component="h2" sx={{ marginY: 0,fontSize:"20px" }}>Exhibitions</Typography>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 ,height:"30px",position:"relative",top:"8px"}}>
