@@ -458,7 +458,7 @@ const Jobs = () => {
                                     </a>
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                        <Box sx={{position:'relative',bottom:"24px",left:'66%','@media (max-width: 767px)': {
+                                        <Box sx={{position:'relative',bottom:"24px",width:'fit-content',left:'62%','@media (max-width: 767px)': {
                                         position:'relative',
                                         top:'65px',
                                         left:'69%'
