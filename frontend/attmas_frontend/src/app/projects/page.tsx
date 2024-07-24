@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -20,6 +20,7 @@ import { Category, Subcategorys } from '@/app/constants/categories';
 import ApproveDialogForProject from '../component/approveforproject/approveforproject';
 import RejectDialogForProject from '../component/rejectforproject/rejectforproject';
 import { styled } from '@mui/material/styles';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 
 
@@ -84,6 +85,7 @@ const Jobs = () => {
     const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; job: Job | null }>({ open: false, job: null });
     const [isApproved, setIsApproved] = useState(false);
     const [isRejected, setIsRejected] = useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
@@ -106,6 +108,13 @@ const Jobs = () => {
         setRejectDialogOpen({ open: false, job: null });
     };
 
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget );
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
@@ -496,28 +505,61 @@ const Jobs = () => {
                                 <Typography variant="body2">{job.Budget}</Typography>
                                 <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                <Box sx={{ float: "right",left:'22%',position:'relative','@media (max-width: 767px)': {position:'relative',left:'10px'}}}>
-                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)} sx={{'@media (max-width: 767px)': {
-                                    position:'relative',
-                                    width:'0px'
-                                 } }}>
+                                <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => handleApplyClick(job.title)}
+                                        sx={{ '@media (max-width: 767px)': { display: 'none' } }}
+                                    >
                                         Apply
                                     </Button>
+
                                     {userDetails.userType === 'Project Owner' && (
                                         <>
                                             <Tooltip title="Edit" arrow>
-                                                <IconButton onClick={() => handleEditJob(job)}>
+                                                <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
                                                     <EditIcon />
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title="Delete" arrow>
-                                                <IconButton onClick={() => handleConfirmDelete(job)}>
+                                                <IconButton onClick={() => handleConfirmDelete(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
                                                     <DeleteRoundedIcon />
                                                 </IconButton>
                                             </Tooltip>
                                         </>
                                     )}
-                                    </Box> 
+
+                                    <IconButton
+                                        aria-controls="simple-menu"
+                                        aria-haspopup="true"
+                                        onClick={handleClick}
+                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                    >
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                    <Menu
+                                        id="simple-menu"
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={Boolean(anchorEl)}
+                                        onClose={handleClose}
+                                        PaperProps={{
+                                            sx: {
+                                                border: '1px solid', 
+                                                boxShadow: 'none', 
+                                            },
+                                        }}
+                                    >
+                                        <MenuItem onClick={() => { handleApplyClick(job.title); handleClose(); }}>Apply</MenuItem>
+                                        {userDetails.userType === 'Project Owner' && (
+                                            <>
+                                                <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>Edit</MenuItem>
+                                                <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>Delete</MenuItem>
+                                            </>
+                                        )}
+                                    </Menu>
+                                </Box> 
                                 </Box>
         
                             </CardContent>
