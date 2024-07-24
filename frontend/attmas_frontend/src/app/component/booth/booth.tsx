@@ -100,7 +100,7 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
 
 const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth, exhibitionId }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  const [productNames, setProductNames] = useState<string[]>([]);
+  const [productNames, setProductNames] = useState<Product[]>([]);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -111,9 +111,9 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
         // const response = await axios.get(APIS.FORM2/${userDetails.username});
         const response = await axios.get(`${APIS.PRODUCTNAME}?username=${userDetails.username}`);
 
-        console.log("response of ProductName", response);
+        console.log("response of ProductName", response.data);
 
-        setProductNames(response.data.products);
+        setProductNames(response.data.products || []);
       } catch (error) {
         console.error('Error fetching product names:', error);
       }
