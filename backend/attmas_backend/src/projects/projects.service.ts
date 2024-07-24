@@ -37,7 +37,14 @@ export class JobsService {
     const title = savedJob.title;
 
     for (const admin of adminUsers) {
-      await this.emailService.sendEmailProject(admin.username, subject, jobId, title, first, last);
+      await this.emailService.sendEmailProject(
+        admin.username,
+        subject,
+        jobId,
+        title,
+        first,
+        last,
+      );
       // await this.emailService.sendEmailProject(
       //   admin.username,
       //   subject,

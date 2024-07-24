@@ -16,6 +16,9 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
+  Grid,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
@@ -44,6 +47,7 @@ interface Product {
 const CustomPriceField = ({ field, form, index }: { field: any; form: any; index: number }) => {
   const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
   const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+
 
   return (
     <TextField
@@ -94,6 +98,9 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
 
 const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth, exhibitionId }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const initialValues = {
     title: '',
@@ -147,6 +154,9 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
           overflow: 'auto',
           maxHeight: '90vh',
           borderRadius: '20px',
+          '@media (max-width: 767px)': {
+            width: '78%',
+          }
         }}
       >
            <IconButton
@@ -209,127 +219,232 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                 Products
               </Typography>
               <FieldArray name="products">
-                {({ push, remove }) => (
-                  <>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Name</TableCell>
-                          <TableCell>Description</TableCell>
-                          <TableCell>Product Type</TableCell>
-                          <TableCell>Price & Currency</TableCell>
-                          <TableCell>Video</TableCell>
-                          <TableCell>Actions</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {values.products.map((product, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Field name={`products.${index}.name`}>
-                                {({ field, form }: FieldProps) => {
-                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                                  return (
-                                    <TextField
-                                      {...field}
-                                      fullWidth
-                                      label="Product Name"
-                                      color='secondary'
-                                      error={Boolean(productTouched && productErrors && productErrors.name)}
-                                      helperText={productTouched && productErrors && productErrors.name}
-                                    />
-                                  );
-                                }}
-                              </Field>
-                            </TableCell>
-                            <TableCell>
-                              <Field name={`products.${index}.description`}>
-                                {({ field, form }: FieldProps) => {
-                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                                  return (
-                                    <TextField
-                                      {...field}
-                                      fullWidth
-                                      label="Product Description"
-                                      color='secondary'
-                                      error={Boolean(productTouched && productErrors && productErrors.description)}
-                                      helperText={productTouched && productErrors && productErrors.description}
-                                      multiline
-                                    />
-                                  );
-                                }}
-                              </Field>
-                            </TableCell>
-                            <TableCell>
-                              <Field name={`products.${index}.productType`}>
-                                {({ field, form }: FieldProps) => {
-                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                                  return (
-                                    <TextField
-                                      {...field}
-                                      fullWidth
-                                      label="Product Type"
-                                      color='secondary'
-                                      error={Boolean(productTouched && productErrors && productErrors.productType)}
-                                      helperText={productTouched && productErrors && productErrors.productType}
-                                    />
-                                  );
-                                }}
-                              </Field>
-                            </TableCell>
-                            <TableCell>
-                              <Field name={`products.${index}.price`}>
-                                {({ field, form }: FieldProps) => (
-                                  <CustomPriceField field={field} form={form} index={index} />
-                                )}
-                              </Field>
-                            </TableCell>
-                             <TableCell>
-                              <Field name={`products.${index}.videourlForproduct`}>
-                                {({ field, form }: FieldProps) => {
-                                  const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                                  const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                                  return (
-                                    <TextField
-                                      {...field}
-                                      fullWidth
-                                      label="Video"
-                                      color='secondary'
-                                      error={Boolean(productTouched && productErrors && productErrors.videourlForproduct)}
-                                      helperText={productTouched && productErrors && productErrors.videourlForproduct}
-                                    />
-                                  );
-                                }}
-                              </Field>
-                            </TableCell>
-                            <TableCell>
-                              <IconButton onClick={() => remove(index)}>
-                                <DeleteIcon />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        <TableRow>
-                          <TableCell colSpan={5}>
-                            <Button
-                              type="button"
-                              variant="outlined"
-                              onClick={() => push({ name: '', description: '', productType: '', price: 0, currency: 'USD' })}
-                              startIcon={<AddIcon />}
-                            >
-                              Add Product
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </>
-                )}
-              </FieldArray>
-
+      {({ push, remove }) => (
+        <>
+          {isMobile ? (
+            <Grid container spacing={2}>
+              {values.products.map((product, index) => (
+                <Grid item xs={12} key={index}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Field name={`products.${index}.name`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Product Name"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.name)}
+                              helperText={productTouched && productErrors && productErrors.name}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Field name={`products.${index}.description`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Product Description"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.description)}
+                              helperText={productTouched && productErrors && productErrors.description}
+                              multiline
+                            />
+                          );
+                        }}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Field name={`products.${index}.productType`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Product Type"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.productType)}
+                              helperText={productTouched && productErrors && productErrors.productType}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Field name={`products.${index}.price`}>
+                        {({ field, form }: FieldProps) => (
+                          <CustomPriceField field={field} form={form} index={index} />
+                        )}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Field name={`products.${index}.videourlForproduct`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Video"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.videourlForproduct)}
+                              helperText={productTouched && productErrors && productErrors.videourlForproduct}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <IconButton onClick={() => remove(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => push({ name: '', description: '', productType: '', price: 0, currency: 'USD' })}
+                  startIcon={<AddIcon />}
+                >
+                  Add Product
+                </Button>
+              </Grid>
+            </Grid>
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Product Type</TableCell>
+                  <TableCell>Price & Currency</TableCell>
+                  <TableCell>Video</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {values.products.map((product, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Field name={`products.${index}.name`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Product Name"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.name)}
+                              helperText={productTouched && productErrors && productErrors.name}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </TableCell>
+                    <TableCell>
+                      <Field name={`products.${index}.description`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Product Description"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.description)}
+                              helperText={productTouched && productErrors && productErrors.description}
+                              multiline
+                            />
+                          );
+                        }}
+                      </Field>
+                    </TableCell>
+                    <TableCell>
+                      <Field name={`products.${index}.productType`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Product Type"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.productType)}
+                              helperText={productTouched && productErrors && productErrors.productType}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </TableCell>
+                    <TableCell>
+                      <Field name={`products.${index}.price`}>
+                        {({ field, form }: FieldProps) => (
+                          <CustomPriceField field={field} form={form} index={index} />
+                        )}
+                      </Field>
+                    </TableCell>
+                    <TableCell>
+                      <Field name={`products.${index}.videourlForproduct`}>
+                        {({ field, form }: FieldProps) => {
+                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
+                          return (
+                            <TextField
+                              {...field}
+                              fullWidth
+                              label="Video"
+                              color="secondary"
+                              error={Boolean(productTouched && productErrors && productErrors.videourlForproduct)}
+                              helperText={productTouched && productErrors && productErrors.videourlForproduct}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => remove(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <TableRow>
+                  <TableCell colSpan={6}>
+                    <Button
+                      type="button"
+                      variant="outlined"
+                      onClick={() => push({ name: '', description: '', productType: '', price: 0, currency: 'USD' })}
+                      startIcon={<AddIcon />}
+                    >
+                      Add Product
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          )}
+        </>
+      )}
+    </FieldArray>
               <Button variant="contained" color="primary" type="submit" style={{ marginTop: '20px' }} disabled={isSubmitting}>
                 {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
               </Button>

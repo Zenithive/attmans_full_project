@@ -315,56 +315,146 @@ const Exhibition = () => {
 
 
   return (
-    <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important" ,overflowX:"hidden"}}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography component="h2" sx={{ marginY: 0,fontSize:"20px" }}>Exhibitions</Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 ,height:"30px",position:"relative",top:"8px"}}>
-        <ToggleButtonGroup
-          value={filterType}
-          exclusive
-          onChange={handleFilterTypeChange}
-          aria-label="filter exhibitions"
-        >
-          <ToggleButton value="all" aria-label="all exhibitions" sx={{fontSize:"10px"}}>
-            All Exhibitions
-          </ToggleButton>
-          <ToggleButton value="mine" aria-label="my exhibitions" sx={{fontSize:"10px"}}>
-            My Exhibitions
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-        <Box sx={{position:"relative",left:"57%",width:"60%",display:"flex"}}>
-          <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-          <Tooltip title="Filter">
-            <FilterAltIcon />
-            </Tooltip>
-          </IconButton>
-        {filterOpen && (
-          <Box sx={{ display: "flex", gap: 3 ,width:"75%"}}>
-            <Autocomplete
-              multiple
-              size='small'
-              sx={{width:"30%",position:"relative",right:"37.5%"}}
-              options={getSubjectItems(subjects)}
-              value={selectedSubjects}
-              onChange={(event, value) => setSelectedSubjects(value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subjects" color='secondary' sx={{ borderRadius: "20px" }} />}
-            />
-            <Autocomplete
-              multiple
-              sx={{width:"30%",position:"relative",right:"104%"}}
-              size='small'
-              options={industries}
-              value={selectedIndustries}
-              onChange={(event, value) => setSelectedIndustries(value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Industries" color='secondary' sx={{ borderRadius: "20px" }} />}
-            />
-              <button onClick={handleFilterChange}>Apply Filters</button>
-          </Box>
+    <Box
+  sx={{
+    background: colors.grey[100],
+    p: 2,
+    borderRadius: "30px !important",
+    overflowX: "hidden",
+    '@media (max-width: 767px)': {
+      position: 'relative',
+      left: '25px',
+    },
+  }}
+>
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      '@media (max-width: 767px)': {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+      },
+    }}
+  >
+    <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
+      Exhibitions
+    </Typography>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        mb: 2,
+        height: "30px",
+        position: "relative",
+        top: "8px",
+        '@media (max-width: 767px)': {
+          position: 'relative',
+          right: '-106px',
+          top: '-27px',
+        },
+      }}
+    >
+      <ToggleButtonGroup
+        value={filterType}
+        exclusive
+        onChange={handleFilterTypeChange}
+        aria-label="filter exhibitions"
+      >
+        <ToggleButton value="all" aria-label="all exhibitions" sx={{ fontSize: "10px" }}>
+          All Exhibitions
+        </ToggleButton>
+        <ToggleButton value="mine" aria-label="my exhibitions" sx={{ fontSize: "10px" }}>
+          My Exhibitions
+        </ToggleButton>
+      </ToggleButtonGroup>
+    </Box>
+    <Box
+  sx={{
+    position: "relative",
+    left: "57%",
+    width: "60%",
+    display: "flex",
+    alignItems: "center",
+    '@media (max-width: 767px)': {
+      position: 'relative',
+      left: '4px',
+      width: '100%',
+      justifyContent: 'flex-start',
+      bottom: '22px',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    },
+  }}
+>
+  <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+    <Tooltip title="Filter">
+      <FilterAltIcon />
+    </Tooltip>
+  </IconButton>
+  {filterOpen && (
+    <Box
+      sx={{
+        display: "flex",
+        gap: 3,
+        width: "75%",
+        '@media (max-width: 767px)': {
+          flexDirection: 'column',
+          width: '100%',
+          gap: 1,
+          mt: 2, 
+        },
+      }}
+    >
+      <Autocomplete
+        multiple
+        size='small'
+        sx={{
+          width: "35%",
+          position: "relative",
+          right: "43.5%",
+          '@media (max-width: 767px)': { width: '100%', right: '0' }
+        }}
+        options={getSubjectItems(subjects)}
+        value={selectedSubjects}
+        onChange={(event, value) => setSelectedSubjects(value)}
+        renderInput={(params) => (
+          <TextField {...params} variant="outlined" label="Filter by Subjects" color='secondary' sx={{ borderRadius: "20px" }} />
         )}
-        </Box>
-        <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit}/>
-      </Box>
+      />
+      <Autocomplete
+        multiple
+        sx={{
+          width: "35%",
+          position: "relative",
+          right: "122%",
+          '@media (max-width: 767px)': { width: '100%', right: '0' }
+        }}
+        size='small'
+        options={industries}
+        value={selectedIndustries}
+        onChange={(event, value) => setSelectedIndustries(value)}
+        renderInput={(params) => (
+          <TextField {...params} variant="outlined" label="Filter by Industries" color='secondary' sx={{ borderRadius: "20px" }} />
+        )}
+      />
+    </Box>
+  )}
+</Box>
+
+    <Box
+      sx={{
+        '@media (max-width: 767px)': {
+          position: 'absolute',
+          top:'4.5%',
+          right:'25%'
+        },
+      }}
+    >
+      <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+    </Box>
+  </Box>
       <InfiniteScroll
         dataLength={exhibitions.length}
         next={() => setPage(prev => prev + 1)}
