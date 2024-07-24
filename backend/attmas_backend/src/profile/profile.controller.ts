@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { PersonalProfile } from './schemas/personalProfile.schema';
-import { WorkExprience } from './schemas/work.exprience.schema';
+import { ProductInfo, WorkExprience } from './schemas/work.exprience.schema';
 import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -104,4 +104,10 @@ export class ProfileController {
   async getProfileByUsername3(@Query('username') username: string): Promise<Categories | null> {
     return this.profileService.getProfileByUsername3(username);
   }
+
+
+  @Get('products')
+async getProducts(@Query('username') username: string): Promise<ProductInfo[] | null> {
+  return this.profileService.getProductNameByUsername(username);
+}
 }

@@ -16,6 +16,9 @@ export const APIS = {
     CHECK_PROFILE: `${SERVER_URL}/profile/check`,
 
 
+
+    PRODUCTNAME: `${SERVER_URL}/profile/products`,
+
     CHECKINTRESTEDUSER: `${SERVER_URL}/interested-users`,
 
 
