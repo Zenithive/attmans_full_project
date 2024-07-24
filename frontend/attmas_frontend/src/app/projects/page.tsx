@@ -469,7 +469,7 @@ const Jobs = () => {
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
                                         <Box sx={{position:'relative',bottom:"24px",width:'fit-content',left:'62%','@media (max-width: 767px)': {
                                         position:'relative',
-                                        top:'65px',
+                                        top:'70px',
                                         left:'69%'
                                     }}}>
                                     <CustomChip
@@ -479,7 +479,7 @@ const Jobs = () => {
                                     </Box>
                                     </span>
                                     <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right",position:'relative',bottom:'47px','@media (max-width: 767px)':{
-                                        position:'relative',top:'40px',right:'100px'
+                                        position:'relative',top:'45px',right:'100px'
                                     } }}>
                                         {job.Expertiselevel}
                                     </Box>
