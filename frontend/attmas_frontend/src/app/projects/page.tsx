@@ -80,7 +80,7 @@ const Jobs = () => {
     const [approveDialogOpen, setApproveDialogOpen] = useState<{
         open: boolean;
         job: Job | null;
-      }>({ open: false, job: null });
+    }>({ open: false, job: null });
     const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; job: Job | null }>({ open: false, job: null });
     const [isApproved, setIsApproved] = useState(false);
     const [isRejected, setIsRejected] = useState(false);
@@ -92,19 +92,19 @@ const Jobs = () => {
 
     const handleApproveDialogOpen = (job: Job) => {
         setApproveDialogOpen({ open: true, job });
-      };
-    
-      const handleApproveDialogClose = () => {
-        setApproveDialogOpen({ open: false, job: null });
-      };
+    };
 
-      const handleRejectDialogOpen = (job: Job) => {
+    const handleApproveDialogClose = () => {
+        setApproveDialogOpen({ open: false, job: null });
+    };
+
+    const handleRejectDialogOpen = (job: Job) => {
         setRejectDialogOpen({ open: true, job });
-      };
-    
-      const handleRejectDialogClose = () => {
+    };
+
+    const handleRejectDialogClose = () => {
         setRejectDialogOpen({ open: false, job: null });
-      };
+    };
 
 
 
@@ -222,7 +222,7 @@ const Jobs = () => {
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
-        setIsApproved(job.status === 'Approved'); 
+        setIsApproved(job.status === 'Approved');
         setIsRejected(job.status === 'Rejected');
         setApplyOpen(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
@@ -252,131 +252,193 @@ const Jobs = () => {
             console.error('Error approving job:', error);
         }
     }, [refetch, viewingJob]);
-    
-    const handleReject = useCallback(async (jobId: string,comment: string, job: Job | null) => {
+
+    const handleReject = useCallback(async (jobId: string, comment: string, job: Job | null) => {
         if (!job) {
-          return;
+            return;
         }
         try {
-          console.log('Rejecting job with comment:', comment);
-          await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
-          setJobs(prevJobs =>
-            prevJobs.map(prevJob =>
-              prevJob._id === job._id ? { ...prevJob, status: 'Rejected', rejectComment: comment } : prevJob
-            )
-          );
-          if (viewingJob && viewingJob._id === job._id) {
-            setViewingJob(prevViewingJob => ({
-              ...prevViewingJob!,
-              status: 'Rejected',
-              rejectComment: comment
-            }));
-          }
-          setViewingJob(null);
-          handleRejectDialogClose();
-          refetch();
+            console.log('Rejecting job with comment:', comment);
+            await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
+            setJobs(prevJobs =>
+                prevJobs.map(prevJob =>
+                    prevJob._id === job._id ? { ...prevJob, status: 'Rejected', rejectComment: comment } : prevJob
+                )
+            );
+            if (viewingJob && viewingJob._id === job._id) {
+                setViewingJob(prevViewingJob => ({
+                    ...prevViewingJob!,
+                    status: 'Rejected',
+                    rejectComment: comment
+                }));
+            }
+            setViewingJob(null);
+            handleRejectDialogClose();
+            refetch();
         } catch (error) {
-          console.error('Error rejecting job:', error);
+            console.error('Error rejecting job:', error);
         }
-      }, [refetch, viewingJob]);
-      
-      
+    }, [refetch, viewingJob]);
+
+
 
     const CustomChip = styled(Chip)(({ theme }) => ({
-        borderRadius: '16px', 
-        border: `1px solid ${theme.palette.success.main}`, 
-        backgroundColor: 'transparent', 
-        color: theme.palette.success.main, 
+        borderRadius: '16px',
+        border: `1px solid ${theme.palette.success.main}`,
+        backgroundColor: 'transparent',
+        color: theme.palette.success.main,
         '&.MuiChip-colorError': {
-          border: `1px solid ${theme.palette.error.main}`,
-          color: theme.palette.error.main,
+            border: `1px solid ${theme.palette.error.main}`,
+            color: theme.palette.error.main,
         },
         '&.MuiChip-colorDefault': {
-          border: `1px solid ${theme.palette.grey[400]}`,
-          color: theme.palette.text.primary,
+            border: `1px solid ${theme.palette.grey[400]}`,
+            color: theme.palette.text.primary,
         },
-      }));
-      
-    
+    }));
+
+
 
     return (
-        <Box sx={{ background: colors.grey[100], p: 2, borderRadius: "30px !important", overflowX: "hidden !important" }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box
+            sx={{
+                background: colors.grey[100],
+                p: 2,
+                borderRadius: "30px !important",
+                overflowX: "hidden !important",
+                '@media (max-width: 767px)': {
+                    position: 'relative',
+                    left: '25px',
+                },
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    '@media (max-width: 767px)': {
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                    },
+                }}
+            >
+                <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
 
-
-                <Typography component="h2" sx={{ marginY: 0 }}>Post Project</Typography>
-
-
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-
-
-                    <ToggleButtonGroup
-                        value={filterType}
-                        exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter exhibitions"
-                        sx={{ height: "30px" }}
-                    >
-                        <ToggleButton value="all" aria-label="all exhibitions">
-                            All Projects
-                        </ToggleButton>
-                        <ToggleButton value="mine" aria-label="my exhibitions">
-                            My Projects
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-
-
-                    <Tooltip title="Filter" arrow>
-                        <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                            <FilterAltIcon />
-                        </IconButton>
-                    </Tooltip>
-
-
-                </Box>
-
-
-                {userDetails.userType === 'Project Owner' && (
-                    <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-                )}
             </Box>
+
+            {userDetails.userType === 'Project Owner' && (
+                <Box sx={{
+                    mt: {
+                        xs: 2, md: 0, float: 'right', position: 'relative', bottom: '20px', '@media (max-width: 767px)': {
+                            position: 'relative',
+                            float: 'right',
+                            top: '0px'
+                        }
+                    }
+                }}>
+                    <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                </Box>
+            )}
+            <Box sx={{
+                position: 'relative', left: '87%',width:'3%', bottom: '26px', '@media (max-width: 767px)': {
+                    position: 'relative',
+                    top: '8px',
+                    left: '-5px',
+                    marginBottom: '15px'
+                }
+            }}>
+                <Tooltip title="Filter" arrow>
+                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
+                        <FilterAltIcon />
+                    </IconButton>
+                </Tooltip>
+            </Box>
+
             {filterOpen && (
-                <Box sx={{ mt: 2, display: "flex", gap: 3, alignItems: 'center' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        marginBottom: '20px',
+                        gap: 3,
+                        alignItems: 'center',
+                        '@media (max-width: 767px)': {
+                            flexDirection: 'column',
+                            alignItems: 'stretch',
+                            gap: 2,
+                            width: '100%'
+                        },
+                    }}
+                >
                     <Autocomplete
-                        sx={{ flex: 1 }}
+                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
                         multiple
-                        size='small'
+                        size="small"
                         options={Expertiselevel}
                         value={selectedExpertis}
                         onChange={(event, value) => setSelectedExpertis(value)}
-                        renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color='secondary' />}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color="secondary" />
+                        )}
                     />
 
                     <Autocomplete
-                        sx={{ flex: 1 }}
+                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
                         multiple
-                        size='small'
+                        size="small"
                         options={Category()}
                         value={selectedCategory}
                         onChange={(event, value) => setSelectedCategory(value)}
-                        renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Categorys" color='secondary' />}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" label="Filter by Category" color="secondary" />
+                        )}
                     />
 
                     <Autocomplete
-                        sx={{ flex: 1 }}
+                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
                         multiple
-                        size='small'
+                        size="small"
                         options={getSubcategorys(Subcategorys())}
                         value={selectedSubcategory}
                         onChange={(event, value) => setSelectedSubcategory(value)}
-                        renderInput={(params) => <TextField {...params} variant="outlined" label="Filter by Subcategorys" color='secondary' />}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" label="Filter by Subcategory" color="secondary" />
+                        )}
                     />
-                    <Button onClick={handleFilterChange} variant="contained" color="primary">Apply Filters</Button>
+
                 </Box>
             )}
 
-
-
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    marginTop:'-15px',
+                    '@media (max-width: 767px)': {
+                        width: '100%',
+                        justifyContent: 'space-between',
+                        mt: 4,
+                        position: 'relative',
+                        left: '28px'
+                    },
+                }}
+            >
+                <ToggleButtonGroup
+                    value={filterType}
+                    exclusive
+                    onChange={handleFilterTypeChange}
+                    aria-label="filter exhibitions"
+                    sx={{ height: "30px" }}
+                >
+                    <ToggleButton value="all" aria-label="all exhibitions">
+                        All Projects
+                    </ToggleButton>
+                    <ToggleButton value="mine" aria-label="my exhibitions">
+                        My Projects
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
             <InfiniteScroll
                 dataLength={jobs.length}
                 next={() => setPage(prev => prev + 1)}
@@ -385,75 +447,61 @@ const Jobs = () => {
                 endMessage={<Typography>No more Projects</Typography>}
             >
 
-
-
                 <Box sx={{ mt: 2 }}>
                     {jobs.map((job) => (
                         <Card key={job._id} sx={{ mb: 2 }}>
                             <CardContent>
                                 <Typography variant="h5">
 
-                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
-                                        {job.title}
+                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer'}}>
+                                        {job.title},
                                     </a>
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                        <CustomChip
-                                            sx={{position:'relative',left:'10px'}}
+                                        <Box sx={{position:'relative',bottom:"30px",left:'24%','@media (max-width: 767px)': {
+                                        position:'relative',
+                                        top:'65px',
+                                        left:'69%'
+                                    }}}>
+                                    <CustomChip
+                                    sx={{position:'relative',left:'10px'}}
                                             label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                             color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-                                            />
+                                        />
+                                    </Box>
                                     </span>
-
-                                    
-
-                                    {/* <Chip
-                                        label={job.Status}
-                                        sx={{
-                                            fontSize: 'small',
-                                            fontWeight: 'bold',
-                                            marginLeft: '10px',
-                                        }}
-                                    /> */}
-                                    <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
+                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right",position:'relative',bottom:'47px','@media (max-width: 767px)':{
+                                        position:'relative',top:'40px',right:'100px'
+                                    } }}>
                                         {job.Expertiselevel}
-                                    </span>
+                                    </Box>
 
-                                  
-                                    <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right", position: "relative", right: "20px", bottom: "8px" }}>
+
+                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right",bottom:'56px',right:'20px',position:'relative','@media (max-width: 767px)': {position:'relative',bottom:'30px'} }}>
                                         <Chip
                                             label={job.SelectService}
                                             variant="outlined"
                                             color='secondary'
+                                            sx={{'@media (max-width: 767px)': {position:'relative',bottom:'10px'}}}
                                         />
-                                    </span>
+                                    </Box>
+                                    </Typography>
 
-
-                                </Typography>
-                                <Typography variant="body2" sx={{ mb: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
+                                 <Box sx={{marginTop:'-21px'}}>  
+                                <Typography variant="body2" sx={{ mb: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' ,'@media (max-width: 767px)': {
+                                    position:'relative',top:'45px'
+                                 }}}>
                                     {job.description}
                                 </Typography>
 
                                 <Typography variant="body2">{job.Budget}</Typography>
                                 <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                {/* <Box sx={{ float: "right" }}>
-                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
-                                        Apply
-                                    </Button>
-                                    <Tooltip title="Edit" arrow>
-                                        <IconButton onClick={() => handleEditJob(job)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete" arrow>
-                                        <IconButton onClick={() => handleConfirmDelete(job)}>
-                                            <DeleteRoundedIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Box> */}
 
-                                <Box sx={{ float: "right" }}>
-                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)}>
+                                <Box sx={{ float: "right",left:'22%',position:'relative','@media (max-width: 767px)': {position:'relative',left:'10px'}}}>
+                                    <Button variant="contained" color="primary" onClick={() => handleApplyClick(job.title)} sx={{'@media (max-width: 767px)': {
+                                    position:'relative',
+                                    width:'0px'
+                                 } }}>
                                         Apply
                                     </Button>
                                     {userDetails.userType === 'Project Owner' && (
@@ -470,8 +518,9 @@ const Jobs = () => {
                                             </Tooltip>
                                         </>
                                     )}
+                                    </Box> 
                                 </Box>
-
+        
                             </CardContent>
                         </Card>
                     ))}
@@ -495,7 +544,10 @@ const Jobs = () => {
                         borderRadius: '20px 0px 0px 20px',
                         width: '600px',
                         p: 2,
-                        backgroundColor: '#f9f9f9'
+                        backgroundColor: '#f9f9f9',
+                        '@media (max-width: 767px)': {
+                            width: '100%',
+                        }
                     }
                 }}
                 BackdropProps={{
@@ -509,9 +561,9 @@ const Jobs = () => {
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
 
 
-                        
-                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px',float:'right' }} />}
-                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float:'right' }} />}
+
+                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right' }} />}
+                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right' }} />}
                         <Typography variant="h5" sx={{ mb: 1 }}>{viewingJob.title}</Typography>
 
 
@@ -595,26 +647,26 @@ const Jobs = () => {
                         <Typography variant="body2" sx={{ mb: 1 }}><b>IPR Ownership:</b></Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.IPRownership}</Typography>
 
-                        
-                            {viewingJob.rejectComment && (
-                             <Box sx={{borderRadius:'5px',position:'relative',top:'20px'}}> 
-                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'error.main' }}>
-                                <b>Rejection Comment:</b> {viewingJob.rejectComment}
-                            </Typography>
-                            </Box>  
-                            )}
+
+                        {viewingJob.rejectComment && (
+                            <Box sx={{ borderRadius: '5px', position: 'relative', top: '20px' }}>
+                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'error.main' }}>
+                                    <b>Rejection Comment:</b> {viewingJob.rejectComment}
+                                </Typography>
+                            </Box>
+                        )}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                             {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
                                 <>
                                     <Button onClick={() => handleApproveDialogOpen(viewingJob)}>
-                                    Approve
-                                </Button>
+                                        Approve
+                                    </Button>
 
-                                <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
-                                    Reject
-                                </Button>
-                                  
+                                    <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
+                                        Reject
+                                    </Button>
+
                                 </>
                             )}
                         </Box>
@@ -623,16 +675,16 @@ const Jobs = () => {
             </Drawer>
 
             <ApproveDialogForProject
-                        open={approveDialogOpen.open}
-                        onClose={handleApproveDialogClose}
-                        onApprove={() => handleApprove(approveDialogOpen.job)}
-                        job={approveDialogOpen.job}
-              />
+                open={approveDialogOpen.open}
+                onClose={handleApproveDialogClose}
+                onApprove={() => handleApprove(approveDialogOpen.job)}
+                job={approveDialogOpen.job}
+            />
 
             <RejectDialogForProject
                 open={rejectDialogOpen.open}
                 onClose={handleRejectDialogClose}
-                onReject={(jonId, comment) => handleReject(jonId,comment, rejectDialogOpen.job)}
+                onReject={(jonId, comment) => handleReject(jonId, comment, rejectDialogOpen.job)}
                 job={rejectDialogOpen.job}
             />
 

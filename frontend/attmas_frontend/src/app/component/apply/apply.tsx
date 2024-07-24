@@ -74,7 +74,9 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
 
   return (
     <Drawer
-      sx={{ '& .MuiDrawer-paper': { width: '50%', borderRadius: 3, pr: 10, mr: -8 } }}
+      sx={{ '& .MuiDrawer-paper': { width: '50%', borderRadius: 3, pr: 10, mr: -8 ,  '@media (max-width: 767px)': {
+        width: '116%',
+    }} }}
       anchor="right"
       open={open}
       onClose={() => setOpen(false)}

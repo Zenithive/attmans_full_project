@@ -403,7 +403,7 @@ const Exhibition = () => {
           flexDirection: 'column',
           width: '100%',
           gap: 1,
-          mt: 2, // Add some margin on top to separate it from the icon
+          mt: 2, 
         },
       }}
     >
@@ -411,9 +411,9 @@ const Exhibition = () => {
         multiple
         size='small'
         sx={{
-          width: "30%",
+          width: "35%",
           position: "relative",
-          right: "37.5%",
+          right: "43.5%",
           '@media (max-width: 767px)': { width: '100%', right: '0' }
         }}
         options={getSubjectItems(subjects)}
@@ -426,9 +426,9 @@ const Exhibition = () => {
       <Autocomplete
         multiple
         sx={{
-          width: "30%",
+          width: "35%",
           position: "relative",
-          right: "104%",
+          right: "122%",
           '@media (max-width: 767px)': { width: '100%', right: '0' }
         }}
         size='small'
