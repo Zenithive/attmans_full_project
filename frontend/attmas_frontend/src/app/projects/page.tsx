@@ -458,13 +458,12 @@ const Jobs = () => {
                                     </a>
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                        <Box sx={{position:'relative',bottom:"30px",left:'24%','@media (max-width: 767px)': {
+                                        <Box sx={{position:'relative',bottom:"24px",left:'66%','@media (max-width: 767px)': {
                                         position:'relative',
                                         top:'65px',
                                         left:'69%'
                                     }}}>
                                     <CustomChip
-                                    sx={{position:'relative',left:'10px'}}
                                             label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                             color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
                                         />
