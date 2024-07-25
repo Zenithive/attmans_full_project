@@ -447,7 +447,7 @@ const Exhibition = () => {
       sx={{
         '@media (max-width: 767px)': {
           position: 'absolute',
-          top:'4.5%',
+          top:'80px',
           right:'25%'
         },
       }}
