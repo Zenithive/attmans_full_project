@@ -16,7 +16,9 @@ import Link from 'next/link';
 
 interface SignUpProps {
   showLinks?: boolean;
-  onSignUpSuccess?: () => void; // Add this prop
+  onSignUpSuccess?: () => void;
+  userType?: string;
+  isAllProfileCompleted?: boolean;
 }
 
 function Copyright(props: any) {
@@ -32,7 +34,7 @@ function Copyright(props: any) {
   );
 }
 
-export const SignUp = ({ showLinks = true, onSignUpSuccess }: SignUpProps) => {
+export const SignUp = ({ showLinks = true, onSignUpSuccess, userType = "non", isAllProfileCompleted = false }: SignUpProps) => {
   const router = useRouter();
   const formik = useFormik({
     initialValues: {
@@ -57,23 +59,21 @@ export const SignUp = ({ showLinks = true, onSignUpSuccess }: SignUpProps) => {
           username: values.email,
           password: values.password,
           mobileNumber: values.mobileNumber,
-          userType: "non",
-          isAllProfileCompleted: false // Add the flag here
+          userType,
+          isAllProfileCompleted
         });
         setStatus({ success: 'Successfully signed up!' });
         
-
         if (onSignUpSuccess) {
-          onSignUpSuccess(); 
+          onSignUpSuccess();
         } else {
-          router.push('/'); 
+          router.push('/');
         }
       } catch (error: any) {
         setStatus({ error: error.response.data.message });
       }
     },
   });
-
 
   return (
     <Container component="main" maxWidth="xs">
@@ -174,7 +174,6 @@ export const SignUp = ({ showLinks = true, onSignUpSuccess }: SignUpProps) => {
                 helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
               />
             </Grid>
-
           </Grid>
           <Button
             type="submit"
