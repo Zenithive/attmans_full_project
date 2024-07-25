@@ -605,7 +605,6 @@ const Jobs = () => {
                         <TextField
                             label="Title"
                             value={viewingJob.title}
-                            InputProps={{ readOnly: true }}
                             fullWidth
                             disabled
                             sx={{ mb: 2 }}
@@ -614,7 +613,6 @@ const Jobs = () => {
                         <TextField
                             label="Description"
                             value={viewingJob.description}
-                            InputProps={{ readOnly: true }}
                             fullWidth
                             disabled
                             sx={{ mb: 2 }}
@@ -623,7 +621,6 @@ const Jobs = () => {
                         <TextField
                             label="Select Service"
                             value={viewingJob.SelectService}
-                            InputProps={{ readOnly: true }}
                             fullWidth
                             disabled
                             sx={{ mb: 2 }}
@@ -634,7 +631,6 @@ const Jobs = () => {
                                 <TextField
                                     label="Details Of Innovation Challenge"
                                     value={viewingJob.DetailsOfInnovationChallenge}
-                                    InputProps={{ readOnly: true }}
                                     fullWidth
                                     disabled
                                     sx={{ mb: 2 }}
@@ -643,7 +639,6 @@ const Jobs = () => {
                                 <TextField
                                     label="Sector"
                                     value={viewingJob.Sector}
-                                    InputProps={{ readOnly: true }}
                                     fullWidth
                                     disabled
                                     sx={{ mb: 2 }}
@@ -652,7 +647,6 @@ const Jobs = () => {
                                 <TextField
                                     label="Area Of Product"
                                     value={viewingJob.AreaOfProduct}
-                                    InputProps={{ readOnly: true }}
                                     fullWidth
                                     disabled
                                     sx={{ mb: 2 }}
