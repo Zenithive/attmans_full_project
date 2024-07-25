@@ -358,6 +358,9 @@ export default function MainNavBar() {
           left: 'auto',
           width: 'calc(100% - 240px)',
           boxShadow: 'none',
+          '@media (max-width: 767px)':{
+            width: '100%',
+          }
         }}
       >
         <Toolbar sx={{ height: 70 }}>

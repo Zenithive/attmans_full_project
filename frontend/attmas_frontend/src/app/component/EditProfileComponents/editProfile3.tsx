@@ -205,7 +205,10 @@ const EditProfile3: React.FC = () => {
         )}
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between',
+        '@media (max-width: 767px)': {
+                       width:'121%',position:'relative',right:'26px'
+                    } }}>
             <Autocomplete
               multiple
               id="categories"
