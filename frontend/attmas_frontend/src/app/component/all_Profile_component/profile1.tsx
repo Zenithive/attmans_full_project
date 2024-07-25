@@ -101,6 +101,11 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
           right: '180px',
           bottom: "60px",
           boxShadow: 5,
+          '@media (max-width: 767px)': {
+            position:'relative',
+            width:'120%',
+            right:'31px',
+          }
           
         }}
       >
@@ -155,18 +160,24 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
               </label>
 
               <ProfileFormFields />
-
               <LoadingButton
                 type="submit"
                 variant="contained"
                 size='small'
                 loading={loading}
                 loadingIndicator={<CircularProgress size={24} />}
-                sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px',
-                 }}
+                sx={{ 
+                  mt: 2,
+                  mb: 2,
+                  ml: { xs: 'auto', md: '90%' }, 
+                  width: { xs: '100%', md: '10%' }, 
+                  height: '40px',
+                  position: { xs: 'relative', md: 'static' }, 
+                }}
               >
                 Save & Next
               </LoadingButton>
+
             </Form>
           )}
         </Formik>
