@@ -6,16 +6,16 @@ export type BoothDocument = Booth & Document;
 @Schema()
 class Product {
   @Prop({ required: true })
-  name: string;
+  productName: string;
 
   @Prop({ required: true })
-  description: string;
+  productDescription: string;
 
   @Prop({ required: true })
   productType: string;
 
   @Prop({ required: true })
-  price: number;
+  productPrice: number;
 
   @Prop({ required: true })
   currency: string;
