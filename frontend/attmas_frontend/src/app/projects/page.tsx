@@ -49,7 +49,6 @@ interface Job {
     IPRownership: string;
     currency: string;
     // Status: string;
-
     status: string;
     rejectComment?: string;
 }
@@ -109,7 +108,7 @@ const Jobs = () => {
     };
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget );
+        setAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
@@ -350,7 +349,7 @@ const Jobs = () => {
                 </Box>
             )}
             <Box sx={{
-                position: 'relative', left: '87%',width:'3%', bottom: '26px', '@media (max-width: 767px)': {
+                position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
                     position: 'relative',
                     top: '8px',
                     left: '-5px',
@@ -423,7 +422,7 @@ const Jobs = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 2,
-                    marginTop:'-15px',
+                    marginTop: '-15px',
                     '@media (max-width: 767px)': {
                         width: '100%',
                         justifyContent: 'space-between',
@@ -462,106 +461,105 @@ const Jobs = () => {
                             <CardContent>
                                 <Typography variant="h5">
 
-                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer'}}>
-                                        {job.title},
+                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
+                                        {job.title}    ,
                                     </a>
                                     <span style={{ fontSize: 'small', color: "#616161" }}>
                                         ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                        <Box sx={{position:'relative',bottom:"24px",width:'fit-content',left:'62%','@media (max-width: 767px)': {
-                                        position:'relative',
-                                        top:'65px',
-                                        left:'69%'
-                                    }}}>
-                                    <CustomChip
-                                            label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                            color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-                                        />
-                                    </Box>
+                                        <Box sx={{
+                                            position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
+                                                position: 'relative',
+                                                top: '65px',
+                                                left: '69%'
+                                            }
+                                        }}>
+                                            <CustomChip
+                                                label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+                                            />
+                                        </Box>
                                     </span>
-                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right",position:'relative',bottom:'47px','@media (max-width: 767px)':{
-                                        position:'relative',top:'40px',right:'100px'
-                                    } }}>
+                                    <Box sx={{
+                                        fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
+                                            position: 'relative', top: '40px', right: '100px'
+                                        }
+                                    }}>
                                         {job.Expertiselevel}
                                     </Box>
 
 
-                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right",bottom:'56px',right:'20px',position:'relative','@media (max-width: 767px)': {position:'relative',bottom:'30px'} }}>
+                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
                                         <Chip
                                             label={job.SelectService}
                                             variant="outlined"
                                             color='secondary'
-                                            sx={{'@media (max-width: 767px)': {position:'relative',bottom:'10px'}}}
+                                            sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
                                         />
                                     </Box>
-                                    </Typography>
-
-                                 <Box sx={{marginTop:'-21px'}}>  
-                                <Typography variant="body2" sx={{ mb: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' ,'@media (max-width: 767px)': {
-                                    position:'relative',top:'45px'
-                                 }}}>
-                                    {job.description}
                                 </Typography>
 
-                                <Typography variant="body2">{job.Budget}</Typography>
-                                <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+                                <Box sx={{ marginTop: '10px' }}>
 
-                                <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => handleApplyClick(job.title)}
-                                        sx={{ '@media (max-width: 767px)': { display: 'none' } }}
-                                    >
-                                        Apply
-                                    </Button>
+                                    <Typography variant="body2">{job.Budget}</Typography>
+                                    <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                    {userDetails.userType === 'Project Owner' && (
-                                        <>
-                                            <Tooltip title="Edit" arrow>
-                                                <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
-                                                    <EditIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Delete" arrow>
-                                                <IconButton onClick={() => handleConfirmDelete(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
-                                                    <DeleteRoundedIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </>
-                                    )}
+                                    <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleApplyClick(job.title)}
+                                            sx={{ '@media (max-width: 767px)': { display: 'none' } }}
+                                        >
+                                            Apply
+                                        </Button>
 
-                                    <IconButton
-                                        aria-controls="simple-menu"
-                                        aria-haspopup="true"
-                                        onClick={handleClick}
-                                        sx={{ display: { xs: 'block', md: 'none' } }}
-                                    >
-                                        <MoreVertIcon />
-                                    </IconButton>
-                                    <Menu
-                                        id="simple-menu"
-                                        anchorEl={anchorEl}
-                                        keepMounted
-                                        open={Boolean(anchorEl)}
-                                        onClose={handleClose}
-                                        PaperProps={{
-                                            sx: {
-                                                border: '1px solid', 
-                                                boxShadow: 'none', 
-                                            },
-                                        }}
-                                    >
-                                        <MenuItem onClick={() => { handleApplyClick(job.title); handleClose(); }}>Apply</MenuItem>
                                         {userDetails.userType === 'Project Owner' && (
                                             <>
-                                                <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>Edit</MenuItem>
-                                                <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>Delete</MenuItem>
+                                                <Tooltip title="Edit" arrow>
+                                                    <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Delete" arrow>
+                                                    <IconButton onClick={() => handleConfirmDelete(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
+                                                        <DeleteRoundedIcon />
+                                                    </IconButton>
+                                                </Tooltip>
                                             </>
                                         )}
-                                    </Menu>
-                                </Box> 
+
+                                        <IconButton
+                                            aria-controls="simple-menu"
+                                            aria-haspopup="true"
+                                            onClick={handleClick}
+                                            sx={{ display: { xs: 'block', md: 'none' } }}
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                        <Menu
+                                            id="simple-menu"
+                                            anchorEl={anchorEl}
+                                            keepMounted
+                                            open={Boolean(anchorEl)}
+                                            onClose={handleClose}
+                                            PaperProps={{
+                                                sx: {
+                                                    border: '1px solid',
+                                                    boxShadow: 'none',
+                                                },
+                                            }}
+                                        >
+                                            <MenuItem onClick={() => { handleApplyClick(job.title); handleClose(); }}>Apply</MenuItem>
+                                            {userDetails.userType === 'Project Owner' && (
+                                                <>
+                                                    <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>Edit</MenuItem>
+                                                    <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>Delete</MenuItem>
+                                                </>
+                                            )}
+                                        </Menu>
+                                    </Box>
                                 </Box>
-        
+
                             </CardContent>
                         </Card>
                     ))}
@@ -601,99 +599,149 @@ const Jobs = () => {
                     <Box p={2}>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
 
+                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right',mb: 2  }} />}
+                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right',mb: 2  }} />}
 
+                        <TextField
+                            label="Title"
+                            value={viewingJob.title}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
-                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right' }} />}
-                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right' }} />}
-                        <Typography variant="h5" sx={{ mb: 1 }}>{viewingJob.title}</Typography>
+                        <TextField
+                            label="Description"
+                            value={viewingJob.description}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Description:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.description}</Typography>
-
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Select Service:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.SelectService}</Typography>
-
-
-
+                        <TextField
+                            label="Select Service"
+                            value={viewingJob.SelectService}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
                         {viewingJob.SelectService === 'Innovative product' && (
                             <>
+                                <TextField
+                                    label="Details Of Innovation Challenge"
+                                    value={viewingJob.DetailsOfInnovationChallenge}
+                                    InputProps={{ readOnly: true }}
+                                    fullWidth
+                                    disabled
+                                    sx={{ mb: 2 }}
+                                />
 
-                                <Typography variant="body2" sx={{ mb: 1 }}><b>Details Of Innovation Challenge:</b></Typography>
-                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.DetailsOfInnovationChallenge}</Typography>
+                                <TextField
+                                    label="Sector"
+                                    value={viewingJob.Sector}
+                                    InputProps={{ readOnly: true }}
+                                    fullWidth
+                                    disabled
+                                    sx={{ mb: 2 }}
+                                />
 
-                                <Typography variant="body2" sx={{ mb: 1 }}><b>Sector:</b></Typography>
-                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Sector}</Typography>
+                                <TextField
+                                    label="Area Of Product"
+                                    value={viewingJob.AreaOfProduct}
+                                    InputProps={{ readOnly: true }}
+                                    fullWidth
+                                    disabled
+                                    sx={{ mb: 2 }}
+                                />
 
-                                <Typography variant="body2" sx={{ mb: 1 }}><b>Area Of Product:</b></Typography>
-                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.AreaOfProduct}</Typography>
-
-                                <Typography variant="body2" sx={{ mb: 1 }}><b>Product Description:</b></Typography>
-                                <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.ProductDescription}</Typography>
-
+                                <TextField
+                                    label="Product Description"
+                                    value={viewingJob.ProductDescription}
+                                    InputProps={{ readOnly: true }}
+                                    fullWidth
+                                    disabled
+                                    sx={{ mb: 2 }}
+                                />
                             </>
                         )}
 
+                        <TextField
+                            label="Expertise Level"
+                            value={viewingJob.Expertiselevel}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
+                        <TextField
+                            label="Budget"
+                            value={`${viewingJob.currency} ${viewingJob.Budget}`}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
+                        <TextField
+                            label="Category"
+                            value={viewingJob.Category.join(', ')}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
+                        <TextField
+                            label="Subcategories"
+                            value={viewingJob.Subcategorys.join(', ')}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Expertise Level:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expertiselevel}</Typography>
+                        <TextField
+                            label="Objective"
+                            value={viewingJob.Objective}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
+                        <TextField
+                            label="Expected Outcomes"
+                            value={viewingJob.Expectedoutcomes}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Budget:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.currency} {viewingJob.Budget}</Typography>
-
-
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Category:</b></Typography>
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-                            {viewingJob.Category.map((category, index) => (
-                                <Chip
-                                    key={index}
-                                    label={category}
-                                    variant="outlined"
-                                    size="small"
-                                    sx={{ fontSize: '0.75rem', height: 'auto', py: 0.5 }}
-                                />
-                            ))}
-                        </Box>
-
-
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Subcategories:</b></Typography>
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-                            {viewingJob.Subcategorys.map((subcategory, index) => (
-                                <Chip
-                                    key={index}
-                                    label={subcategory}
-                                    variant="outlined"
-                                    size="small"
-                                    sx={{ fontSize: '0.75rem', height: 'auto', py: 0.5 }}
-                                />
-                            ))}
-                        </Box>
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Objective:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Objective}</Typography>
-
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>Expected Outcomes:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.Expectedoutcomes}</Typography>
-
-
-                        <Typography variant="body2" sx={{ mb: 1 }}><b>IPR Ownership:</b></Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>{viewingJob.IPRownership}</Typography>
-
+                        <TextField
+                            label="IPR Ownership"
+                            value={viewingJob.IPRownership}
+                            InputProps={{ readOnly: true }}
+                            fullWidth
+                            disabled
+                            sx={{ mb: 2 }}
+                        />
 
                         {viewingJob.rejectComment && (
                             <Box sx={{ borderRadius: '5px', position: 'relative', top: '20px' }}>
-                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'error.main' }}>
-                                    <b>Rejection Comment:</b> {viewingJob.rejectComment}
-                                </Typography>
+                                <TextField
+                                    label="Rejection Comment"
+                                    value={viewingJob.rejectComment}
+                                    InputProps={{ readOnly: true }}
+                                    fullWidth
+                                    disabled
+                                    sx={{ mb: 2, fontStyle: 'italic', color: 'error.main' }}
+                                />
                             </Box>
                         )}
 
@@ -707,13 +755,13 @@ const Jobs = () => {
                                     <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
                                         Reject
                                     </Button>
-
                                 </>
                             )}
                         </Box>
                     </Box>
                 )}
             </Drawer>
+
 
             <ApproveDialogForProject
                 open={approveDialogOpen.open}

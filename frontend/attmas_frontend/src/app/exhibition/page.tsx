@@ -481,7 +481,6 @@ const Exhibition = () => {
                   {exhibition.status}
                 </span>
               </Typography>
-              <Typography variant="body2">{exhibition.description}</Typography>
               <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
               <Typography sx={{ display: "flex", float: "right" }}>
               {userType === "Admin" && (
