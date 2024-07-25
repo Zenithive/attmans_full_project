@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -14,7 +14,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   CircularProgress,
   Grid,
   useMediaQuery,
@@ -24,9 +23,12 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close'; 
+import CloseIcon from '@mui/icons-material/Close';
 import { Formik, Field, FieldArray, Form, FieldProps, FormikErrors } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import { APIS } from '@/app/constants/api.constant';
+import Autocomplete from '@mui/material/Autocomplete';
 
 interface BoothDetailsModalProps {
   open: boolean;
@@ -36,10 +38,10 @@ interface BoothDetailsModalProps {
 }
 
 interface Product {
-  name: string;
-  description: string;
+  productName: string;
+  productDescription: string;
   productType: string;
-  price: string;
+  productPrice: string;
   currency: string;
   videourlForproduct: string;
 }
@@ -48,7 +50,6 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
   const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
   const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
 
-
   return (
     <TextField
       {...field}
@@ -56,8 +57,8 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
       label="Product Price"
       color='secondary'
       type="text"
-      error={Boolean(productTouched && productErrors && productErrors.price)}
-      helperText={(productTouched && productErrors && productErrors.price) || (productTouched && productErrors && productErrors.currency)}
+      error={Boolean(productTouched && productErrors && productErrors.productPrice)}
+      helperText={(productTouched && productErrors && productErrors.productPrice) || (productTouched && productErrors && productErrors.currency)}
       InputProps={{
         startAdornment: (
           <FormControl variant="standard" sx={{ minWidth: 60 }}>
@@ -65,7 +66,7 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
               value={form.values.products[index].currency}
               sx={{
                 '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none'
+                  border: 'none'
                 },
                 '& .MuiSelect-select': {
                   borderBottom: 'none',
@@ -98,15 +99,30 @@ const CustomPriceField = ({ field, form, index }: { field: any; form: any; index
 
 const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, createBooth, exhibitionId }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-
+  const [productDetails, setProductDetails] = useState<Product[]>([]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        const response = await axios.get(`${APIS.PRODUCTNAME}?username=${userDetails.username}`);
+        console.log("response of Products ", response.data);
+        setProductDetails(response.data || []);
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+      }
+    };
+    if (userDetails._id) {
+      fetchProductDetails();
+    }
+  }, [userDetails._id]);
 
   const initialValues = {
     title: '',
     description: '',
     videoUrl: '',
-    products: [{ name: '', description: '', productType: '', price: '', currency: 'INR' ,videourlForproduct:'',}] as Product[],
+    products: [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR', videourlForproduct: '' }] as Product[],
     userId: userDetails._id,
     username: userDetails.username,
     exhibitionId: exhibitionId || '',
@@ -118,10 +134,10 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
     videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
     products: Yup.array().of(
       Yup.object().shape({
-        name: Yup.string().required('Product name is required'),
-        description: Yup.string().required('Product description is required'),
+        productName: Yup.string().required('Product name is required'),
+        productDescription: Yup.string().required('Product description is required'),
         productType: Yup.string().required('Product type is required'),
-        price: Yup.number().required('Product price is required').min(0, 'Price cannot be negative'),
+        productPrice: Yup.number().required('Product price is required').min(0, 'Price cannot be negative'),
         currency: Yup.string().required('Currency is required'),
         videourlForproduct: Yup.string().url('Invalid URL').required('Video URL is required'),
       })
@@ -135,6 +151,17 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
       onClose();
     } catch (error) {
       console.error('Error creating booth:', error);
+    }
+  };
+
+  const handleProductSelect = (index: number, selectedProductName: string, setFieldValue: any) => {
+    const selectedProduct = productDetails.find(product => product.productName === selectedProductName);
+    if (selectedProduct) {
+      setFieldValue(`products.${index}.productDescription`, selectedProduct.productDescription);
+      setFieldValue(`products.${index}.productType`, selectedProduct.productType);
+      setFieldValue(`products.${index}.productPrice`, selectedProduct.productPrice);
+      setFieldValue(`products.${index}.currency`, selectedProduct.currency);
+      setFieldValue(`products.${index}.videourlForproduct`, selectedProduct.videourlForproduct);
     }
   };
 
@@ -159,7 +186,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
           }
         }}
       >
-           <IconButton
+        <IconButton
           aria-label="close"
           onClick={onClose}
           sx={{
@@ -174,7 +201,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
           Booth Details
         </Typography>
         <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-          {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
+          {({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldValue }) => (
             <Form>
               <TextField
                 fullWidth
@@ -214,240 +241,262 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
                 error={Boolean(touched.videoUrl && errors.videoUrl)}
                 helperText={touched.videoUrl && errors.videoUrl}
               />
-
               <Typography variant="h6" component="h2" style={{ marginTop: '20px' }}>
                 Products
               </Typography>
               <FieldArray name="products">
-      {({ push, remove }) => (
-        <>
-          {isMobile ? (
-            <Grid container spacing={2}>
-              {values.products.map((product, index) => (
-                <Grid item xs={12} key={index}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <Field name={`products.${index}.name`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Product Name"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.name)}
-                              helperText={productTouched && productErrors && productErrors.name}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Field name={`products.${index}.description`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Product Description"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.description)}
-                              helperText={productTouched && productErrors && productErrors.description}
-                              multiline
-                            />
-                          );
-                        }}
-                      </Field>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Field name={`products.${index}.productType`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Product Type"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.productType)}
-                              helperText={productTouched && productErrors && productErrors.productType}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Field name={`products.${index}.price`}>
-                        {({ field, form }: FieldProps) => (
-                          <CustomPriceField field={field} form={form} index={index} />
-                        )}
-                      </Field>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Field name={`products.${index}.videourlForproduct`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Video"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.videourlForproduct)}
-                              helperText={productTouched && productErrors && productErrors.videourlForproduct}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <IconButton onClick={() => remove(index)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              ))}
-              <Grid item xs={12}>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={() => push({ name: '', description: '', productType: '', price: 0, currency: 'USD' })}
-                  startIcon={<AddIcon />}
-                >
-                  Add Product
+                {({ push, remove }) => (
+                  <>
+                    {isMobile ? (
+                      <Grid container spacing={2}>
+                        {values.products.map((product, index) => (
+                          <Grid item xs={12} key={index}>
+                            <Grid container spacing={2}>
+                              <Grid item xs={12}>
+                                <Field name={`products.${index}.productName`}>
+                                  {({ field }: FieldProps) => {
+                                    const productErrors = (errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                                    const productTouched = (touched.products as boolean[] | undefined)?.[index];
+                                    return (
+                                      <Autocomplete
+                                        options={productDetails.map(product => product.productName)}
+                                        getOptionLabel={(option) => option}
+                                    
+                                        onChange={(event, value) => {
+                                          if (value !== null) {
+                                            handleProductSelect(index, value, setFieldValue);
+                                          }
+                                        }}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            {...field}
+                                            label="Product Name"
+                                            color='secondary'
+                                            error={Boolean(productTouched && productErrors && productErrors.productName)}
+                                            helperText={productTouched && productErrors && productErrors.productName}
+                                          />
+                                        )}
+                                      />
+                                    );
+                                  }}
+                                </Field>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  fullWidth
+                                  label="Product Description"
+                                  name={`products.${index}.productDescription`}
+                                  color='secondary'
+                                  value={values.products[index].productDescription}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  margin="normal"
+                                  error={Boolean(
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription
+                                  )}
+                                  helperText={
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription
+                                  }
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  fullWidth
+                                  label="Product Type"
+                                  name={`products.${index}.productType`}
+                                  color='secondary'
+                                  value={values.products[index].productType}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  margin="normal"
+                                  error={Boolean(
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productType &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productType
+                                  )}
+                                  helperText={
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productType &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productType
+                                  }
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Field name={`products.${index}.productPrice`}>
+                                  {({ field, form }: FieldProps) => (
+                                    <CustomPriceField field={field} form={form} index={index} />
+                                  )}
+                                </Field>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  fullWidth
+                                  label="Video URL for Product"
+                                  name={`products.${index}.videourlForproduct`}
+                                  color='secondary'
+                                  value={values.products[index].videourlForproduct}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  margin="normal"
+                                  error={Boolean(
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct
+                                  )}
+                                  helperText={
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct
+                                  }
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <IconButton onClick={() => remove(index)} disabled={isSubmitting}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    ) : (
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Product Name</TableCell>
+                            <TableCell>Product Description</TableCell>
+                            <TableCell>Product Type</TableCell>
+                            <TableCell>Product Price</TableCell>
+                            <TableCell>Video URL</TableCell>
+                            <TableCell>Action</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {values.products.map((product, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <Field name={`products.${index}.productName`}>
+                                  {({ field }: FieldProps) => {
+                                    const productErrors = (errors.products as FormikErrors<Product>[] | undefined)?.[index];
+                                    const productTouched = (touched.products as boolean[] | undefined)?.[index];
+                                    return (
+                                      <Autocomplete
+                                        options={productDetails.map(product => product.productName)}
+                                        getOptionLabel={(option) => option}
+                                        onChange={(event, value) => {
+                                          if (value !== null) {
+                                            handleProductSelect(index, value, setFieldValue);
+                                          }
+                                        }}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            {...field}
+                                            label="Product Name"
+                                            color='secondary'
+                                            error={Boolean(productTouched && productErrors && productErrors.productName)}
+                                            helperText={productTouched && productErrors && productErrors.productName}
+                                          />
+                                        )}
+                                      />
+                                    );
+                                  }}
+                                </Field>
+                              </TableCell>
+                              <TableCell>
+                                <TextField
+                                  fullWidth
+                                  label="Product Description"
+                                  name={`products.${index}.productDescription`}
+                                  color='secondary'
+                                  value={values.products[index].productDescription}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  margin="normal"
+                                  error={Boolean(
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription
+                                  )}
+                                  helperText={
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productDescription
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <TextField
+                                  fullWidth
+                                  label="Product Type"
+                                  name={`products.${index}.productType`}
+                                  color='secondary'
+                                  value={values.products[index].productType}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  margin="normal"
+                                  error={Boolean(
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productType &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productType
+                                  )}
+                                  helperText={
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.productType &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.productType
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Field name={`products.${index}.productPrice`}>
+                                  {({ field, form }: FieldProps) => (
+                                    <CustomPriceField field={field} form={form} index={index} />
+                                  )}
+                                </Field>
+                              </TableCell>
+                              <TableCell>
+                                <TextField
+                                  fullWidth
+                                  label="Video URL for Product"
+                                  name={`products.${index}.videourlForproduct`}
+                                  color='secondary'
+                                  value={values.products[index].videourlForproduct}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  margin="normal"
+                                  error={Boolean(
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct
+                                  )}
+                                  helperText={
+                                    (touched.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct &&
+                                    (errors.products as FormikErrors<Product>[] | undefined)?.[index]?.videourlForproduct
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <IconButton onClick={() => remove(index)} disabled={isSubmitting}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    )}
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={() => push({ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR', videourlForproduct: '' })}
+                      >
+                        Add Product
+                      </Button>
+                    </Box>
+                  </>
+                )}
+              </FieldArray>
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+                  {isSubmitting ? <CircularProgress size={24} /> : 'Submit'}
                 </Button>
-              </Grid>
-            </Grid>
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Product Type</TableCell>
-                  <TableCell>Price & Currency</TableCell>
-                  <TableCell>Video</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {values.products.map((product, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Field name={`products.${index}.name`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Product Name"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.name)}
-                              helperText={productTouched && productErrors && productErrors.name}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </TableCell>
-                    <TableCell>
-                      <Field name={`products.${index}.description`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Product Description"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.description)}
-                              helperText={productTouched && productErrors && productErrors.description}
-                              multiline
-                            />
-                          );
-                        }}
-                      </Field>
-                    </TableCell>
-                    <TableCell>
-                      <Field name={`products.${index}.productType`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Product Type"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.productType)}
-                              helperText={productTouched && productErrors && productErrors.productType}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </TableCell>
-                    <TableCell>
-                      <Field name={`products.${index}.price`}>
-                        {({ field, form }: FieldProps) => (
-                          <CustomPriceField field={field} form={form} index={index} />
-                        )}
-                      </Field>
-                    </TableCell>
-                    <TableCell>
-                      <Field name={`products.${index}.videourlForproduct`}>
-                        {({ field, form }: FieldProps) => {
-                          const productErrors = (form.errors.products as FormikErrors<Product>[] | undefined)?.[index];
-                          const productTouched = (form.touched.products as boolean[] | undefined)?.[index];
-                          return (
-                            <TextField
-                              {...field}
-                              fullWidth
-                              label="Video"
-                              color="secondary"
-                              error={Boolean(productTouched && productErrors && productErrors.videourlForproduct)}
-                              helperText={productTouched && productErrors && productErrors.videourlForproduct}
-                            />
-                          );
-                        }}
-                      </Field>
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => remove(index)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <Button
-                      type="button"
-                      variant="outlined"
-                      onClick={() => push({ name: '', description: '', productType: '', price: 0, currency: 'USD' })}
-                      startIcon={<AddIcon />}
-                    >
-                      Add Product
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          )}
-        </>
-      )}
-    </FieldArray>
-              <Button variant="contained" color="primary" type="submit" style={{ marginTop: '20px' }} disabled={isSubmitting}>
-                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
-              </Button>
+              </Box>
             </Form>
           )}
         </Formik>
@@ -457,3 +506,4 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
 };
 
 export default BoothDetailsModal;
+  

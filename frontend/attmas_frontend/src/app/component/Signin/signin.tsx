@@ -3,8 +3,6 @@ import React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -22,7 +20,9 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
 
 interface SignInProps {
-  toggleForm: CallableFunction;
+  toggleForm?: CallableFunction;
+  showLinks?: boolean;
+  onSignInSuccess?: () => void;
 }
 
 function Copyright(props: any) {
@@ -37,12 +37,9 @@ function Copyright(props: any) {
     </Typography>
   );
 }
-
-export const SignIn = ({ toggleForm }: SignInProps) => {
+export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess }: SignInProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
-  // const dispatch = useAppDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -56,9 +53,6 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
-        console.log("response.data.access_token", response.data.access_token);
-        console.log("response", response.data.user);
-
         const res = response.data.user;
         const user = {
           token: response.data.access_token,
@@ -66,21 +60,24 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
           firstName: res.firstName,
           lastName: res.lastName,
           mobileNumber: res.mobileNumber,
-          userType:res.userType,
+          userType: res.userType,
           _id: res._id,
         };
-        console.log("user", user)
 
         dispatch(addUser(user))
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-        if (response.data.user.isAllProfileCompleted ||
-          ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
-          router.push("/dashboard");
+
+
+        if (onSignInSuccess) {
+          onSignInSuccess();
         }
-        else {
+        else if (response.data.user.isAllProfileCompleted || ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
+          router.push("/dashboard");
+        } else {
           router.push("/profile");
         }
+        // Call the success handler
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }
@@ -134,11 +131,6 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
           />
-          {/* <FormControlLabel
-            control={<Checkbox value="remember" />}
-            color='secondary'
-            label="Remember me"
-          /> */}
           <Button
             type="submit"
             fullWidth
@@ -156,22 +148,23 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
               {formik.status.success}
             </Typography>
           )}
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" color='secondary'>
-                Forgot password?
-              </Link>
+          {showLinks && (
+            <Grid container>
+              <Grid item xs>
+                <Link href="#" color='secondary'>
+                  Forgot password?
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link href="/signup" color='secondary'>
+                  {"Don't have an account? Sign Up"}
+                </Link>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Link href="/signup" color='secondary'>
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
+          )}
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
     </Container>
   );
 }
-

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PersonalProfile } from './schemas/personalProfile.schema';
-import { WorkExprience } from './schemas/work.exprience.schema';
+import { ProductInfo, WorkExprience } from './schemas/work.exprience.schema';
 import { Categories } from './schemas/category.schema';
 import { UsersService } from 'src/users/users.service';
 
@@ -124,6 +124,29 @@ export class ProfileService {
   async getProfileByUsername2(username: string): Promise<WorkExprience | null> {
     return this.workExprience.findOne({ username }).exec();
   }
+
+  // async getProductNameByUsername(username: string): Promise<WorkExprience | null> {
+  //   const product = this.workExprience.findOne({ username }).exec();
+  //   console.log("products", product)
+  //   return product;
+  // }
+
+  async getProductNameByUsername(username: string): Promise<ProductInfo[] | null> {
+    try {
+      // Find the document and project only the `products` field
+      const workExperience = await this.workExprience
+        .findOne({ username })
+        .select('products') // Only select the `products` field
+        .exec();
+  
+      // If the work experience document is found, return the `products` field
+      return workExperience ? workExperience.products : null;
+    } catch (error) {
+      console.error('Error fetching products by username:', error);
+      return null;
+    }
+  }
+  
 
   async getProfileByUsername3(username: string): Promise<Categories | null> {
     return this.categories.findOne({ username }).exec();

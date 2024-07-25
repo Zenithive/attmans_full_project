@@ -32,7 +32,7 @@ interface Jobs {
     _id?: string;
     title: string;
     description: string;
-    username:string;
+    username: string;
     Budget: number;
     Expertiselevel: string;
     TimeFrame: string | null;
@@ -93,7 +93,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         DetailsOfInnovationChallenge: '',
         Sector: '',
         AreaOfProduct: '',
-        username:userDetails.username,
+        username: userDetails.username,
         ProductDescription: '',
         currency: 'INR',
 
@@ -150,8 +150,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 //onAddJobs(response.data);
                 pubsub.publish('JobCreated', { message: 'A new Job Created' });
                 pubsub.publish('toast', { message: 'Create Project successfully!', severity: 'success' });
-
-            }
+ 
+            } 
             resetForm();
             toggleDrawer(false);
             onCancelEdit && onCancelEdit();
@@ -179,6 +179,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 <Formik
                     initialValues={editingJobs ? {
                         title: editingJobs.title || '',
+                     
                         description: editingJobs.description || '',
                         SelectService: editingJobs.SelectService || '',
                         Expertiselevel: editingJobs.Expertiselevel || '',
@@ -349,136 +350,139 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <FormControl variant="standard">
-                                                        <Select
-                                                            value={currency}
-                                                            onChange={(e) => setCurrency(e.target.value as string)}
-                                                        >
-                                                            <MenuItem value="INR">INR</MenuItem>
-                                                            <MenuItem value="USD">USD</MenuItem>
-                                                        </Select>
+                                                <FormControl variant="standard">
+                                                    <Select
+                                                        value={currency}
+                                                        onChange={(e) => {
+                                                            setCurrency(e.target.value as string);
+                                                            setFieldValue('currency', e.target.value as string); // Update Formik value
+                                                        }}
+                                                    >
+                                                        <MenuItem value="INR">INR</MenuItem>
+                                                        <MenuItem value="USD">USD</MenuItem>
+                                                    </Select>
 
-                                                    </FormControl>
+                                                </FormControl>
                                                 </InputAdornment>
-                                            ),
+                                ),
                                         }}
                                     />
-                                </Box>
-
-
-                                <Autocomplete
-                                    multiple
-                                    options={Category()}
-                                    value={values.categoryforCategory}
-
-                                    onChange={(event, value) => setFieldValue('categoryforCategory', value)}
-                                    renderTags={(value, getTagProps) => (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {value.map((option: string, index) => (
-                                                <Chip
-                                                    label={option}
-                                                    color='secondary'
-                                                    {...getTagProps({ index })}
-                                                    key={option}
-                                                    onDelete={() => setFieldValue('categoryforCategory', values.categoryforCategory.filter((ind: string) => ind !== option))}
-                                                />
-                                            ))}
-                                        </Box>
-                                    )}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            variant="outlined"
-                                            label="Preferred Category"
-                                            color='secondary'
-                                            placeholder="Select Category"
-                                            error={!!(errors.categoryforCategory && touched.categoryforCategory)}
-                                            helperText={
-                                                typeof errors.categoryforCategory === 'string' && touched.categoryforCategory
-                                                    ? errors.categoryforCategory
-                                                    : undefined
-                                            }
-
-                                        />
-                                    )}
-                                />
-
-
-
-                                <SubjectMatterExpertise
-                                    selectedValues={values.Subcategory}
-                                    setSelectedValues={(val) => setFieldValue('Subcategory', val)}
-                                    options={options} // Pass the options array here
-                                    Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
-                                        throw new Error('Function not implemented.');
-                                    }} />
-
-                                <TextField
-                                    label="Objective"
-                                    name="Objective"
-                                    color='secondary'
-                                    variant="outlined"
-                                    value={values.Objective}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    multiline
-                                    fullWidth
-                                    error={!!(errors.Objective && touched.Objective)}
-                                    helperText={<ErrorMessage name="Objective" />}
-                                />
-                                <TextField
-                                    label="Expected out comes"
-                                    name="Expectedoutcomes"
-                                    color='secondary'
-                                    variant="outlined"
-                                    value={values.Expectedoutcomes}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    rows={4}
-                                    multiline
-                                    fullWidth
-                                    error={!!(errors.Expectedoutcomes && touched.Expectedoutcomes)}
-                                    helperText={<ErrorMessage name="Expectedoutcomes" />}
-                                />
-                                <TextField
-                                    label="IPR ownership"
-                                    name="IPRownership"
-                                    color='secondary'
-                                    variant="outlined"
-                                    value={values.IPRownership}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    multiline
-                                    fullWidth
-                                    error={!!(errors.IPRownership && touched.IPRownership)}
-                                    helperText={<ErrorMessage name="IPRownership" />}
-                                />
-
-
-
-
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DateTimePicker
-                                        label="Time Frame"
-                                        // color='secondary'
-                                        value={values.TimeFrame}
-                                        onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
-                                        slotProps={{
-                                            textField: {
-                                                color: 'secondary'
-                                            },
-                                        }}
-                                    />
-                                </LocalizationProvider>
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                                    <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
-                                    <Button variant="contained" type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
-                                </Box>
                             </Box>
+
+
+                            <Autocomplete
+                                multiple
+                                options={Category()}
+                                value={values.categoryforCategory}
+
+                                onChange={(event, value) => setFieldValue('categoryforCategory', value)}
+                                renderTags={(value, getTagProps) => (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {value.map((option: string, index) => (
+                                            <Chip
+                                                label={option}
+                                                color='secondary'
+                                                {...getTagProps({ index })}
+                                                key={option}
+                                                onDelete={() => setFieldValue('categoryforCategory', values.categoryforCategory.filter((ind: string) => ind !== option))}
+                                            />
+                                        ))}
+                                    </Box>
+                                )}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="outlined"
+                                        label="Preferred Category"
+                                        color='secondary'
+                                        placeholder="Select Category"
+                                        error={!!(errors.categoryforCategory && touched.categoryforCategory)}
+                                        helperText={
+                                            typeof errors.categoryforCategory === 'string' && touched.categoryforCategory
+                                                ? errors.categoryforCategory
+                                                : undefined
+                                        }
+
+                                    />
+                                )}
+                            />
+
+
+
+                            <SubjectMatterExpertise
+                                selectedValues={values.Subcategory}
+                                setSelectedValues={(val) => setFieldValue('Subcategory', val)}
+                                options={options} // Pass the options array here
+                                Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
+                                    throw new Error('Function not implemented.');
+                                }} />
+
+                            <TextField
+                                label="Objective"
+                                name="Objective"
+                                color='secondary'
+                                variant="outlined"
+                                value={values.Objective}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                multiline
+                                fullWidth
+                                error={!!(errors.Objective && touched.Objective)}
+                                helperText={<ErrorMessage name="Objective" />}
+                            />
+                            <TextField
+                                label="Expected out comes"
+                                name="Expectedoutcomes"
+                                color='secondary'
+                                variant="outlined"
+                                value={values.Expectedoutcomes}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                rows={4}
+                                multiline
+                                fullWidth
+                                error={!!(errors.Expectedoutcomes && touched.Expectedoutcomes)}
+                                helperText={<ErrorMessage name="Expectedoutcomes" />}
+                            />
+                            <TextField
+                                label="IPR ownership"
+                                name="IPRownership"
+                                color='secondary'
+                                variant="outlined"
+                                value={values.IPRownership}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                multiline
+                                fullWidth
+                                error={!!(errors.IPRownership && touched.IPRownership)}
+                                helperText={<ErrorMessage name="IPRownership" />}
+                            />
+
+
+
+
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                    label="Time Frame"
+                                    // color='secondary'
+                                    value={values.TimeFrame}
+                                    onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
+                                    slotProps={{
+                                        textField: {
+                                            color: 'secondary'
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                                <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+                                <Button variant="contained" type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
+                            </Box>
+                        </Box>
                         </Form>
                     )}
-                </Formik>
-            </Drawer>
+            </Formik>
+        </Drawer >
         </>
     );
 };
