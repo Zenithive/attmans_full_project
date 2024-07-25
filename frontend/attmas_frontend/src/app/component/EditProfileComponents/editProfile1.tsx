@@ -95,11 +95,7 @@ const EditProfile1: React.FC = () => {
   };
 
   return (
-    <Container component="main" maxWidth="md" sx={{ '@media (max-width: 767px)': {
-      width: '74%',
-      position:'relative',
-      left:'34%'
-    }}}>
+    <Container component="main" maxWidth="md">
       <CssBaseline />
       <Box
         sx={{
@@ -112,6 +108,11 @@ const EditProfile1: React.FC = () => {
           right: '180px',
           bottom: "60px",
           boxShadow: 5,
+           '@media (max-width: 767px)': {
+            width: '100%',
+            position:'relative',
+            left:'10%'
+          }
         }}
       >
         <Typography component="h1" variant="h5" align="center">
