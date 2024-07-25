@@ -171,7 +171,11 @@ const EditProfile3: React.FC = () => {
   const filteredOptions = filterOptions(options, searchTerm);
 
   return (
-    <Container component="main" maxWidth="md">
+    <Container component="main" maxWidth="md" sx={{ '@media (max-width: 767px)': {
+      width: '74%',
+      position:'relative',
+      left:'34%'
+    }}}>
       <CssBaseline />
       <Box
         sx={{
@@ -234,7 +238,7 @@ const EditProfile3: React.FC = () => {
               style={{ width: '45%' }}
             />
             <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '50%' }}>
-              <button type="button" onClick={handleToggleDropdown} style={{ minHeight: '57.5px' }}>
+              <button type="button" onClick={handleToggleDropdown} style={{ minHeight: '57.5px'}}>
                 {selectedValues.length > 0 ? (
                   selectedValues.map(value => (
                     <Chip
@@ -332,6 +336,9 @@ const EditProfile3: React.FC = () => {
     button {
       margin-right: 10px;
       width: 514px; /* Decrease width */
+        @media (max-width: 767px){
+        width: 220px;
+      };
       border-radius: 20px;
       background-color: white;
       min-height: 57px; /* Increase height */

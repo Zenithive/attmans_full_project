@@ -96,11 +96,12 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
           padding: 4,
           border: '1px solid #ccc',
           borderRadius: 2,
-          width: '142.5%', // Increase the width of the box
+          width: '142.5%', // 
           position: 'relative',
           right: '180px',
           bottom: "60px",
           boxShadow: 5,
+          
         }}
       >
         <Typography component="h1" variant="h5" align="center">
@@ -161,7 +162,8 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                 size='small'
                 loading={loading}
                 loadingIndicator={<CircularProgress size={24} />}
-                sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
+                sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px',
+                 }}
               >
                 Save & Next
               </LoadingButton>

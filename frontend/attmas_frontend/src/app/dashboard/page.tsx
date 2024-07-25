@@ -41,7 +41,10 @@ const DashBoard: React.FC = () => {
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
     return (
-        <Box p={3}>
+        <Box p={3} sx={{'@media (max-width: 767px)': {
+                    position: 'relative',
+                    left: '25px',
+                },}}>
             
 
             <Paper elevation={3} sx={{ p: 2, mt: 2 }}>

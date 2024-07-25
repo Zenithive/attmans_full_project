@@ -155,7 +155,11 @@ const EditProfile2: React.FC = () => {
     };
 
     return (
-        <Container component="main" maxWidth="md">
+        <Container component="main" maxWidth="md" sx={{ '@media (max-width: 767px)': {
+            width: '74%',
+            position:'relative',
+            left:'34%'
+          }}}>
             <CssBaseline />
             <Box
                 sx={{
