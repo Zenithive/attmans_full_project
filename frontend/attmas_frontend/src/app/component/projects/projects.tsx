@@ -42,6 +42,7 @@ interface Jobs {
     Objective: string;
     Expectedoutcomes: string;
     IPRownership: string;
+    currency:string;
 }
 
 interface AddJobsProps {
@@ -65,7 +66,8 @@ const validationSchema = Yup.object().shape({
     Budget: Yup.number().required("Budget is required"),
     TimeFrame: Yup.date().nullable('Date & Time is required'),
     categoryforCategory: Yup.array().of(Yup.string()),
-    Subcategory: Yup.array().of(Yup.string())
+    Subcategory: Yup.array().of(Yup.string()),
+    currency: Yup.string().required('Currency is required')
 });
 
 export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
@@ -93,6 +95,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         AreaOfProduct: '',
         username:userDetails.username,
         ProductDescription: '',
+        currency: 'INR',
 
     }), []);
 
@@ -114,7 +117,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             }))
         ), []);
     
-    const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string;}, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; AreaOfProduct: string; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; currency: string;}, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,
             description: values.description,
@@ -132,7 +135,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             Expectedoutcomes: values.Expectedoutcomes,
             IPRownership: values.IPRownership,
             userId: userDetails._id,
-            username:userDetails.username
+            username:userDetails.username,
+            currency: values.currency,
         };
 
         try {
@@ -189,6 +193,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                         Expectedoutcomes: editingJobs.Expectedoutcomes || '',
                         Objective: editingJobs.Objective || '',
                         IPRownership: editingJobs.IPRownership || '',
+                        currency: editingJobs.currency || '',
                     } : initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
