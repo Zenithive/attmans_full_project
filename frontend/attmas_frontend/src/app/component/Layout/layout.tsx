@@ -27,11 +27,12 @@ const Layout: React.FC<LayoutProps> = ({ children, displayMainSideBar }) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: {
-            sm: !isHomeOrSignup && displayMainSideBar
-              ? `calc(100% - ${drawerWidth}px)`
-              : '100%',
-          }, // Adjust width when sidebar is hidden
+          // width: {
+          //   sm: !isHomeOrSignup && displayMainSideBar
+          //     ? `calc(100% - ${drawerWidth}px)`
+          //     : '100%',
+          // }, // Adjust width when sidebar is hidden
+          width:'100%'
         }}
       >
         <Toolbar />

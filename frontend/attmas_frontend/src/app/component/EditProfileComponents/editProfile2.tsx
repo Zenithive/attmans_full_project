@@ -168,6 +168,11 @@ const EditProfile2: React.FC = () => {
                     right: '180px',
                     bottom: "60px",
                     boxShadow: 5,
+                    '@media (max-width: 767px)': {
+                        width: '105%',
+                        position:'relative',
+                        left:'7%'
+                      }
                 }}
             >
                 <Typography component="h1" variant="h5" align="center">
@@ -178,13 +183,15 @@ const EditProfile2: React.FC = () => {
                 </Typography>
 
                 <FormikProvider value={formik}>
-                    <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-                        <Grid container spacing={2}>
+                    <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1}}>
+                        <Grid container spacing={2} sx={{'@media (max-width: 767px)': {
+                       width:'126%',position:'relative',right:'26px'
+                    }}}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     select
-                                    style={{ background: "white", borderRadius: "25px" }}
+                                    style={{ background: "white", borderRadius: "25px"}}
                                     id="qualification"
                                     label="Qualification"
                                     color='secondary'

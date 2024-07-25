@@ -108,6 +108,11 @@ const EditProfile1: React.FC = () => {
           right: '180px',
           bottom: "60px",
           boxShadow: 5,
+           '@media (max-width: 767px)': {
+            width: '105%',
+            position:'relative',
+            left:'7%'
+          }
         }}
       >
         <Typography component="h1" variant="h5" align="center">

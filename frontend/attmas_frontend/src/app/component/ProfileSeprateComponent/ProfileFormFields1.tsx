@@ -11,7 +11,9 @@ const ProfileFormFields: React.FC = () => {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{'@media (max-width: 767px)': {
+                       width:'122%',position:'relative',right:'22px'
+                    }}}>
       <Grid item xs={12}>
         <TextField
           fullWidth
