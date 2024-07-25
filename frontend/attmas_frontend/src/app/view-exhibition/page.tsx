@@ -262,7 +262,7 @@ const ExhibitionsPage: React.FC = () => {
           }}>
 
 
-            {/* {userType === 'Innovators' && isParticipateButtonVisible && ( */}
+            {(userDetails && userType === 'Innovators'  && isParticipateButtonVisible)&& (
               <Button
                 variant="contained"
                 color="primary"
@@ -275,7 +275,7 @@ const ExhibitionsPage: React.FC = () => {
               >
                 Participate
               </Button>
-            {/* )}  */}
+            )} 
 
             {/* // ***** Intrested Button ***** // */}
 
