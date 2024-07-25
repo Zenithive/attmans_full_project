@@ -71,7 +71,7 @@ const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibi
                 {showSignIn ? (
                     <SignIn showLinks={false} onSignInSuccess={handleSignInSuccess} />
                 ) : (
-                    <SignUp showLinks={false} onSignUpSuccess={handleSignUpSuccess} />
+                    <SignUp showLinks={false} onSignUpSuccess={handleSignUpSuccess} userType="Visitors" isAllProfileCompleted={true} />
                 )}
                 <Box
                     sx={{
