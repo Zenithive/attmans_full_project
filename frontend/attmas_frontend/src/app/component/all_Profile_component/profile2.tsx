@@ -172,6 +172,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                     right: '180px',
                     bottom: "60px",
                     boxShadow: 5,
+                    '@media (max-width: 767px)': {
+                        position:'relative',
+                        width:'120%',
+                        right:'31px',
+                      }
                 }}
             >
                 <Typography component="h1" variant="h5" align="center">
@@ -482,7 +487,10 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             type="button"
                             variant="contained"
                             size="small"
-                            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
+                            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' , '@media (max-width: 767px)':{
+                                position:'relative',
+                                top:'2px'
+                            }}}
                             onClick={onPrevious}
                         >
                             Back
@@ -494,7 +502,15 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             size="small"
                             loading={loading}
                             loadingIndicator={<CircularProgress size={24} />}
-                            sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
+                            sx={{ 
+                                mt: 2,
+                                mb: 2,
+                                ml: { xs: 'auto', md: '90%' }, 
+                                width: { xs: '40%', md: '10%' }, 
+                                height: '40px',
+                                position: { xs: 'relative', md: 'static' }, 
+                                left:'40%'
+                              }}
                         >
                             Save & Next
                         </LoadingButton>
