@@ -497,20 +497,12 @@ const Exhibition = () => {
                       </Tooltip>
                     </IconButton>
                   )}
-                <IconButton onClick={() => handleSendInnovators(exhibition)}>
-                <Tooltip title="innovators">
-                  <SendIcon />
-                  </Tooltip>
-                </IconButton>
               </Typography>
             </CardContent>
           </Card>
         ))}
       </Box>
       </InfiniteScroll>
-      {sendingExhibition && (
-        <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
-      )}
       <DeleteConfirmationDialog
       open={confirmDelete.open}
       onCancel={handleCancelDelete}
