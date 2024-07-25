@@ -185,9 +185,9 @@ const EditProfile3: React.FC = () => {
           bottom: "60px",
           boxShadow: 5,
           '@media (max-width: 767px)': {
-            width: '100%',
+            width: '105%',
             position: 'relative',
-            left: '10%'
+            left: '7%'
           }
         }}
       >
