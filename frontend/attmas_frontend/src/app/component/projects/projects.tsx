@@ -150,8 +150,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 //onAddJobs(response.data);
                 pubsub.publish('JobCreated', { message: 'A new Job Created' });
                 pubsub.publish('toast', { message: 'Create Project successfully!', severity: 'success' });
-
-            }
+ 
+            } 
             resetForm();
             toggleDrawer(false);
             onCancelEdit && onCancelEdit();
