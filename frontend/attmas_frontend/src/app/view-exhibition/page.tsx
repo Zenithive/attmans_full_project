@@ -59,6 +59,7 @@ const ExhibitionsPage: React.FC = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; booth: Booth | null }>({ open: false, booth: null });
   const [isParticipateButtonVisible, setParticipateButtonVisible] = useState(true);
   const [hasUserBooth, setHasUserBooth] = useState(false);
+  const [view, setView] = useState('boothDetails');
 
 
   useEffect(() => {
@@ -238,6 +239,10 @@ const ExhibitionsPage: React.FC = () => {
     }
   };
 
+  const handleViewChange = (event: React.MouseEvent<HTMLElement>, newView: string) => {
+    setView(newView);
+  };
+
   return (
     <>
       <Head>
@@ -338,7 +343,10 @@ const ExhibitionsPage: React.FC = () => {
           ))}
         </div>
 
+
         <Divider orientation="horizontal" flexItem />
+
+      {view === 'boothDetails' && (
         <div>
           <Box sx={{
             width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px', '@media (max-width: 767px)': {
@@ -376,6 +384,17 @@ const ExhibitionsPage: React.FC = () => {
               </ToggleButtonGroup>
             )}
           </Box>
+        <Box display="flex" justifyContent="center" marginTop="20px">
+        <ToggleButtonGroup
+          value={view}
+          exclusive
+          onChange={handleViewChange}
+          aria-label="view selection"
+        >
+          <ToggleButton value="boothDetails">Booth Details</ToggleButton>
+          <ToggleButton value="visitors">Visitors</ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
           <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
             {booths
               .filter(booth => booth.exhibitionId === exhibitionId)
@@ -497,7 +516,6 @@ const ExhibitionsPage: React.FC = () => {
               <Typography variant="h6" style={{ marginTop: '20px' }}>No booths to display</Typography>
             )}
           </Box>
-
           <ApproveDialog
             open={approveDialogOpen.open}
             onClose={() => setApproveDialogOpen({ open: false, booth: null })}
@@ -523,6 +541,7 @@ const ExhibitionsPage: React.FC = () => {
             />
           )}
         </div>
+            )}
       </Box>
     </>
   );
