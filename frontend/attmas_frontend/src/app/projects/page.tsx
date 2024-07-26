@@ -674,13 +674,13 @@ const Jobs = () => {
 
                         <TextField
                             label="Budget"
-                            value={`${viewingJob.currency} ${viewingJob.Budget}`}
+                            value={`${viewingJob.currency === 'USD' ? '$' : '₹'} ${viewingJob.Budget}`}
                             InputProps={{ readOnly: true }}
                             fullWidth
                             disabled
                             sx={{ mb: 2 }}
                         />
-
+                        
                         <TextField
                             label="Category"
                             value={viewingJob.Category.join(', ')}

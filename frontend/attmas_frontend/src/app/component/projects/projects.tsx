@@ -179,7 +179,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                 <Formik
                     initialValues={editingJobs ? {
                         title: editingJobs.title || '',
-                     
                         description: editingJobs.description || '',
                         SelectService: editingJobs.SelectService || '',
                         Expertiselevel: editingJobs.Expertiselevel || '',
@@ -354,16 +353,16 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                                     <Select
                                                         value={currency}
                                                         onChange={(e) => {
-                                                            setCurrency(e.target.value as string);
-                                                            setFieldValue('currency', e.target.value as string); // Update Formik value
+                                                            const selectedCurrency = e.target.value as string;
+                                                            setCurrency(selectedCurrency);
+                                                            setFieldValue('currency', selectedCurrency); 
                                                         }}
                                                     >
                                                         <MenuItem value="INR">INR</MenuItem>
                                                         <MenuItem value="USD">USD</MenuItem>
                                                     </Select>
-
                                                 </FormControl>
-                                                </InputAdornment>
+                                            </InputAdornment>
                                 ),
                                         }}
                                     />

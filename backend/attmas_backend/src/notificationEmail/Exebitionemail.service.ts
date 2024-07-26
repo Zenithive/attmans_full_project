@@ -106,7 +106,7 @@ export class EmailService2 {
         sentAt: new Date(),
         title,
         first,
-        last
+        last,
       });
       await email.save();
     } catch (error) {

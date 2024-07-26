@@ -27,6 +27,14 @@ interface Exhibition {
   serverDate: string;
 }
 
+interface Visitor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+}
+
+
 interface Booth {
   _id: string;
   title: string;
@@ -47,6 +55,7 @@ interface Booth {
 const ExhibitionsPage: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [booths, setBooths] = useState<Booth[]>([]);
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [showInterestedModal, setShowInterestedModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -99,12 +108,31 @@ const ExhibitionsPage: React.FC = () => {
     };
 
 
-
-
+    const fetchVisitors = async () => {
+      try {
+        const exhibitionId = searchParams.get('exhibitionId');
+        if (!exhibitionId) {
+          console.error('id not found');
+          return;
+        }
+        const response = await axios.get(`${APIS.GET_VISITORS}`, {
+          params: {
+            exhibitionId,
+          },
+        });
+        console.log('Fetched visitors:', response.data);
+        setVisitors(response.data);
+      } catch (error) {
+        console.error('Error fetching visitors:', error);
+      }
+    };
 
     fetchExhibitions();
     fetchBooths();
-  }, [userDetails?._id, searchParams, statusFilter]);
+    if (view === 'visitors') {
+      fetchVisitors();
+    }
+  }, [userDetails?._id, searchParams, statusFilter, view]);
 
 
   const handleCreateBooth = async (boothData: any) => {
@@ -267,7 +295,7 @@ const ExhibitionsPage: React.FC = () => {
           }}>
 
 
-            {(userDetails && userType === 'Innovators'  && isParticipateButtonVisible)&& (
+            {(userDetails && userType === 'Innovators' && isParticipateButtonVisible) && (
               <Button
                 variant="contained"
                 color="primary"
@@ -280,13 +308,10 @@ const ExhibitionsPage: React.FC = () => {
               >
                 Participate
               </Button>
-            )} 
-
-            {/* // ***** Intrested Button ***** // */}
+            )}
 
 
-
-            {(!userType  || userType === 'Visitors') && (
+            {(!userType || userType === 'Visitors') && (
               <Button
                 variant="contained"
                 color="primary"
@@ -345,8 +370,6 @@ const ExhibitionsPage: React.FC = () => {
 
 
         <Divider orientation="horizontal" flexItem />
-
-      {view === 'boothDetails' && (
         <div>
           <Box sx={{
             width: '40%', color: 'black', position: 'relative', left: '11%', top: '20px', '@media (max-width: 767px)': {
@@ -356,7 +379,7 @@ const ExhibitionsPage: React.FC = () => {
             }
           }}>
             <h1>Booth Details</h1>
-            {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
+            {(userDetails && (userType === 'Admin' || userType === 'Innovators' )&& view === 'boothDetails') && (
               <ToggleButtonGroup
                 value={statusFilter}
                 exclusive
@@ -384,138 +407,160 @@ const ExhibitionsPage: React.FC = () => {
               </ToggleButtonGroup>
             )}
           </Box>
-        <Box display="flex" justifyContent="center" marginTop="20px">
-        <ToggleButtonGroup
-          value={view}
-          exclusive
-          onChange={handleViewChange}
-          aria-label="view selection"
-        >
-          <ToggleButton value="boothDetails">Booth Details</ToggleButton>
-          <ToggleButton value="visitors">Visitors</ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-          <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
-            {booths
-              .filter(booth => booth.exhibitionId === exhibitionId)
-              .filter(booth => {
-                if (statusFilter === 'All') {
-                  return true;
-                } else {
-                  return booth.status === statusFilter;
-                }
-              })
-              .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
-              .map(booth => (
-                <Grid item xs={12} sm={6} md={4} key={booth._id}>
-                  <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
-                    <CardContent>
-                      <Typography
-                        onClick={userDetails && (userType === 'Admin' || userType === 'Innovators') ? () => {
-                          setSelectedBooth(booth);
-                          setDialogOpen(true);
-                        } : undefined}
-                        style={{
-                          cursor: userDetails && (userType === 'Admin' || userType === 'Innovators') ? 'pointer' : 'default',
-                          display: 'inline-block',
-                        }}
-                      >
-                        {(userDetails && (userType === 'Admin' || userType === 'Innovators')) ? (
-                          <Tooltip
-                            title="Click here to see Booth details"
-                            arrow
-                            placement="top"
-                            PopperProps={{
-                              modifiers: [
-                                {
-                                  name: 'offset',
-                                  options: {
-                                    offset: [0, -10],
+          {userType !== 'visitors' && (
+            <Box display="flex" justifyContent="center" marginTop="20px">
+              <ToggleButtonGroup
+                value={view}
+                exclusive
+                onChange={handleViewChange}
+                aria-label="view selection"
+              >
+                <ToggleButton value="boothDetails">Booth Details</ToggleButton>
+                <ToggleButton value="visitors">Visitors</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+          )}
+          {view === 'boothDetails' && (
+            <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
+              {booths
+                .filter(booth => booth.exhibitionId === exhibitionId)
+                .filter(booth => {
+                  if (statusFilter === 'All') {
+                    return true;
+                  } else {
+                    return booth.status === statusFilter;
+                  }
+                })
+                .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
+                .map(booth => (
+                  <Grid item xs={12} sm={6} md={4} key={booth._id}>
+                    <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
+                      <CardContent>
+                        <Typography
+                          onClick={userDetails && (userType === 'Admin' || userType === 'Innovators') ? () => {
+                            setSelectedBooth(booth);
+                            setDialogOpen(true);
+                          } : undefined}
+                          style={{
+                            cursor: userDetails && (userType === 'Admin' || userType === 'Innovators') ? 'pointer' : 'default',
+                            display: 'inline-block',
+                          }}
+                        >
+                          {(userDetails && (userType === 'Admin' || userType === 'Innovators')) ? (
+                            <Tooltip
+                              title="Click here to see Booth details"
+                              arrow
+                              placement="top"
+                              PopperProps={{
+                                modifiers: [
+                                  {
+                                    name: 'offset',
+                                    options: {
+                                      offset: [0, -10],
+                                    },
                                   },
-                                },
-                              ],
-                            }}
-                          >
+                                ],
+                              }}
+                            >
+                              <h2>{booth.title}</h2>
+                            </Tooltip>
+                          ) : (
                             <h2>{booth.title}</h2>
-                          </Tooltip>
-                        ) : (
-                          <h2>{booth.title}</h2>
-                        )}
-                      </Typography>
-                      {exhibitions.map((exhibition) => (
-                        <Box key={exhibition._id}>
-                          {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
-                            dayjs(exhibition.dateTime).isSame(dayjs(exhibition.serverDate), 'day') && (
+                          )}
+                        </Typography>
+                        {exhibitions.map((exhibition) => (
+                          <Box key={exhibition._id}>
+                            {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
+                              dayjs(exhibition.dateTime).isSame(dayjs(exhibition.serverDate), 'day') && (
+                                <Button
+                                  sx={{ position: 'relative', float: 'right', bottom: '55px' }}
+                                  onClick={() => {
+                                    setSelectedBooth(booth);
+                                    setDialogOpen(true)
+                                  }}
+                                >
+                                  View Details
+                                </Button>
+                              )}
+                          </Box>
+                        ))}
+                        <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
+                        <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
+                        <Box sx={{
+                          position: 'relative', left: '76%', width: '48%', bottom: '45px', '@media (max-width: 767px)': {
+                            position: 'relative', top: '-65px', left: '71%'
+                          }
+                        }}>
+                          {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
+                            <Chip
+                              label={
+                                booth.status === 'Approved' ? 'Approved' :
+                                  booth.status === 'Rejected' ? 'Rejected' :
+                                    'Pending'
+                              }
+                              variant="outlined"
+                              color={
+                                booth.status === 'Approved' ? 'success' :
+                                  booth.status === 'Rejected' ? 'error' :
+                                    'default'
+                              }
+                            />
+                          )}
+                        </Box>    
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', float: 'left' }}>
+                          {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
+                            <>
                               <Button
-                                sx={{ position: 'relative', float: 'right', bottom: '55px' }}
-                                onClick={() => {
-                                  setSelectedBooth(booth);
-                                  setDialogOpen(true)
-                                }}
+                                onClick={() =>
+                                  setApproveDialogOpen({ open: true, booth: booth })
+                                }
+                                variant="contained"
+                                style={{ marginRight: '10px' }}
                               >
-                                View Details
+                                Approve
                               </Button>
-                            )}
+                              <Button
+                                onClick={() =>
+                                  setRejectDialogOpen({ open: true, booth: booth })
+                                }
+                                variant="contained"
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          )}
                         </Box>
-                      ))}
-                      <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
-                      <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
-                      <Box sx={{
-                        position: 'relative', left: '76%', width: '48%', bottom: '45px', '@media (max-width: 767px)': {
-                          position: 'relative', top: '-65px', left: '71%'
-                        }
-                      }}>
-                        {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
-                          <Chip
-                            label={
-                              booth.status === 'Approved' ? 'Approved' :
-                                booth.status === 'Rejected' ? 'Rejected' :
-                                  'Pending'
-                            }
-                            variant="outlined"
-                            color={
-                              booth.status === 'Approved' ? 'success' :
-                                booth.status === 'Rejected' ? 'error' :
-                                  'default'
-                            }
-                          />
-                        )}
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', float: 'left' }}>
-                        {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
-                          <>
-                            <Button
-                              onClick={() =>
-                                setApproveDialogOpen({ open: true, booth: booth })
-                              }
-                              variant="contained"
-                              style={{ marginRight: '10px' }}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              onClick={() =>
-                                setRejectDialogOpen({ open: true, booth: booth })
-                              }
-                              variant="contained"
-                            >
-                              Reject
-                            </Button>
-                          </>
-                        )}
-                      </Box>
-                      <Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-          </Grid>
+                        <Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+            </Grid>
+          )}
           <Box sx={{ textAlign: 'center', position: 'relative' }}>
             {booths.filter(booth => booth.exhibitionId === exhibitionId).length === 0 && (
               <Typography variant="h6" style={{ marginTop: '20px' }}>No booths to display</Typography>
             )}
           </Box>
+          {view === 'visitors' && (
+            <Grid container spacing={2}>
+              {visitors.map(visitor => (
+                <Grid item xs={12} sm={6} md={4} key={visitor._id}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" component="div">
+                        {visitor.firstName} {visitor.lastName}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {visitor.username}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
           <ApproveDialog
             open={approveDialogOpen.open}
             onClose={() => setApproveDialogOpen({ open: false, booth: null })}
@@ -541,7 +586,6 @@ const ExhibitionsPage: React.FC = () => {
             />
           )}
         </div>
-            )}
       </Box>
     </>
   );
