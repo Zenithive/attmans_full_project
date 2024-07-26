@@ -19,7 +19,7 @@ type Option = {
 
 const industryOptions = [
   "Chemicals",
-  "Agriculture",  
+  "Agriculture",
   "Electronics",
   "Energy",
   "Environmental and waste management",
@@ -184,6 +184,11 @@ const EditProfile3: React.FC = () => {
           right: '180px',
           bottom: "60px",
           boxShadow: 5,
+          '@media (max-width: 767px)': {
+            width: '105%',
+            position: 'relative',
+            left: '7%'
+          }
         }}
       >
         <Typography component="h1" variant="h5" align="center">
@@ -200,8 +205,10 @@ const EditProfile3: React.FC = () => {
         )}
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between',
+        '@media (max-width: 767px)': {
+                       width:'121%',position:'relative',right:'26px'
+                    } }}>
             <Autocomplete
               multiple
               id="categories"
@@ -223,7 +230,6 @@ const EditProfile3: React.FC = () => {
                 <li {...props}>
                   <Checkbox
                     color='secondary'
-
                     checked={selected}
                     onChange={(e) => handleCategoryCheckboxChange(option, e.target.checked)}
                     style={{ marginRight: 8 }}
@@ -231,10 +237,12 @@ const EditProfile3: React.FC = () => {
                   {option}
                 </li>
               )}
-              style={{ width: '45%' }}
+              sx={{ width: { xs: '100%', md: '45%' }, marginBottom: { xs: 2, md: 0 } }}
             />
-            <div className="nested-multiselect-dropdown" ref={dropdownRef} style={{ width: '50%' }}>
-              <button type="button" onClick={handleToggleDropdown} style={{ minHeight: '57.5px' }}>
+            <Box className="nested-multiselect-dropdown"
+              ref={dropdownRef}
+              sx={{ width: { xs: '100%', md: '50%' } }}>
+              <button type="button" onClick={handleToggleDropdown} style={{ width: '100%', minHeight: '57.5px' }}>
                 {selectedValues.length > 0 ? (
                   selectedValues.map(value => (
                     <Chip
@@ -262,27 +270,24 @@ const EditProfile3: React.FC = () => {
                   </div>
                 </div>
               )}
-            </div>
-
-
+            </Box>
           </Box>
-
-            <Box mt={3} display="flex" justifyContent="center">
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                color="primary"
-                loading={loading}
-                loadingIndicator={<CircularProgress size={24} />}
-              >
-                Update Subject matter expertise
-              </LoadingButton>
+          <Box mt={3} display="flex" justifyContent="center">
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              color="primary"
+              loading={loading}
+              loadingIndicator={<CircularProgress size={24} />}
+            >
+              Update Subject matter expertise
+            </LoadingButton>
           </Box>
         </Box>
       </Box>
 
-      
-  <style jsx>{`
+
+      <style jsx>{`
     .nested-multiselect-dropdown {
       position: relative;
       display: inline-block;
@@ -332,6 +337,9 @@ const EditProfile3: React.FC = () => {
     button {
       margin-right: 10px;
       width: 514px; /* Decrease width */
+        @media (max-width: 767px){
+        width: 170px;
+      };
       border-radius: 20px;
       background-color: white;
       min-height: 57px; /* Increase height */

@@ -411,9 +411,9 @@ const Exhibition = () => {
         multiple
         size='small'
         sx={{
-          width: "30%",
+          width: "35%",
           position: "relative",
-          right: "37.5%",
+          right: "43.5%",
           '@media (max-width: 767px)': { width: '100%', right: '0' }
         }}
         options={getSubjectItems(subjects)}
@@ -426,9 +426,9 @@ const Exhibition = () => {
       <Autocomplete
         multiple
         sx={{
-          width: "30%",
+          width: "35%",
           position: "relative",
-          right: "104%",
+          right: "122%",
           '@media (max-width: 767px)': { width: '100%', right: '0' }
         }}
         size='small'
@@ -447,7 +447,7 @@ const Exhibition = () => {
       sx={{
         '@media (max-width: 767px)': {
           position: 'absolute',
-          top:'4.5%',
+          top:'80px',
           right:'25%'
         },
       }}
@@ -481,7 +481,6 @@ const Exhibition = () => {
                   {exhibition.status}
                 </span>
               </Typography>
-              <Typography variant="body2">{exhibition.description}</Typography>
               <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
               <Typography sx={{ display: "flex", float: "right" }}>
               {userType === "Admin" && (
@@ -498,20 +497,12 @@ const Exhibition = () => {
                       </Tooltip>
                     </IconButton>
                   )}
-                <IconButton onClick={() => handleSendInnovators(exhibition)}>
-                <Tooltip title="innovators">
-                  <SendIcon />
-                  </Tooltip>
-                </IconButton>
               </Typography>
             </CardContent>
           </Card>
         ))}
       </Box>
       </InfiniteScroll>
-      {sendingExhibition && (
-        <SendInnovators exhibition={sendingExhibition} onCancel={handleCancelSend} />
-      )}
       <DeleteConfirmationDialog
       open={confirmDelete.open}
       onCancel={handleCancelDelete}

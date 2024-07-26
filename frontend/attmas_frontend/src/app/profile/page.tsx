@@ -47,6 +47,7 @@ import MainSideBar from '../component/MainSideBar';
 
 const Page: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number | null>(null);
+  const [isMobileView, setIsMobileView] = useState<boolean>(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   useEffect(() => {
@@ -71,6 +72,21 @@ const Page: React.FC = () => {
     setCurrentStep(prevStep => (prevStep !== null ? prevStep - 1 : null));
   };
 
+  useEffect(() => {
+
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 767);
+    };
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+
   if (currentStep === null) {
     return <div>Loading...</div>;
   }
@@ -78,7 +94,8 @@ const Page: React.FC = () => {
   return (
     <>
     {/* <MainSideBar/> */}
-      <HorizontalStepper currentStep={currentStep} />
+
+    {!isMobileView && <HorizontalStepper currentStep={currentStep} />}
       {currentStep === 1 && <Profile1 onNext={handleNext} />}
       {currentStep === 2 && <Profile2 onNext={handleNext} onPrevious={handlePrevious} />}
       {currentStep === 3 && <Profile3 onPrevious={handlePrevious} />}

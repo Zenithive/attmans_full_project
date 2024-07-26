@@ -114,6 +114,11 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
           right: '180px',
           bottom: "60px",
           boxShadow: 5,
+          '@media (max-width: 767px)': {
+            position: 'relative',
+            width: '120%',
+            right: '31px',
+          }
         }}
       >
         <Typography component="h1" variant="h5" align="center">
@@ -130,7 +135,14 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         )}
 
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              justifyContent: 'space-between',
+              gap: 2, 
+            }}
+          >
             <Autocomplete
               multiple
               id="categories"
@@ -146,12 +158,13 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                   label="Categories"
                   placeholder="Select categories"
                   color="secondary"
+                  sx={{ width: '100%' }} 
                 />
               )}
               renderOption={(props, option, { selected }) => (
                 <li {...props}>
                   <Checkbox
-                    color='secondary'
+                    color="secondary"
                     checked={selected}
                     onChange={(e) => handleCategoryCheckboxChange(option, e.target.checked)}
                     style={{ marginRight: 8 }}
@@ -159,18 +172,20 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                   {option}
                 </li>
               )}
-              style={{ width: '45%' }}
+              sx={{ width: '100%', maxWidth: { xs: '100%', md: '45%' } }}
             />
 
-            <SubjectMatterExpertise
-              selectedValues={selectedValues}
-              setSelectedValues={(values) => {
-                setSelectedValues(values);
-                formik.setFieldValue('subcategories', values);
-              } }
-              options={options} value={[]} onChange={function (selectedSubjects: string[]): void {
-                throw new Error('Function not implemented.');
-              } } Option={[]}            />
+            <Box sx={{ width: '100%', maxWidth: { xs: '100%', md: '45%' } }}>
+              <SubjectMatterExpertise
+                            selectedValues={selectedValues}
+                            setSelectedValues={(values) => {
+                              setSelectedValues(values);
+                              formik.setFieldValue('subcategories', values);
+                            } }
+                            options={options} Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
+                              throw new Error('Function not implemented.');
+                            } }  />
+            </Box>
           </Box>
 
           <Button
@@ -190,7 +205,12 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               size="small"
               loading={loading}
               loadingIndicator={<CircularProgress size={24} />}
-              sx={{ mt: 2, mb: 2, ml: '84.5%', width: '10%', height: '40px' }}
+              sx={{ mt: 2, mb: 2, ml: '84.5%', width: '10%', height: '40px' ,
+                '@media (max-width: 767px)': {
+                  position:'relative',
+                  bottom:'22px'
+                }
+              }}
             >
               Save
             </LoadingButton>
@@ -202,4 +222,3 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
 };
 
 export default ProfileForm3;
- 

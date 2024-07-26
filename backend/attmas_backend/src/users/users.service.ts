@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -15,10 +19,6 @@ export class UsersService {
     private mailerService: MailerService, // Inject MailerService
   ) {}
 
- 
-
-
-
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
     const isAlreadyExist = await this.findByUsername(rest.username);
@@ -29,7 +29,7 @@ export class UsersService {
     const createdUser = new this.userModel({
       ...rest,
       password: hashedPassword,
-      isAllProfileCompleted: false,
+      // isAllProfileCompleted: false,
     });
     await createdUser.save();
 
