@@ -60,6 +60,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                             </TableCell>
                             <TableCell>
                                 <TextField
+                                    multiline
                                     value={product.productDescription}
                                     onChange={(e) => handleInputChange(index, 'productDescription', e.target.value)}
                                     fullWidth

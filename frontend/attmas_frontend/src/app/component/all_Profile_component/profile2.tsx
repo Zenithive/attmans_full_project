@@ -43,7 +43,7 @@ interface ProfileForm2Props {
 
 const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
-    const [isFreelancer, setIsFreelancer] = useState(false);
+    const [isInnovator, setIsInnovator] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
@@ -113,7 +113,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        setIsFreelancer(value === 'Innovators');
+        setIsInnovator(value === 'Innovators');
 
         if (value !== 'Innovators') {
             setShowProductDetails(false);
@@ -275,109 +275,118 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             </Grid>
 
 
-                            {isFreelancer && (
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        fullWidth
-                                        select
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                        id="productToMarket"
-                                        color= 'secondary'
-                                        label="Product to Market"
-                                        name="productToMarket"
-                                        onChange={(e) => {
-                                            handleProductToMarketChange(e);
-                                            formik.handleChange(e);
-                                        }}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.productToMarket}
-                                        error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
-                                        helperText={formik.touched.productToMarket && formik.errors.productToMarket}
-                                    >
-                                        <MenuItem value="Yes">Yes</MenuItem>
-                                        <MenuItem value="No">No</MenuItem>
-                                    </TextField>
-                                </Grid>
+                            {isInnovator ? (
+                                <>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            select
+                                            style={{ background: "white", borderRadius: "25px" }}
+                                            id="productToMarket"
+                                            color= 'secondary'
+                                            label="Product to Market"
+                                            name="productToMarket"
+                                            onChange={(e) => {
+                                                handleProductToMarketChange(e);
+                                                formik.handleChange(e);
+                                            }}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.productToMarket}
+                                            error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
+                                            helperText={formik.touched.productToMarket && formik.errors.productToMarket}
+                                        >
+                                            <MenuItem value="Yes">Yes</MenuItem>
+                                            <MenuItem value="No">No</MenuItem>
+                                        </TextField>
+                                    </Grid>
 
+                                    {formik.values.productToMarket == "Yes" ? <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            select
+                                            style={{ background: "white", borderRadius: "25px" }}
+                                            id="hasPatent"
+                                            color= 'secondary'
+                                            label="Do you have a patent?"
+                                            name="hasPatent"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.hasPatent}
+                                            error={formik.touched.hasPatent && Boolean(formik.errors.hasPatent)}
+                                            helperText={formik.touched.hasPatent && formik.errors.hasPatent}
+                                        >
+                                            <MenuItem value="Yes">Yes</MenuItem>
+                                            <MenuItem value="No">No</MenuItem>
+                                        </TextField>
+                                    </Grid> : ""}
+                                </>
+                            ) : ""}
 
-                            )}
-
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    style={{ background: "white", borderRadius: "25px" }}
-                                    id="hasPatent"
-                                    color= 'secondary'
-                                    label="Do you have a patent?"
-                                    name="hasPatent"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.hasPatent}
-                                    error={formik.touched.hasPatent && Boolean(formik.errors.hasPatent)}
-                                    helperText={formik.touched.hasPatent && formik.errors.hasPatent}
-                                >
-                                    <MenuItem value="Yes">Yes</MenuItem>
-                                    <MenuItem value="No">No</MenuItem>
-                                </TextField>
-                            </Grid>
-                            {isFreelancer && showProductDetails && (
-                                <Grid item xs={12}>
-                                    <ProductTable
-                                        products={formik.values.products}
-                                        onRemove={(index: number) => {
-                                            const updatedProducts = [...formik.values.products];
-                                            updatedProducts.splice(index, 1);
-                                            formik.setFieldValue('products', updatedProducts);
-                                        }}
-                                        onChange={(index: number, updatedProduct: Product) => handleProductChange(index, updatedProduct)}
-                                    />
-                                    <Button
-                                        onClick={() => {
-                                            const updatedProducts = [...formik.values.products, { productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }];
-                                            formik.setFieldValue('products', updatedProducts);
-                                        }}
-                                    >
-                                        Add Product
-                                    </Button>
-                                </Grid>
+                            
+                            {isInnovator && showProductDetails && (
+                                <>
+                                    <Grid item xs={12}>
+                                        <ProductTable
+                                            products={formik.values.products}
+                                            onRemove={(index: number) => {
+                                                const updatedProducts = [...formik.values.products];
+                                                updatedProducts.splice(index, 1);
+                                                formik.setFieldValue('products', updatedProducts);
+                                            }}
+                                            onChange={(index: number, updatedProduct: Product) => handleProductChange(index, updatedProduct)}
+                                        />
+                                        
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Button
+                                            onClick={() => {
+                                                const updatedProducts = [...formik.values.products, { productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }];
+                                                formik.setFieldValue('products', updatedProducts);
+                                            }}
+                                        >
+                                            Add Product
+                                        </Button>
+                                    </Grid>
+                                </>
                             )}
                             
 
                             {/* *********** back and back *************** */}
 
+                            <Grid item xs={12}>
+                                <Button
+                                type="button"
+                                variant="contained"
+                                size="small"
+                                sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' , '@media (max-width: 767px)':{
+                                    position:'relative',
+                                    top:'2px'
+                                }}}
+                                onClick={onPrevious}
+                                >
+                                    Back
+                                </Button>
 
-                            <Button
-                            type="button"
-                            variant="contained"
-                            size="small"
-                            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' , '@media (max-width: 767px)':{
-                                position:'relative',
-                                top:'2px'
-                            }}}
-                            onClick={onPrevious}
-                        >
-                            Back
-                        </Button>
+                                <LoadingButton
+                                    type="submit"
+                                    variant="contained"
+                                    size="small"
+                                    loading={loading}
+                                    loadingIndicator={<CircularProgress size={24} />}
+                                    sx={{ 
+                                        mt: 2,
+                                        mb: 2,
+                                        ml: { xs: 'auto', md: '90%' }, 
+                                        width: { xs: '40%', md: '10%' }, 
+                                        height: '40px',
+                                        position: { xs: 'relative', md: 'static' }, 
+                                        left:'40%'
+                                    }}
+                                >
+                                    Save & Next
+                                </LoadingButton>
+                            </Grid>
 
-                        <LoadingButton
-                            type="submit"
-                            variant="contained"
-                            size="small"
-                            loading={loading}
-                            loadingIndicator={<CircularProgress size={24} />}
-                            sx={{ 
-                                mt: 2,
-                                mb: 2,
-                                ml: { xs: 'auto', md: '90%' }, 
-                                width: { xs: '40%', md: '10%' }, 
-                                height: '40px',
-                                position: { xs: 'relative', md: 'static' }, 
-                                left:'40%'
-                              }}
-                        >
-                            Save & Next
-                        </LoadingButton>
                         </Grid>
                     </Box>
                 </FormikProvider>
