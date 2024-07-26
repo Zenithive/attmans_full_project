@@ -4,7 +4,7 @@ import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
-import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
+import { Box, Typography, Divider, Card, CardContent, Button, Chip, ToggleButton, ToggleButtonGroup, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, Tooltip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid, Avatar } from '@mui/material';
 import BoothDetailsModal from '../component/booth/booth';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
@@ -32,6 +32,8 @@ interface Visitor {
   firstName: string;
   lastName: string;
   username: string;
+  mobileNumber: string;
+  timestamps:string;
 }
 
 
@@ -69,6 +71,7 @@ const ExhibitionsPage: React.FC = () => {
   const [isParticipateButtonVisible, setParticipateButtonVisible] = useState(true);
   const [hasUserBooth, setHasUserBooth] = useState(false);
   const [view, setView] = useState('boothDetails');
+  
 
 
   useEffect(() => {
@@ -408,7 +411,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
           </Box>
           {userType !== 'visitors' && (
-            <Box display="flex" justifyContent="center" marginTop="20px">
+            <Box display="flex" justifyContent="center" marginTop="20px" sx={{position:'relative',bottom:'22px'}}>
               <ToggleButtonGroup
                 value={view}
                 exclusive
@@ -544,20 +547,31 @@ const ExhibitionsPage: React.FC = () => {
             )}
           </Box>
           {view === 'visitors' && (
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
               {visitors.map(visitor => (
-                <Grid item xs={12} sm={6} md={4} key={visitor._id}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" component="div">
-                        {visitor.firstName} {visitor.lastName}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        {visitor.username}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+               <Grid item xs={12} sm={6} md={4} key={visitor._id}>
+               <Card sx={{ maxWidth: 320, height: 200, borderRadius: 2, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>
+                 <CardContent sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+                   <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+                     {visitor.firstName[0]}{visitor.lastName[0]}
+                   </Avatar>
+                   <div>
+                     <Typography variant="h6" component="div" gutterBottom>
+                       {visitor.firstName} {visitor.lastName}
+                     </Typography>
+                     <Typography variant="body2" color="text.secondary" gutterBottom>
+                       {visitor.username}
+                     </Typography>
+                     <Typography variant="body2" color="text.secondary" gutterBottom>
+                       {visitor.mobileNumber}
+                     </Typography>
+                     <Typography variant="body2" color="text.secondary">
+                       Date: {dayjs(visitor.timestamps).format('MMMM D, YYYY h:mm A')}
+                     </Typography>
+                   </div>
+                 </CardContent>
+               </Card>
+             </Grid>
               ))}
             </Grid>
           )}

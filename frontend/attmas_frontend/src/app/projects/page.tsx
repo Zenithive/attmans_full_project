@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -549,11 +549,21 @@ const Jobs = () => {
                                                 },
                                             }}
                                         >
-                                            <MenuItem onClick={() => { handleApplyClick(job.title); handleClose(); }}>Apply</MenuItem>
+                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px' ,position:'relative',bottom:'8px',height:'55px'}} onClick={() => { handleApplyClick(job.title); handleClose(); }}>Apply</MenuItem>
                                             {userDetails.userType === 'Project Owner' && (
                                                 <>
-                                                    <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>Edit</MenuItem>
-                                                    <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>Delete</MenuItem>
+                                                    <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
+                                                        <ListItemIcon>
+                                                            <EditIcon />
+                                                        </ListItemIcon>
+                                                        <ListItemText primary="Edit" />
+                                                    </MenuItem>
+                                                    <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>
+                                                        <ListItemIcon>
+                                                            <DeleteRoundedIcon />
+                                                        </ListItemIcon>
+                                                        <ListItemText primary="Delete" />
+                                                    </MenuItem>
                                                 </>
                                             )}
                                         </Menu>
@@ -599,8 +609,8 @@ const Jobs = () => {
                     <Box p={2}>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
 
-                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right',mb: 2  }} />}
-                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right',mb: 2  }} />}
+                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right', mb: 2 }} />}
+                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right', mb: 2 }} />}
 
                         <TextField
                             label="Title"
@@ -680,7 +690,7 @@ const Jobs = () => {
                             disabled
                             sx={{ mb: 2 }}
                         />
-                        
+
                         <TextField
                             label="Category"
                             value={viewingJob.Category.join(', ')}

@@ -74,8 +74,10 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           password: values.password,
           userId: res._id,
           userType: res.userType,
-          exhibitionId: exhibitionId || null, 
-
+          exhibitionId: exhibitionId || null,
+          firstName: res.firstName,
+          lastName: res.lastName,
+          mobileNumber: res.mobileNumber,
         };
 
         if (res.userType === "Visitors") {

@@ -60,6 +60,7 @@ export const APIS = {
 
     GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
     GET_VISITORS:  `${SERVER_URL}/interested-users`,
+    ADD_VISITOR: `${SERVER_URL}/interested-users`,
 
 
     NOTIFICATIONS: `${SERVER_URL}/emails`,

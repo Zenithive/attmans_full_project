@@ -21,6 +21,6 @@ export const InterestedUserSchema = new Schema(
     userType: { type: String, required: false },
   },
   {
-    timestamps: false,
+    timestamps: true,
   },
 );
