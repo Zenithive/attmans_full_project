@@ -69,7 +69,6 @@ export class User {
 
   @Prop()
   isAllProfileCompleted: boolean;
-
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
