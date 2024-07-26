@@ -13,16 +13,15 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
-import { addUser } from '@/app/reducers/userReducer';
-import { useAppDispatch } from '@/app/reducers/hooks.redux';
-import { UserSchema, selectUserSession } from '../../reducers/userReducer';
-import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
   showLinks?: boolean;
   onSignInSuccess?: () => void;
+  exhibitionId?: string | null;
 }
 
 function Copyright(props: any) {
@@ -37,9 +36,11 @@ function Copyright(props: any) {
     </Typography>
   );
 }
-export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess }: SignInProps) => {
+
+export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId  }: SignInProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const formik = useFormik({
     initialValues: {
@@ -64,20 +65,30 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess }: SignIn
           _id: res._id,
         };
 
-        dispatch(addUser(user))
+        dispatch(addUser(user));
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
 
+        const interestedUser = {
+          username: values.email,
+          password: values.password,
+          userId: res._id,
+          userType: res.userType,
+          exhibitionId: exhibitionId || null, 
+
+        };
+
+        if (res.userType === "Visitors") {
+          await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
+        }
 
         if (onSignInSuccess) {
           onSignInSuccess();
-        }
-        else if (response.data.user.isAllProfileCompleted || ["innoveters", "freelancer", "business"].includes(response.data.user.userType)) {
+        } else if (res.isAllProfileCompleted || ["innoveters", "freelancer", "business"].includes(res.userType)) {
           router.push("/dashboard");
         } else {
           router.push("/profile");
         }
-        // Call the success handler
       } catch (error) {
         formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
       }

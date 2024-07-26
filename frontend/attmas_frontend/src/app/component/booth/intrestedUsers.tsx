@@ -13,7 +13,7 @@ import { SignUp } from '../SignUp/signup';
 interface InterestedModalProps {
     open: boolean;
     onClose: () => void;
-    exhibitionId: string | null;
+    exhibitionId?: string | null;
 }
 
 const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibitionId }) => {
@@ -69,7 +69,7 @@ const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibi
                     </Alert>
                 )}
                 {showSignIn ? (
-                    <SignIn showLinks={false} onSignInSuccess={handleSignInSuccess} />
+                    <SignIn exhibitionId={exhibitionId} showLinks={false} onSignInSuccess={handleSignInSuccess} />
                 ) : (
                     <SignUp showLinks={false} onSignUpSuccess={handleSignUpSuccess} userType="Visitors" isAllProfileCompleted={true} />
                 )}

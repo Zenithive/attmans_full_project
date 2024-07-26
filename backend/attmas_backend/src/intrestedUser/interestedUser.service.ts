@@ -22,6 +22,7 @@ export class InterestedUserService {
       mobileNumber,
       userId,
       exhibitionId,
+      userType,
     } = createInterestedUserDto;
 
     console.log('Create InterestedUser DTO:', createInterestedUserDto);
@@ -74,6 +75,7 @@ export class InterestedUserService {
       mobileNumber,
       exhibitionId,
       userId,
+      userType,
     });
     console.log('Created InterestedUser:', createdUser);
 

@@ -7,6 +7,7 @@ export interface InterestedUser extends Document {
   mobileNumber: string;
   userId: string;
   exhibitionId: string;
+  userType: string;
 }
 
 export const InterestedUserSchema = new Schema(
@@ -17,6 +18,7 @@ export const InterestedUserSchema = new Schema(
     userId: { type: String, required: false },
     username: { type: String, required: false },
     exhibitionId: { type: String, required: false },
+    userType: { type: String, required: false },
   },
   {
     timestamps: false,
