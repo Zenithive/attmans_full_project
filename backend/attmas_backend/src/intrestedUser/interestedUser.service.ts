@@ -14,7 +14,7 @@ export class InterestedUserService {
     ) {}
 
     async create(createInterestedUserDto: any): Promise<InterestedUser> {
-        const { username, firstName, lastName, mobileNumber, userId, exhibitionId } = createInterestedUserDto;
+        const { username, firstName, lastName, mobileNumber, userId, exhibitionId,userType } = createInterestedUserDto;
 
         console.log('Create InterestedUser DTO:', createInterestedUserDto);
 
@@ -57,7 +57,7 @@ export class InterestedUserService {
         }
 
         // Create interested user entry
-        const createdUser = new this.interestedUserModel({ username, firstName, lastName, mobileNumber, exhibitionId, userId });
+        const createdUser = new this.interestedUserModel({ username, firstName, lastName, mobileNumber, exhibitionId, userId ,userType});
         console.log('Created InterestedUser:', createdUser);
 
         return createdUser.save();
