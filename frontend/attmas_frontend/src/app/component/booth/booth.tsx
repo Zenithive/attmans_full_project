@@ -134,7 +134,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
     videoUrl: Yup.string().url('Invalid URL').required('Video URL is required'),
     products: Yup.array().of(
       Yup.object().shape({
-        productName: Yup.string().required('Product name is required'),
+        // productName: Yup.string().required('Product name is required'),
         productDescription: Yup.string().required('Product description is required'),
         productType: Yup.string().required('Product type is required'),
         productPrice: Yup.number().required('Product price is required').min(0, 'Price cannot be negative'),

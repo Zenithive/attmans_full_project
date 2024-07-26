@@ -19,6 +19,9 @@ export class ProductInfo {
   @Prop({ required: false })
   currency: string;
 
+  @Prop({ required: false })
+  videoUrl: string;
+
 
 }
 
