@@ -42,6 +42,7 @@ export const APIS = {
     UPDATE_BOOTH: `${SERVER_URL}/booths/update-buttons-hidden`,
     APPROVE_PROJECT: `${SERVER_URL}/jobs/approve`,
     REJECT_PROJECT: `${SERVER_URL}/jobs/reject`,
+
     
 
 
@@ -58,6 +59,8 @@ export const APIS = {
 
 
     GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
+    GET_VISITORS:  `${SERVER_URL}/interested-users`,
+    ADD_VISITOR: `${SERVER_URL}/interested-users`,
 
 
     NOTIFICATIONS: `${SERVER_URL}/emails`,

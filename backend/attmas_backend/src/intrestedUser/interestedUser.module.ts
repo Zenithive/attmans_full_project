@@ -7,12 +7,14 @@ import { MailerService } from 'src/common/service/UserEmailSend';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-    imports: [
-        MongooseModule.forFeature([{ name: 'InterestedUser', schema: InterestedUserSchema }]),
-        UsersModule, // Import UsersModule
-    ],
-    providers: [InterestedUserService,MailerService],
-    controllers: [InterestedUserController],
-    exports: [InterestedUserService,MailerService],
+  imports: [
+    MongooseModule.forFeature([
+      { name: 'InterestedUser', schema: InterestedUserSchema },
+    ]),
+    UsersModule, // Import UsersModule
+  ],
+  providers: [InterestedUserService, MailerService],
+  controllers: [InterestedUserController],
+  exports: [InterestedUserService, MailerService],
 })
 export class InterestedUserModule {}

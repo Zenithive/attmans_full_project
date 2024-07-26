@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -14,10 +18,6 @@ export class UsersService {
     @InjectModel(Categories.name) private categoriesModel: Model<Categories>,
     private mailerService: MailerService, // Inject MailerService
   ) {}
-
- 
-
-
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
