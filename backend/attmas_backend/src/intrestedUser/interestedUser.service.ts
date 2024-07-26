@@ -100,7 +100,7 @@ export class InterestedUserService {
     ): Promise<InterestedUser[]> {
         return this.interestedUserModel.find({ exhibitionId }).exec();
     }
-}
+} 
 
 
 
