@@ -23,34 +23,34 @@ export class InterestedUserService {
         console.log('Existing User:', existingUser);
 
         try {
-            if (existingUser) {
-                // Send "abc" message
-                console.log('Sending "abc" email to:', username);
-                await this.mailerService.sendEmail(
-                    username,
-                    'Existing User of Attmas',
-                    `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nBest regards,\nTeam Attmas`,
-                );
-                console.log('Email sent to existing user successfully.');
+            // if (existingUser) {
+            //     // Send "abc" message
+            //     console.log('Sending "abc" email to:', username);
+            //     await this.mailerService.sendEmail(
+            //         username,
+            //         'Existing User of Attmas',
+            //         `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nBest regards,\nTeam Attmas`,
+            //     );
+            //     console.log('Email sent to existing user successfully.');
 
-                // Create interested user entry with null or blank values
-                const createdUser = new this.interestedUserModel({
-                    username: null,
-                    firstName: null,
-                    lastName: null,
-                    mobileNumber: null,
-                    exhibitionId: null,
-                    userId: null,
-                    userType: null,
-                });
-                console.log('Created InterestedUser with null values:', createdUser);
+            //     // Create interested user entry with null or blank values
+            //     const createdUser = new this.interestedUserModel({
+            //         username: null,
+            //         firstName: null,
+            //         lastName: null,
+            //         mobileNumber: null,
+            //         exhibitionId: null,
+            //         userId: null,
+            //         userType: null,
+            //     });
+            //     console.log('Created InterestedUser with null values:', createdUser);
 
-                // Save and then delete the null entry
-                await createdUser.save();
-                await this.deleteNullEntries();
+            //     // Save and then delete the null entry
+            //     await createdUser.save();
+            //     await this.deleteNullEntries();
 
-                return createdUser;
-            } else {
+            //     return createdUser;
+            // } else {
                 // Send "xyz" message
                 console.log('Sending "xyz" email to:', username);
                 await this.mailerService.sendEmail(
@@ -75,32 +75,35 @@ export class InterestedUserService {
 
                 return createdUser.save();
             }
-        } catch (error) {
+         catch (error) {
             console.error('Error sending email:', error);
             throw error;
         }
-    }
+    // }
 
     // Method to delete InterestedUser entries with all null or blank values
-    private async deleteNullEntries(): Promise<void> {
-        await this.interestedUserModel.deleteMany({
-            username: { $eq: null },
-            firstName: { $eq: null },
-            lastName: { $eq: null },
-            mobileNumber: { $eq: null },
-            exhibitionId: { $eq: null },
-            userId: { $eq: null },
-            userType: { $eq: null },
-        }).exec();
-        console.log('Deleted null or blank entries from InterestedUser collection.');
-    }
+    // private async deleteNullEntries(): Promise<void> {
+    //     await this.interestedUserModel.deleteMany({
+    //         username: { $eq: null },
+    //         firstName: { $eq: null },
+    //         lastName: { $eq: null },
+    //         mobileNumber: { $eq: null },
+    //         exhibitionId: { $eq: null },
+    //         userId: { $eq: null },
+    //         userType: { $eq: null },
+    //     }).exec();
+    //     console.log('Deleted null or blank entries from InterestedUser collection.');
+    // }
 
-    async findVisitorsByExhibition(
-        exhibitionId: string,
-    ): Promise<InterestedUser[]> {
-        return this.interestedUserModel.find({ exhibitionId }).exec();
-    }
+    
 } 
+
+async findVisitorsByExhibition(
+    exhibitionId: string,
+): Promise<InterestedUser[]> {
+    return this.interestedUserModel.find({ exhibitionId }).exec();
+} 
+}
 
 
 
