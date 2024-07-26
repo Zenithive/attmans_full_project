@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
 import Link from 'next/link';
+import { CircularProgress } from '@mui/material';
 
 interface SignUpProps {
 }
@@ -181,11 +182,12 @@ export const SignUp = () => {
             <Button
               type="submit"
               fullWidth
+              disabled={formik.isSubmitting}
               variant="contained"
               color='secondary'
               sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
+            >              
+              {formik.isSubmitting ? <CircularProgress /> : 'Sign Up'}
             </Button>
             {formik.status && formik.status.error && (
               <Typography variant="body2" color="error" align="center">

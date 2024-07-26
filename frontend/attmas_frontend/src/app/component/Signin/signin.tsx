@@ -20,6 +20,7 @@ import { useAppDispatch } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
+import { CircularProgress } from '@mui/material';
 
 interface SignInProps {
   toggleForm: CallableFunction;
@@ -56,8 +57,6 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
-        console.log("response.data.access_token", response.data.access_token);
-        console.log("response", response.data.user);
 
         const res = response.data.user;
         const user = {
@@ -66,10 +65,9 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
           firstName: res.firstName,
           lastName: res.lastName,
           mobileNumber: res.mobileNumber,
-          userType:res.userType,
+          userType: res.userType,
           _id: res._id,
         };
-        console.log("user", user)
 
         dispatch(addUser(user))
         document.cookie = `access_token=${response.data.access_token}`;
@@ -141,11 +139,12 @@ export const SignIn = ({ toggleForm }: SignInProps) => {
           /> */}
           <Button
             type="submit"
+            disabled={formik.isSubmitting}
             fullWidth
             variant="contained"
             color='secondary'
             sx={{ mt: 3, mb: 2 }}
-          >Sign In</Button>
+          >{formik.isSubmitting ? <CircularProgress /> : 'Sign In'}</Button>
           {formik.status && formik.status.error && (
             <Typography variant="body2" color="error" align="center">
               {formik.status.error}
