@@ -22,6 +22,10 @@ export class CreateApplyDto {
   Budget: number;
 
   @IsNotEmpty()
+  @IsString()
+  currency: number;
+
+  @IsNotEmpty()
   // @IsEmail()
   username: string;
 }
