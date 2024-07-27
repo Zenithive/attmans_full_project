@@ -555,9 +555,9 @@ const ExhibitionsPage: React.FC = () => {
                <Grid item xs={12} sm={6} md={4} key={visitor._id}>
                <Card sx={{ maxWidth: 320, height: 200, borderRadius: 2, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>
                  <CardContent sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                   {/* <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+                   <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
                      {visitor.firstName[0]}{visitor.lastName[0]}
-                   </Avatar> */}
+                   </Avatar>
                    <div>
                      <Typography variant="h6" component="div" gutterBottom>
                        {visitor.firstName} {visitor.lastName}

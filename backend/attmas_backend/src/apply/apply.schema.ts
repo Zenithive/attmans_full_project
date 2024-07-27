@@ -24,6 +24,9 @@ export class Apply {
   @Prop({ required: true })
   Budget: number;
 
+  @Prop({ required: true })
+  currency: string;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 

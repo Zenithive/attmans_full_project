@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, InputLabel, Select, MenuItem, Autocomplete, Chip } from '@mui/material';
+import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, InputLabel, Select, MenuItem, Autocomplete, Chip, InputAdornment } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -19,6 +19,7 @@ interface Apply {
   title: string;
   description: string;
   Budget: number;
+  currency: string;
   TimeFrame: string | null;
 }
 
@@ -26,6 +27,7 @@ const validationSchema = Yup.object().shape({
   title: Yup.string().required('Title is required'),
   description: Yup.string().required('Description is required'),
   Budget: Yup.number().required('Budget is required'),
+  currency: Yup.string().required('Currency is required'),
   TimeFrame: Yup.date().nullable('Date & Time is required'),
 });
 
@@ -42,17 +44,19 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
     title: jobTitle,
     description: '',
     Budget: 0,
+    currency: 'INR',
     TimeFrame: null as Dayjs | null,
   };
 
   const handleSubmit = async (
-    values: { title: string; description: string; Budget: number; TimeFrame: Dayjs | null },
+    values: { title: string; description: string; Budget: number; TimeFrame: Dayjs | null;  currency: string;},
     { setSubmitting, resetForm }: any
   ) => {
     const applyData = {
       title: values.title,
       description: values.description,
       TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
+      currency: values.currency,
       Budget: values.Budget,
       userId: userDetails._id,
       username: userDetails.username
@@ -120,15 +124,33 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
               <TextField
                 fullWidth
                 name="Budget"
-                label="BUDGET"
-                color='secondary'
+                label="Budget"
                 type="number"
+                color='secondary'
                 value={values.Budget}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.Budget && Boolean(errors.Budget)}
                 helperText={touched.Budget && errors.Budget}
-                margin="normal"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FormControl variant="standard">
+                        <Select
+                          value={values.currency}
+                          onChange={(e) => {
+                            const selectedCurrency = e.target.value as string;
+                            setFieldValue('currency', selectedCurrency);
+                          }}
+                        
+                        >
+                          <MenuItem value="INR">INR</MenuItem>
+                          <MenuItem value="USD">USD</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DateTimePicker
