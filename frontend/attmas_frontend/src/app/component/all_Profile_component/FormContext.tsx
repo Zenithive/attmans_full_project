@@ -12,7 +12,7 @@ export const useFormContext = (): FormContextType => {
   if (!context) {
     throw new Error('useFormContext must be used within a FormProvider');
   }
-  return context; 
+  return context;
 };
 
 export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

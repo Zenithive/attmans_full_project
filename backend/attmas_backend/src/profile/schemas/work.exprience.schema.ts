@@ -20,9 +20,7 @@ export class ProductInfo {
   currency: string;
 
   @Prop({ required: false })
-  videoUrl: string;
-
-
+  videourlForproduct: string;
 }
 
 export const ProductInfoSchema = SchemaFactory.createForClass(ProductInfo);
@@ -62,7 +60,6 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false, type: String }) // Ensure the type is String
   hasPatent: string;
-
 }
 
 export const WorkSchema = SchemaFactory.createForClass(WorkExprience);

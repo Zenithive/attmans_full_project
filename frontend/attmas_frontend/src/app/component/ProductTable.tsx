@@ -19,7 +19,7 @@ export interface Product {
     productType: string;
     productPrice: string;
     currency: string;
-    videoUrl?: string;
+    videourlForproduct?: string;
 }
 
 interface ProductTableProps {
@@ -88,8 +88,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                             </TableCell>
                             <TableCell>
                                 <TextField
-                                    value={product.videoUrl || ''}
-                                    onChange={(e) => handleInputChange(index, 'videoUrl', e.target.value)}
+                                    value={product.videourlForproduct
+                                        || ''}
+                                    onChange={(e) => handleInputChange(index, 'videourlForproduct', e.target.value)}
                                     fullWidth
                                 />
                             </TableCell>
