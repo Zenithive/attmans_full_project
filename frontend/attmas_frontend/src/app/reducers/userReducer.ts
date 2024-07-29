@@ -1,10 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
+import { userType } from "../services/user.access.service";
 
 
 export interface UserSchema{
   token : string, username: string, firstName: string, lastName: string, mobileNumber: string 
-  ,_id:string, userType:string
+  ,_id:string, userType: userType
 }
 export interface UserState {
   user: UserSchema; 
