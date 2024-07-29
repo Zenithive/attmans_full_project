@@ -9,7 +9,6 @@ import {
 } from 'src/profile/schemas/category.schema';
 import { MailerService } from 'src/common/service/UserEmailSend';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -18,7 +17,7 @@ import { MailerService } from 'src/common/service/UserEmailSend';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService,MailerService],
+  providers: [UsersService, MailerService],
   exports: [UsersService, MongooseModule],
 })
 export class UsersModule {}

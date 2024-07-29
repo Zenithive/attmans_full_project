@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { useMediaQuery, Theme } from '@mui/material';
+import { getRoleBasedAccess } from '../services/user.access.service';
 
 export const drawerWidth = 240;
 
@@ -38,54 +39,68 @@ export default function MainSideBar() {
     router.push(path);
   }
 
+  const {
+    isAdmin,
+    isFreelancer,
+    isInnovator,
+    isProjectOwner,
+    isVisitor
+  } = getRoleBasedAccess(userDetails.userType);
+
   const SIDEBAR_LIST_NAVS = [
     {
       path: '/dashboard',
       icon: () => (
         <DashboardCustomizeIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Dashboard"
+      Name: "Dashboard",
+      isVisible: (isAdmin || isFreelancer || isProjectOwner || isInnovator)
     },
     {
       path: '/innovators',
       icon: () => (
         <GroupIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Innovators"
+      Name: "Innovators",
+      isVisible: (isAdmin || isProjectOwner)
     },
     {
       path: '/freelancers',
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Freelancers"
+      Name: "Freelancers",
+      isVisible: (isAdmin || isProjectOwner)
     },
     {
       path: '/projectowner',
       icon: () => (
         <BusinessIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Project Owner"
+      Name: "Project Owner",
+      isVisible: isAdmin 
     },
     {
       path: '/projects',
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Projects"
+      Name: "Projects",
+      isVisible: (isAdmin || isFreelancer || isProjectOwner || isInnovator)
     },
     {
       path: '/exhibition',
       icon: () => (
         <Diversity1Icon sx={{ fontSize: 22 }} />
       ),
-      Name: "Exhibition"
+      Name: "Exhibition",
+      isVisible: (isAdmin || isProjectOwner || isInnovator || isVisitor)
     },
   ];
 
-  const filteredNavs = userDetails.userType === 'Freelancer'
-    ? SIDEBAR_LIST_NAVS.filter(nav => nav.Name !== "Freelancers" && nav.Name !== "Project Owner")
-    : SIDEBAR_LIST_NAVS;
+  // const filteredNavs = userDetails.userType === 'Freelancer'
+  //   ? SIDEBAR_LIST_NAVS.filter(nav => nav.Name !== "Freelancers" && nav.Name !== "Project Owner")
+  //   : SIDEBAR_LIST_NAVS;
 
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
@@ -121,8 +136,9 @@ export default function MainSideBar() {
         </Toolbar>
         {pathName !== '/profile' && (
           <List>
-            {filteredNavs.map((navItem, index) => (
-              <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
+            {SIDEBAR_LIST_NAVS.map((navItem, index) => (
+              <>
+              {navItem.isVisible ? <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
                 <ListItemButton selected={pathName === navItem.path} sx={{ borderRadius: 3 }}>
                   <ListItemIcon sx={{ minWidth: 40 }}>
                     {navItem.icon()}
@@ -131,7 +147,8 @@ export default function MainSideBar() {
                     <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
                   )}
                 </ListItemButton>
-              </ListItem>
+              </ListItem> : ""}
+              </>
             ))}
           </List>
         )}

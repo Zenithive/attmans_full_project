@@ -10,8 +10,9 @@ import { useRouter } from 'next/navigation';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { pubsub } from '@/app/services/pubsub.service';
+import router from 'next/router';
 
 const EditProfile1: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -51,15 +52,20 @@ const EditProfile1: React.FC = () => {
   const fetchUserProfile = async (setValues: (values: typeof initialValues) => void) => {
     setLoading(true);
     try {
-      const response = await axios.get(`${SERVER_URL}/profile/profileByUsername?username=${userDetails.username}`);
+      const response = await axios.get(`${SERVER_URL}/profile/profileByUsername?username=${userDetails.username}`, {
+        headers: { username: userDetails.username },
+      });
       const userData = response.data;
+      console.log('userData',userData);
       setValues({
         ...initialValues,
         ...userData,
       });
-      if (userData.profilePhotoURL) {
-        setProfilePhotoURL(userData.profilePhotoURL);
+      if (userData.profilePhoto) { // Check for userData.profilePhoto instead of userData.profilePhotoURL
+        setProfilePhotoURL(`${SERVER_URL}/${userData.profilePhoto}`);
       }
+      console.log('userData.profilePhoto',userData.profilePhoto)
+      console.log('photo',response);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setFetchError('Failed to fetch user profile');
@@ -71,18 +77,27 @@ const EditProfile1: React.FC = () => {
   const handleSubmit = async (values: typeof initialValues) => {
     setLoading(true);
     try {
-      await axios.post(APIS.FORM1, values);
+      const formData = new FormData();
+      Object.keys(values).forEach(key => {
+        formData.append(key, values[key as keyof typeof values]);
+      });
+      if (profilePhoto) {
+        formData.append('profilePhoto', profilePhoto);
+      }
 
-      // Publish success toast message
+      await axios.post(APIS.FORM1, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
       pubsub.publish('toast', {
         message: 'Profile updated successfully!',
         severity: 'success'
       });
 
-      // Redirect to dashboard after 3 seconds
       setTimeout(() => {
-        // router.push('/dashboard');
+        router.push('/dashboard');
       }, 3000);
+
     } catch (error) {
       console.error('Error submitting form:', error);
       pubsub.publish('toast', {
@@ -93,6 +108,7 @@ const EditProfile1: React.FC = () => {
       setLoading(false);
     }
   };
+  console.log('handleSubmit',handleSubmit);
 
   return (
     <Container component="main" maxWidth="md">
@@ -209,3 +225,7 @@ const EditProfile1: React.FC = () => {
 }
 
 export default EditProfile1;
+function dispatch(arg0: { payload: UserSchema; type: "user/addUser"; }) {
+  throw new Error('Function not implemented.');
+}
+
