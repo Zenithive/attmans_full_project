@@ -31,7 +31,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     ApplyModule,
     BoothModule,
     EmailModule,
-    InterestedUserModule
+    InterestedUserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

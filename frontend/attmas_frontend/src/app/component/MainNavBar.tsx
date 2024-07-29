@@ -21,6 +21,7 @@ import DOMPurify from 'dompurify';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CircleIcon from '@mui/icons-material/Circle';
 import Jobs from '../projects/page';
+import { CommonAvatar } from './common-ui/avatar.component';
 
 interface Email {
   _id: string;
@@ -385,11 +386,12 @@ export default function MainNavBar() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              {profilePhoto ? (
+              {/* {profilePhoto ? (
                 <Avatar src={`${SERVER_URL}/${profilePhoto}`} />
               ) : (
                 <AccountCircle />
-              )}
+              )} */}
+              <CommonAvatar name={`${userDetails.firstName} ${userDetails.lastName}`} url={`${SERVER_URL}/${profilePhoto}`}></CommonAvatar>
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>

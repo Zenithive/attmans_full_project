@@ -113,10 +113,10 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({ open, onClose, cr
         console.error('Error fetching product details:', error);
       }
     };
-    if (userDetails._id) {
+    if (open && userDetails._id) {
       fetchProductDetails();
     }
-  }, [userDetails._id]);
+  }, [userDetails._id, open]);
 
   const initialValues = {
     title: '',
