@@ -12,6 +12,8 @@ import {
     TextField,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CurrencyPriceInput from './CurrencyPriceInput';
+import { ProductForBooth } from './ProductTableForBooth';
 
 export interface Product {
     productName: string;
@@ -26,11 +28,28 @@ interface ProductTableProps {
     products: Product[];
     onRemove: (index: number) => void;
     onChange: (index: number, updatedProduct: Product) => void;
+    showActions?: boolean; 
+    readOnly?: boolean; // Add this prop
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChange }) => {
+const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChange, showActions = true, readOnly = false }) => {
     const handleInputChange = (index: number, field: keyof Product, value: string) => {
+        if (readOnly) return; // Skip if readOnly is true
         const updatedProduct = { ...products[index], [field]: value };
+        onChange(index, updatedProduct);
+    };
+
+    const handleCurrencyPriceChange = (index: number, field: keyof ProductForBooth, value: string) => {
+        if (readOnly) return; // Skip if readOnly is true
+        const updatedProduct = { ...products[index], [field]: value };
+        onChange(index, updatedProduct);
+    };
+
+    const handlePriceCurrencyChange = (index: number, value: string) => {
+        if (readOnly) return; // Skip if readOnly is true
+        const [currency, ...priceParts] = value.split(' ');
+        const productPrice = priceParts.join(' ');
+        const updatedProduct = { ...products[index], currency, productPrice };
         onChange(index, updatedProduct);
     };
 
@@ -42,10 +61,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                         <TableCell>Product Name</TableCell>
                         <TableCell>Product Description</TableCell>
                         <TableCell>Product Type</TableCell>
-                        <TableCell>Product Price</TableCell>
-                        <TableCell>Currency</TableCell>
+                        <TableCell>Product Price & Currency</TableCell>
                         <TableCell>Video URL</TableCell>
-                        <TableCell>Actions</TableCell>
+                        {showActions && !readOnly && <TableCell>Actions</TableCell>}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -56,6 +74,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                                     value={product.productName}
                                     onChange={(e) => handleInputChange(index, 'productName', e.target.value)}
                                     fullWidth
+                                    InputProps={{ readOnly: readOnly }}
                                 />
                             </TableCell>
                             <TableCell>
@@ -64,6 +83,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                                     value={product.productDescription}
                                     onChange={(e) => handleInputChange(index, 'productDescription', e.target.value)}
                                     fullWidth
+                                    InputProps={{ readOnly: readOnly }}
                                 />
                             </TableCell>
                             <TableCell>
@@ -71,38 +91,36 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                                     value={product.productType}
                                     onChange={(e) => handleInputChange(index, 'productType', e.target.value)}
                                     fullWidth
+                                    InputProps={{ readOnly: readOnly }}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <CurrencyPriceInput
+                                    price={product.productPrice}
+                                    currency={product.currency}
+                                    onPriceChange={(value) => handleCurrencyPriceChange(index, 'productPrice', value)}
+                                    onCurrencyChange={(value) => handleCurrencyPriceChange(index, 'currency', value)}
+                                    readonly={readOnly}
                                 />
                             </TableCell>
                             <TableCell>
                                 <TextField
-                                    value={product.productPrice}
-                                    onChange={(e) => handleInputChange(index, 'productPrice', e.target.value)}
-                                    fullWidth
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    value={product.currency}
-                                    onChange={(e) => handleInputChange(index, 'currency', e.target.value)}
-                                    fullWidth
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    value={product.videourlForproduct
-                                        || ''}
+                                    value={product.videourlForproduct || ''}
                                     onChange={(e) => handleInputChange(index, 'videourlForproduct', e.target.value)}
                                     fullWidth
+                                    InputProps={{ readOnly: readOnly }}
                                 />
                             </TableCell>
-                            <TableCell>
-                                <IconButton
-                                    aria-label="remove product"
-                                    onClick={() => onRemove(index)}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                            </TableCell>
+                            {showActions && !readOnly && (
+                                <TableCell>
+                                    <IconButton
+                                        aria-label="remove product"
+                                        onClick={() => onRemove(index)}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            )}
                         </TableRow>
                     ))}
                 </TableBody>

@@ -13,7 +13,7 @@ export class ProductInfo {
   @Prop({ required: false })
   productType: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false,type: Number })
   productPrice: string;
 
   @Prop({ required: false })
