@@ -410,7 +410,7 @@ const ExhibitionsPage: React.FC = () => {
               </ToggleButtonGroup>
             )}
           </Box>
-          {userType !== 'visitors' && (
+          {userType !== 'Visitors' && (
             <Box display="flex" justifyContent="center" marginTop="20px" sx={{position:'relative',bottom:'22px'}}>
               <ToggleButtonGroup
                 value={view}
