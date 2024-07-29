@@ -216,6 +216,7 @@ export default function MainNavBar() {
         horizontal: 'right',
       }}
       open={Boolean(anchorEl)}
+  
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>
