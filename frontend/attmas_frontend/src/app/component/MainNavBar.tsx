@@ -11,7 +11,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
 import { Divider, MenuItem, Typography } from '@mui/material';
-import { UserSchema, selectUserSession } from '../reducers/userReducer';
+import { UserSchema, selectUserSession, updateProfilePhoto } from '../reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
@@ -75,6 +75,7 @@ export default function MainNavBar() {
           headers: { username: userDetails.username },
         });
         setProfilePhoto(response.data.profilePhoto);
+        dispatch(updateProfilePhoto(response.data.profilePhoto));
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
@@ -82,7 +83,7 @@ export default function MainNavBar() {
     if (userDetails.username) {
       fetchUserProfile();
     }
-  }, [userDetails.username]);
+  }, [userDetails.username,profilePhoto]);
 
   React.useEffect(() => {
     const fetchNotifications = async () => {
@@ -205,30 +206,55 @@ export default function MainNavBar() {
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'top',
+        vertical: 'bottom',
         horizontal: 'right',
       }}
       id={menuId}
       keepMounted
-      sx={{width:'14%'}}
+      PaperProps={{
+        style: {
+          width: '300px',
+          overflow: 'visible',
+          filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+          marginTop: '-5px',
+        },
+        sx: {
+          '&:before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: 22,
+            width: 11,
+            height: 11,
+            bgcolor: 'background.paper',
+            transform: 'translateY(-50%) rotate(45deg)',
+            zIndex: 0,
+          },
+        },
+      }}
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right',
       }}
-      open={Boolean(anchorEl)}
-  
+      open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>
-        Signed in as <br />
-        {userDetails.firstName} {userDetails.lastName}<br/>
-        ({userDetails.userType})
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+        <Avatar src={`${SERVER_URL}/${profilePhoto}`} sx={{ width: 56, height: 56, mb: 1 }} />
+        <Typography variant="h6">{userDetails.firstName} {userDetails.lastName}</Typography>
+        <Typography variant="body2" color="textSecondary">{userDetails.userType}</Typography>
+      </Box>
+      <Divider />
+      <MenuItem onClick={handleProfileRedirect}>
+        <Typography variant="body2">Profile</Typography>
       </MenuItem>
-      <MenuItem onClick={handleProfileRedirect}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Log out</MenuItem>
+      <MenuItem onClick={handleLogout}>
+        <Typography variant="body2">Log out</Typography>
+      </MenuItem>
     </Menu>
   );
-
+  
   const notificationMenuId = 'primary-notification-menu';
 
   const renderNotificationMenu = (

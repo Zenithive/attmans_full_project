@@ -66,6 +66,7 @@ const EditProfile: React.FC = () => {
             try {
                 const { password, ...restValues } = values;
                 const payload = changePassword ? values : restValues;
+                console.log('Payload:', payload);
                 await axios.put(`${SERVER_URL}/users/${userDetails._id}`, payload);
                 setStatus({ success: 'Profile updated successfully!' });
             } catch (error) {
