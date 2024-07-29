@@ -141,19 +141,24 @@ export class UsersService {
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    const user = await this.userModel.findById({ _id: id }).exec();
+    const user = await this.userModel.findById(id).exec();
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    if (updateUserDto.username && updateUserDto.username !== user.username) {
+    console.log('updateUserDto:', updateUserDto);
+    console.log('Current user email:', user.username);
+
+    if (updateUserDto.email && updateUserDto.email !== user.username) {
+      console.log('Updating email...');
       const existingUser = await this.userModel
-        .findOne({ username: updateUserDto.username })
+        .findOne({ username: updateUserDto.email })
         .exec();
-      console.log('existingUser', existingUser);
       if (existingUser && existingUser._id.toString() !== id) {
         throw new ConflictException('Email is already in use');
       }
+      console.log('existingUser', existingUser);
+      user.username = updateUserDto.email;
     }
 
     if (updateUserDto.password) {
@@ -161,9 +166,9 @@ export class UsersService {
       updateUserDto.password = hashedPassword;
     }
 
-    Object.assign(user, updateUserDto);
+    Object.assign(user, updateUserDto, { username: user.username });
     await user.save();
-    console.log('user', user);
+    console.log('Updated user:', user);
     return user;
   }
 }

@@ -9,8 +9,8 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
-import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector, useAppDispatch } from '@/app/reducers/hooks.redux';
+import { addUser, selectUserSession, UserSchema, updateProfilePhoto } from '@/app/reducers/userReducer';
 import { pubsub } from '@/app/services/pubsub.service';
 import router from 'next/router';
 
@@ -20,8 +20,8 @@ const EditProfile1: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  const dispatch = useAppDispatch();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  // const router = useRouter();
 
   const initialValues = {
     gender: '',
@@ -40,7 +40,6 @@ const EditProfile1: React.FC = () => {
     address: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
     state: Yup.string().required('Required'),
-    // pinCode: Yup.string().required('Required'),
     pinCode: Yup.string()
       .required('Required')
       .matches(/^[0-9]+$/, 'Must be only digits'),
@@ -56,16 +55,15 @@ const EditProfile1: React.FC = () => {
         headers: { username: userDetails.username },
       });
       const userData = response.data;
-      console.log('userData',userData);
       setValues({
         ...initialValues,
         ...userData,
       });
-      if (userData.profilePhoto) { // Check for userData.profilePhoto instead of userData.profilePhotoURL
-        setProfilePhotoURL(`${SERVER_URL}/${userData.profilePhoto}`);
+      if (userData.profilePhoto) {
+        const profilePhotoURL = `${SERVER_URL}/${userData.profilePhoto}`;
+        setProfilePhotoURL(profilePhotoURL);
+        dispatch(updateProfilePhoto(profilePhotoURL));
       }
-      console.log('userData.profilePhoto',userData.profilePhoto)
-      console.log('photo',response);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setFetchError('Failed to fetch user profile');
@@ -78,7 +76,7 @@ const EditProfile1: React.FC = () => {
     setLoading(true);
     try {
       const formData = new FormData();
-      Object.keys(values).forEach(key => {
+      Object.keys(values).forEach((key) => {
         formData.append(key, values[key as keyof typeof values]);
       });
       if (profilePhoto) {
@@ -91,24 +89,27 @@ const EditProfile1: React.FC = () => {
 
       pubsub.publish('toast', {
         message: 'Profile updated successfully!',
-        severity: 'success'
+        severity: 'success',
       });
+
+      if (profilePhoto) {
+        const profilePhotoURL = URL.createObjectURL(profilePhoto);
+        dispatch(updateProfilePhoto(profilePhotoURL));
+      }
 
       setTimeout(() => {
         router.push('/dashboard');
       }, 3000);
-
     } catch (error) {
       console.error('Error submitting form:', error);
       pubsub.publish('toast', {
         message: 'Failed to update profile.',
-        severity: 'error'
+        severity: 'error',
       });
     } finally {
       setLoading(false);
     }
   };
-  console.log('handleSubmit',handleSubmit);
 
   return (
     <Container component="main" maxWidth="md">
@@ -122,13 +123,13 @@ const EditProfile1: React.FC = () => {
           width: '142.5%',
           position: 'relative',
           right: '180px',
-          bottom: "60px",
+          bottom: '60px',
           boxShadow: 5,
-           '@media (max-width: 767px)': {
+          '@media (max-width: 767px)': {
             width: '105%',
-            position:'relative',
-            left:'7%'
-          }
+            position: 'relative',
+            left: '7%',
+          },
         }}
       >
         <Typography component="h1" variant="h5" align="center">
@@ -165,7 +166,9 @@ const EditProfile1: React.FC = () => {
                     if (event.currentTarget.files) {
                       const file = event.currentTarget.files[0];
                       setProfilePhoto(file);
-                      setProfilePhotoURL(URL.createObjectURL(file));
+                      const profilePhotoURL = URL.createObjectURL(file);
+                      setProfilePhotoURL(profilePhotoURL);
+                      dispatch(updateProfilePhoto(profilePhotoURL));
                     }
                   }}
                 />
@@ -191,17 +194,6 @@ const EditProfile1: React.FC = () => {
 
                 <ProfileFormFields />
 
-                {/* <LoadingButton
-                  type="submit"
-                  variant="contained"
-                  size='small'
-                  loading={loading}
-                  loadingIndicator={<CircularProgress size={24} />}
-                  sx={{ mt: 2, mb: 2, ml: '90%', width: '10%', height: '40px' }}
-                >
-                  Save
-                </LoadingButton> */}
-
                 <Box mt={3} display="flex" justifyContent="center">
                   <LoadingButton
                     type="submit"
@@ -213,8 +205,6 @@ const EditProfile1: React.FC = () => {
                     Update Personal Details
                   </LoadingButton>
                 </Box>
-
-
               </Form>
             );
           }}
@@ -222,10 +212,6 @@ const EditProfile1: React.FC = () => {
       </Box>
     </Container>
   );
-}
+};
 
 export default EditProfile1;
-function dispatch(arg0: { payload: UserSchema; type: "user/addUser"; }) {
-  throw new Error('Function not implemented.');
-}
-
