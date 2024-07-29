@@ -13,6 +13,18 @@ import Toast from "./component/toast/Toast"; // Adjust the import path according
 const inter = Inter({ subsets: ["latin"] });
 
 const theme = createTheme({
+  typography: {
+    fontFamily: [
+      '"Segoe UI"',
+      // 'Roboto',
+      // '"Helvetica Neue"',
+      // 'Arial',
+      // 'sans-serif',
+      // '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  },
   palette: {
     primary: {
       main: "#f5f5f5",

@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
+import { CircularProgress } from '@mui/material';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -54,6 +55,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
     onSubmit: async (values) => {
       try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
+
         const res = response.data.user;
         const user = {
           token: response.data.access_token,
@@ -146,11 +148,12 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           />
           <Button
             type="submit"
+            disabled={formik.isSubmitting}
             fullWidth
             variant="contained"
             color='secondary'
             sx={{ mt: 3, mb: 2 }}
-          >Sign In</Button>
+          >{formik.isSubmitting ? <CircularProgress /> : 'Sign In'}</Button>
           {formik.status && formik.status.error && (
             <Typography variant="body2" color="error" align="center">
               {formik.status.error}
