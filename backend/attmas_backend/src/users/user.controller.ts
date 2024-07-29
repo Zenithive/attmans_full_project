@@ -6,6 +6,9 @@ import {
   UseGuards,
   Get,
   Query,
+  NotFoundException,
+  Param,
+  Put,
 } from '@nestjs/common';
 import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
@@ -59,5 +62,26 @@ export class UsersController {
   async getUsersByUserType1(@Query('userType') userType: string) {
     const usernames = await this.usersService.findUsersByUserType1(userType);
     return usernames;
+  }
+
+  @Get('profile')
+  async getUserProfile(@Query('username') username: string) {
+    const user = await this.usersService.findByUsername(username);
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+    return user;
+  }
+
+  @Put(':id')
+  async updateUserProfile(
+    @Param('id') id: string,
+    @Body() updateUserDto: CreateUserDto,
+  ) {
+    const updatedUser = await this.usersService.updateUserProfile(
+      id,
+      updateUserDto,
+    );
+    return updatedUser;
   }
 }

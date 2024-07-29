@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './user.schema';
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto, UpdateUserDto } from './create-user.dto';
 import { Categories } from 'src/profile/schemas/category.schema';
 import { MailerService } from 'src/common/service/UserEmailSend';
 
@@ -135,5 +135,35 @@ export class UsersService {
       username: user.username,
     }));
     return userDetails;
+  }
+
+  async updateUserProfile(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    const user = await this.userModel.findById({ _id: id }).exec();
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (updateUserDto.username && updateUserDto.username !== user.username) {
+      const existingUser = await this.userModel
+        .findOne({ username: updateUserDto.username })
+        .exec();
+      console.log('existingUser', existingUser);
+      if (existingUser && existingUser._id.toString() !== id) {
+        throw new ConflictException('Email is already in use');
+      }
+    }
+
+    if (updateUserDto.password) {
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, 10);
+      updateUserDto.password = hashedPassword;
+    }
+
+    Object.assign(user, updateUserDto);
+    await user.save();
+    console.log('user', user);
+    return user;
   }
 }

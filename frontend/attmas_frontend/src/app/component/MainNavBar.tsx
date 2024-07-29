@@ -210,6 +210,7 @@ export default function MainNavBar() {
       }}
       id={menuId}
       keepMounted
+      sx={{width:'14%'}}
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right',
@@ -219,7 +220,8 @@ export default function MainNavBar() {
     >
       <MenuItem onClick={handleMenuClose}>
         Signed in as <br />
-        {userDetails.username}
+        {userDetails.firstName} {userDetails.lastName}<br/>
+        ({userDetails.userType})
       </MenuItem>
       <MenuItem onClick={handleProfileRedirect}>Profile</MenuItem>
       <MenuItem onClick={handleLogout}>Log out</MenuItem>

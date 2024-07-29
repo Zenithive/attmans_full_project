@@ -131,14 +131,16 @@ export class ProfileService {
   //   return product;
   // }
 
-  async getProductNameByUsername(username: string): Promise<ProductInfo[] | null> {
+  async getProductNameByUsername(
+    username: string,
+  ): Promise<ProductInfo[] | null> {
     try {
       // Find the document and project only the `products` field
       const workExperience = await this.workExprience
         .findOne({ username })
         .select('products') // Only select the `products` field
         .exec();
-  
+
       // If the work experience document is found, return the `products` field
       return workExperience ? workExperience.products : null;
     } catch (error) {
@@ -146,7 +148,6 @@ export class ProfileService {
       return null;
     }
   }
-  
 
   async getProfileByUsername3(username: string): Promise<Categories | null> {
     return this.categories.findOne({ username }).exec();

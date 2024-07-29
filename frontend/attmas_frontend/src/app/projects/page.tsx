@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
 import axios from 'axios';
@@ -737,16 +737,13 @@ const Jobs = () => {
                         />
 
                         {viewingJob.rejectComment && (
-                            <Box sx={{ borderRadius: '5px', position: 'relative', top: '20px' }}>
-                                <TextField
-                                    label="Rejection Comment"
-                                    value={viewingJob.rejectComment}
-                                    InputProps={{ readOnly: true }}
-                                    fullWidth
-                                    disabled
-                                    sx={{ mb: 2, fontStyle: 'italic', color: 'error.main' }}
-                                />
-                            </Box>
+                           <Grid item xs={12}>
+                           <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
+                             <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'white' }}>
+                               <b>Rejection Comment:</b> {viewingJob.rejectComment}
+                             </Typography>
+                           </Box>
+                         </Grid>
                         )}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
