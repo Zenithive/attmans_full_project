@@ -13,6 +13,7 @@ import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
+import Jobs from '@/app/projects/page';
 
 interface Apply {
   _id?: string;
@@ -21,6 +22,34 @@ interface Apply {
   Budget: number;
   currency: string;
   TimeFrame: string | null;
+}
+
+interface Job {
+  _id?: string;
+  title: string;
+  description: string;
+  Budget: number;
+  Expertiselevel: string;
+  TimeFrame: string | null;
+  Category: string[];
+  Subcategorys: string[];
+
+  // ******** op ******** //
+  DetailsOfInnovationChallenge: string;
+  Sector: string;
+  AreaOfProduct: string;
+  ProductDescription: string;
+
+
+  username: string;
+  SelectService: string;
+  Objective: string;
+  Expectedoutcomes: string;
+  IPRownership: string;
+  currency: string;
+  // Status: string;
+  status: string;
+  rejectComment?: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -35,9 +64,11 @@ interface AddApplyProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   jobTitle: string;
+  jobId: string;
+
 }
 
-export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
+export const AddApply= ({ open, setOpen,jobTitle,jobId}:AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const initialValues = {
@@ -46,10 +77,11 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
     Budget: 0,
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
+    jobId:jobId
   };
 
   const handleSubmit = async (
-    values: { title: string; description: string; Budget: number; TimeFrame: Dayjs | null;  currency: string;},
+    values: { title: string; description: string; Budget: number; TimeFrame: Dayjs | null;  currency: string; jobId: string;},
     { setSubmitting, resetForm }: any
   ) => {
     const applyData = {
@@ -59,7 +91,8 @@ export const AddApply= ({ open, setOpen,jobTitle }:AddApplyProps) => {
       currency: values.currency,
       Budget: values.Budget,
       userId: userDetails._id,
-      username: userDetails.username
+      username: userDetails.username,
+      jobId: values.jobId,
     };
 
     try {

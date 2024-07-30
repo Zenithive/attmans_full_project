@@ -21,8 +21,7 @@ import ApproveDialogForProject from '../component/approveforproject/approveforpr
 import RejectDialogForProject from '../component/rejectforproject/rejectforproject';
 import { styled } from '@mui/material/styles';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-
-
+import ProjectDrawer from '../component/projectDrwer/projectDrwer';
 
 
 interface Job {
@@ -55,6 +54,15 @@ interface Job {
 
 
 
+interface Apply {
+    _id?: string;
+    title: string;
+    description: string;
+    Budget: number;
+    currency: string;
+    TimeFrame: string | null;
+}
+
 const Expertiselevel = [
     "Beginner",
     "Intermidiate",
@@ -68,6 +76,7 @@ const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
+    const [selectedJobId, setSelectedJobId] =  useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
@@ -85,6 +94,8 @@ const Jobs = () => {
     const [isApproved, setIsApproved] = useState(false);
     const [isRejected, setIsRejected] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+    
+
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
@@ -144,6 +155,8 @@ const Jobs = () => {
             console.error('Error fetching jobs:', error);
         }
     }, [userId, filterType]);
+
+ 
 
     const refetch = useCallback(async () => {
         try {
@@ -213,9 +226,10 @@ const Jobs = () => {
         setConfirmDelete({ open: false, jobs: null });
     };
 
-    const handleApplyClick = useCallback((title: string) => {
+    const handleApplyClick = useCallback((title: string,job:Job) => {
         setApplyOpen(true);
         setJobTitle(title);
+        setSelectedJobId(job._id || '');
     }, []);
     const handleFilterChange = useCallback(() => {
         refetch();
@@ -306,6 +320,7 @@ const Jobs = () => {
     }));
 
 
+    
 
     return (
         <Box
@@ -502,16 +517,19 @@ const Jobs = () => {
 
                                     <Typography variant="body2">{job.Budget}</Typography>
                                     <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-
+                                    
                                     <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => handleApplyClick(job.title)}
-                                            sx={{ '@media (max-width: 767px)': { display: 'none' } }}
-                                        >
-                                            Apply
-                                        </Button>
+                                    {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleApplyClick(job.title,job)}
+                                                sx={{ '@media (max-width: 767px)': { display: 'none' } }}
+                                            >
+                                                Apply
+                                            </Button>
+                                        )}
+
 
                                         {userDetails.userType === 'Project Owner' && (
                                             <>
@@ -549,7 +567,7 @@ const Jobs = () => {
                                                 },
                                             }}
                                         >
-                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px' ,position:'relative',bottom:'8px',height:'55px'}} onClick={() => { handleApplyClick(job.title); handleClose(); }}>Apply</MenuItem>
+                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title,job); handleClose(); }}>Apply</MenuItem>
                                             {userDetails.userType === 'Project Owner' && (
                                                 <>
                                                     <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
@@ -575,7 +593,14 @@ const Jobs = () => {
                     ))}
                 </Box>
             </InfiniteScroll>
-            <AddApply open={applyOpen} setOpen={setApplyOpen} jobTitle={jobTitle} />
+
+            <AddApply 
+            open={applyOpen} 
+            setOpen={setApplyOpen} 
+            jobTitle={jobTitle} 
+            jobId={selectedJobId}
+            />
+
             <DeleteConfirmationDialog
                 open={confirmDelete.open}
                 onCancel={handleCancelDelete}
@@ -584,185 +609,14 @@ const Jobs = () => {
             />
 
 
-            <Drawer
-                anchor="right"
-                open={!!viewingJob}
-                onClose={() => setViewingJob(null)}
-                PaperProps={{
-                    sx: {
-                        borderRadius: '20px 0px 0px 20px',
-                        width: '600px',
-                        p: 2,
-                        backgroundColor: '#f9f9f9',
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                        }
-                    }
-                }}
-                BackdropProps={{
-                    sx: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    }
-                }}
-            >
-                {viewingJob && (
-                    <Box p={2}>
-                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Project Details Information</Typography>
 
-                        {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right', mb: 2 }} />}
-                        {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right', mb: 2 }} />}
-
-                        <TextField
-                            label="Title"
-                            value={viewingJob.title}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Description"
-                            value={viewingJob.description}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Select Service"
-                            value={viewingJob.SelectService}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        {viewingJob.SelectService === 'Innovative product' && (
-                            <>
-                                <TextField
-                                    label="Details Of Innovation Challenge"
-                                    value={viewingJob.DetailsOfInnovationChallenge}
-                                    fullWidth
-                                    disabled
-                                    sx={{ mb: 2 }}
-                                />
-
-                                <TextField
-                                    label="Sector"
-                                    value={viewingJob.Sector}
-                                    fullWidth
-                                    disabled
-                                    sx={{ mb: 2 }}
-                                />
-
-                                <TextField
-                                    label="Area Of Product"
-                                    value={viewingJob.AreaOfProduct}
-                                    fullWidth
-                                    disabled
-                                    sx={{ mb: 2 }}
-                                />
-
-                                <TextField
-                                    label="Product Description"
-                                    value={viewingJob.ProductDescription}
-                                    InputProps={{ readOnly: true }}
-                                    fullWidth
-                                    disabled
-                                    sx={{ mb: 2 }}
-                                />
-                            </>
-                        )}
-
-                        <TextField
-                            label="Expertise Level"
-                            value={viewingJob.Expertiselevel}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Budget"
-                            value={`${viewingJob.currency === 'USD' ? '$' : '₹'} ${viewingJob.Budget}`}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Category"
-                            value={viewingJob.Category.join(', ')}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Subcategories"
-                            value={viewingJob.Subcategorys.join(', ')}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Objective"
-                            value={viewingJob.Objective}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="Expected Outcomes"
-                            value={viewingJob.Expectedoutcomes}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        <TextField
-                            label="IPR Ownership"
-                            value={viewingJob.IPRownership}
-                            InputProps={{ readOnly: true }}
-                            fullWidth
-                            disabled
-                            sx={{ mb: 2 }}
-                        />
-
-                        {viewingJob.rejectComment && (
-                           <Grid item xs={12}>
-                           <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
-                             <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'white' }}>
-                               <b>Rejection Comment:</b> {viewingJob.rejectComment}
-                             </Typography>
-                           </Box>
-                         </Grid>
-                        )}
-
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                            {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
-                                <>
-                                    <Button onClick={() => handleApproveDialogOpen(viewingJob)}>
-                                        Approve
-                                    </Button>
-
-                                    <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
-                                        Reject
-                                    </Button>
-                                </>
-                            )}
-                        </Box>
-                    </Box>
-                )}
-            </Drawer>
-
+            <ProjectDrawer
+                viewingJob={viewingJob}
+                setViewingJob={setViewingJob}
+                userType={userType}
+                handleApproveDialogOpen={handleApproveDialogOpen}
+                handleRejectDialogOpen={handleRejectDialogOpen}
+            />
 
             <ApproveDialogForProject
                 open={approveDialogOpen.open}
