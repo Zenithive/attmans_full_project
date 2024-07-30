@@ -261,6 +261,50 @@ export class EmailService2 {
     }
   }
 
+  async sendApplicationStatusEmail(
+    to: string,
+    subject: string,
+    applicationId: string,
+    title: string,
+    status3: string,
+    adminFirstName: string,
+    adminLastName: string,
+  ) {
+    try {
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`User with username ${to} not found`);
+      }
+
+      const html = `
+        Dear ${user.firstName} ${user.lastName},<br>
+        Your application "${title}" has been ${status3} by ${adminFirstName} ${adminLastName}.
+      `;
+
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to,
+        subject,
+        sentAt: new Date(),
+        read: false,
+        applicationId,
+        title,
+        status3,
+        adminFirstName,
+        adminLastName,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to ${to}:`, error);
+    }
+  }
+
   // email.service2.ts
   async markAsRead(id: string): Promise<void> {
     await this.emailModel.findByIdAndUpdate(id, { read: true }).exec();

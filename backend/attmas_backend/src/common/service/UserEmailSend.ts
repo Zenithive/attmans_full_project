@@ -10,26 +10,26 @@ console.log('process.env.EMAIL_PASS', process.env.EMAIL_PASS);
 
 @Injectable()
 export class MailerService {
-    private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter;
 
-    constructor() {
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail', // or any other service
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-    }
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail', // or any other service
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
 
-    async sendEmail(to: string, subject: string, text: string): Promise<void> {
-        const mailOptions = {
-            from: 'process.env.EMAIL_USER',
-            to,
-            subject,
-            text,
-        };
+  async sendEmail(to: string, subject: string, text: string): Promise<void> {
+    const mailOptions = {
+      from: 'process.env.EMAIL_USER',
+      to,
+      subject,
+      text,
+    };
 
-        await this.transporter.sendMail(mailOptions);
-    }
+    await this.transporter.sendMail(mailOptions);
+  }
 }

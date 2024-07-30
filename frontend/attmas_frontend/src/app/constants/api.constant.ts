@@ -42,6 +42,9 @@ export const APIS = {
     UPDATE_BOOTH: `${SERVER_URL}/booths/update-buttons-hidden`,
     APPROVE_PROJECT: `${SERVER_URL}/jobs/approve`,
     REJECT_PROJECT: `${SERVER_URL}/jobs/reject`,
+    APPROVE_Apply_PROJECT: `${SERVER_URL}/apply/approve`,
+    REJECT_Apply_PROJECT: `${SERVER_URL}/apply/reject`,
+    APPLY_JOBID: `${SERVER_URL}/apply/jobId`,
 
     
 
