@@ -12,10 +12,11 @@ export const APIS = {
     //****** Profile API url ******//
     FORM1: `${SERVER_URL}/profile/form1`,
     FORM2: `${SERVER_URL}/profile/form2`,
+    FORMTOPRODUCT: `${SERVER_URL}/profile/formtoproduct`,
     FORM3: `${SERVER_URL}/profile/form3`,
     CHECK_PROFILE: `${SERVER_URL}/profile/check`,
 
-    ADDBOTHPRODUCTTOWORKEXPRINCE: `${SERVER_URL}/profile`,
+    ADDBOTHPRODUCTTOWORKEXPRINCE: `${SERVER_URL}/profile/addProductToWorkExperience`,
 
 
 

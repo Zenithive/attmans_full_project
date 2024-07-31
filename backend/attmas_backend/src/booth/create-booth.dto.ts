@@ -33,6 +33,9 @@ class ProductDto {
   @IsString()
   @IsNotEmpty()
   videourlForproduct: string;
+
+  @IsString()
+  _id: string;
 }
 
 export class CreateBoothDto {
