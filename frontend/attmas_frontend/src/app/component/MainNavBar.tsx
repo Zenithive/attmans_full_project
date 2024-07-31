@@ -168,7 +168,7 @@ export default function MainNavBar() {
     if (notification.applicationId && notification.status3) {
       return `
         Dear ${userName},<br>
-        Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="http://localhost:4200/projects" target="_blank">here</a> for more details.
+        Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a> for more details.
       `;
     }
   
@@ -176,7 +176,7 @@ export default function MainNavBar() {
       return `
         Dear ${userName},<br>
         You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
-        <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
+        <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
       `;
     }
   
