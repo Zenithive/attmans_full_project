@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CurrencyPriceInput from './CurrencyPriceInput';
 
 export interface ProductForBooth {
+  _id?: string;
   productName: string;
   productDescription: string;
   productType: string;

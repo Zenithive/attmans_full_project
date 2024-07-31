@@ -10,12 +10,14 @@ import {
 } from 'src/exhibition/schema/exhibition.schema';
 import { EmailServices } from 'src/common/service/emailExibition';
 import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
+import { WorkExprience, WorkSchema } from 'src/profile/schemas/work.exprience.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Booth.name, schema: BoothSchema },
       { name: Exhibition.name, schema: ExhibitionSchema },
+      { name: WorkExprience.name, schema: WorkSchema },
     ]),
     UsersModule,
     EmailModule,

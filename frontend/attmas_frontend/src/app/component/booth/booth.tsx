@@ -33,6 +33,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
 }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const [productDetails, setProductDetails] = useState<ProductForBooth[]>([]);
+  const [existingProducts, setExistingProducts] = useState<ProductForBooth[]>([]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -42,6 +43,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
         );
         console.log("response of Products ", response.data);
         setProductDetails(response.data || []);
+        setExistingProducts(response.data || []);
       } catch (error) {
         console.error("Error fetching product details:", error);
       }
@@ -91,6 +93,33 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
     ),
   });
 
+  // const handleSubmit = async (
+  //   values: typeof initialValues,
+  //   { resetForm }: any
+  // ) => {
+  //   console.log("Submitting form with values:", values);
+  //   try {
+  //     await createBooth(values);
+  //     console.log("Booth created successfully");
+  
+  //     // New post request with only userId, username, and products
+  //     await axios.post(`${APIS.ADDBOTHPRODUCTTOWORKEXPRINCE}`, {
+  //       userId: values.userId,
+  //       username: values.username,
+  //       products: values.products,
+  //     }, {
+  //       params: { username: values.username }
+  //     });
+  //     console.log("Product added to WorkExperience");
+  
+  //     resetForm();
+  //     onClose();
+  //   } catch (error) {
+  //     console.error("Error creating booth:", error);
+  //   }
+  // };
+
+
   const handleSubmit = async (
     values: typeof initialValues,
     { resetForm }: any
@@ -98,15 +127,34 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
     try {
       await createBooth(values);
 
-      // New post request with only userId, username, and products
-      await axios.post(`${APIS.ADDBOTHPRODUCTTOWORKEXPRINCE}`, {
-        userId: values.userId,
-        username: values.username,
-        products: values.products,
-      }, {
-        params: { username: values.username }
-      });
+      // Identify new products
+      const newProducts = values.products.filter(
+        (product) =>
+          !existingProducts.some(
+            (existingProduct) =>
+              existingProduct.productName === product.productName &&
+              existingProduct.productDescription === product.productDescription &&
+              existingProduct.productType === product.productType &&
+              existingProduct.productPrice === product.productPrice &&
+              existingProduct.currency === product.currency &&
+              existingProduct.videourlForproduct === product.videourlForproduct
+          )
+      );
 
+      if (newProducts.length > 0) {
+        // Send only new products in the API request
+        await axios.post(
+          `${APIS.FORMTOPRODUCT}`,
+          {
+            userId: values.userId,
+            username: values.username,
+            products: newProducts,
+          },
+          {
+            params: { username: values.username },
+          }
+        );
+      }
 
       resetForm();
       onClose();
@@ -114,6 +162,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
       console.error("Error creating booth:", error);
     }
   };
+  
 
   return (
     <Modal

@@ -9,20 +9,37 @@ import {
   ExhibitionDocument,
 } from 'src/exhibition/schema/exhibition.schema';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
+import { WorkExprience } from 'src/profile/schemas/work.exprience.schema';
 
 @Injectable()
 export class BoothService {
   constructor(
     @InjectModel(Booth.name) private boothModel: Model<BoothDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(WorkExprience.name) private workExperienceModel: Model<UserDocument>,
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
     private emailService: EmailService2,
-  ) {}
+  ) { }
 
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
+
+    console.log("Booth Products:", createBoothDto.products); 
+
     const createdBooth = new this.boothModel(createBoothDto);
     const booth = await createdBooth.save();
+    
+    const newProducts = createBoothDto.products.filter(product => !product._id);
+
+    if (newProducts.length > 0) {
+      // Update WorkExprience by matching the username and pushing new products
+      await this.workExperienceModel.updateOne(
+        { username: createBoothDto.username },  // Match by username
+        { $push: { products: { $each: newProducts } } }  // Push new products into products array
+      );
+    }
+
+    
 
     const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
 
@@ -40,7 +57,6 @@ export class BoothService {
         exhibition.title,
       );
     }
-
     return booth;
   }
 
@@ -61,13 +77,13 @@ export class BoothService {
   }
 
   async findBoothProduct(username: string): Promise<Product[]> {
-    const booth = await this.boothModel.findOne({username}).select('products').exec();
+    const booth = await this.boothModel.findOne({ username }).select('products').exec();
     if (!booth) {
       throw new NotFoundException(`Booth with username  ${username} not found`);
     }
-    console.log("booth.products",booth.products);
+    console.log("booth.products", booth.products);
     return booth.products;
-    
+
   }
 
   async delete(id: string): Promise<Booth> {
