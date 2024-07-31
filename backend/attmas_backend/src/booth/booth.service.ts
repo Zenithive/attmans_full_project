@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Booth, BoothDocument } from './booth.schema';
+import { Booth, BoothDocument, Product } from './booth.schema';
 import { CreateBoothDto } from './create-booth.dto';
 import { User, UserDocument } from 'src/users/user.schema';
 import {
@@ -58,6 +58,16 @@ export class BoothService {
       throw new NotFoundException(`Booth with id ${id} not found`);
     }
     return booth;
+  }
+
+  async findBoothProduct(username: string): Promise<Product[]> {
+    const booth = await this.boothModel.findOne({username}).select('products').exec();
+    if (!booth) {
+      throw new NotFoundException(`Booth with username  ${username} not found`);
+    }
+    console.log("booth.products",booth.products);
+    return booth.products;
+    
   }
 
   async delete(id: string): Promise<Booth> {

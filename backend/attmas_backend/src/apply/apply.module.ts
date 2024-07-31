@@ -5,11 +5,13 @@ import { ApplyController } from './apply.controller';
 import { Apply, ApplySchema } from './apply.schema';
 import { UsersModule } from 'src/users/users.module';
 import { EmailService } from 'src/common/service/email.service';
+import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Apply.name, schema: ApplySchema }]),
     UsersModule,
+    EmailModule,
   ],
   controllers: [ApplyController],
   providers: [ApplyService, EmailService],

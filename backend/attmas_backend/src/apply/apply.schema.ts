@@ -32,6 +32,18 @@ export class Apply {
 
   @Prop({ required: false })
   username: string;
+
+  @Prop({ default: 'Pending' })
+  status: string;
+
+  @Prop({ required: false })
+  rejectComment: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Job', required: true })
+  jobId: Types.ObjectId;
+
+  @Prop({ default: false })
+  buttonsHidden: boolean;
 }
 
 export const ApplySchema = SchemaFactory.createForClass(Apply);

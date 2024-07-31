@@ -68,6 +68,9 @@ export class User {
   userType?: string;
 
   @Prop()
+  profilePhoto?: string;
+
+  @Prop()
   isAllProfileCompleted: boolean;
 }
 

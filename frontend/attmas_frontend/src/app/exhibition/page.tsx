@@ -16,6 +16,7 @@ import { useMemo,useCallback } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
+import EditProfile from '../component/EditProfileComponents/editUserProfile';
 
 interface Exhibition {
   _id?: string;

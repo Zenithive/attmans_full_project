@@ -15,6 +15,8 @@ export const APIS = {
     FORM3: `${SERVER_URL}/profile/form3`,
     CHECK_PROFILE: `${SERVER_URL}/profile/check`,
 
+    ADDBOTHPRODUCTTOWORKEXPRINCE: `${SERVER_URL}/profile`,
+
 
 
     PRODUCTNAME: `${SERVER_URL}/profile/products`,
@@ -37,11 +39,15 @@ export const APIS = {
     GET_SUBMITTED_INNOVATORS:`${SERVER_URL}/exhibitions/submitted-innovators`,
     CREATE_BOOTH: `${SERVER_URL}/booths`,
     GET_BOOTH: `${SERVER_URL}/booths`,
+    GET_BOOTHPRODUCTS: `${SERVER_URL}/booths`,
     APPROVE_BOOTH: `${SERVER_URL}/booths/approve`,
     REJECT_BOOTH: `${SERVER_URL}/booths/reject`,
     UPDATE_BOOTH: `${SERVER_URL}/booths/update-buttons-hidden`,
     APPROVE_PROJECT: `${SERVER_URL}/jobs/approve`,
     REJECT_PROJECT: `${SERVER_URL}/jobs/reject`,
+    APPROVE_Apply_PROJECT: `${SERVER_URL}/apply/approve`,
+    REJECT_Apply_PROJECT: `${SERVER_URL}/apply/reject`,
+    APPLY_JOBID: `${SERVER_URL}/apply/jobId`,
 
     
 

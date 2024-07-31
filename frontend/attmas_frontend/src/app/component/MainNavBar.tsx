@@ -11,7 +11,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
 import { Divider, MenuItem, Typography } from '@mui/material';
-import { UserSchema, selectUserSession } from '../reducers/userReducer';
+import { UserSchema, selectUserSession, updateProfilePhoto } from '../reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
 import axios from 'axios';
@@ -35,11 +35,13 @@ interface Email {
   sentAt: Date;
   status?: string;
   status2?: string;
+  status3?: string;
   jobId?: StaticRange;
   exhibitionUserFirstName?: string;
   exhibitionUserLastName?: string;
   adminFirstName?: string;
   adminLastName?: string;
+  applicationId?: string,
 
 }
 
@@ -76,6 +78,7 @@ export default function MainNavBar() {
           headers: { username: userDetails.username },
         });
         setProfilePhoto(response.data.profilePhoto);
+        dispatch(updateProfilePhoto(response.data.profilePhoto));
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
@@ -83,7 +86,7 @@ export default function MainNavBar() {
     if (userDetails.username) {
       fetchUserProfile();
     }
-  }, [userDetails.username]);
+  }, [userDetails.username,profilePhoto]);
 
   React.useEffect(() => {
     const fetchNotifications = async () => {
@@ -162,71 +165,105 @@ export default function MainNavBar() {
     const baseUrl = 'http://localhost:4200/projects';
     const userName = `${userDetails.firstName} ${userDetails.lastName}`;
     const viewExhibitionUrl = `/view-exhibition?exhibitionId=${notification.exhibitionId}`;
-
+  
+    if (notification.applicationId && notification.status3) {
+      return `
+        Dear ${userName},<br>
+        Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a> for more details.
+      `;
+    }
+  
     if (notification.subject === 'New Project Created') {
       return `
-            Dear ${userName},<br>
-            You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
-            <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
-        `;
+        Dear ${userName},<br>
+        You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
+        <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
+      `;
     }
-
-    else if (notification.status) {
+  
+    if (notification.status) {
       return `
-            Dear ${userName},<br>
-            Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
-        `;
+        Dear ${userName},<br>
+        Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+      `;
     }
-
-    else if (notification.boothUsername) {
+  
+    if (notification.boothUsername) {
       return `
-            Dear ${userName},<br>
-            You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to approve/reject.
-        `;
+        Dear ${userName},<br>
+        You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to approve/reject.
+      `;
     }
-
-    else if(notification.status2){
-      console.log('job',notification.status2)
+  
+    if (notification.status2) {
       return `
-       Dear ${userName},<br>
+        Dear ${userName},<br>
         Your project "${notification.title}" has been ${notification.status2} by ${notification.adminFirstName} ${notification.adminLastName}. 
         <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects.
       `;
     }
-
+  
     return `
-        Dear ${userName},<br>
-        You have been invited to participate in the exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to participate.
+      Dear ${userName},<br>
+      You have been invited to participate in the exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to participate.
     `;
   };
-
+  
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'top',
+        vertical: 'bottom',
         horizontal: 'right',
       }}
       id={menuId}
       keepMounted
+      PaperProps={{
+        style: {
+          width: '300px',
+          overflow: 'visible',
+          filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+          marginTop: '-5px',
+        },
+        sx: {
+          '&:before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: 22,
+            width: 11,
+            height: 11,
+            bgcolor: 'background.paper',
+            transform: 'translateY(-50%) rotate(45deg)',
+            zIndex: 0,
+          },
+        },
+      }}
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right',
       }}
-      open={Boolean(anchorEl)}
+      open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>
-        Signed in as <br />
-        {userDetails.username}
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+
+        <Typography variant="h6">{userDetails.firstName} {userDetails.lastName}</Typography>
+        <Typography variant="body2" color="textSecondary">{userDetails.userType}</Typography>
+      </Box>
+      <Divider />
+      <MenuItem onClick={handleProfileRedirect}>
+        <Typography variant="body2">Profile</Typography>
       </MenuItem>
-      <MenuItem onClick={handleProfileRedirect}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Log out</MenuItem>
+      <MenuItem onClick={handleLogout}>
+        <Typography variant="body2">Log out</Typography>
+      </MenuItem>
     </Menu>
   );
-
+  
   const notificationMenuId = 'primary-notification-menu';
 
   const renderNotificationMenu = (

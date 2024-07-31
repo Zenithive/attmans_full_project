@@ -10,6 +10,12 @@ import { APIS, SERVER_URL } from '../constants/api.constant';
 import { categories, subcategories1 } from '../constants/categories';
 import CloseIcon from '@mui/icons-material/Close';
 import { CommonAvatar } from './common-ui/avatar.component';
+import { useAppSelector } from "@/app/reducers/hooks.redux";
+import { UserSchema, selectUserSession } from "@/app/reducers/userReducer";
+import { useState } from 'react';
+import { ProductForBooth } from './ProductTableForBooth';
+import ProductTable, { Product } from './ProductTable';
+
 interface User {
   _id: string;
   firstName: string;
@@ -32,6 +38,8 @@ interface UserListProps {
   endMessage: string;
 }
 
+
+
 const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const [rowData, setRowData] = React.useState<User[]>([]);
   const [categoryData, setCategoryData] = React.useState<CategoryData[]>([]);
@@ -43,8 +51,11 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const [selectedSubCategory, setSelectedSubCategory] = React.useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
+  const [productDetails, setProductDetails] = useState<ProductForBooth[]>([]);
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-  React.useEffect(() => {
+
+React.useEffect(() => {
     const fetchCategories = async () => {
       try {
         const categoriesResponse = await axios.get<CategoryData[]>(APIS.CATEGORIES);
@@ -56,6 +67,10 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 
     fetchCategories();
   }, []);
+
+
+
+
 
   const fetchUsers = async () => {
     try {
@@ -73,6 +88,11 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
     }
   };
 
+
+
+
+
+
   React.useEffect(() => {
     fetchUsers();
   }, [filterText, selectedCategory, selectedSubCategory]);
@@ -84,6 +104,9 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
     setHasMore(true);
   };
 
+
+
+
   const handleCategoryChange = (event: React.SyntheticEvent, value: string | null) => {
     setSelectedCategory(value);
     setSelectedSubCategory(null);
@@ -91,6 +114,10 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
     setRowData([]);
     setHasMore(true);
   };
+
+
+
+
 
   const handleSubCategoryChange = (event: React.SyntheticEvent, value: string | null) => {
     setSelectedSubCategory(value);
@@ -110,7 +137,25 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 
 
 
+  // const handleUserClick = (user: User) => {
+  //   setSelectedUser(user);
+  //   setDrawerOpen(true);
+  // };
+
   const handleUserClick = (user: User) => {
+    // Fetch product details for the selected user
+    const fetchProductDetailsForUser = async () => {
+      try {
+        const response = await axios.get<ProductForBooth[]>(
+          `${APIS.PRODUCTNAME}?username=${user.username}`
+        );
+        setProductDetails(response.data || []);
+      } catch (error) {
+        console.error("Error fetching product details:", error);
+      }
+    };
+
+    fetchProductDetailsForUser();
     setSelectedUser(user);
     setDrawerOpen(true);
   };
@@ -236,7 +281,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
         PaperProps={{
           sx: {
             borderRadius: '20px 0px 0px 20px',
-            width: '600px',
+            width: '800px',
             p: 2,
             backgroundColor: '#f9f9f9',
             '@media (max-width: 767px)': {
@@ -270,7 +315,8 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                 color='secondary'
                 fullWidth
                 disabled
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, width: '50%' }}
+
               />
 
               <TextField
@@ -281,7 +327,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                 color='secondary'
                 fullWidth
                 disabled
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, width: '50%' }}
               />
 
               <TextField
@@ -292,7 +338,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                 color='secondary'
                 disabled
                 fullWidth
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, width: '50%' }}
               />
 
               <TextField
@@ -303,7 +349,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                 color='secondary'
                 fullWidth
                 disabled
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, width: '50%' }}
               />
 
               {getUserCategoryData(selectedUser.username) && (
@@ -316,7 +362,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                     color='secondary'
                     fullWidth
                     disabled
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 2, width: '50%' }}
                   />
 
                   <TextField
@@ -327,9 +373,27 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                     color='secondary'
                     fullWidth
                     disabled
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 2, width: '50%' }}
+                  />
+
+
+                  <ProductTable
+                    products={productDetails}
+                    onRemove={(index) => {
+                      // Handle product removal logic
+                      const updatedProducts = productDetails.filter((_, i) => i !== index);
+                      setProductDetails(updatedProducts);
+                    }}
+                    onChange={(index, updatedProduct) => {
+                      // Handle product change logic
+                      const updatedProducts = productDetails.map((product, i) => i === index ? updatedProduct : product);
+                      setProductDetails(updatedProducts);
+                    }}
+                    showActions={false} // Hide actions
+                    readOnly={true} // Make the table read-only
                   />
                 </>
+
               )}
             </>
           )}

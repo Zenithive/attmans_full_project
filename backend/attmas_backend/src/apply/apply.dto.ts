@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateApplyDto {
@@ -28,4 +28,12 @@ export class CreateApplyDto {
   @IsNotEmpty()
   // @IsEmail()
   username: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  jobId: Types.ObjectId;
 }
