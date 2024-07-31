@@ -6,9 +6,10 @@ import {
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { APIS } from '../constants/api.constant';
+import { APIS, SERVER_URL } from '../constants/api.constant';
 import { categories, subcategories1 } from '../constants/categories';
 import CloseIcon from '@mui/icons-material/Close';
+import { CommonAvatar } from './common-ui/avatar.component';
 interface User {
   _id: string;
   firstName: string;
@@ -199,24 +200,29 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
           {rowData.map((user) => {
             const { categories, subcategories } = getUserCategoryData(user.username);
             return (
-              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px', boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)' }}>
+              <Card key={user._id} sx={{ mb: 2, borderRadius: '16px', boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)', padding: "10px 0" }}>
                 <CardContent>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="h6" onClick={() => handleUserClick(user)} sx={{ cursor: 'pointer' }}>
-                        {user.firstName} {user.lastName}
-                      </Typography>
-                      <Chip variant="outlined" label={user.userType} color="secondary" />
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <CommonAvatar name={`${user.firstName} ${user.lastName}`} style={{width: 80, height: 80, marginRight: 15}}></CommonAvatar>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {user.username} | {user.mobileNumber}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {categories.join(', ')} | {subcategories.join(', ')}
-                      </Typography>
+                    <Grid container sm xs={12} spacing={1}>
+                      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="h6" onClick={() => handleUserClick(user)} sx={{ cursor: 'pointer' }}>
+                          {user.firstName} {user.lastName}
+                        </Typography>
+                        <Chip variant="outlined" label={user.userType} color="secondary" />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>
+                          {user.username} | {user.mobileNumber}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>
+                          {categories.join(', ')} | {subcategories.join(', ')}
+                        </Typography>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </CardContent>
