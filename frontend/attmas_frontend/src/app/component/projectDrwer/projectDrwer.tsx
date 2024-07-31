@@ -362,7 +362,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       </Typography>
                     </CardContent>
                     <Box sx={{ p: 1 }}>
-                    {app.status !== 'Approved' && app.status !== 'Rejected' && (
+                    {app.status !== 'Approved' && app.status !== 'Rejected' &&  (userType === 'Admin') && (
                       <>
                         <Button
                           variant="contained"

@@ -166,10 +166,9 @@ export default function MainNavBar() {
     const viewExhibitionUrl = `/view-exhibition?exhibitionId=${notification.exhibitionId}`;
   
     if (notification.applicationId && notification.status3) {
-      console.log('apply', notification.applicationId, notification.status3);
       return `
         Dear ${userName},<br>
-        Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}".Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+        Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="http://localhost:4200/projects" target="_blank">here</a> for more details.
       `;
     }
   
@@ -196,7 +195,6 @@ export default function MainNavBar() {
     }
   
     if (notification.status2) {
-      console.log('job', notification.status2);
       return `
         Dear ${userName},<br>
         Your project "${notification.title}" has been ${notification.status2} by ${notification.adminFirstName} ${notification.adminLastName}. 
