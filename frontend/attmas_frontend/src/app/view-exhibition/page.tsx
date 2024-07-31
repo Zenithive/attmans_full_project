@@ -312,7 +312,7 @@ const ExhibitionsPage: React.FC = () => {
               >
                 Participate
               </Button>
-            )}
+           )}
 
 
             {(!userType || userType === 'Visitors') && (
