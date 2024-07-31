@@ -39,3 +39,30 @@ export class CreateUserDto {
   })
   userType?: UserType;
 }
+export class UpdateUserDto {
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  password?: string;
+
+  @IsOptional()
+  @IsString()
+  mobileNumber?: string;
+
+  @IsOptional()
+  @IsEnum(UserType, {
+    message: 'userType must be one of the following values: admin, user, guest',
+  })
+  userType?: UserType;
+}

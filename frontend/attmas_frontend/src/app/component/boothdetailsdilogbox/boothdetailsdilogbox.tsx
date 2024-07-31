@@ -19,7 +19,7 @@ import {
   Grid,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
 
 interface Product {
@@ -165,7 +165,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                                 }}
                               >
                                 <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
-                                  <PlayCircleOutlineIcon />
+                                  <YouTubeIcon style={{ fontSize: '40px',position:'relative',right:'10px' }}/>
                                 </IconButton>
                               </Tooltip>
                             </TableCell>

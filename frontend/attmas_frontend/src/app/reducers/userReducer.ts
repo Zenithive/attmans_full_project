@@ -1,10 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
+import { userType } from "../services/user.access.service";
 
 
 export interface UserSchema{
   token : string, username: string, firstName: string, lastName: string, mobileNumber: string 
-  ,_id:string, userType:string
+  ,_id:string, userType: userType,profilePhoto?: string;
 }
 export interface UserState {
   user: UserSchema; 
@@ -34,10 +35,13 @@ export const userSliece = createSlice({
     removeUser: (state) => {
       state.user = { ...initialState.user };
     }, 
-  }
+    updateProfilePhoto: (state, action: PayloadAction<string>) => {
+      state.user.profilePhoto = action.payload;
+    },
+  } 
 });
 
-export const { addUser, removeUser } = userSliece.actions;
+export const { addUser, removeUser ,updateProfilePhoto} = userSliece.actions;
 
 export const selectUserSession = (state: RootState) => state.user.user;
 

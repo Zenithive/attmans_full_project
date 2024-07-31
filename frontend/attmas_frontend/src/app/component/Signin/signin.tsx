@@ -17,6 +17,7 @@ import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReduc
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
+import { getRoleBasedAccess } from '@/app/services/user.access.service';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -82,14 +83,24 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           mobileNumber: res.mobileNumber,
         };
 
-        if (res.userType === "Visitors") {
+        const {
+          isAdmin,
+          isFreelancer,
+          isInnovator,
+          isProjectOwner,
+          isVisitor
+        } = getRoleBasedAccess(res.userType);
+
+        if (exhibitionId) {
           await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
         }
 
         if (onSignInSuccess) {
           onSignInSuccess();
-        } else if (res.isAllProfileCompleted || ["innoveters", "freelancer", "business"].includes(res.userType)) {
+        } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
           router.push("/dashboard");
+        } else if (isVisitor) {
+          router.push("/exhibition");
         } else {
           router.push("/profile");
         }

@@ -33,4 +33,22 @@ export class ApplyController {
     }
     return apply;
   }
+
+  @Post('approve/:id')
+  async approve(@Param('id') id: string) {
+    return this.applyService.approveApplication(id);
+  }
+
+  @Post('reject/:id')
+  async reject(
+    @Param('id') id: string,
+    @Body('rejectComment') rejectComment: string,
+  ) {
+    return this.applyService.rejectApplication(id, rejectComment);
+  }
+
+  @Get('jobId/:jobId')
+  async findByJobId(@Param('jobId') jobId: string) {
+    return this.applyService.findByJobId(jobId);
+  }
 }

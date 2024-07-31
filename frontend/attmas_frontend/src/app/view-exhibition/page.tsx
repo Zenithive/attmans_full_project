@@ -13,6 +13,7 @@ import RemoveDialog from '../component/removedilog/removedilog';
 import BoothDetailsDialog from '../component/boothdetailsdilogbox/boothdetailsdilogbox';
 import Head from 'next/head';
 import IntrestedModal from '../component/booth/intrestedUsers';
+import StatusFilter from '../component/filter/filter';
 
 interface Exhibition {
   _id?: string;
@@ -383,34 +384,10 @@ const ExhibitionsPage: React.FC = () => {
           }}>
             <h1>Booth Details</h1>
             {(userDetails && (userType === 'Admin' || userType === 'Innovators' )&& view === 'boothDetails') && (
-              <ToggleButtonGroup
-                value={statusFilter}
-                exclusive
-                onChange={handleStatusFilterChange}
-                aria-label="status filter"
-                sx={{
-                  position: 'relative', left: '40%', bottom: '63px', '@media (max-width: 767px)': {
-                    position: 'relative',
-                    top: '10px',
-                    left: '-24px'
-                  }
-                }}
-              >
-                <ToggleButton value="All" aria-label="all">All
-                </ToggleButton>
-                <ToggleButton value="Pending" aria-label="pending">
-                  Pending
-                </ToggleButton>
-                <ToggleButton value="Approved" aria-label="approved">
-                  Approved
-                </ToggleButton>
-                <ToggleButton value="Rejected" aria-label="rejected">
-                  Rejected
-                </ToggleButton>
-              </ToggleButtonGroup>
+              <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} />
             )}
           </Box>
-          {userType !== 'visitors' && (
+          {userType !== 'Visitors' && (
             <Box display="flex" justifyContent="center" marginTop="20px" sx={{position:'relative',bottom:'22px'}}>
               <ToggleButtonGroup
                 value={view}
