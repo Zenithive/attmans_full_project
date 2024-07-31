@@ -61,6 +61,9 @@ export class Email extends Document {
   @Prop({ ref: 'applies', required: false })
   status3: string;
 
+  @Prop({ ref: 'applies', required: false })
+  applicationId: string;
+
   @Prop({ ref: 'exhibitions', required: false })
   exhibitionUserFirstName: string;
 
