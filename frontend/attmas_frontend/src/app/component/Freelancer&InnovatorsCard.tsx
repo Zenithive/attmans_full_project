@@ -16,7 +16,6 @@ import { useState } from 'react';
 import { ProductForBooth } from './ProductTableForBooth';
 import ProductTable, { Product } from './ProductTable';
 
-
 interface User {
   _id: string;
   firstName: string;
@@ -40,8 +39,6 @@ interface UserListProps {
   endMessage: string;
 }
 
-
-
 const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const [rowData, setRowData] = React.useState<User[]>([]);
   const [categoryData, setCategoryData] = React.useState<CategoryData[]>([]);
@@ -56,10 +53,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const [productDetails, setProductDetails] = useState<ProductForBooth[]>([]);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
-
-
-
-React.useEffect(() => {
+  React.useEffect(() => {
     const fetchCategories = async () => {
       try {
         const categoriesResponse = await axios.get<CategoryData[]>(APIS.CATEGORIES);
@@ -72,14 +66,12 @@ React.useEffect(() => {
     fetchCategories();
   }, []);
 
-
   const fetchUsers = async () => {
     try {
       const response = await axios.get<User[]>(
         `${apiUrl}&page=${page}&limit=6&filter=${filterText}&category=${selectedCategory ?? ''}&subCategory=${selectedSubCategory ?? ''}`
       );
-      console.log("USERLIST(usertype) Response", response);
-      
+
       if (response.data.length < 6) {
         setHasMore(false);
       }
@@ -89,8 +81,7 @@ React.useEffect(() => {
       console.error('Error fetching users:', error);
       setHasMore(false);
     }
-  };  
-
+  };
 
   React.useEffect(() => {
     fetchUsers();
@@ -103,22 +94,6 @@ React.useEffect(() => {
     setHasMore(true);
   };
 
-  // React.useEffect(() => {
-  //   const fetchAllProfiles = async () => {
-  //     try {
-  //       const response = await axios.get<User[]>(`${APIS.ALL_PROFILES}`);
-  //       setAllProfiles(response.data || []);
-  //     } catch (error) {
-  //       console.error('Error fetching all profiles:', error);
-  //     }
-  //   };
-
-  //   fetchAllProfiles();
-  // }, []);
-
-
-
-
   const handleCategoryChange = (event: React.SyntheticEvent, value: string | null) => {
     setSelectedCategory(value);
     setSelectedSubCategory(null);
@@ -126,10 +101,6 @@ React.useEffect(() => {
     setRowData([]);
     setHasMore(true);
   };
-
-
-
-
 
   const handleSubCategoryChange = (event: React.SyntheticEvent, value: string | null) => {
     setSelectedSubCategory(value);
@@ -146,7 +117,6 @@ React.useEffect(() => {
     const userCategoryData = categoryData.find(data => data.username === username);
     return userCategoryData ? userCategoryData : { categories: [], subcategories: [] };
   };
-
 
   const handleUserClick = (user: User) => {
     // Fetch product details for the selected user
@@ -255,30 +225,29 @@ React.useEffect(() => {
                 <CardContent>
                   <Grid container spacing={2}>
                     <Grid item>
-                      {/* <CommonAvatar name={`${user.firstName} ${user.lastName}`} style={{width: 80, height: 80, marginRight: 15}}></CommonAvatar> */}
-
+                      
                       <CommonAvatar
-                        // name={`${user.firstName} ${user.lastName}`}
                         url={user.personalProfilePhoto} // Pass the profile photo URL
                         style={{ width: 80, height: 80, marginRight: 15 }}
                       />
                     </Grid>
+
                     <Grid container sm xs={12} spacing={1}>
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="h6" onClick={() => handleUserClick(user)} sx={{ cursor: 'pointer' }}>
-                        {user.firstName} {user.lastName}
-                      </Typography>
-                      <Chip variant="outlined" label={user.userType} color="secondary" />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {user.username} | {user.mobileNumber}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {categories.join(', ')} | {subcategories.join(', ')}
-                      </Typography>
+                      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="h6" onClick={() => handleUserClick(user)} sx={{ cursor: 'pointer' }}>
+                          {user.firstName} {user.lastName}
+                        </Typography>
+                        <Chip variant="outlined" label={user.userType} color="secondary" />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>
+                          {user.username} | {user.mobileNumber}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>
+                          {categories.join(', ')} | {subcategories.join(', ')}
+                        </Typography>
                       </Grid>
                     </Grid>
                   </Grid>
@@ -289,128 +258,141 @@ React.useEffect(() => {
         </Box>
       </InfiniteScroll>
 
-      <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}
-        PaperProps={{
-          sx: {
-            borderRadius: '20px 0px 0px 20px',
-            width: '800px',
-            p: 2,
-            backgroundColor: '#f9f9f9',
-            '@media (max-width: 767px)': {
-              width: '100%',
-            }
-          }
-        }}
-        BackdropProps={{
-          sx: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }
-        }}>
+      
+<Drawer
+  anchor="right"
+  open={drawerOpen}
+  onClose={handleDrawerClose}
+  PaperProps={{
+    sx: {
+      borderRadius: "20px 0px 0px 20px",
+      width: "800px",
+      p: 2,
+      backgroundColor: "#f9f9f9",
+      "@media (max-width: 767px)": {
+        width: "100%",
+      },
+    },
+  }}
+  BackdropProps={{
+    sx: {
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+  }}
+>
+  <div style={{ position: "relative" }}>
+    <IconButton
+      onClick={handleDrawerClose}
+      sx={{ position: "absolute", top: "-6px", right: 16 }}
+    >
+      <CloseIcon />
+    </IconButton>
+    {selectedUser && (
+      <>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
+          Detailed Information
+        </Typography>
 
-        <div style={{ position: 'relative' }}>
-          <IconButton
-            onClick={handleDrawerClose}
-            sx={{ position: 'absolute', top: '-6px', right: 16 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          {selectedUser && (
-            <>
-              <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
-                Detailed Information
-              </Typography>
+        {/* First row with User Name and Email */}
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <TextField
+            label="User Name"
+            value={`${selectedUser.firstName} ${selectedUser.lastName}`}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            disabled
+            sx={{ width: "50%" }}
+          />
+
+          <TextField
+            label="Email"
+            value={selectedUser.username}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            disabled
+            sx={{ width: "50%" }}
+          />
+        </Box>
+
+        {/* Second row with Mobile Number and User Type */}
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <TextField
+            label="Mobile Number"
+            value={selectedUser.mobileNumber}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            color="secondary"
+            disabled
+            fullWidth
+            sx={{ width: "50%" }}
+          />
+
+          <TextField
+            label="User Type"
+            value={selectedUser.userType}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            color="secondary"
+            fullWidth
+            disabled
+            sx={{ width: "50%" }}
+          />
+        </Box>
+
+        {getUserCategoryData(selectedUser.username) && (
+          <>
+            {/* Third row with Categories and Subcategories */}
+            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
               <TextField
-                label="User Name"
-                value={`${selectedUser.firstName} ${selectedUser.lastName}`}
+                label="Categories"
+                value={getUserCategoryData(selectedUser.username).categories.join(", ")}
                 InputProps={{ readOnly: true }}
                 variant="outlined"
-                color='secondary'
+                color="secondary"
                 fullWidth
                 disabled
-                sx={{ mb: 2, width: '50%' }}
-
+                sx={{ width: "50%" }}
               />
 
               <TextField
-                label="Email"
-                value={selectedUser.username}
+                label="Subcategories"
+                value={getUserCategoryData(selectedUser.username).subcategories.join(", ")}
                 InputProps={{ readOnly: true }}
                 variant="outlined"
-                color='secondary'
+                color="secondary"
                 fullWidth
                 disabled
-                sx={{ mb: 2, width: '50%' }}
+                sx={{ width: "50%" }}
               />
+            </Box>
 
-              <TextField
-                label="Mobile Number"
-                value={selectedUser.mobileNumber}
-                InputProps={{ readOnly: true }}
-                variant="outlined"
-                color='secondary'
-                disabled
-                fullWidth
-                sx={{ mb: 2, width: '50%' }}
-              />
-
-              <TextField
-                label="User Type"
-                value={selectedUser.userType}
-                InputProps={{ readOnly: true }}
-                variant="outlined"
-                color='secondary'
-                fullWidth
-                disabled
-                sx={{ mb: 2, width: '50%' }}
-              />
-
-              {getUserCategoryData(selectedUser.username) && (
-                <>
-                  <TextField
-                    label="Categories"
-                    value={getUserCategoryData(selectedUser.username).categories.join(', ')}
-                    InputProps={{ readOnly: true }}
-                    variant="outlined"
-                    color='secondary'
-                    fullWidth
-                    disabled
-                    sx={{ mb: 2, width: '50%' }}
-                  />
-
-                  <TextField
-                    label="Subcategories"
-                    value={getUserCategoryData(selectedUser.username).subcategories.join(', ')}
-                    InputProps={{ readOnly: true }}
-                    variant="outlined"
-                    color='secondary'
-                    fullWidth
-                    disabled
-                    sx={{ mb: 2, width: '50%' }}
-                  />
-
-
-                  <ProductTable
-                    products={productDetails}
-                    onRemove={(index) => {
-                      // Handle product removal logic
-                      const updatedProducts = productDetails.filter((_, i) => i !== index);
-                      setProductDetails(updatedProducts);
-                    }}
-                    onChange={(index, updatedProduct) => {
-                      // Handle product change logic
-                      const updatedProducts = productDetails.map((product, i) => i === index ? updatedProduct : product);
-                      setProductDetails(updatedProducts);
-                    }}
-                    showActions={false} // Hide actions
-                    readOnly={true} // Make the table read-only
-                  />
-                </>
-
-              )}
-            </>
-          )}
-        </div>
-      </Drawer>
+            {/* Product Table */}
+            <ProductTable
+              products={productDetails}
+              onRemove={(index) => {
+                const updatedProducts = productDetails.filter((_, i) => i !== index);
+                setProductDetails(updatedProducts);
+              }}
+              onChange={(index, updatedProduct) => {
+                const updatedProducts = productDetails.map((product, i) =>
+                  i === index ? updatedProduct : product
+                );
+                setProductDetails(updatedProducts);
+              }}
+              showActions={false} // Hide actions
+              readOnly={true} // Make the table read-only
+            />
+          </>
+        )}
+      </>
+    )}
+  </div>
+</Drawer>
+      
     </Box>
   );
 };
