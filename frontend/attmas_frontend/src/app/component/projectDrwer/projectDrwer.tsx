@@ -120,7 +120,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     if (userType === 'Project Owner') {
       return app.status === 'Approved';
     }
-    if (userType === 'Innovator' || userType === 'Freelancer') {
+    if (userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser; 
     }
     return true;
