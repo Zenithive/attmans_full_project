@@ -342,6 +342,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         name="Budget"
                                         label="Budget"
                                         type="number"
+                                        color='secondary'
                                         value={values.Budget}
                                         onChange={handleChange}
                                         error={touched.Budget && Boolean(errors.Budget)}
