@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Apply, ApplyDocument } from './apply.schema';
@@ -28,6 +32,16 @@ export class ApplyService {
   // }
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
+    const existingApplication = await this.ApplyModel.findOne({
+      userId: createApplyDto.userId,
+      jobId: createApplyDto.jobId,
+    }).exec();
+
+    console.log('existingApplication', existingApplication);
+    if (existingApplication) {
+      throw new ConflictException('User has already applied for this job');
+    }
+
     const createdApply = new this.ApplyModel(createApplyDto);
     await createdApply.save();
 
@@ -138,6 +152,19 @@ export class ApplyService {
     return application;
   }
   async findByJobId(jobId: string): Promise<Apply[]> {
+    return this.ApplyModel.find({ jobId })
+      .populate('userId', 'firstName lastName username')
+      .exec();
+  }
+  async findApplicationsByUserId(userId: string): Promise<Apply[]> {
+    return this.ApplyModel.find({ userId }).exec();
+  }
+
+  async findAppliedJobs(userId: string): Promise<Apply[]> {
+    return this.ApplyModel.find({ userId }).exec();
+  }
+
+  async findJobDetails(jobId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ jobId })
       .populate('userId', 'firstName lastName username')
       .exec();

@@ -61,6 +61,7 @@ interface Apply {
     Budget: number;
     currency: string;
     TimeFrame: string | null;
+    jobId: string;
 }
 
 const Expertiselevel = [
@@ -76,7 +77,7 @@ const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
-    const [selectedJobId, setSelectedJobId] =  useState<string>('');
+    const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
@@ -94,7 +95,8 @@ const Jobs = () => {
     const [isApproved, setIsApproved] = useState(false);
     const [isRejected, setIsRejected] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-    
+    const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
+
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -132,6 +134,7 @@ const Jobs = () => {
             const response = await axios.get(APIS.JOBS, {
                 params: {
                     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
+                    status: userType === 'Admin' ? undefined : 'Approved',
                     userId: filterType === "mine" ? userId : undefined
                 }
             });
@@ -154,9 +157,9 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, filterType]);
+    }, [userId, filterType, userType]);
 
- 
+
 
     const refetch = useCallback(async () => {
         try {
@@ -226,11 +229,38 @@ const Jobs = () => {
         setConfirmDelete({ open: false, jobs: null });
     };
 
-    const handleApplyClick = useCallback((title: string,job:Job) => {
-        setApplyOpen(true);
-        setJobTitle(title);
-        setSelectedJobId(job._id || '');
-    }, []);
+    useEffect(() => {
+        const fetchAppliedJobs = async () => {
+            try {
+                const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
+                console.log('respons page', response.data);
+                const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
+                console.log('fetchedAppliedJobs', fetchedAppliedJobs);
+                setAppliedJobs(fetchedAppliedJobs);
+            } catch (error) {
+                console.error('Error fetching applied jobs:', error);
+            }
+        };
+        fetchAppliedJobs();
+    }, [userId]);
+
+    const handleApplyClick = useCallback(async (title: string, job: Job) => {
+        try {
+            setApplyOpen(true);
+            setJobTitle(title);
+            setSelectedJobId(job._id || '');
+
+            setAppliedJobs(prev => [...prev, job._id || '']);
+
+            await axios.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title });
+
+            setApplyOpen(false);
+        } catch (error) {
+            console.error('Error applying for job:', error);
+        }
+    }, [userId]);
+
+
     const handleFilterChange = useCallback(() => {
         refetch();
     }, [refetch]);
@@ -320,7 +350,14 @@ const Jobs = () => {
     }));
 
 
-    
+    const filteredJobs = useMemo(() => {
+        if (userType === 'Admin' || userType === 'Project Owner') {
+            return jobs;
+        }
+        return jobs.filter(job => job.status === 'Approved');
+    }, [jobs, userType]);
+
+
 
     return (
         <Box
@@ -431,38 +468,70 @@ const Jobs = () => {
 
                 </Box>
             )}
-
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    marginTop: '-15px',
-                    '@media (max-width: 767px)': {
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        mt: 4,
-                        position: 'relative',
-                        left: '28px'
-                    },
-                }}
-            >
-                <ToggleButtonGroup
-                    value={filterType}
-                    exclusive
-                    onChange={handleFilterTypeChange}
-                    aria-label="filter exhibitions"
-                    sx={{ height: "30px" }}
+            {(userType === 'Project Owner') && (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        marginTop: '-15px',
+                        '@media (max-width: 767px)': {
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            mt: 4,
+                            position: 'relative',
+                            left: '28px'
+                        },
+                    }}
                 >
-                    <ToggleButton value="all" aria-label="all exhibitions">
-                        All Projects
-                    </ToggleButton>
-                    <ToggleButton value="mine" aria-label="my exhibitions">
-                        My Projects
-                    </ToggleButton>
-                </ToggleButtonGroup>
-            </Box>
+                    <ToggleButtonGroup
+                        value={filterType}
+                        exclusive
+                        onChange={handleFilterTypeChange}
+                        aria-label="filter exhibitions"
+                        sx={{ height: "30px" }}
+                    >
+                        <ToggleButton value="all" aria-label="all exhibitions">
+                            All Projects
+                        </ToggleButton>
+                        <ToggleButton value="mine" aria-label="my exhibitions">
+                            My Projects
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+            )}
+
+            {userType === 'Admin' && (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        marginTop: '-15px',
+                        '@media (max-width: 767px)': {
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            mt: 4,
+                            position: 'relative',
+                            left: '28px'
+                        },
+                    }}
+                >
+                    <ToggleButtonGroup
+                        value={filterType}
+                        exclusive
+                        onChange={handleFilterTypeChange}
+                        aria-label="filter projects"
+                        sx={{ height: "30px" }}
+                    >
+                        <ToggleButton value="all" aria-label="all projects">
+                            All Projects
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+            )}
             <InfiniteScroll
+                key={appliedJobs.join(',')}
                 dataLength={jobs.length}
                 next={() => setPage(prev => prev + 1)}
                 hasMore={hasMore}
@@ -471,7 +540,7 @@ const Jobs = () => {
             >
 
                 <Box sx={{ mt: 2 }}>
-                    {jobs.map((job) => (
+                    {filteredJobs.map((job) => (
                         <Card key={job._id} sx={{ mb: 2 }}>
                             <CardContent>
                                 <Typography variant="h5">
@@ -517,18 +586,19 @@ const Jobs = () => {
 
                                     <Typography variant="body2">{job.Budget}</Typography>
                                     <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                    
+
                                     <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                    {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                                        {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                onClick={() => handleApplyClick(job.title,job)}
-                                                sx={{ '@media (max-width: 767px)': { display: 'none' } }}
+                                                onClick={() => handleApplyClick(job.title, job)}
+                                                sx={{ float: 'right' }}
                                             >
                                                 Apply
                                             </Button>
                                         )}
+
 
 
                                         {userDetails.userType === 'Project Owner' && (
@@ -567,7 +637,7 @@ const Jobs = () => {
                                                 },
                                             }}
                                         >
-                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title,job); handleClose(); }}>Apply</MenuItem>
+                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
                                             {userDetails.userType === 'Project Owner' && (
                                                 <>
                                                     <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
@@ -594,11 +664,11 @@ const Jobs = () => {
                 </Box>
             </InfiniteScroll>
 
-            <AddApply 
-            open={applyOpen} 
-            setOpen={setApplyOpen} 
-            jobTitle={jobTitle} 
-            jobId={selectedJobId}
+            <AddApply
+                open={applyOpen}
+                setOpen={setApplyOpen}
+                jobTitle={jobTitle}
+                jobId={selectedJobId}
             />
 
             <DeleteConfirmationDialog
