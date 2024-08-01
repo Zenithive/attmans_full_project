@@ -24,6 +24,8 @@ export const APIS = {
 
     CHECKINTRESTEDUSER: `${SERVER_URL}/interested-users`,
 
+    ALL_PROFILES: `${SERVER_URL}/profile/all`,
+
 
 
 

@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { ProductForBooth } from './ProductTableForBooth';
 import ProductTable, { Product } from './ProductTable';
 
+
 interface User {
   _id: string;
   firstName: string;
@@ -23,6 +24,7 @@ interface User {
   mobileNumber: string;
   username: string;
   userType: string;
+  personalProfilePhoto?: string;
 }
 
 interface CategoryData {
@@ -55,6 +57,8 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
 
+
+
 React.useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -69,14 +73,13 @@ React.useEffect(() => {
   }, []);
 
 
-
-
-
   const fetchUsers = async () => {
     try {
       const response = await axios.get<User[]>(
         `${apiUrl}&page=${page}&limit=6&filter=${filterText}&category=${selectedCategory ?? ''}&subCategory=${selectedSubCategory ?? ''}`
       );
+      console.log("USERLIST(usertype) Response", response);
+      
       if (response.data.length < 6) {
         setHasMore(false);
       }
@@ -86,11 +89,7 @@ React.useEffect(() => {
       console.error('Error fetching users:', error);
       setHasMore(false);
     }
-  };
-
-
-
-
+  };  
 
 
   React.useEffect(() => {
@@ -103,6 +102,19 @@ React.useEffect(() => {
     setRowData([]);
     setHasMore(true);
   };
+
+  // React.useEffect(() => {
+  //   const fetchAllProfiles = async () => {
+  //     try {
+  //       const response = await axios.get<User[]>(`${APIS.ALL_PROFILES}`);
+  //       setAllProfiles(response.data || []);
+  //     } catch (error) {
+  //       console.error('Error fetching all profiles:', error);
+  //     }
+  //   };
+
+  //   fetchAllProfiles();
+  // }, []);
 
 
 
@@ -135,12 +147,6 @@ React.useEffect(() => {
     return userCategoryData ? userCategoryData : { categories: [], subcategories: [] };
   };
 
-
-
-  // const handleUserClick = (user: User) => {
-  //   setSelectedUser(user);
-  //   setDrawerOpen(true);
-  // };
 
   const handleUserClick = (user: User) => {
     // Fetch product details for the selected user
@@ -249,24 +255,30 @@ React.useEffect(() => {
                 <CardContent>
                   <Grid container spacing={2}>
                     <Grid item>
-                      <CommonAvatar name={`${user.firstName} ${user.lastName}`} style={{width: 80, height: 80, marginRight: 15}}></CommonAvatar>
+                      {/* <CommonAvatar name={`${user.firstName} ${user.lastName}`} style={{width: 80, height: 80, marginRight: 15}}></CommonAvatar> */}
+
+                      <CommonAvatar
+                        // name={`${user.firstName} ${user.lastName}`}
+                        url={user.personalProfilePhoto} // Pass the profile photo URL
+                        style={{ width: 80, height: 80, marginRight: 15 }}
+                      />
                     </Grid>
                     <Grid container sm xs={12} spacing={1}>
-                      <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="h6" onClick={() => handleUserClick(user)} sx={{ cursor: 'pointer' }}>
-                          {user.firstName} {user.lastName}
-                        </Typography>
-                        <Chip variant="outlined" label={user.userType} color="secondary" />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>
-                          {user.username} | {user.mobileNumber}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>
-                          {categories.join(', ')} | {subcategories.join(', ')}
-                        </Typography>
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="h6" onClick={() => handleUserClick(user)} sx={{ cursor: 'pointer' }}>
+                        {user.firstName} {user.lastName}
+                      </Typography>
+                      <Chip variant="outlined" label={user.userType} color="secondary" />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {user.username} | {user.mobileNumber}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {categories.join(', ')} | {subcategories.join(', ')}
+                      </Typography>
                       </Grid>
                     </Grid>
                   </Grid>
