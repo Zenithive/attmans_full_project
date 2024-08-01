@@ -75,6 +75,55 @@ export class UsersService {
     return user.save();
   }
 
+  // async findUsersByUserType(
+  //   userType: string,
+  //   page: number,
+  //   limit: number,
+  //   filter: string,
+  //   category: string,
+  //   subCategory: string,
+  // ): Promise<User[]> {
+  //   const skip = (page - 1) * limit;
+  //   const filterQuery: any = { userType };
+
+  //   if (filter) {
+  //     filterQuery.$or = [
+  //       { firstName: new RegExp(filter, 'i') },
+  //       { lastName: new RegExp(filter, 'i') },
+  //     ];
+  //   }
+
+  //   const users = await this.userModel
+  //     .find(filterQuery)
+  //     .select('-password')
+  //     .skip(skip)
+  //     .limit(limit)
+  //     .exec();
+
+  //   if (category || subCategory) {
+  //     const usernames = users.map((user) => user.username);
+
+  //     const categoryFilter: any = { username: { $in: usernames } };
+  //     if (category) {
+  //       categoryFilter['categories'] = category;
+  //     }
+  //     if (subCategory) {
+  //       categoryFilter['subcategories'] = subCategory;
+  //     }
+
+  //     const categoryData = await this.categoriesModel
+  //       .find(categoryFilter)
+  //       .exec();
+  //     const filteredUsernames = new Set(
+  //       categoryData.map((cat) => cat.username),
+  //     );
+
+  //     return users.filter((user) => filteredUsernames.has(user.username));
+  //   }
+
+  //   return users;
+  // }
+
   async findUsersByUserType(
     userType: string,
     page: number,
@@ -82,27 +131,52 @@ export class UsersService {
     filter: string,
     category: string,
     subCategory: string,
-  ): Promise<User[]> {
+  ): Promise<any[]> {
     const skip = (page - 1) * limit;
     const filterQuery: any = { userType };
-
+  
     if (filter) {
       filterQuery.$or = [
         { firstName: new RegExp(filter, 'i') },
         { lastName: new RegExp(filter, 'i') },
       ];
     }
-
+  
     const users = await this.userModel
-      .find(filterQuery)
-      .select('-password')
-      .skip(skip)
-      .limit(limit)
+      .aggregate([
+        { $match: filterQuery }, // Match users by userType
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'personalprofiles', // The collection name of the PersonalProfile model
+            localField: 'username',
+            foreignField: 'username',
+            as: 'personalProfileData',
+          },
+        },
+        {
+          $unwind: {
+            path: '$personalProfileData',
+            preserveNullAndEmptyArrays: true, // Set to true if some users might not have a corresponding personal profile
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            firstName: 1,
+            lastName: 1,
+            username: 1,
+            userType: 1,
+            personalProfilePhoto: '$personalProfileData.profilePhoto', // Replace 'personalField' with the actual field name you want from PersonalProfile
+          },
+        },
+      ])
       .exec();
-
+  
     if (category || subCategory) {
       const usernames = users.map((user) => user.username);
-
+  
       const categoryFilter: any = { username: { $in: usernames } };
       if (category) {
         categoryFilter['categories'] = category;
@@ -110,19 +184,20 @@ export class UsersService {
       if (subCategory) {
         categoryFilter['subcategories'] = subCategory;
       }
-
+  
       const categoryData = await this.categoriesModel
         .find(categoryFilter)
         .exec();
       const filteredUsernames = new Set(
         categoryData.map((cat) => cat.username),
       );
-
+  
       return users.filter((user) => filteredUsernames.has(user.username));
     }
-
+  
     return users;
   }
+  
 
   async findUsersByUserType1(
     userType: string,

@@ -17,7 +17,7 @@ export class ProfileService {
     @InjectModel(Categories.name)
     private readonly categories: Model<Categories>,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   async createOrUpdateForm1(
     personalProfile: PersonalProfile,
@@ -65,7 +65,7 @@ export class ProfileService {
   }
 
 
-  
+
 
   async createOrUpdateForm3(categories: Categories): Promise<Categories> {
     const existingProfile = await this.categories.findOne({
@@ -159,4 +159,20 @@ export class ProfileService {
   async getProfileByUserId(username: string): Promise<PersonalProfile> {
     return this.profileModel.findOne({ username }).exec();
   }
+  // get profile photo
+  async getAllProfiles(): Promise<PersonalProfile[]> {
+    try {
+      const profiles = await this.profileModel
+        .find()
+        .select('username profilePhoto') // Specify the fields to include
+        .exec();
+      return profiles;
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+      throw error; // or return an empty array or some default value
+    }
+  }
+  
+  
+  
 }

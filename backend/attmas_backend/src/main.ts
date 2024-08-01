@@ -14,7 +14,7 @@ async function bootstrap() {
   // Enable CORS
 
   app.useStaticAssets(join(__dirname, '..', 'profilePhoto'), {
-    prefix: '/profilePhoto',
+    prefix: '/profilePhoto/',
   });
 
   app.enableCors({

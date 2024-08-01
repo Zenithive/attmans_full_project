@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   // Patch,
   Post,
   Query,
@@ -74,6 +75,16 @@ export class ProfileController {
     // console.log("username",username)
     return this.profileService.getProfileByUserId(username);
   }
+
+  // get profile photo
+  @Get('all')
+async getAllProfiles(): Promise<PersonalProfile[]> {
+  try {
+    return await this.profileService.getAllProfiles();
+  } catch (error) {
+    throw new InternalServerErrorException('Failed to fetch profiles');
+  }
+}
   
   @Get('check')
   async checkProfileCompletion(@Query('username') username: string): Promise<{ profileCompleted: number }> {
