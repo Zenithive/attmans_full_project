@@ -30,6 +30,7 @@ export class JobsController {
     @Query('userId') userId?: string,
     @Query('Subcategorys') Subcategorys: string[] = [],
     @Query('Expertiselevel') Expertiselevel: string[] = [],
+    @Query('status') status?: string,
   ): Promise<Jobs[]> {
     return this.jobsService.findAll(
       page,
@@ -38,6 +39,7 @@ export class JobsController {
       userId,
       Subcategorys,
       Expertiselevel,
+      status,
     );
   }
 

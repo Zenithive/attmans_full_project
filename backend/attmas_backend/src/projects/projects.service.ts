@@ -63,6 +63,7 @@ export class JobsService {
     userId?: string,
     Subcategorys?: string[],
     Expertiselevel?: string[],
+    status?: string,
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
@@ -81,6 +82,10 @@ export class JobsService {
 
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
+    }
+
+    if (status) {
+      filter.status = status;
     }
 
     console.log('Applied Filters:', filter);

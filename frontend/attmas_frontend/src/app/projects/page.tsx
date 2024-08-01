@@ -62,7 +62,7 @@ interface Apply {
     Budget: number;
     currency: string;
     TimeFrame: string | null;
-    jobId:string;
+    jobId: string;
 }
 
 const Expertiselevel = [
@@ -78,7 +78,7 @@ const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
-    const [selectedJobId, setSelectedJobId] =  useState<string>('');
+    const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
@@ -97,8 +97,10 @@ const Jobs = () => {
     const [isRejected, setIsRejected] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
-    
-    
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
+
+
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -131,13 +133,13 @@ const Jobs = () => {
     };
 
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
+    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null) => {
         try {
             const response = await axios.get(APIS.JOBS, {
                 params: {
                     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
-                    status: userType === 'Admin' ? undefined : 'Approved',
-                    userId: filterType === "mine" ? userId : undefined
+                    status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
+                    userId: filterType === 'mine' ? userId : undefined
                 }
             });
 
@@ -146,10 +148,8 @@ const Jobs = () => {
             if (response.data.length === 0) {
                 setHasMore(false);
             } else {
-                setJobs((prev) => {
-                    const newJobs = response.data.filter((newJobs: Job) => {
-                        return !prev.some((existingJobs) => existingJobs._id === newJobs._id);
-                    });
+                setJobs(prev => {
+                    const newJobs = response.data.filter((newJobs: Job) => !prev.some((existingJobs) => existingJobs._id === newJobs._id));
                     return [...prev, ...newJobs];
                 });
                 if (response.data.length < 10) {
@@ -159,20 +159,20 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, filterType,userType]);
+    }, [userId, filterType, userType]);
 
- 
+
 
     const refetch = useCallback(async () => {
         try {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis);
+            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory]);
+    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus]);
 
     useEffect(() => {
         refetch();
@@ -180,7 +180,7 @@ const Jobs = () => {
 
     useEffect(() => {
         if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis);
+            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus);
         }
     }, [page]);
 
@@ -233,36 +233,36 @@ const Jobs = () => {
 
     useEffect(() => {
         const fetchAppliedJobs = async () => {
-          try {
-            const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
-            console.log('respons page',response.data);
-            const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-            console.log('fetchedAppliedJobs',fetchedAppliedJobs);
-            setAppliedJobs(fetchedAppliedJobs);
-          } catch (error) {
-            console.error('Error fetching applied jobs:', error);
-          }
+            try {
+                const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
+                console.log('respons page', response.data);
+                const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
+                console.log('fetchedAppliedJobs', fetchedAppliedJobs);
+                setAppliedJobs(fetchedAppliedJobs);
+            } catch (error) {
+                console.error('Error fetching applied jobs:', error);
+            }
         };
         fetchAppliedJobs();
-      }, [userId]);
+    }, [userId]);
 
-      const handleApplyClick = useCallback(async (title: string, job: Job) => {
+    const handleApplyClick = useCallback(async (title: string, job: Job) => {
         try {
-          setApplyOpen(true);
-          setJobTitle(title);
-          setSelectedJobId(job._id || '');
-      
-          setAppliedJobs(prev => [...prev, job._id || '']);
-      
-          await axios.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title });
-      
-          setApplyOpen(false);
+            setApplyOpen(true);
+            setJobTitle(title);
+            setSelectedJobId(job._id || '');
+
+            setAppliedJobs(prev => [...prev, job._id || '']);
+
+            await axios.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title });
+
+            setApplyOpen(false);
         } catch (error) {
-          console.error('Error applying for job:', error);
+            console.error('Error applying for job:', error);
         }
-      }, [userId]);
-      
-    
+    }, [userId]);
+
+
     const handleFilterChange = useCallback(() => {
         refetch();
     }, [refetch]);
@@ -273,7 +273,7 @@ const Jobs = () => {
         }
     }
 
-    
+
 
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
@@ -303,6 +303,7 @@ const Jobs = () => {
             }
             setViewingJob(null);
             handleApproveDialogClose();
+            setSelectedStatus('Approved');
             refetch();
         } catch (error) {
             console.error('Error approving job:', error);
@@ -329,6 +330,7 @@ const Jobs = () => {
                 }));
             }
             setViewingJob(null);
+            setSelectedStatus('Rejected');
             handleRejectDialogClose();
             refetch();
         } catch (error) {
@@ -355,10 +357,17 @@ const Jobs = () => {
 
 
     const filteredJobs = useMemo(() => {
-        return jobs.filter(job => userType === 'Admin' || job.status === 'Approved');
-    }, [jobs, userType]);
-    
-    
+        return jobs.filter(job => {
+            if (userType === 'Admin' && selectedStatus) {
+                return job.status === selectedStatus;
+            }
+            return userType === 'Admin' || job.status === 'Approved';
+        });
+        
+    }, [jobs, userType, selectedStatus]);
+
+
+
 
     return (
         <Box
@@ -469,42 +478,72 @@ const Jobs = () => {
 
                 </Box>
             )}
-         {
-    (userType === 'Project Owner' || userType === 'Admin') && (
-        <Box
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                marginTop: '-15px',
-                '@media (max-width: 767px)': {
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    mt: 4,
-                    position: 'relative',
-                    left: '28px'
-                },
-            }}
-        >
-            <ToggleButtonGroup
-                value={filterType}
-                exclusive
-                onChange={handleFilterTypeChange}
-                aria-label="filter exhibitions"
-                sx={{ height: "30px" }}
-            >
-                <ToggleButton value="all" aria-label="all exhibitions">
-                    All Projects
-                </ToggleButton>
-                {userType === 'Project Owner' && (
-                    <ToggleButton value="mine" aria-label="my exhibitions">
-                        My Projects
-                    </ToggleButton>
+             {userType === 'Admin' && (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                    }}
+                >
+                    <ToggleButtonGroup
+                        value={selectedStatus}
+                        exclusive
+                        onChange={(event, newStatus) => setSelectedStatus(newStatus)}
+                        aria-label="filter jobs by status"
+                        sx={{ height: '40px' }}
+                    >
+                        <ToggleButton value="" aria-label="all jobs">
+                            All Projects
+                        </ToggleButton>
+                        <ToggleButton value="Pending" aria-label="pending jobs">
+                            Pending
+                        </ToggleButton>
+                        <ToggleButton value="Approved" aria-label="approved jobs">
+                            Approved
+                        </ToggleButton>
+                        <ToggleButton value="Rejected" aria-label="rejected jobs">
+                            Rejected
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+
+            )}
+
+            {(userType === 'Project Owner') && (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            marginTop: '-15px',
+                            '@media (max-width: 767px)': {
+                                width: '100%',
+                                justifyContent: 'space-between',
+                                mt: 4,
+                                position: 'relative',
+                                left: '28px'
+                            },
+                        }}
+                    >
+                        <ToggleButtonGroup
+                            value={filterType}
+                            exclusive
+                            onChange={handleFilterTypeChange}
+                            aria-label="filter exhibitions"
+                            sx={{ height: "30px" }}
+                        >
+                            <ToggleButton value="all" aria-label="all exhibitions">
+                                All Projects
+                            </ToggleButton>
+                            {userType === 'Project Owner' && (
+                                <ToggleButton value="mine" aria-label="my exhibitions">
+                                    My Projects
+                                </ToggleButton>
+                            )}
+                        </ToggleButtonGroup>
+                    </Box>
                 )}
-            </ToggleButtonGroup>
-        </Box>
-    )
-}
 
             <InfiniteScroll
                 key={appliedJobs.join(',')}
@@ -562,18 +601,18 @@ const Jobs = () => {
 
                                     <Typography variant="body2">{job.Budget}</Typography>
                                     <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                    
+
                                     <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                    {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '')&& (
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => handleApplyClick(job.title, job)}
-                                            sx={{ float: 'right' }}
-                                        >
-                                            Apply
-                                        </Button>
-                                    )}
+                                        {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleApplyClick(job.title, job)}
+                                                sx={{ float: 'right' }}
+                                            >
+                                                Apply
+                                            </Button>
+                                        )}
 
 
 
@@ -613,7 +652,7 @@ const Jobs = () => {
                                                 },
                                             }}
                                         >
-                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title,job); handleClose(); }}>Apply</MenuItem>
+                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
                                             {userDetails.userType === 'Project Owner' && (
                                                 <>
                                                     <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
@@ -640,11 +679,11 @@ const Jobs = () => {
                 </Box>
             </InfiniteScroll>
 
-            <AddApply 
-            open={applyOpen} 
-            setOpen={setApplyOpen} 
-            jobTitle={jobTitle} 
-            jobId={selectedJobId}
+            <AddApply
+                open={applyOpen}
+                setOpen={setApplyOpen}
+                jobTitle={jobTitle}
+                jobId={selectedJobId}
             />
 
             <DeleteConfirmationDialog
