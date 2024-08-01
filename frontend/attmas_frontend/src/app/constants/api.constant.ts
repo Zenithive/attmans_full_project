@@ -49,6 +49,7 @@ export const APIS = {
     APPROVE_Apply_PROJECT: `${SERVER_URL}/apply/approve`,
     REJECT_Apply_PROJECT: `${SERVER_URL}/apply/reject`,
     APPLY_JOBID: `${SERVER_URL}/apply/jobId`,
+    APPLY_USERID: `${SERVER_URL}/apply/userId`,
 
     
 
@@ -77,5 +78,8 @@ export const APIS = {
     MARK_AS_READ: `${SERVER_URL}/emails/markasread`,
 
     GET_CURRENT_DATE: `${SERVER_URL}/exhibitions/current-date`,
+
+    APPLIED_JOBS: `${SERVER_URL}/apply/appliedJobs`,
+    JOB_DETAILS: `${SERVER_URL}/apply/jobDetails`,
 
 }

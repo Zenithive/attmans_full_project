@@ -7,6 +7,8 @@ import { APIS } from '@/app/constants/api.constant';
 import ApproveDialogForApply from '../applyapprove/applyapprove';
 import RejectDialogForApply from '../applyreject/applyreject';
 import StatusFilter from '../filter/filter';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 
 interface Job {
   _id?: string;
@@ -39,6 +41,7 @@ interface Apply {
   currency: string;
   TimeFrame: string | null;
   status?: string;
+  username:string;
 }
 
 interface ProjectDrawerProps {
@@ -54,7 +57,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   setViewingJob,
   userType,
   handleApproveDialogOpen,
-  handleRejectDialogOpen
+  handleRejectDialogOpen,
 }) => {
   const isApproved = viewingJob?.status === 'Approved';
   const isRejected = viewingJob?.status === 'Rejected';
@@ -63,6 +66,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [approveDialogOpen, setApproveDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const currentUser = userDetails.username; 
 
   const fetchApplications = useCallback(async () => {
     if (viewingJob?._id) {
@@ -110,6 +116,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const filteredApplications = applications.filter(app => {
     if (filter === 'All') return true;
     return app.status === filter;
+  }).filter(app => {
+    if (userType === 'Project Owner') {
+      return app.status === 'Approved';
+    }
+    if (userType === 'Innovator' || userType === 'Freelancer') {
+      return app.username === currentUser; 
+    }
+    return true;
   });
 
   return (
@@ -309,13 +323,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
             <Divider orientation="horizontal" flexItem />
 
-             <Box sx={{position:'relative',top:'30px'}}>
+             <Box sx={{position:'relative',top:'30px',marginBottom:'20px'}}>
                 <DialogTitle>
                        Applications for Project
                 </DialogTitle>
              </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 ,position:'relative',top:'40px',right:'15%'}}>
+           { (userType === 'Admin') && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 ,position:'relative',top:'20px',right:'15%'}}>
             <StatusFilter
             value={filter}
             onChange={(event, newStatus) => {
@@ -325,6 +340,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             }}
           />
             </Box>
+           )}
             <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (

@@ -51,4 +51,19 @@ export class ApplyController {
   async findByJobId(@Param('jobId') jobId: string) {
     return this.applyService.findByJobId(jobId);
   }
+
+  @Get('user/:userId')
+  async getApplicationsByUser(@Param('userId') userId: string) {
+    return this.applyService.findApplicationsByUserId(userId);
+  }
+
+  @Get('appliedJobs/:userId')
+  async getAppliedJobs(@Param('userId') userId: string) {
+    return this.applyService.findAppliedJobs(userId);
+  }
+
+  @Get('jobDetails/:jobId')
+  async getJobDetails(@Param('jobId') jobId: string) {
+    return this.applyService.findJobDetails(jobId);
+  }
 }
