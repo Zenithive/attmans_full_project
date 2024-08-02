@@ -23,8 +23,8 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
 
 interface Product {
-  name: string;
-  description: string;
+  productName: string;
+  productDescription: string;
   productType: string;
   price: number;
   currency: string;
@@ -144,8 +144,8 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                       <TableBody>
                         {booth.products.map((product, index) => (
                           <TableRow key={index}>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.description}</TableCell>
+                            <TableCell>{product.productName}</TableCell>
+                            <TableCell>{product.productDescription}</TableCell>
                             <TableCell>{product.productType}</TableCell>
                             <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.price}</TableCell>
                             <TableCell>
