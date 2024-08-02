@@ -186,7 +186,7 @@ export default function MainNavBar() {
     if (notification.status) {
       return `
         Dear ${userName},<br>
-        Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+        Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
       `;
     }
   
