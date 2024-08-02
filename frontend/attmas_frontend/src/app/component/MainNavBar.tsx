@@ -201,7 +201,7 @@ export default function MainNavBar() {
       return `
         Dear ${userName},<br>
         Your project "${notification.title}" has been ${notification.status2} by ${notification.adminFirstName} ${notification.adminLastName}. 
-        <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects.
+        <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects.
       `;
     }
   

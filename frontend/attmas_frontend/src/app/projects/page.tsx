@@ -189,6 +189,7 @@ const Jobs = () => {
 
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
+        
         };
     }, [refetch]);
 
