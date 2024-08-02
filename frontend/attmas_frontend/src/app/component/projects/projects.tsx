@@ -94,6 +94,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         Sector: '',
         AreaOfProduct: '',
         username: userDetails.username,
+        firstName:userDetails.firstName,
+        lastName:userDetails.lastName,
         ProductDescription: '',
         currency: 'INR',
 
@@ -136,6 +138,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             IPRownership: values.IPRownership,
             userId: userDetails._id,
             username:userDetails.username,
+            firstName:userDetails.firstName,
+            lastName:userDetails.lastName,
             currency: values.currency,
         };
 

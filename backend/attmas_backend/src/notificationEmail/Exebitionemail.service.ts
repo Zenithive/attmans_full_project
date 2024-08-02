@@ -85,7 +85,7 @@ export class EmailService2 {
       // Customize email message with user's first name and last name
       const html = `
         Dear ${user.firstName} ${user.lastName},<br>
-        You have been notified that ${first} ${last}  had created  the Project "${title}".<br>
+        You have been notified that "${first} ${last}"  had created  the Project "${title}".<br>
 
       `;
 

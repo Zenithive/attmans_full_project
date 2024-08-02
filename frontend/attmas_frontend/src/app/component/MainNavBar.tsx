@@ -42,6 +42,8 @@ interface Email {
   adminFirstName?: string;
   adminLastName?: string;
   applicationId?: string,
+  first?:string,
+  last?:string,
 
 }
 
@@ -176,7 +178,7 @@ export default function MainNavBar() {
     if (notification.subject === 'New Project Created') {
       return `
         Dear ${userName},<br>
-        You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
+        You have been notified that "${notification.first} ${notification.last}" has created a project. 
         <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
       `;
     }
