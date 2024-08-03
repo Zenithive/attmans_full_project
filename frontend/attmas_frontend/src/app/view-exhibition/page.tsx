@@ -43,7 +43,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { name: string; description: string; productType: string; price: number; currency: string; videourlForproduct: string; }[];
+  products: { productName: string; productDescription: string; productType: string; price: number; currency: string; videourlForproduct: string; }[];
   userId: {
     firstName: string;
     lastName: string;
@@ -73,6 +73,7 @@ const ExhibitionsPage: React.FC = () => {
   const [isParticipateButtonVisible, setParticipateButtonVisible] = useState(true);
   const [hasUserBooth, setHasUserBooth] = useState(false);
   const [view, setView] = useState('boothDetails');
+
   
 
 

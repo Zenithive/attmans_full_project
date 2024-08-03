@@ -34,6 +34,12 @@ export class InterestedUserService {
     console.log('Existing User:', existingUser);
 
     try {
+      const interestExists = await this.interestedUserModel
+        .findOne({ username, exhibitionId })
+        .exec();
+      if (interestExists) {
+        throw new Error('User has already shown interest in this exhibition');
+      }
       // if (existingUser) {
       //     // Send "abc" message
       //     console.log('Sending "abc" email to:', username);
@@ -112,6 +118,10 @@ export class InterestedUserService {
     //     }).exec();
     //     console.log('Deleted null or blank entries from InterestedUser collection.');
     // }
+  }
+
+  async findExhibitionsByUser(userId: string): Promise<InterestedUser[]> {
+    return this.interestedUserModel.find({ userId }).exec();
   }
 
   async findVisitorsByExhibition(
