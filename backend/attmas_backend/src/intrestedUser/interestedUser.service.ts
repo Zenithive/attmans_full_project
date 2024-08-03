@@ -38,7 +38,7 @@ export class InterestedUserService {
         .findOne({ username, exhibitionId })
         .exec();
       if (interestExists) {
-        throw new Error('User has already shown interest in this exhibition');
+        throw new Error('User has already shown interest in the exhibition');
       }
       // if (existingUser) {
       //     // Send "abc" message
