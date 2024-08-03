@@ -118,7 +118,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           const errorMessage = (simulatedError).response?.data.message;
       
           if (errorMessage === 'User has already shown interest in this exhibition') {
-            formik.setStatus({ error: 'You have already shown interest for exhibition.' });
+            formik.setStatus({ error: 'You have already shown interest for the exhibition.' });
           } else {
             formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
           }
