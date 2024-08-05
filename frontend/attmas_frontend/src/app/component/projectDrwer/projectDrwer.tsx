@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, Grid, TextField, Chip, Button, IconButton, Card, CardContent, Typography, Box, Divider } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Grid, TextField, Chip, Button, IconButton, Card, CardContent, Typography, Box, Divider, Tooltip } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -9,6 +9,8 @@ import RejectDialogForApply from '../applyreject/applyreject';
 import StatusFilter from '../filter/filter';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import ApplyDetailsDialog from '../projectsDetails/projectDetails';
+import booth from '../booth/booth';
 
 interface Job {
   _id?: string;
@@ -40,7 +42,10 @@ interface Apply {
   Budget: number;
   currency: string;
   TimeFrame: string | null;
-  status?: string;
+  rejectComment: string;
+  status:string;
+  firstName:string;
+  lastName:string;
   username:string;
 }
 
@@ -63,9 +68,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const isRejected = viewingJob?.status === 'Rejected';
   const [filter, setFilter] = useState<string>('All');
   const [applications, setApplications] = useState<Apply[]>([]);
+  const [selectedApply, setSelectedApply] = useState<Apply | null>(null);
   const [approveDialogOpen, setApproveDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const currentUser = userDetails.username; 
@@ -367,9 +374,38 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             mb: 2,
                         }}
                       />
-                      <Typography variant="h6" sx={{ mb: 1 }}>
-                        {app.title}
-                      </Typography>
+                       <Typography
+                            onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner') ? () => {
+                              setSelectedApply(app);
+                              setDialogOpen(true);
+                            } : undefined}
+                            style={{
+                              cursor: userDetails && (userType === 'Admin' || userType === 'Project Owner') ? 'pointer' : 'default',
+                              display: 'inline-block',
+                            }}
+                          >
+                            {(userDetails && (userType === 'Admin' || userType === 'Project Owner')) ? (
+                              <Tooltip
+                                title="Click here to see Project details"
+                                arrow
+                                placement="top"
+                                PopperProps={{
+                                  modifiers: [
+                                    {
+                                      name: 'offset',
+                                      options: {
+                                        offset: [0, -10],
+                                      },
+                                    },
+                                  ],
+                                }}
+                              >
+                                <h2>{app.title}</h2>
+                              </Tooltip>
+                            ) : (
+                              <h2>{app.title}</h2>
+                            )}
+                          </Typography>
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
                       </Typography>
@@ -436,6 +472,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 }
               }}
               apply={rejectDialogOpen.apply}
+            />
+          )}
+
+        {selectedApply && (
+            <ApplyDetailsDialog
+              open={dialogOpen}
+              onClose={() => setDialogOpen(false)}
+              apply={selectedApply}
             />
           )}
         </>

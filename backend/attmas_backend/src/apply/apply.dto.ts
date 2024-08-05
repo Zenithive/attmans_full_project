@@ -36,4 +36,12 @@ export class CreateApplyDto {
   @IsNotEmpty()
   @IsString()
   jobId: Types.ObjectId;
+
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
 }
