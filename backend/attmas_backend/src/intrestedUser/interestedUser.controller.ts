@@ -16,4 +16,9 @@ export class InterestedUserController {
   ): Promise<any> {
     return this.interestedUserService.findVisitorsByExhibition(exhibitionId);
   }
+
+  @Get('/user-interests')
+  async findExhibitionsByUser(@Query('userId') userId: string): Promise<any> {
+    return this.interestedUserService.findExhibitionsByUser(userId);
+  }
 }

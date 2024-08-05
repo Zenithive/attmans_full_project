@@ -30,8 +30,14 @@ export class Apply {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   username: string;
+
+  @Prop({ required: true })
+  firstName: string;
+
+  @Prop({ required: true })
+  lastName: string;
 
   @Prop({ default: 'Pending' })
   status: string;

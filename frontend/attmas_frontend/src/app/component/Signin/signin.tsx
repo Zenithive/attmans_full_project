@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
 import { getRoleBasedAccess } from '@/app/services/user.access.service';
+import { AxiosError } from 'axios';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -105,8 +106,26 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           router.push("/profile");
         }
       } catch (error) {
-        formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
-      }
+        if (error instanceof AxiosError) {
+          const simulatedError = {
+            response: {
+              data: {
+                message: 'User has already shown interest in this exhibition'
+              }
+            }
+          };
+          
+          const errorMessage = (simulatedError).response?.data.message;
+      
+          if (errorMessage === 'User has already shown interest in the exhibition') {
+            formik.setStatus({ error: 'You have already shown interest for the exhibition.' });
+          } else {
+            formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
+          }
+        } else {
+          formik.setStatus({ error: 'An unexpected error occurred.' });
+        }
+      }  
     }
   });
 

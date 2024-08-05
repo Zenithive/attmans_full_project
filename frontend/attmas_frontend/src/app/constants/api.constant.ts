@@ -84,4 +84,7 @@ export const APIS = {
     APPLIED_JOBS: `${SERVER_URL}/apply/appliedJobs`,
     JOB_DETAILS: `${SERVER_URL}/apply/jobDetails`,
 
+    GET_INTERESTED_EXHIBITIONS: `${SERVER_URL}/interested-users/user-interests`, 
+    SHOW_INTEREST: `${SERVER_URL}/interested-users`, 
+
 }

@@ -16,9 +16,11 @@ interface InterestedModalProps {
     exhibitionId?: string | null;
 }
 
+
 const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibitionId }) => {
     const [showSignIn, setShowSignIn] = useState(true); // Default to Sign-In form
     const [message, setMessage] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleSignUpSuccess = () => {
         setShowSignIn(true); // Automatically switch to Sign In after successful sign-up
