@@ -105,6 +105,10 @@ export class InterestedUserService {
     }
   }
 
+  async findExhibitionsByUser(userId: string): Promise<InterestedUser[]> {
+    return this.interestedUserModel.find({ userId }).exec();
+  }
+
 
   async findVisitorsByExhibition(
     exhibitionId: string,
