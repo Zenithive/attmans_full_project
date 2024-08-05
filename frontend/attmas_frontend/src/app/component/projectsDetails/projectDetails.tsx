@@ -17,6 +17,7 @@ import {
   Button,
   Tooltip,
   Grid,
+  TextField,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
@@ -87,29 +88,42 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                  Status: {apply.status}, Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
                </Typography>
              </Box>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h6" component="div" sx={{ mb: 2 ,'@media (max-width: 767px)':{
-                  position:'relative',top:'10px'}}}>
-                    <Box fontWeight="bold">Title: {apply.title}</Box>
-                  </Typography>
+              <Grid container spacing={2} flexDirection={'column'}>
+                <Grid item xs={12} sm={5}>
+                <TextField
+                  label="Title"
+                  value={apply.title}
+                  fullWidth
+                  disabled
+                  sx={{ mb: 2 }}
+                />
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6" component="div" sx={{ mb: 2 ,'@media (max-width: 767px)':{
-                    position:'relative',
-                  }}}>
-                    Description: {apply.description}
-                  </Typography>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                  label="Description"
+                  value={apply.description}
+                  fullWidth
+                  disabled
+                  sx={{ mb: 2 }}
+                />
                 </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="h6" component="div" sx={{mb:2}}>
-                        Applied User:{apply.firstName} {apply.lastName}
-                    </Typography>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                  label="Applied User"
+                  value={`${apply.firstName} ${apply.lastName}`}
+                  fullWidth
+                  disabled
+                  sx={{ mb: 2 }}
+                />
                 </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="h6" component="div" sx={{mb:2}}>
-                        Budget:{apply.currency === 'USD' ? '$' : '₹'}{apply.Budget}
-                    </Typography>
+                <Grid item xs={12}> 
+                <TextField
+                  label="Budget"
+                  value={`${apply.currency === 'USD' ? '$' : '₹'}${apply.Budget}`}
+                  fullWidth
+                  disabled
+                  sx={{ mb: 2 }}
+                />
                 </Grid>
                 {apply.rejectComment && (
                   <Grid item xs={12}>

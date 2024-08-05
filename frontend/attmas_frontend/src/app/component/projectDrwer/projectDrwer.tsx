@@ -47,6 +47,7 @@ interface Apply {
   firstName:string;
   lastName:string;
   username:string;
+  jobId:string;
 }
 
 interface ProjectDrawerProps {
@@ -125,7 +126,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     return app.status === filter;
   }).filter(app => {
     if (userType === 'Project Owner') {
-      return app.status === 'Approved';
+      return  app.status === 'Approved' && currentUser === viewingJob?.username;
     }
     if (userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser; 
@@ -355,7 +356,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     key={app._id}
                     sx={{
                       width: 300,
-                      height: 182,
+                      height: 'auto',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
@@ -406,6 +407,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                               <h2>{app.title}</h2>
                             )}
                           </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                        <b>Applied User:</b> {app.firstName} {app.lastName}
+                      </Typography>    
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
                       </Typography>
