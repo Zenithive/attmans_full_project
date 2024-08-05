@@ -22,6 +22,7 @@ import RejectDialogForProject from '../component/rejectforproject/rejectforproje
 import { styled } from '@mui/material/styles';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ProjectDrawer from '../component/projectDrwer/projectDrwer';
+import StatusFilter from '../component/filter/filter';
 
 
 interface Job {
@@ -96,6 +97,9 @@ const Jobs = () => {
     const [isRejected, setIsRejected] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
+
 
 
 
@@ -129,13 +133,13 @@ const Jobs = () => {
     };
 
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[]) => {
+    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null) => {
         try {
             const response = await axios.get(APIS.JOBS, {
                 params: {
                     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
-                    status: userType === 'Admin' ? undefined : 'Approved',
-                    userId: filterType === "mine" ? userId : undefined
+                    status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
+                    userId: filterType === 'mine' ? userId : undefined
                 }
             });
 
@@ -144,10 +148,8 @@ const Jobs = () => {
             if (response.data.length === 0) {
                 setHasMore(false);
             } else {
-                setJobs((prev) => {
-                    const newJobs = response.data.filter((newJobs: Job) => {
-                        return !prev.some((existingJobs) => existingJobs._id === newJobs._id);
-                    });
+                setJobs(prev => {
+                    const newJobs = response.data.filter((newJobs: Job) => !prev.some((existingJobs) => existingJobs._id === newJobs._id));
                     return [...prev, ...newJobs];
                 });
                 if (response.data.length < 10) {
@@ -166,11 +168,11 @@ const Jobs = () => {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis);
+            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory]);
+    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus]);
 
     useEffect(() => {
         refetch();
@@ -178,7 +180,7 @@ const Jobs = () => {
 
     useEffect(() => {
         if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis);
+            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus);
         }
     }, [page]);
 
@@ -187,6 +189,7 @@ const Jobs = () => {
 
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
+        
         };
     }, [refetch]);
 
@@ -271,6 +274,8 @@ const Jobs = () => {
         }
     }
 
+
+
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
@@ -299,6 +304,7 @@ const Jobs = () => {
             }
             setViewingJob(null);
             handleApproveDialogClose();
+            setSelectedStatus('Approved');
             refetch();
         } catch (error) {
             console.error('Error approving job:', error);
@@ -325,6 +331,7 @@ const Jobs = () => {
                 }));
             }
             setViewingJob(null);
+            setSelectedStatus('Rejected');
             handleRejectDialogClose();
             refetch();
         } catch (error) {
@@ -351,11 +358,15 @@ const Jobs = () => {
 
 
     const filteredJobs = useMemo(() => {
-        if (userType === 'Admin' || userType === 'Project Owner') {
-            return jobs;
-        }
-        return jobs.filter(job => job.status === 'Approved');
-    }, [jobs, userType]);
+        return jobs.filter(job => {
+            if (userType === 'Admin' && selectedStatus) {
+                return job.status === selectedStatus;
+            }
+            return userType === 'Admin' || job.status === 'Approved';
+        });
+        
+    }, [jobs, userType, selectedStatus]);
+
 
 
 
@@ -468,68 +479,73 @@ const Jobs = () => {
 
                 </Box>
             )}
-            {(userType === 'Project Owner') && (
+             {userType === 'Admin' && (
                 <Box
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: 2,
-                        marginTop: '-15px',
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px'
-                        },
                     }}
                 >
                     <ToggleButtonGroup
-                        value={filterType}
+                        value={selectedStatus}
                         exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter exhibitions"
-                        sx={{ height: "30px" }}
+                        onChange={(event, newStatus) => setSelectedStatus(newStatus)}
+                        aria-label="filter jobs by status"
+                        sx={{ height: '40px' }}
                     >
-                        <ToggleButton value="all" aria-label="all exhibitions">
+                        <ToggleButton value="" aria-label="all jobs">
                             All Projects
                         </ToggleButton>
-                        <ToggleButton value="mine" aria-label="my exhibitions">
-                            My Projects
+                        <ToggleButton value="Pending" aria-label="pending jobs">
+                            Pending
+                        </ToggleButton>
+                        <ToggleButton value="Approved" aria-label="approved jobs">
+                            Approved
+                        </ToggleButton>
+                        <ToggleButton value="Rejected" aria-label="rejected jobs">
+                            Rejected
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Box>
+
             )}
 
-            {userType === 'Admin' && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        marginTop: '-15px',
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px'
-                        },
-                    }}
-                >
-                    <ToggleButtonGroup
-                        value={filterType}
-                        exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter projects"
-                        sx={{ height: "30px" }}
+            {(userType === 'Project Owner') && (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            marginTop: '-15px',
+                            '@media (max-width: 767px)': {
+                                width: '100%',
+                                justifyContent: 'space-between',
+                                mt: 4,
+                                position: 'relative',
+                                left: '28px'
+                            },
+                        }}
                     >
-                        <ToggleButton value="all" aria-label="all projects">
-                            All Projects
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-            )}
+                        <ToggleButtonGroup
+                            value={filterType}
+                            exclusive
+                            onChange={handleFilterTypeChange}
+                            aria-label="filter exhibitions"
+                            sx={{ height: "30px" }}
+                        >
+                            <ToggleButton value="all" aria-label="all exhibitions">
+                                All Projects
+                            </ToggleButton>
+                            {userType === 'Project Owner' && (
+                                <ToggleButton value="mine" aria-label="my exhibitions">
+                                    My Projects
+                                </ToggleButton>
+                            )}
+                        </ToggleButtonGroup>
+                    </Box>
+                )}
+
             <InfiniteScroll
                 key={appliedJobs.join(',')}
                 dataLength={jobs.length}

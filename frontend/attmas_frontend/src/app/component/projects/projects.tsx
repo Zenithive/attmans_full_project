@@ -94,6 +94,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         Sector: '',
         AreaOfProduct: '',
         username: userDetails.username,
+        firstName:userDetails.firstName,
+        lastName:userDetails.lastName,
         ProductDescription: '',
         currency: 'INR',
 
@@ -136,6 +138,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             IPRownership: values.IPRownership,
             userId: userDetails._id,
             username:userDetails.username,
+            firstName:userDetails.firstName,
+            lastName:userDetails.lastName,
             currency: values.currency,
         };
 
@@ -342,6 +346,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         name="Budget"
                                         label="Budget"
                                         type="number"
+                                        color='secondary'
                                         value={values.Budget}
                                         onChange={handleChange}
                                         error={touched.Budget && Boolean(errors.Budget)}

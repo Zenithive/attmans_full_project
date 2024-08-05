@@ -36,10 +36,10 @@ export class Jobs {
   @Prop({ required: false })
   Sector: string;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   firstName: string;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   lastName: string;
 
   @Prop({ required: false })

@@ -42,6 +42,8 @@ interface Email {
   adminFirstName?: string;
   adminLastName?: string;
   applicationId?: string,
+  first?:string,
+  last?:string,
 
 }
 
@@ -176,7 +178,7 @@ export default function MainNavBar() {
     if (notification.subject === 'New Project Created') {
       return `
         Dear ${userName},<br>
-        You have been notified that ${notification.adminFirstName} ${notification.adminLastName} has created a project. 
+        You have been notified that "${notification.first} ${notification.last}" has created a project. 
         <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
       `;
     }
@@ -184,7 +186,7 @@ export default function MainNavBar() {
     if (notification.status) {
       return `
         Dear ${userName},<br>
-        Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+        Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
       `;
     }
   
@@ -199,7 +201,7 @@ export default function MainNavBar() {
       return `
         Dear ${userName},<br>
         Your project "${notification.title}" has been ${notification.status2} by ${notification.adminFirstName} ${notification.adminLastName}. 
-        <a href="${baseUrl}" style="color:blue; cursor:pointer;">Click here</a> to view projects.
+        <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects.
       `;
     }
   

@@ -137,6 +137,7 @@ export const AddApply= ({ open, setOpen,jobTitle,jobId}:AddApplyProps) => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 fullWidth
+                disabled
                 error={!!(errors.title && touched.title)}
                 helperText={<ErrorMessage name="title" />}
               />
