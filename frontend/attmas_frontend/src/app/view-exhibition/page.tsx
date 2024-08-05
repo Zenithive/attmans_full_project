@@ -22,6 +22,7 @@ interface Exhibition {
   description: string;
   status: string;
   videoUrl: string;
+  meetingUrl: string;
   dateTime: string;
   industries: string[];
   subjects: string[];
@@ -35,7 +36,7 @@ interface Visitor {
   lastName: string;
   username: string;
   mobileNumber: string;
-  timestamps:string;
+  timestamps: string;
 }
 
 
@@ -73,8 +74,8 @@ const ExhibitionsPage: React.FC = () => {
   const [isParticipateButtonVisible, setParticipateButtonVisible] = useState(true);
   const [hasUserBooth, setHasUserBooth] = useState(false);
   const [view, setView] = useState('boothDetails');
+  const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
 
-  
 
 
   useEffect(() => {
@@ -87,6 +88,7 @@ const ExhibitionsPage: React.FC = () => {
         }
         const response = await axios.get(`${APIS.EXHIBITION}/${exhibitionId}`);
         setExhibitions([response.data]);
+        setSelectedExhibition(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -277,6 +279,18 @@ const ExhibitionsPage: React.FC = () => {
     setView(newView);
   };
 
+  const handleJoinLiveClick = () => {
+    if (selectedExhibition && selectedExhibition.meetingUrl) {
+      window.open(selectedExhibition.meetingUrl, '_blank');
+    }
+  };
+
+  const isJoinLiveButtonVisible = (dateTime: string) => {
+    const exhibitionDate = dayjs(dateTime).startOf('day');
+    const currentDate = dayjs().startOf('day');
+    return exhibitionDate.isSame(currentDate);
+  };
+
   return (
     <>
       <Head>
@@ -314,7 +328,7 @@ const ExhibitionsPage: React.FC = () => {
               >
                 Participate
               </Button>
-           )}
+            )}
 
 
             {(!userType || userType === 'Visitors') && (
@@ -328,6 +342,16 @@ const ExhibitionsPage: React.FC = () => {
               </Button>
             )}
 
+            {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && (  
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleJoinLiveClick}
+                sx={{ position: 'absolute', right: '330px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+              >
+                Join Live
+              </Button>
+            )}
           </Box>
           <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
           <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} exhibitionId={exhibitionId} />
@@ -385,12 +409,12 @@ const ExhibitionsPage: React.FC = () => {
             }
           }}>
             <h1>Booth Details</h1>
-            {(userDetails && (userType === 'Admin' || userType === 'Innovators' )&& view === 'boothDetails') && (
+            {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
               <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} />
             )}
           </Box>
           {userType !== 'Visitors' && (
-            <Box display="flex" justifyContent="center" marginTop="20px" sx={{position:'relative',bottom:'22px'}}>
+            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '22px' }}>
               <ToggleButtonGroup
                 value={view}
                 exclusive
@@ -398,7 +422,7 @@ const ExhibitionsPage: React.FC = () => {
                 aria-label="view selection"
               >
                 <ToggleButton value="boothDetails">Booth Details</ToggleButton>
-                {userDetails && userType === 'Admin' ? 
+                {userDetails && userType === 'Admin' ?
                   <ToggleButton value="visitors">Visitors</ToggleButton> : ""}
               </ToggleButtonGroup>
             </Box>
@@ -490,7 +514,7 @@ const ExhibitionsPage: React.FC = () => {
                                 }
                               />
                             )}
-                          </Box>    
+                          </Box>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', float: 'left' }}>
                             {booth.status !== 'Approved' && booth.status !== 'Rejected' && (userType === 'Admin') && (
                               <>
@@ -531,30 +555,30 @@ const ExhibitionsPage: React.FC = () => {
           {view === 'visitors' && (
             <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
               {visitors.map(visitor => (
-               <Grid item xs={12} sm={6} md={4} key={visitor._id}>
-               <Card sx={{ maxWidth: 320, height: 200, borderRadius: 2, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>
-                 <CardContent sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <CommonAvatar name={`${visitor.firstName} ${visitor.lastName}`} style={{ backgroundColor: 'primary.main', width: 56, height: 56 }}></CommonAvatar>
-                   {/* <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+                <Grid item xs={12} sm={6} md={4} key={visitor._id}>
+                  <Card sx={{ maxWidth: 320, height: 200, borderRadius: 2, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>
+                    <CardContent sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <CommonAvatar name={`${visitor.firstName} ${visitor.lastName}`} style={{ backgroundColor: 'primary.main', width: 56, height: 56 }}></CommonAvatar>
+                      {/* <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
                      {visitor.firstName[0]}{visitor.lastName[0]}
                    </Avatar> */}
-                   <div>
-                     <Typography variant="h6" component="div" gutterBottom >
-                       {visitor.firstName} {visitor.lastName}
-                     </Typography>
-                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                       {visitor.username}
-                     </Typography>
-                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                       {visitor.mobileNumber}
-                     </Typography>
-                     <Typography variant="body2" color="text.secondary">
-                       Date: {dayjs(visitor.timestamps).format('MMMM D, YYYY h:mm A')}
-                     </Typography>
-                   </div>
-                 </CardContent>
-               </Card>
-             </Grid>
+                      <div>
+                        <Typography variant="h6" component="div" gutterBottom >
+                          {visitor.firstName} {visitor.lastName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {visitor.username}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {visitor.mobileNumber}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Date: {dayjs(visitor.timestamps).format('MMMM D, YYYY h:mm A')}
+                        </Typography>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Grid>
               ))}
             </Grid>
           )}

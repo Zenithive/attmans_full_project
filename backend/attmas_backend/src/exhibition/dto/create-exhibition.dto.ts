@@ -38,6 +38,10 @@ export class CreateExhibitionDto {
   @IsUrl()
   videoUrl: string;
 
+  @IsNotEmpty()
+  @IsUrl()
+  meetingUrl: string;
+
   userType: string;
 }
 
@@ -68,4 +72,7 @@ export class UpdateExhibitionDto {
 
   @IsUrl()
   videoUrl?: string;
+  
+  @IsUrl()
+  meetingUrl?: string;
 }
