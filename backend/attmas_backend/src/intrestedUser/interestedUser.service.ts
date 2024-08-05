@@ -12,7 +12,7 @@ export class InterestedUserService {
     private readonly interestedUserModel: Model<InterestedUser>,
     @InjectModel('User') private readonly userModel: Model<User>,
     private mailerService: MailerService, // Inject MailerService
-  ) {}
+  ) { }
 
   async create(createInterestedUserDto: any): Promise<InterestedUser> {
     const {
@@ -34,85 +34,77 @@ export class InterestedUserService {
     console.log('Existing User:', existingUser);
 
     try {
-      // if (existingUser) {
-      //     // Send "abc" message
-      //     console.log('Sending "abc" email to:', username);
-      //     await this.mailerService.sendEmail(
-      //         username,
-      //         'Existing User of Attmas',
-      //         `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nBest regards,\nTeam Attmas`,
-      //     );
-      //     console.log('Email sent to existing user successfully.');
+      if (existingUser) {
+        // Send "abc" message
+        const backendBaseUrl = process.env.BACKEND_BASE_URL;
 
-      //     // Create interested user entry with null or blank values
-      //     const createdUser = new this.interestedUserModel({
-      //         username: null,
-      //         firstName: null,
-      //         lastName: null,
-      //         mobileNumber: null,
-      //         exhibitionId: null,
-      //         userId: null,
-      //         userType: null,
-      //     });
-      //     console.log('Created InterestedUser with null values:', createdUser);
+        console.log('BACKEND_BASE_URL:', backendBaseUrl);
+        const exhibitionUrl = `${backendBaseUrl}/view-exhibition?exhibitionId=${exhibitionId}`;
+        console.log('Sending "abc" email to:', username);
+        await this.mailerService.sendEmail(
+          username,
+          'Existing User of Attmas',
+          `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nClick <a href="${exhibitionUrl}">here</a> to participate in the Exhibition.\n\nBest regards,\nTeam Attmas`,
+        );
+        console.log('Email sent to existing user successfully.');
 
-      //     // Save and then delete the null entry
-      //     await createdUser.save();
-      //     await this.deleteNullEntries();
+        // Create interested user entry with null or blank values
+        const createdUser = new this.interestedUserModel({
+          username,
+          firstName,
+          lastName,
+          mobileNumber,
+          exhibitionId,
+          userId,
+          userType,
+        });
+        console.log('Created InterestedUser with null values:', createdUser);
 
-      //     return createdUser;
-      // } else {
-      // Send "xyz" message
-      console.log('Sending "xyz" email to:', username);
-      await this.mailerService.sendEmail(
-        username,
-        'New User Interest in Attmas',
-        `Hello ${firstName},\n\nThank you for showing interest in our Attmas service!\n\nBest regards,\nTeam Attmas`,
-      );
-      console.log('Email sent to new user successfully.');
+        // Save and then delete the null entry
+        await createdUser.save();
 
-      // Send welcome email
-      console.log('Sending welcome email to new user:', username);
-      await this.mailerService.sendEmail(
-        username,
-        'Welcome to Attmas!',
-        `Hello ${firstName},\n\nWelcome to Attmas! We're excited to have you on board.\n\nBest regards,\nTeam Attmas`,
-      );
-      console.log('Welcome email sent to new user successfully.');
+        return createdUser;
+      } else {
+        // Send "xyz" message
+        console.log('Sending "xyz" email to:', username);
+        await this.mailerService.sendEmail(
+          username,
+          'New User Interest in Attmas',
+          `Hello ${firstName},\n\nThank you for showing interest in our Attmas service!\n\nBest regards,\nTeam Attmas`,
+        );
+        console.log('Email sent to new user successfully.');
 
-      // Create interested user entry with provided values
-      const createdUser = new this.interestedUserModel({
-        username,
-        firstName,
-        lastName,
-        mobileNumber,
-        exhibitionId,
-        userId,
-        userType,
-      });
-      console.log('Created InterestedUser:', createdUser);
+        // Send welcome email
+        console.log('Sending welcome email to new user:', username);
+        await this.mailerService.sendEmail(
+          username,
+          'Welcome to Attmas!',
+          `Hello ${firstName},\n\nWelcome to Attmas! We're excited to have you on board.\n\nBest regards,\nTeam Attmas`,
+        );
+        console.log('Welcome email sent to new user successfully.');
 
-      return createdUser.save();
-    } catch (error) {
+        // Create interested user entry with provided values
+        const createdUser = new this.interestedUserModel({
+          username,
+          firstName,
+          lastName,
+          mobileNumber,
+          exhibitionId,
+          userId,
+          userType,
+        });
+        console.log('Created InterestedUser:', createdUser);
+
+        return createdUser.save();
+      }
+    }
+    catch (error) {
       console.error('Error sending email:', error);
       throw error;
-    }
-    // }
 
-    // Method to delete InterestedUser entries with all null or blank values
-    // private async deleteNullEntries(): Promise<void> {
-    //     await this.interestedUserModel.deleteMany({
-    //         username: { $eq: null },
-    //         firstName: { $eq: null },
-    //         lastName: { $eq: null },
-    //         mobileNumber: { $eq: null },
-    //         exhibitionId: { $eq: null },
-    //         userId: { $eq: null },
-    //         userType: { $eq: null },
-    //     }).exec();
-    //     console.log('Deleted null or blank entries from InterestedUser collection.');
-    // }
+    }
   }
+
 
   async findVisitorsByExhibition(
     exhibitionId: string,

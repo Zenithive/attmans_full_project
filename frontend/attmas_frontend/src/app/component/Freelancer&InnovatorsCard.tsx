@@ -147,7 +147,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
         background: '#f0f0f0',
         p: 2,
         borderRadius: 1,
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.8)',
+        boxShadow: '0px 0px 0px rgba(0, 0, 0, 0)',
         '@media (max-width: 767px)': {
           position: 'relative',
           left: '25px',
@@ -369,8 +369,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                 sx={{ width: "50%" }}
               />
             </Box>
-
-            {/* Product Table */}
+            {selectedUser.userType === 'Innovators' && (
             <ProductTable
               products={productDetails}
               onRemove={(index) => {
@@ -386,6 +385,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
               showActions={false} // Hide actions
               readOnly={true} // Make the table read-only
             />
+          )}
           </>
         )}
       </>
