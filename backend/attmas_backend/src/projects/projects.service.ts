@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { User, UserDocument } from 'src/users/user.schema';
 import { Jobs, JobsDocument } from './projects.schema';
-import { CreateJobsDto, UpdateJobsDto } from './create-projects.dto';
+import {
+  AddCommentDto,
+  CreateJobsDto,
+  UpdateJobsDto,
+} from './create-projects.dto';
 import { UsersService } from 'src/users/users.service';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 import {
@@ -94,16 +98,25 @@ export class JobsService {
       .find(filter)
       .skip(skip)
       .limit(limit)
-      .populate('userId', 'firstName lastName username', this.userModel)
+      .populate(
+        'userId',
+        'firstName lastName username userType',
+        this.userModel,
+      )
       .exec();
   }
 
   async findJobWithUser(id: string): Promise<Jobs> {
-    return this.jobsModel.findById(id).populate('user').exec();
+    return this.jobsModel
+      .findById(id)
+      .populate('userId', 'firstName lastName username')
+      .exec();
   }
 
   async update(id: string, updateJobsDto: UpdateJobsDto): Promise<Jobs> {
+    console.log('id', { _id: id });
     const existingJob = await this.jobsModel.findById({ _id: id });
+    console.log('existingJob', existingJob);
     if (!existingJob) {
       throw new NotFoundException(`Jobs with id ${id} not found`);
     }
@@ -206,5 +219,31 @@ export class JobsService {
       console.error(`Error rejecting project with ID ${id}:`, error);
       throw error;
     }
+  }
+
+  async addComment(jobId: string, addCommentDto: AddCommentDto): Promise<Jobs> {
+    const job = await this.jobsModel.findById(jobId);
+    if (!job) {
+      throw new NotFoundException(`Job with id ${jobId} not found`);
+    }
+
+    const user = await this.userModel.findById(addCommentDto.createdBy);
+    if (!user) {
+      throw new NotFoundException(
+        `User with id ${addCommentDto.createdBy} not found`,
+      );
+    }
+
+    const comment = {
+      commentText: addCommentDto.commentText,
+      createdBy: new Types.ObjectId(addCommentDto.createdBy),
+      createdAt: new Date(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      userType: user.userType,
+    };
+
+    job.comments.push(comment);
+    return job.save();
   }
 }
