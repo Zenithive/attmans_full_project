@@ -11,8 +11,10 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import ApplyDetailsDialog from '../projectsDetails/projectDetails';
 import booth from '../booth/booth';
+import AddComment from '../projectComment/projectComment';
+import JobDetail from '../projectCommentCard/projectCommentCard';
 
-interface Job {
+export interface Job {
   _id?: string;
   title: string;
   description: string;
@@ -43,11 +45,11 @@ interface Apply {
   currency: string;
   TimeFrame: string | null;
   rejectComment: string;
-  status:string;
-  firstName:string;
-  lastName:string;
-  username:string;
-  jobId:string;
+  status: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  jobId: string;
 }
 
 interface ProjectDrawerProps {
@@ -74,9 +76,10 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [jobDetailKey, setJobDetailKey] = useState<number>(0);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  const currentUser = userDetails.username; 
+  const currentUser = userDetails.username;
 
   const fetchApplications = useCallback(async () => {
     if (viewingJob?._id) {
@@ -95,7 +98,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const handleApprove = async (applicationId: string) => {
     try {
-    if(!applicationId) return;
+      if (!applicationId) return;
       await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
       fetchApplications();
       setFilter('Approved');
@@ -119,20 +122,28 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     }
   };
 
-  
+
 
   const filteredApplications = applications.filter(app => {
     if (filter === 'All') return true;
     return app.status === filter;
   }).filter(app => {
     if (userType === 'Project Owner') {
-      return  app.status === 'Approved' && currentUser === viewingJob?.username;
+      return app.status === 'Approved' && currentUser === viewingJob?.username;
     }
     if (userType === 'Innovators' || userType === 'Freelancer') {
-      return app.username === currentUser; 
+      return app.username === currentUser;
     }
     return true;
   });
+
+  const handleCommentSubmitted = () => {
+    fetchApplications();
+    setJobDetailKey(prev => prev + 1); 
+  };
+
+  const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
+    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved' );
 
   return (
     <Dialog
@@ -151,7 +162,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       }}
     >
       <DialogTitle>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'  ,fontSize:'25px'}}>
           Project Details Information
           <IconButton
             edge="start"
@@ -316,6 +327,37 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               )}
             </Grid>
 
+            {canAddComment && ( 
+            <Divider orientation="horizontal" flexItem  sx={{marginBottom:'30px'}}/>
+            )}
+                
+            {canAddComment && (
+              <Grid item xs={12} sm={12}>
+                <Box
+                  sx={{
+                    backgroundColor: '#f5f5f5',
+                    padding: 2,
+                    borderRadius: 1,
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom sx={{fontSize:'25px'}}>
+                   Comments for Project
+                  </Typography>
+                  <AddComment
+                    jobId={viewingJob._id || ''}
+                    onCommentSubmitted={handleCommentSubmitted}
+                  />
+                </Box>
+              </Grid>
+            )}
+
+            {canAddComment && (
+              <Grid item xs={12} sm={12}>
+                <JobDetail key={jobDetailKey} jobId={viewingJob?._id || ''} />
+              </Grid>
+            )}
+
+            
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
               {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
                 <>
@@ -331,24 +373,24 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
             <Divider orientation="horizontal" flexItem />
 
-             <Box sx={{position:'relative',top:'30px',marginBottom:'20px'}}>
-                <DialogTitle>
-                       Applications for Project
-                </DialogTitle>
-             </Box>
-
-           { (userType === 'Admin') && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 ,position:'relative',top:'20px',right:'15%'}}>
-            <StatusFilter
-            value={filter}
-            onChange={(event, newStatus) => {
-              if (newStatus !== null) {
-                setFilter(newStatus);
-              }
-            }}
-          />
+            <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
+              <DialogTitle sx={{fontSize:'25px'}}>
+                Applications for Project
+              </DialogTitle>
             </Box>
-           )}
+
+            {(userType === 'Admin') && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2, position: 'relative', top: '20px', right: '15%' }}>
+                <StatusFilter
+                  value={filter}
+                  onChange={(event, newStatus) => {
+                    if (newStatus !== null) {
+                      setFilter(newStatus);
+                    }
+                  }}
+                />
+              </Box>
+            )}
             <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (
@@ -368,48 +410,48 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         label={app.status}
                         variant="outlined"
                         sx={{
-                            borderColor: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
-                            color: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
-                            borderRadius: '16px',
-                            float: 'right',
-                            mb: 2,
+                          borderColor: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
+                          color: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
+                          borderRadius: '16px',
+                          float: 'right',
+                          mb: 2,
                         }}
                       />
-                       <Typography
-                            onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner') ? () => {
-                              setSelectedApply(app);
-                              setDialogOpen(true);
-                            } : undefined}
-                            style={{
-                              cursor: userDetails && (userType === 'Admin' || userType === 'Project Owner') ? 'pointer' : 'default',
-                              display: 'inline-block',
+                      <Typography
+                        onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner') ? () => {
+                          setSelectedApply(app);
+                          setDialogOpen(true);
+                        } : undefined}
+                        style={{
+                          cursor: userDetails && (userType === 'Admin' || userType === 'Project Owner') ? 'pointer' : 'default',
+                          display: 'inline-block',
+                        }}
+                      >
+                        {(userDetails && (userType === 'Admin' || userType === 'Project Owner')) ? (
+                          <Tooltip
+                            title="Click here to see Project details"
+                            arrow
+                            placement="top"
+                            PopperProps={{
+                              modifiers: [
+                                {
+                                  name: 'offset',
+                                  options: {
+                                    offset: [0, -10],
+                                  },
+                                },
+                              ],
                             }}
                           >
-                            {(userDetails && (userType === 'Admin' || userType === 'Project Owner')) ? (
-                              <Tooltip
-                                title="Click here to see Project details"
-                                arrow
-                                placement="top"
-                                PopperProps={{
-                                  modifiers: [
-                                    {
-                                      name: 'offset',
-                                      options: {
-                                        offset: [0, -10],
-                                      },
-                                    },
-                                  ],
-                                }}
-                              >
-                                <h2>{app.title}</h2>
-                              </Tooltip>
-                            ) : (
-                              <h2>{app.title}</h2>
-                            )}
-                          </Typography>
+                            <h2>{app.title}</h2>
+                          </Tooltip>
+                        ) : (
+                          <h2>{app.title}</h2>
+                        )}
+                      </Typography>
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Applied User:</b> {app.firstName} {app.lastName}
-                      </Typography>    
+                      </Typography>
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
                       </Typography>
@@ -418,31 +460,31 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       </Typography>
                     </CardContent>
                     <Box sx={{ p: 1 }}>
-                    {app.status !== 'Approved' && app.status !== 'Rejected' &&  (userType === 'Admin') && (
-                      <>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => {
-                            setApproveDialogOpen({ open: true, apply: app });
-                          }}
-                         
-                          sx={{ mr: 1 }}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => {
-                            setRejectDialogOpen({ open: true, apply: app });
-                          }}
-                          
-                        >
-                          Reject
-                        </Button>
-                      </>
-                     )}
+                      {app.status !== 'Approved' && app.status !== 'Rejected' && (userType === 'Admin') && (
+                        <>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                              setApproveDialogOpen({ open: true, apply: app });
+                            }}
+
+                            sx={{ mr: 1 }}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                              setRejectDialogOpen({ open: true, apply: app });
+                            }}
+
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
                     </Box>
                   </Card>
                 ))
@@ -453,6 +495,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           </Box>
         )}
         <>
+        
           {approveDialogOpen.open && (
             <ApproveDialogForApply
               open={approveDialogOpen.open}
@@ -479,7 +522,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             />
           )}
 
-        {selectedApply && (
+          {selectedApply && (
             <ApplyDetailsDialog
               open={dialogOpen}
               onClose={() => setDialogOpen(false)}

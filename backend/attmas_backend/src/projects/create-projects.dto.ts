@@ -149,9 +149,15 @@ export class UpdateJobsDto {
 
   @IsNotEmpty()
   @IsString()
-  username: string;
+  username?: string;
+}
 
+export class AddCommentDto {
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  rejectComment?: string;
+  commentText: string;
+
+  @IsNotEmpty()
+  @IsString()
+  createdBy: string;
 }

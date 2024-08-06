@@ -5,12 +5,15 @@ import {
   Body,
   NotFoundException,
   Param,
-  Put,
   Delete,
   Query,
 } from '@nestjs/common';
 import { JobsService } from './projects.service';
-import { CreateJobsDto, UpdateJobsDto } from './create-projects.dto';
+import {
+  AddCommentDto,
+  CreateJobsDto,
+  UpdateJobsDto,
+} from './create-projects.dto';
 import { Jobs } from './projects.schema';
 
 @Controller('jobs')
@@ -52,7 +55,7 @@ export class JobsController {
     return job;
   }
 
-  @Put(':id')
+  @Post(':id')
   async update(
     @Param('id') id: string,
     @Body() updateJobsDto: UpdateJobsDto,
@@ -85,5 +88,13 @@ export class JobsController {
   ): Promise<Jobs> {
     console.log('Received body:', body);
     return this.jobsService.rejectProject(id, body.comment);
+  }
+
+  @Post('comments/:id')
+  async addComment(
+    @Param('id') jobId: string,
+    @Body() addCommentDto: AddCommentDto,
+  ) {
+    return this.jobsService.addComment(jobId, addCommentDto);
   }
 }

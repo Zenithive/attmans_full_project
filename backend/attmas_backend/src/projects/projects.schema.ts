@@ -36,10 +36,10 @@ export class Jobs {
   @Prop({ required: false })
   Sector: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   firstName: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   lastName: string;
 
   @Prop({ required: false })
@@ -89,6 +89,28 @@ export class Jobs {
 
   @Prop({ required: false })
   rejectComment: string;
+
+  @Prop({
+    type: [
+      {
+        commentText: String,
+        createdBy: { type: Types.ObjectId, ref: 'User' },
+        createdAt: { type: Date, default: Date.now },
+        firstName: String,
+        lastName: String,
+        userType: String,
+      },
+    ],
+    default: [],
+  })
+  comments: Array<{
+    commentText: string;
+    createdBy: Types.ObjectId;
+    createdAt: Date;
+    firstName: string;
+    lastName: string;
+    userType: string;
+  }>;
 }
 
 export const JobsSchema = SchemaFactory.createForClass(Jobs);
