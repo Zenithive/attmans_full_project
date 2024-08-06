@@ -48,6 +48,9 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   userType: string;
+  
+  @Prop({ required: false })
+  patentDetails: string;
 
   @Prop({ type: [ProductInfoSchema], required: false }) // Use array of ProductInfo schema
   products: ProductInfo[];

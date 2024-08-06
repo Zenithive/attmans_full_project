@@ -30,7 +30,8 @@ interface FormValues {
     userType: string;
     productToMarket: string;
     products: Product[];
-    hasPatent: boolean;
+    hasPatent: string;
+    patentDetails: string; // New field
     username: string;
     userId: string;
 }
@@ -68,6 +69,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             })
         ),
         hasPatent: Yup.string().nullable(),
+        // patentDetails: Yup.string().when('hasPatent', {
+        //     is: 'Yes',
+        //     then: Yup.string().required('Patent details are required'),
+        //     otherwise: Yup.string().nullable()
+        // }),
     });
 
     const formik = useFormik<FormValues>({
@@ -80,7 +86,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             userType: '',
             productToMarket: '',
             products: [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
-            hasPatent: false,
+            hasPatent: 'No',
+            patentDetails: '',
             username: userDetails.username,
             userId: userDetails._id,
         },
@@ -319,6 +326,25 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                             <MenuItem value="No">No</MenuItem>
                                         </TextField>
                                     </Grid> : ""}
+
+                                    {formik.values.hasPatent === "Yes" && (
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={4}
+                                                id="patentDetails"
+                                                color='secondary'
+                                                label="Provide details about the research product or solution that you intend to commercialize"
+                                                name="patentDetails"
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.patentDetails}
+                                                error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
+                                                helperText={formik.touched.patentDetails && formik.errors.patentDetails}
+                                            />
+                                        </Grid>
+                                    )}
                                 </>
                             ) : ""}
 
