@@ -108,7 +108,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         },
     });
 
-   
+
 
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
@@ -172,7 +172,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 width: '126%', position: 'relative', right: '26px'
                             }
                         }}>
-                            <Grid color= 'secondary' item xs={12} sm={6}>
+                            <Grid color='secondary' item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     select
@@ -194,12 +194,12 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     <MenuItem value="Ph.D.">Ph.D.</MenuItem>
                                 </TextField>
                             </Grid>
-                            <Grid color= 'secondary' item xs={12} sm={6}>
+                            <Grid color='secondary' item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     id="organization"
                                     label="Organization"
-                                    color= 'secondary'
+                                    color='secondary'
                                     name="organization"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -213,7 +213,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     fullWidth
                                     id="sector"
                                     label="Sector"
-                                    color= 'secondary'
+                                    color='secondary'
                                     name="sector"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -226,7 +226,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 <TextField
                                     fullWidth
                                     id="workAddress"
-                                    color= 'secondary'
+                                    color='secondary'
                                     label="Work Address"
                                     name="workAddress"
                                     onChange={formik.handleChange}
@@ -240,7 +240,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 <TextField
                                     fullWidth
                                     id="designation"
-                                    color= 'secondary'
+                                    color='secondary'
                                     label="Designation"
                                     name="designation"
                                     onChange={formik.handleChange}
@@ -283,7 +283,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                             select
                                             style={{ background: "white", borderRadius: "25px" }}
                                             id="productToMarket"
-                                            color= 'secondary'
+                                            color='secondary'
                                             label="Product to Market"
                                             name="productToMarket"
                                             onChange={(e) => {
@@ -306,7 +306,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                             select
                                             style={{ background: "white", borderRadius: "25px" }}
                                             id="hasPatent"
-                                            color= 'secondary'
+                                            color='secondary'
                                             label="Do you have a patent?"
                                             name="hasPatent"
                                             onChange={formik.handleChange}
@@ -322,7 +322,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 </>
                             ) : ""}
 
-                            
+
                             {isInnovator && showProductDetails && (
                                 <>
                                     <Grid item xs={12}>
@@ -335,7 +335,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                             }}
                                             onChange={(index: number, updatedProduct: Product) => handleProductChange(index, updatedProduct)}
                                         />
-                                        
+
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Button
@@ -349,20 +349,22 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     </Grid>
                                 </>
                             )}
-                            
+
 
                             {/* *********** back and back *************** */}
 
                             <Grid item xs={12}>
                                 <Button
-                                type="button"
-                                variant="contained"
-                                size="small"
-                                sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' , '@media (max-width: 767px)':{
-                                    position:'relative',
-                                    top:'2px'
-                                }}}
-                                onClick={onPrevious}
+                                    type="button"
+                                    variant="contained"
+                                    size="small"
+                                    sx={{
+                                        mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px', '@media (max-width: 767px)': {
+                                            position: 'relative',
+                                            top: '2px'
+                                        }
+                                    }}
+                                    onClick={onPrevious}
                                 >
                                     Back
                                 </Button>
@@ -373,14 +375,14 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     size="small"
                                     loading={loading}
                                     loadingIndicator={<CircularProgress size={24} />}
-                                    sx={{ 
+                                    sx={{
                                         mt: 2,
                                         mb: 2,
-                                        ml: { xs: 'auto', md: '90%' }, 
-                                        width: { xs: '40%', md: '10%' }, 
+                                        ml: { xs: 'auto', md: '90%' },
+                                        width: { xs: '40%', md: '10%' },
                                         height: '40px',
-                                        position: { xs: 'relative', md: 'static' }, 
-                                        left:'40%'
+                                        position: { xs: 'relative', md: 'static' },
+                                        left: '40%'
                                     }}
                                 >
                                     Save & Next
@@ -390,6 +392,33 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                         </Grid>
                     </Box>
                 </FormikProvider>
+
+                {/* Added sentences at the end of the form
+                <Typography variant="body2" color="text.secondary" align="center" mt={4}>
+                    <i>
+                        <b>
+                            Please Note: <br />
+                            If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                            Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
+                        </b>
+                    </i>
+                </Typography> */}
+
+                {/* Added sentences at the end of the form */}
+                <Typography
+                    variant="body2"
+                    align="center"
+                    mt={4}
+                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
+                >
+                    Please Note: <br />
+                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
+                </Typography>
+
+
+
+
                 {fetchError && (
                     <Typography color="error" align="center" mt={2}>
                         {fetchError}
