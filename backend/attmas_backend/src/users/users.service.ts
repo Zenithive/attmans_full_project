@@ -134,14 +134,14 @@ export class UsersService {
   ): Promise<any[]> {
     const skip = (page - 1) * limit;
     const filterQuery: any = { userType };
-  
+
     if (filter) {
       filterQuery.$or = [
         { firstName: new RegExp(filter, 'i') },
         { lastName: new RegExp(filter, 'i') },
       ];
     }
-  
+
     const users = await this.userModel
       .aggregate([
         { $match: filterQuery }, // Match users by userType
@@ -173,10 +173,10 @@ export class UsersService {
         },
       ])
       .exec();
-  
+
     if (category || subCategory) {
       const usernames = users.map((user) => user.username);
-  
+
       const categoryFilter: any = { username: { $in: usernames } };
       if (category) {
         categoryFilter['categories'] = category;
@@ -184,20 +184,19 @@ export class UsersService {
       if (subCategory) {
         categoryFilter['subcategories'] = subCategory;
       }
-  
+
       const categoryData = await this.categoriesModel
         .find(categoryFilter)
         .exec();
       const filteredUsernames = new Set(
         categoryData.map((cat) => cat.username),
       );
-  
+
       return users.filter((user) => filteredUsernames.has(user.username));
     }
-  
+
     return users;
   }
-  
 
   async findUsersByUserType1(
     userType: string,

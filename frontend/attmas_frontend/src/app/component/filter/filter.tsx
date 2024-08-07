@@ -15,7 +15,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({ value, onChange }) => {
       aria-label="status filter"
       sx={{
         position: 'relative', 
-        left: '40%', 
+        left: '45%', 
         bottom: '63px', 
         '@media (max-width: 767px)': {
           position: 'relative',
