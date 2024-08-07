@@ -135,6 +135,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   </Grid>
                 )}
               </Grid>
+
+              
             </Box>
           )}
         </DialogContent>
