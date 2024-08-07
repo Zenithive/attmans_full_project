@@ -15,64 +15,19 @@ import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
-import { Drawer } from '@mui/material';
 import { Category, Subcategorys } from '@/app/constants/categories';
 import ApproveDialogForProject from '../component/approveforproject/approveforproject';
 import RejectDialogForProject from '../component/rejectforproject/rejectforproject';
 import { styled } from '@mui/material/styles';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ProjectDrawer from '../component/projectDrwer/projectDrwer';
-import StatusFilter from '../component/filter/filter';
-
-
-interface Job {
-    _id?: string;
-    title: string;
-    description: string;
-    Budget: number;
-    Expertiselevel: string;
-    TimeFrame: string | null;
-    Category: string[];
-    Subcategorys: string[];
-
-    // ******** op ******** //
-    DetailsOfInnovationChallenge: string;
-    Sector: string;
-    AreaOfProduct: string;
-    ProductDescription: string;
-
-
-    username: string;
-    SelectService: string;
-    Objective: string;
-    Expectedoutcomes: string;
-    IPRownership: string;
-    currency: string;
-    // Status: string;
-    status: string;
-    rejectComment?: string;
-}
+import { Job, Apply } from './projectinterface';
+import { Expertiselevel } from './projectinterface';
+import { getSubcategorys } from './projectinterface';
+import { CustomChip } from './projectinterface';
 
 
 
-interface Apply {
-    _id?: string;
-    title: string;
-    description: string;
-    Budget: number;
-    currency: string;
-    TimeFrame: string | null;
-    jobId: string;
-}
-
-const Expertiselevel = [
-    "Beginner",
-    "Intermidiate",
-    "Expert",
-    "Phd"
-];
-
-const getSubcategorys = (Subcategorys: any[]) => Subcategorys.flatMap((Subcategory: { items: any; }) => Subcategory.items);
 
 const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
@@ -98,15 +53,11 @@ const Jobs = () => {
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-
-
-
-
-
+    const [viewingJob, setViewingJob] = useState<Job | null>(null);
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
-
-    const [viewingJob, setViewingJob] = useState<Job | null>(null);
+    const [isShowingApplies, setIsShowingApplies] = useState(false);
+    const [applies, setApplies] = useState<Apply[]>([]);
 
     const handleApproveDialogOpen = (job: Job) => {
         setApproveDialogOpen({ open: true, job });
@@ -162,6 +113,30 @@ const Jobs = () => {
     }, [userId, filterType, userType]);
 
 
+    ///////////   All Applies fetch   ////////////
+
+    const fetchApplies = useCallback(async () => {
+        try {
+            console.log('Fetching applies...');
+            const response = await axios.get(APIS.APPLIED_APPLICATION);
+            console.log('Applies fetched:', response.data);
+            setApplies(response.data);
+        } catch (error) {
+            console.error('Error fetching applies:', error);
+        }
+    }, []);
+
+    const handleAllAppliesClicks = async () => {
+        console.log('All Applies button clicked');
+        if (!isShowingApplies) {
+            await fetchApplies();
+        }
+        setIsShowingApplies(!isShowingApplies);
+    };
+
+    // useEffect(() => {
+    //     fetchJobs();
+    // }, [fetchJobs]);
 
     const refetch = useCallback(async () => {
         try {
@@ -189,7 +164,7 @@ const Jobs = () => {
 
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
-        
+
         };
     }, [refetch]);
 
@@ -274,8 +249,6 @@ const Jobs = () => {
         }
     }
 
-
-
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
@@ -339,24 +312,6 @@ const Jobs = () => {
         }
     }, [refetch, viewingJob]);
 
-
-
-    const CustomChip = styled(Chip)(({ theme }) => ({
-        borderRadius: '16px',
-        border: `1px solid ${theme.palette.success.main}`,
-        backgroundColor: 'transparent',
-        color: theme.palette.success.main,
-        '&.MuiChip-colorError': {
-            border: `1px solid ${theme.palette.error.main}`,
-            color: theme.palette.error.main,
-        },
-        '&.MuiChip-colorDefault': {
-            border: `1px solid ${theme.palette.grey[400]}`,
-            color: theme.palette.text.primary,
-        },
-    }));
-
-
     const filteredJobs = useMemo(() => {
         return jobs.filter(job => {
             if (userType === 'Admin' && selectedStatus) {
@@ -364,13 +319,11 @@ const Jobs = () => {
             }
             return userType === 'Admin' || job.status === 'Approved';
         });
-        
+
     }, [jobs, userType, selectedStatus]);
 
-
-
-
     return (
+
         <Box
             sx={{
                 background: colors.grey[100],
@@ -395,6 +348,9 @@ const Jobs = () => {
                 }}
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
+
+
+               
 
             </Box>
 
@@ -479,7 +435,7 @@ const Jobs = () => {
 
                 </Box>
             )}
-             {userType === 'Admin' && (
+            {userType === 'Admin' && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -512,173 +468,235 @@ const Jobs = () => {
             )}
 
             {(userType === 'Project Owner') && (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 2,
-                            marginTop: '-15px',
-                            '@media (max-width: 767px)': {
-                                width: '100%',
-                                justifyContent: 'space-between',
-                                mt: 4,
-                                position: 'relative',
-                                left: '28px'
-                            },
-                        }}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        marginTop: '-15px',
+                        '@media (max-width: 767px)': {
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            mt: 4,
+                            position: 'relative',
+                            left: '28px'
+                        },
+                    }}
+                >
+                    <ToggleButtonGroup
+                        value={filterType}
+                        exclusive
+                        onChange={handleFilterTypeChange}
+                        aria-label="filter exhibitions"
+                        sx={{ height: "30px" }}
                     >
-                        <ToggleButtonGroup
-                            value={filterType}
-                            exclusive
-                            onChange={handleFilterTypeChange}
-                            aria-label="filter exhibitions"
-                            sx={{ height: "30px" }}
-                        >
-                            <ToggleButton value="all" aria-label="all exhibitions">
-                                All Projects
+                        {/* <ToggleButton value="all" aria-label="all exhibitions">
+                            All ProjectS
+                        </ToggleButton>
+                        {userType === 'Project Owner' && (
+                            <ToggleButton value="mine" aria-label="my exhibitions">
+                                My Projects
                             </ToggleButton>
-                            {userType === 'Project Owner' && (
-                                <ToggleButton value="mine" aria-label="my exhibitions">
-                                    My Projects
-                                </ToggleButton>
-                            )}
-                        </ToggleButtonGroup>
+                        )} */}
+
+                        <ToggleButton value="all" aria-label="all exhibitions">
+                            All Projects
+                        </ToggleButton>
+
+
+
+                        {userType === 'Project Owner' && (
+                            <ToggleButton value="mine" aria-label="my exhibitions">
+                                My Projects
+                            </ToggleButton>
+                        )}
+                    </ToggleButtonGroup>
                     </Box>
-                )}
+            )}
 
-            <InfiniteScroll
-                key={appliedJobs.join(',')}
-                dataLength={jobs.length}
-                next={() => setPage(prev => prev + 1)}
-                hasMore={hasMore}
-                loader={<Typography>Loading...</Typography>}
-                endMessage={<Typography>No more Projects</Typography>}
-            >
 
-                <Box sx={{ mt: 2 }}>
-                    {filteredJobs.map((job) => (
-                        <Card key={job._id} sx={{ mb: 2 }}>
-                            <CardContent>
-                                <Typography variant="h5">
+                    {userType === 'Innovators' && (
 
-                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
-                                        {job.title}    ,
-                                    </a>
-                                    <span style={{ fontSize: 'small', color: "#616161" }}>
-                                        ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                        <Box sx={{
-                                            position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
-                                                position: 'relative',
-                                                top: '65px',
-                                                left: '69%'
-                                            }
-                                        }}>
-                                            <CustomChip
-                                                label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-                                            />
+                    <Chip
+                        label="All Applies"
+                        variant="outlined"
+                        onClick={handleAllAppliesClicks}
+                        sx={{ ml: 2 }} // Add some margin if needed
+                    /> )}
+
+
+
+
+
+
+
+
+            <Box sx={{ mt: 2 }}>
+                {isShowingApplies ? (
+                    <Box>
+                        {applies.map((apply) => (
+                            <Card key={apply._id} sx={{ mb: 2 }}>
+                                <CardContent>
+                                    <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <Box>
+                                            Bid on : {apply.title}
                                         </Box>
-                                    </span>
-                                    <Box sx={{
-                                        fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
-                                            position: 'relative', top: '40px', right: '100px'
-                                        }
-                                    }}>
-                                        {job.Expertiselevel}
-                                    </Box>
+                                        <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                            {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                        </Box>
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ mt: 1 }}>
+                                        Bid Money: {apply.currency} {apply.Budget}
+                                    </Typography>
+
+                                    <Typography variant="body1">
+                                        Bid Person Name: {apply.firstName} {apply.lastName}
+                                    </Typography>
+
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Box>
+                ) : (
+                    // Render job listings
+                    <InfiniteScroll
+                        key={appliedJobs.join(',')}
+                        dataLength={jobs.length}
+                        next={() => setPage(prev => prev + 1)}
+                        hasMore={hasMore}
+                        loader={<Typography>Loading...</Typography>}
+                        endMessage={<Typography>No more Projects</Typography>}
+                    >
+
+                        <Box sx={{ mt: 2 }}>
+                            {filteredJobs.map((job) => (
+                                <Card key={job._id} sx={{ mb: 2 }}>
+                                    <CardContent>
+                                        <Typography variant="h5">
+
+                                            <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
+                                                {job.title}    ,
+                                            </a>
+                                            <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                <Box sx={{
+                                                    position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
+                                                        position: 'relative',
+                                                        top: '65px',
+                                                        left: '69%'
+                                                    }
+                                                }}>
+                                                    <CustomChip
+                                                        label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                        color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+                                                    />
+                                                </Box>
+                                            </span>
+                                            <Box sx={{
+                                                fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
+                                                    position: 'relative', top: '40px', right: '100px'
+                                                }
+                                            }}>
+                                                {job.Expertiselevel}
+                                            </Box>
 
 
-                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
-                                        <Chip
-                                            label={job.SelectService}
-                                            variant="outlined"
-                                            color='secondary'
-                                            sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
-                                        />
-                                    </Box>
-                                </Typography>
+                                            <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
+                                                <Chip
+                                                    label={job.SelectService}
+                                                    variant="outlined"
+                                                    color='secondary'
+                                                    sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
+                                                />
+                                            </Box>
+                                        </Typography>
 
-                                <Box sx={{ marginTop: '10px' }}>
+                                        <Box sx={{ marginTop: '10px' }}>
 
-                                    <Typography variant="body2">{job.Budget}</Typography>
-                                    <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+                                            <Typography variant="body2">{job.Budget}</Typography>
+                                            <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                    <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                        {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                onClick={() => handleApplyClick(job.title, job)}
-                                                sx={{ float: 'right' }}
-                                            >
-                                                Apply
-                                            </Button>
-                                        )}
+                                            <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
+                                                {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        onClick={() => handleApplyClick(job.title, job)}
+                                                        sx={{ float: 'right' }}
+                                                    >
+                                                        Apply
+                                                    </Button>
+                                                )}
 
 
 
-                                        {userDetails.userType === 'Project Owner' && (
-                                            <>
-                                                <Tooltip title="Edit" arrow>
-                                                    <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
-                                                        <EditIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title="Delete" arrow>
-                                                    <IconButton onClick={() => handleConfirmDelete(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
-                                                        <DeleteRoundedIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </>
-                                        )}
+                                                {userDetails.userType === 'Project Owner' && (
+                                                    <>
+                                                        <Tooltip title="Edit" arrow>
+                                                            <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
+                                                                <EditIcon />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title="Delete" arrow>
+                                                            <IconButton onClick={() => handleConfirmDelete(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
+                                                                <DeleteRoundedIcon />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </>
+                                                )}
 
-                                        <IconButton
-                                            aria-controls="simple-menu"
-                                            aria-haspopup="true"
-                                            onClick={handleClick}
-                                            sx={{ display: { xs: 'block', md: 'none' } }}
-                                        >
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                        <Menu
-                                            id="simple-menu"
-                                            anchorEl={anchorEl}
-                                            keepMounted
-                                            open={Boolean(anchorEl)}
-                                            onClose={handleClose}
-                                            PaperProps={{
-                                                sx: {
-                                                    border: '1px solid',
-                                                    boxShadow: 'none',
-                                                },
-                                            }}
-                                        >
-                                            <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
-                                            {userDetails.userType === 'Project Owner' && (
-                                                <>
-                                                    <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
-                                                        <ListItemIcon>
-                                                            <EditIcon />
-                                                        </ListItemIcon>
-                                                        <ListItemText primary="Edit" />
-                                                    </MenuItem>
-                                                    <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>
-                                                        <ListItemIcon>
-                                                            <DeleteRoundedIcon />
-                                                        </ListItemIcon>
-                                                        <ListItemText primary="Delete" />
-                                                    </MenuItem>
-                                                </>
-                                            )}
-                                        </Menu>
-                                    </Box>
-                                </Box>
+                                                <IconButton
+                                                    aria-controls="simple-menu"
+                                                    aria-haspopup="true"
+                                                    onClick={handleClick}
+                                                    sx={{ display: { xs: 'block', md: 'none' } }}
+                                                >
+                                                    <MoreVertIcon />
+                                                </IconButton>
 
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Box>
-            </InfiniteScroll>
+
+                                                <Menu
+                                                    id="simple-menu"
+                                                    anchorEl={anchorEl}
+                                                    keepMounted
+                                                    open={Boolean(anchorEl)}
+                                                    onClose={handleClose}
+                                                    PaperProps={{
+                                                        sx: {
+                                                            border: '1px solid',
+                                                            boxShadow: 'none',
+                                                        },
+                                                    }}
+                                                >
+                                                    <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
+                                                    {userDetails.userType === 'Project Owner' && (
+                                                        <>
+                                                            <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
+                                                                <ListItemIcon>
+                                                                    <EditIcon />
+                                                                </ListItemIcon>
+                                                                <ListItemText primary="Edit" />
+                                                            </MenuItem>
+                                                            <MenuItem onClick={() => { handleConfirmDelete(job); handleClose(); }}>
+                                                                <ListItemIcon>
+                                                                    <DeleteRoundedIcon />
+                                                                </ListItemIcon>
+                                                                <ListItemText primary="Delete" />
+                                                            </MenuItem>
+                                                        </>
+                                                    )}
+                                                </Menu>
+                                            </Box>
+                                        </Box>
+
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </Box>
+                    </InfiniteScroll>
+                )}
+            </Box>
+
 
             <AddApply
                 open={applyOpen}
@@ -693,8 +711,6 @@ const Jobs = () => {
                 onConfirm={handleDeleteJob}
                 title={confirmDelete.jobs?.title || ''}
             />
-
-
 
             <ProjectDrawer
                 viewingJob={viewingJob}
@@ -717,7 +733,6 @@ const Jobs = () => {
                 onReject={(jonId, comment) => handleReject(jonId, comment, rejectDialogOpen.job)}
                 job={rejectDialogOpen.job}
             />
-
         </Box>
     );
 };

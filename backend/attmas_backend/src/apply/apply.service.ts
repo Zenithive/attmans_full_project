@@ -75,7 +75,7 @@ export class ApplyService {
   }
 
   async findAll(): Promise<Apply[]> {
-    return this.jobsModel
+    return this.ApplyModel
       .find()
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();

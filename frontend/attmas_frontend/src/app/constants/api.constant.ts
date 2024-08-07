@@ -84,6 +84,7 @@ export const APIS = {
     GET_CURRENT_DATE: `${SERVER_URL}/exhibitions/current-date`,
 
     APPLIED_JOBS: `${SERVER_URL}/apply/appliedJobs`,
+    APPLIED_APPLICATION: `${SERVER_URL}/Apply`,
     JOB_DETAILS: `${SERVER_URL}/apply/jobDetails`,
 
     GET_INTERESTED_EXHIBITIONS: `${SERVER_URL}/interested-users/user-interests`, 
