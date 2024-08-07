@@ -6,6 +6,7 @@ import { CommentsController } from './comments.controller';
 import { Comment, CommentSchema } from './comments.schema';
 import { User, UserSchema } from 'src/users/user.schema';
 import { Jobs, JobsSchema } from 'src/projects/projects.schema';
+import { Apply, ApplySchema } from 'src/apply/apply.schema';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Jobs, JobsSchema } from 'src/projects/projects.schema';
       { name: Comment.name, schema: CommentSchema },
       { name: User.name, schema: UserSchema },
       { name: Jobs.name, schema: JobsSchema },
+      { name: Apply.name, schema: ApplySchema },
     ]),
   ],
   providers: [CommentsService],

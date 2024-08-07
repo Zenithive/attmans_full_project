@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class AddCommentDto {
@@ -12,4 +12,8 @@ export class AddCommentDto {
   @IsNotEmpty()
   @IsString()
   jobId: Types.ObjectId;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  applyId: string;
 }

@@ -6,6 +6,7 @@ import { Comment, CommentDocument } from './comments.schema';
 import { AddCommentDto } from './create-comments.dto';
 import { User, UserDocument } from 'src/users/user.schema';
 import { Jobs, JobsDocument } from 'src/projects/projects.schema';
+import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 
 @Injectable()
 export class CommentsService {
@@ -13,13 +14,15 @@ export class CommentsService {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Jobs.name) private jobsModel: Model<JobsDocument>,
+    @InjectModel(Apply.name) private appliesModel: Model<ApplyDocument>,
   ) {}
 
   async create(addCommentDto: AddCommentDto): Promise<Comment> {
-    const { createdBy, jobId, commentText } = addCommentDto;
-    console.log('{ createdBy, jobId, commentText }', {
+    const { createdBy, jobId, applyId, commentText } = addCommentDto;
+    console.log('{ createdBy, jobId, applyId, commentText }', {
       createdBy,
       jobId,
+      applyId,
       commentText,
     });
 
@@ -37,6 +40,13 @@ export class CommentsService {
 
     console.log('job', job);
 
+    const apply = await this.appliesModel.findById(applyId);
+    if (!apply) {
+      throw new NotFoundException(`Apply with id ${applyId} not found`);
+    }
+
+    console.log('apply', apply);
+
     const comment = new this.commentModel({
       commentText,
       createdBy,
@@ -45,14 +55,15 @@ export class CommentsService {
       lastName: user.lastName,
       userType: user.userType,
       jobId,
+      applyId,
     });
 
     console.log('comment', comment);
     return comment.save();
   }
 
-  async findByJobId(jobId: string): Promise<Comment[]> {
-    return this.commentModel.find({ jobId }).exec();
+  async findByJobAndApply(jobId: string, applyId: string): Promise<Comment[]> {
+    return this.commentModel.find({ jobId, applyId }).exec();
   }
 
   async findOne(id: string): Promise<Comment> {

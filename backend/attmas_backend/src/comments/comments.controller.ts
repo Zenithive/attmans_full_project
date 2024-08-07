@@ -19,9 +19,12 @@ export class CommentsController {
     return this.commentsService.create(addCommentDto);
   }
 
-  @Get('job/:jobId')
-  async findByJobId(@Param('jobId') jobId: string): Promise<Comment[]> {
-    return this.commentsService.findByJobId(jobId);
+  @Get('job/:jobId/apply/:applyId')
+  async findByJobAndApply(
+    @Param('jobId') jobId: string,
+    @Param('applyId') applyId: string,
+  ): Promise<Comment[]> {
+    return this.commentsService.findByJobAndApply(jobId, applyId);
   }
 
   @Get(':id')

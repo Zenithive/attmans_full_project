@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 
 interface AddCommentProps {
   jobId: string;
+  applyId:string | undefined;
   onCommentSubmitted: () => void;
 }
 
@@ -16,7 +17,7 @@ const validationSchema = Yup.object({
   comment: Yup.string().required('Comment needs to be Filled'),
 });
 
-const AddComment: React.FC<AddCommentProps> = ({ jobId, onCommentSubmitted }) => {
+const AddComment: React.FC<AddCommentProps> = ({ jobId,applyId,onCommentSubmitted }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const handleSubmit = async (
@@ -27,7 +28,8 @@ const AddComment: React.FC<AddCommentProps> = ({ jobId, onCommentSubmitted }) =>
       await axios.post(`${APIS.ADD_COMMENT}`, {
         createdBy: userDetails._id,
         commentText: values.comment,
-        jobId
+        jobId,
+        applyId,
       });
       resetForm();
       onCommentSubmitted();

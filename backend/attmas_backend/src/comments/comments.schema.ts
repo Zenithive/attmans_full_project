@@ -25,6 +25,9 @@ export class Comment {
 
   @Prop({ type: Types.ObjectId, ref: 'Jobs', required: true })
   jobId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })
+  applyId: Types.ObjectId;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

@@ -28,6 +28,8 @@ export const APIS = {
 
     ADD_COMMENT: `${SERVER_URL}/comments`,
 
+    GET_COMMENT:`${SERVER_URL}/comments`,
+
 
 
 
