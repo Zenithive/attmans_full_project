@@ -26,7 +26,9 @@ export const APIS = {
 
     ALL_PROFILES: `${SERVER_URL}/profile/all`,
 
-    ADD_COMMENT: `${SERVER_URL}/jobs`,
+    ADD_COMMENT: `${SERVER_URL}/comments`,
+
+    GET_COMMENT:`${SERVER_URL}/comments`,
 
 
 

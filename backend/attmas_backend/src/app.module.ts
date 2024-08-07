@@ -13,6 +13,7 @@ import { ApplyModule } from './apply/apply.module';
 import { BoothModule } from './booth/booth.module';
 import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
 import { InterestedUserModule } from './intrestedUser/interestedUser.module';
+import { CommentsModule } from './comments/comments.module';
 
 dotenv.config();
 console.log('process.env.MONGO_URL', process.env.URI);
@@ -32,6 +33,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     BoothModule,
     EmailModule,
     InterestedUserModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
