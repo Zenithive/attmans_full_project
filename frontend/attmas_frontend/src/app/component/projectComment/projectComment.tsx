@@ -24,9 +24,10 @@ const AddComment: React.FC<AddCommentProps> = ({ jobId, onCommentSubmitted }) =>
     { setSubmitting, resetForm }: any
   ) => {
     try {
-      await axios.post(`${APIS.ADD_COMMENT}/comments/${jobId}`, {
+      await axios.post(`${APIS.ADD_COMMENT}`, {
         createdBy: userDetails._id,
         commentText: values.comment,
+        jobId
       });
       resetForm();
       onCommentSubmitted();
