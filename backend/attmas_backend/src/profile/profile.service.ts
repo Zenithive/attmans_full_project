@@ -156,9 +156,44 @@ export class ProfileService {
     return this.categories.findOne({ username }).exec();
   }
 
-  async getProfileByUserId(username: string): Promise<PersonalProfile> {
-    return this.profileModel.findOne({ username }).exec();
+  // async getProfileByUserId(username: string): Promise<PersonalProfile> {
+  //   return this.profileModel.findOne({ username }).exec();
+  // }
+
+  async getProfileWithUserInfo(username: string): Promise<any> {
+    return this.profileModel.aggregate([
+      {
+        $match: { username } // Match the document in the PersonalProfile collection
+      },
+      {
+        $lookup: {
+          from: 'users', // The name of the collection you want to join
+          localField: 'username',
+          foreignField: 'username',
+          as: 'user_info'
+        }
+      },
+      {
+        $unwind: {
+          path: '$user_info', // Deconstruct the user_info array
+          preserveNullAndEmptyArrays: true // Keep profiles even if no matching user is found
+        }
+      },
+      {
+        $addFields: {
+          userType: { $ifNull: ['$user_info.userType', null] } // Add userType field to the root level, if it exists
+        }
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id if you don't need it
+          'user_info': 0 // Exclude user_info field if you don't want it in the final output
+        }
+      }
+    ]).exec();
   }
+  
+  
   // get profile photo
   async getAllProfiles(): Promise<PersonalProfile[]> {
     try {
