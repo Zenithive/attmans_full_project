@@ -13,7 +13,7 @@ interface AddCommentProps {
 }
 
 const validationSchema = Yup.object({
-  comment: Yup.string().required('Comment is required'),
+  comment: Yup.string().required('Comment needs to be Filled'),
 });
 
 const AddComment: React.FC<AddCommentProps> = ({ jobId, onCommentSubmitted }) => {
