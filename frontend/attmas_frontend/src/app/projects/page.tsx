@@ -368,6 +368,10 @@ const Jobs = () => {
     }, [jobs, userType, selectedStatus]);
 
 
+    const handleCancelApply = useCallback((jobId: string) => {
+        setAppliedJobs(prev => prev.filter(id => id !== jobId));
+    }, []);
+    
 
 
     return (
@@ -685,6 +689,7 @@ const Jobs = () => {
                 setOpen={setApplyOpen}
                 jobTitle={jobTitle}
                 jobId={selectedJobId}
+                onCancel={() => handleCancelApply(selectedJobId)}
             />
 
             <DeleteConfirmationDialog
