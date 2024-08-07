@@ -27,7 +27,7 @@ export interface Job {
   Sector: string;
   AreaOfProduct: string;
   ProductDescription: string;
-  username: string;
+  username: string; 
   SelectService: string;
   Objective: string;
   Expectedoutcomes: string;
@@ -143,6 +143,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   };
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
+    userType === 'Admin' ||
     (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved' );
 
   return (
@@ -330,6 +331,12 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             {canAddComment && ( 
             <Divider orientation="horizontal" flexItem  sx={{marginBottom:'30px'}}/>
             )}
+
+          {canAddComment && (
+              <Grid item xs={12} sm={12}>
+                <JobDetail key={jobDetailKey} jobId={viewingJob?._id || ''} />
+              </Grid>
+            )}
                 
             {canAddComment && (
               <Grid item xs={12} sm={12}>
@@ -338,22 +345,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     backgroundColor: '#f5f5f5',
                     padding: 2,
                     borderRadius: 1,
+                    marginTop:'20px'
                   }}
                 >
-                  <Typography variant="h6" gutterBottom sx={{fontSize:'25px'}}>
-                   Comments for Project
-                  </Typography>
                   <AddComment
                     jobId={viewingJob._id || ''}
                     onCommentSubmitted={handleCommentSubmitted}
                   />
                 </Box>
-              </Grid>
-            )}
-
-            {canAddComment && (
-              <Grid item xs={12} sm={12}>
-                <JobDetail key={jobDetailKey} jobId={viewingJob?._id || ''} />
               </Grid>
             )}
 

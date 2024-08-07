@@ -68,6 +68,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,  onCommentSubmitted}) => 
                 <Typography variant="caption" color="textSecondary">
                   {new Date(comment.createdAt).toLocaleString()}
                 </Typography>
+                <Typography variant="body2" sx={{float:'right', position:'relative',bottom:'20px'}}>
+                  <strong>{comment.userType}</strong>
+                </Typography>
               </Paper>
             ))
           ) : (
