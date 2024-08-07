@@ -25,6 +25,7 @@ interface Exhibition {
     description: string;
     status: string;
     videoUrl: string;
+    meetingUrl: string;
     dateTime: string;
     industries: string[];
     subjects: string[];
@@ -43,6 +44,7 @@ const validationSchema = Yup.object().shape({
     description: Yup.string().required('Description is required'),
     status: Yup.string(),
     videoUrl: Yup.string().required('Video URL is required'),
+    meetingUrl: Yup.string().required('Meeting URL is required'),
     dateTime: Yup.date().nullable('Date & Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
@@ -60,6 +62,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         description: '',
         status: '',
         videoUrl: '',
+        meetingUrl: '',
         dateTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: []
@@ -93,13 +96,14 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         category: subject.category,
         label: item
     }))), [subjects]);
-    const handleSubmit =React.useCallback (async (values: { title: string; description: string; status:string;dateTime:Dayjs | null; categoryforIndustries: string[]; subject: string[];videoUrl:string; }, { setSubmitting, resetForm }: any) => {
+    const handleSubmit = React.useCallback(async (values: { title: string; description: string; status: string; dateTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; videoUrl: string; meetingUrl:string }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
             dateTime: values.dateTime ? values.dateTime.toISOString() : null,
             status: values.status,
             videoUrl: values.videoUrl,
+            meetingUrl: values.meetingUrl,
             industries: values.categoryforIndustries,
             subjects: values.subject,
             userId: userDetails._id,
@@ -134,14 +138,18 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         <>
             {userType === "Admin" && (
                 <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
-                    borderRadius: 3, backgroundColor: '#CC4800', color: "white",'@media (max-width: 767px)':{
-                        position:'relative',width:'157%'
+                    borderRadius: 3, backgroundColor: '#CC4800', color: "white", '@media (max-width: 767px)': {
+                        position: 'relative', width: '157%'
                     }
                 }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
             )}
-            <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 , '@media (max-width: 767px)':{
-                width:'116%'
-            }} }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
+            <Drawer sx={{
+                '& .MuiDrawer-paper': {
+                    width: "50%", borderRadius: 3, pr: 10, mr: -8, '@media (max-width: 767px)': {
+                        width: '116%'
+                    }
+                }
+            }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
                     <h2>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
@@ -155,6 +163,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                         description: editingExhibition.description || '',
                         status: editingExhibition.status || '',
                         videoUrl: editingExhibition.videoUrl || '',
+                        meetingUrl: editingExhibition.meetingUrl || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
@@ -203,7 +212,21 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     multiline
                                     fullWidth
                                     error={!!(errors.videoUrl && touched.videoUrl)}
-                                    helperText={<ErrorMessage name="description" />}
+                                    helperText={<ErrorMessage name="videoUrl" />}
+                                />
+
+                                <TextField
+                                    label="Meeting Url"
+                                    name="meetingUrl"
+                                    variant="outlined"
+                                    color='secondary'
+                                    value={values.meetingUrl}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    multiline
+                                    fullWidth
+                                    error={!!(errors.meetingUrl && touched.meetingUrl)}
+                                    helperText={<ErrorMessage name="meetingUrl" />}
                                 />
                                 {editingExhibition && (
                                     <FormControl fullWidth>
@@ -260,7 +283,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                         />
                                     )}
                                 />
-                                
+
 
                                 <SubjectMatterExpertise
                                     selectedValues={values.subject}
@@ -268,10 +291,10 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     options={options} // Pass the options array here
                                     Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
                                         throw new Error('Function not implemented.');
-                                    } }                                />
+                                    }} />
 
 
-                                    
+
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DateTimePicker
                                         label="Date & Time"

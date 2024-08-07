@@ -13,11 +13,12 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
-import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { getRoleBasedAccess } from '@/app/services/user.access.service';
+import { AxiosError } from 'axios';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -39,7 +40,7 @@ function Copyright(props: any) {
   );
 }
 
-export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId  }: SignInProps) => {
+export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId }: SignInProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -83,30 +84,50 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           mobileNumber: res.mobileNumber,
         };
 
-        const {
-          isAdmin,
-          isFreelancer,
-          isInnovator,
-          isProjectOwner,
-          isVisitor
-        } = getRoleBasedAccess(res.userType);
-
         if (exhibitionId) {
           await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
         }
 
         if (onSignInSuccess) {
           onSignInSuccess();
-        } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
-          router.push("/dashboard");
-        } else if (isVisitor) {
-          router.push("/exhibition");
         } else {
-          router.push("/profile");
+          const {
+            isAdmin,
+            isFreelancer,
+            isInnovator,
+            isProjectOwner,
+            isVisitor
+          } = getRoleBasedAccess(res.userType);
+
+          if (isVisitor) {
+            router.push("/exhibition");
+          } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
+            router.push("/dashboard");
+          } else {
+            router.push("/profile");
+          }
         }
       } catch (error) {
-        formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
-      }
+        if (error instanceof AxiosError) {
+          const simulatedError = {
+            response: {
+              data: {
+                message: 'User has already shown interest in this exhibition'
+              }
+            }
+          };
+          
+          const errorMessage = (simulatedError).response?.data.message;
+      
+          if (errorMessage === 'User has already shown interest in the exhibition') {
+            formik.setStatus({ error: 'You have already shown interest for the exhibition.' });
+          } else {
+            formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
+          }
+        } else {
+          formik.setStatus({ error: 'An unexpected error occurred.' });
+        }
+      }  
     }
   });
 

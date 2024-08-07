@@ -92,6 +92,8 @@ export const AddApply= ({ open, setOpen,jobTitle,jobId}:AddApplyProps) => {
       Budget: values.Budget,
       userId: userDetails._id,
       username: userDetails.username,
+      firstName: userDetails.firstName,
+      lastName:userDetails.lastName,
       jobId: values.jobId,
     };
 

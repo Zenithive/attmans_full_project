@@ -30,7 +30,8 @@ interface FormValues {
     userType: string;
     productToMarket: string;
     products: Product[];
-    hasPatent: boolean;
+    hasPatent: string;
+    patentDetails: string;
     username: string;
     userId: string;
 }
@@ -73,7 +74,8 @@ const EditProfile2: React.FC = () => {
             userType: '',
             productToMarket: '',
             products: [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
-            hasPatent: false,
+            hasPatent: 'No',
+            patentDetails: '',
             username: userDetails.username,
             userId: userDetails._id,
         },
@@ -118,6 +120,8 @@ const EditProfile2: React.FC = () => {
                     productToMarket: userData.productToMarket || '',
                     products: userData.products || [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
                     hasPatent: userData.hasPatent || false,
+                    patentDetails: userData.patentDetails || '',
+
                 });
 
                 setIsFreelancer(userData.userType === 'Innovators');
@@ -344,6 +348,25 @@ const EditProfile2: React.FC = () => {
                                     <MenuItem value="No">No</MenuItem>
                                 </TextField>
                             </Grid>
+
+                            {formik.values.hasPatent === "Yes" && (
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={4}
+                                                id="patentDetails"
+                                                color='secondary'
+                                                label="Provide details about the research product or solution that you intend to commercialize"
+                                                name="patentDetails"
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.patentDetails}
+                                                error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
+                                                helperText={formik.touched.patentDetails && formik.errors.patentDetails}
+                                            />
+                                        </Grid>
+                                    )}
                             {isFreelancer && showProductDetails && (
                                 <Grid item xs={12}>
                                     <ProductTable
@@ -381,6 +404,18 @@ const EditProfile2: React.FC = () => {
                         </Grid>
                     </Box>
                 </FormikProvider>
+
+                {/* Added sentences at the end of the form */}
+                <Typography
+                    variant="body2"
+                    align="center"
+                    mt={4}
+                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
+                >
+                    Please Note: <br />
+                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
+                </Typography>
                 {fetchError && (
                     <Typography color="error" align="center" mt={2}>
                         {fetchError}
