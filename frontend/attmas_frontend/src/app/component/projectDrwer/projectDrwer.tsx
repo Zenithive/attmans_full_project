@@ -42,7 +42,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [jobDetailKey, setJobDetailKey] = useState<number>(0);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const currentUser = userDetails.username;
@@ -129,10 +128,10 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const handleCommentSubmitted = () => {
     fetchApplications();
-    setJobDetailKey(prev => prev + 1); 
   };
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
+    userType === 'Admin' ||
     (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved' );
 
   return (
@@ -317,36 +316,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               )}
             </Grid>
 
-            {canAddComment && ( 
-            <Divider orientation="horizontal" flexItem  sx={{marginBottom:'30px'}}/>
-            )}
-                
-            {canAddComment && (
-              <Grid item xs={12} sm={12}>
-                <Box
-                  sx={{
-                    backgroundColor: '#f5f5f5',
-                    padding: 2,
-                    borderRadius: 1,
-                  }}
-                >
-                  <Typography variant="h6" gutterBottom sx={{fontSize:'25px'}}>
-                   Comments for Project
-                  </Typography>
-                  <AddComment
-                    jobId={viewingJob._id || ''}
-                    onCommentSubmitted={handleCommentSubmitted}
-                  />
-                </Box>
-              </Grid>
-            )}
-
-            {canAddComment && (
-              <Grid item xs={12} sm={12}>
-                <JobDetail key={jobDetailKey} jobId={viewingJob?._id || ''} />
-              </Grid>
-            )}
-
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
               {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
@@ -408,16 +377,16 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         }}
                       />
                       <Typography
-                        onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner') ? () => {
+                        onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner'  || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser)) ? () => {
                           setSelectedApply(app);
                           setDialogOpen(true);
                         } : undefined}
                         style={{
-                          cursor: userDetails && (userType === 'Admin' || userType === 'Project Owner') ? 'pointer' : 'default',
+                          cursor: userDetails && (userType === 'Admin' || userType === 'Project Owner' || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser)) ? 'pointer' : 'default',
                           display: 'inline-block',
                         }}
                       >
-                        {(userDetails && (userType === 'Admin' || userType === 'Project Owner')) ? (
+                        {(userDetails && (userType === 'Admin' || userType === 'Project Owner' || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser))) ? (
                           <Tooltip
                             title="Click here to see Project details"
                             arrow
@@ -517,6 +486,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               open={dialogOpen}
               onClose={() => setDialogOpen(false)}
               apply={selectedApply}
+              jobId={viewingJob?._id || ''}
+              canAddComment={canAddComment}
+              onCommentSubmitted={handleCommentSubmitted}
             />
           )}
         </>

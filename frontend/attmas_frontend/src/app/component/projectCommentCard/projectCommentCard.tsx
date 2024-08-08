@@ -7,10 +7,11 @@ import { APIS } from '@/app/constants/api.constant';
 
 interface JobDetailProps {
   jobId: string;
+  applyId: string | undefined;
   onCommentSubmitted?: () => void;
 }
 
-const JobDetail: React.FC<JobDetailProps> = ({ jobId ,  onCommentSubmitted}) => {
+const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitted}) => {
   const [job, setJob] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
 
@@ -23,14 +24,30 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,  onCommentSubmitted}) => 
     }
   };
 
+  const fetchComments = async () => {
+    try {
+      console.log("Fetching comments...");
+      const response = await axios.get(`${APIS.GET_COMMENT}/job/${jobId}/apply/${applyId}`);
+      console.log("Comments fetched:", response.data);
+      setJob((prevJob: any) => ({ ...prevJob, comments: response.data }));
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
   useEffect(() => {
     fetchJobDetails();
   }, [jobId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [jobId, applyId]);
 
 
   useEffect(() => {
     if (onCommentSubmitted) {
       onCommentSubmitted(); 
+      fetchComments();
     }
   }, [onCommentSubmitted]);
 
@@ -67,6 +84,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,  onCommentSubmitted}) => 
                 </Typography>
                 <Typography variant="caption" color="textSecondary">
                   {new Date(comment.createdAt).toLocaleString()}
+                </Typography>
+                <Typography variant="body2" sx={{float:'right', position:'relative',bottom:'20px'}}>
+                  <strong>{comment.userType}</strong>
                 </Typography>
               </Paper>
             ))
