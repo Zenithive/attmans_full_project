@@ -152,7 +152,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
               <>
                 <Divider orientation="horizontal" flexItem sx={{ marginBottom: '30px' }} />
                 <Grid item xs={12} sm={12}>
-                  <JobDetail key={jobDetailKey} jobId={jobId} applyId={apply._id}/>
+                  <JobDetail key={jobDetailKey} jobId={jobId} applyId={apply._id}  onCommentSubmitted={onCommentSubmitted}/>
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <Box
