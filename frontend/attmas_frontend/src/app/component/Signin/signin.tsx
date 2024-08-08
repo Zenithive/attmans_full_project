@@ -13,10 +13,10 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
-import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { getRoleBasedAccess } from '@/app/services/user.access.service';
 import { AxiosError } from 'axios';
 
@@ -40,7 +40,7 @@ function Copyright(props: any) {
   );
 }
 
-export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId  }: SignInProps) => {
+export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId }: SignInProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -84,26 +84,28 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           mobileNumber: res.mobileNumber,
         };
 
-        const {
-          isAdmin,
-          isFreelancer,
-          isInnovator,
-          isProjectOwner,
-          isVisitor
-        } = getRoleBasedAccess(res.userType);
-
         if (exhibitionId) {
           await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
         }
 
         if (onSignInSuccess) {
           onSignInSuccess();
-        } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
-          router.push("/dashboard");
-        } else if (isVisitor) {
-          router.push("/exhibition");
         } else {
-          router.push("/profile");
+          const {
+            isAdmin,
+            isFreelancer,
+            isInnovator,
+            isProjectOwner,
+            isVisitor
+          } = getRoleBasedAccess(res.userType);
+
+          if (isVisitor) {
+            router.push("/exhibition");
+          } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
+            router.push("/dashboard");
+          } else {
+            router.push("/profile");
+          }
         }
       } catch (error) {
         if (error instanceof AxiosError) {
