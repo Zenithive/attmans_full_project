@@ -134,10 +134,6 @@ const Jobs = () => {
         setIsShowingApplies(!isShowingApplies);
     };
 
-    // useEffect(() => {
-    //     fetchJobs();
-    // }, [fetchJobs]);
-
     const refetch = useCallback(async () => {
         try {
             setPage(1);
