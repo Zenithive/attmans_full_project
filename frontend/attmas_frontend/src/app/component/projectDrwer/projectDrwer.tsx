@@ -350,21 +350,20 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 />
               </Box>
             )}
-            <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+           <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (
                   <Card
                     key={app._id}
                     sx={{
                       width: 300,
-                      height: "auto", 
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      mb: 2,
+                      height: 'auto',
                     }}
                   >
-                    <CardContent sx={{ flex: 1, overflow: 'auto' }}>
+                    <CardContent sx={{ flex: 1 }}>
                       <Chip
                         label={app.status}
                         variant="outlined"
@@ -377,16 +376,35 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         }}
                       />
                       <Typography
-                        onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner' || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser)) ? () => {
-                          setSelectedApply(app);
-                          setDialogOpen(true);
-                        } : undefined}
+                        onClick={
+                          userDetails &&
+                            (userType === 'Admin' ||
+                              userType === 'Project Owner' ||
+                              (userType === 'Innovators' || userType === 'Freelancer') &&
+                              filteredApplications.some((app) => app.username === currentUser))
+                            ? () => {
+                              setSelectedApply(app);
+                              setDialogOpen(true);
+                            }
+                            : undefined
+                        }
                         style={{
-                          cursor: userDetails && (userType === 'Admin' || userType === 'Project Owner' || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser)) ? 'pointer' : 'default',
+                          cursor:
+                            userDetails &&
+                              (userType === 'Admin' ||
+                                userType === 'Project Owner' ||
+                                (userType === 'Innovators' || userType === 'Freelancer') &&
+                                filteredApplications.some((app) => app.username === currentUser))
+                              ? 'pointer'
+                              : 'default',
                           display: 'inline-block',
                         }}
                       >
-                        {(userDetails && (userType === 'Admin' || userType === 'Project Owner' || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser))) ? (
+                        {userDetails &&
+                          (userType === 'Admin' ||
+                            userType === 'Project Owner' ||
+                            (userType === 'Innovators' || userType === 'Freelancer') &&
+                            filteredApplications.some((app) => app.username === currentUser)) ? (
                           <Tooltip
                             title="Click here to see Project details"
                             arrow
@@ -419,7 +437,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       </Typography>
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                      {app.status !== 'Approved' && app.status !== 'Rejected' && (userType === 'Admin') && (
+                      {app.status !== 'Approved' && app.status !== 'Rejected' && userType === 'Admin' && (
                         <>
                           <Button
                             variant="contained"
@@ -449,7 +467,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 <Typography>No applications found.</Typography>
               )}
             </Box>
-
           </Box>
         )}
         <>
