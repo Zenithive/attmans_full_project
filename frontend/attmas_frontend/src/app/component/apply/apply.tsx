@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment } from '@mui/material';
+import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -9,18 +9,32 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { pubsub } from '@/app/services/pubsub.service';
-import { Formik, Form, ErrorMessage } from 'formik';
+import { Formik, Form, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 interface AddApplyProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   jobTitle: string;
   jobId: string;
-  onCancel?: () => void; // Optional callback for cancel action
+  onCancel?: () => void; 
 }
+
+interface FormValues {
+  title: string;
+  description: string;
+  Budget: number;
+  currency: string;
+  TimeFrame: Dayjs | null;
+  jobId: string;
+  milestones: string[];
+}
+
+
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Title is required'),
@@ -28,6 +42,7 @@ const validationSchema = Yup.object().shape({
   Budget: Yup.number().required('Budget is required'),
   currency: Yup.string().required('Currency is required'),
   TimeFrame: Yup.date().nullable('Date & Time is required'),
+  milestones: Yup.array().of(Yup.string().required('Milestone is required')).optional(),
 });
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
@@ -39,11 +54,12 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     Budget: 0,
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
-    jobId: jobId
+    jobId: jobId,
+    milestones: [] as string[]
   };
 
   const handleSubmit = async (
-    values: { title: string; description: string; Budget: number; TimeFrame: Dayjs | null; currency: string; jobId: string; },
+    values:FormValues,
     { setSubmitting, resetForm }: any
   ) => {
     const applyData = {
@@ -57,6 +73,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       firstName: userDetails.firstName,
       lastName: userDetails.lastName,
       jobId: values.jobId,
+      milestones: values.milestones,
     };
 
     try {
@@ -164,6 +181,54 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                   onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                 />
               </LocalizationProvider>
+              <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                 Add Your  Milestones
+                </Typography>
+                <FieldArray
+                  name="milestones"
+                  render={(arrayHelpers) => (
+                    <Box>
+                      {values.milestones && values.milestones.length > 0 ? (
+                        values.milestones.map((milestone, index) => (
+                          <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                            <TextField
+                              placeholder="Milestone..."
+                              name={`milestones[${index}]`}
+                              value={milestone}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              fullWidth
+                              error={touched.milestones && Boolean(errors.milestones)}
+                              helperText={touched.milestones && errors.milestones}
+                            />
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <IconButton
+                                onClick={() => arrayHelpers.remove(index)}
+                                aria-label="remove milestone"
+                                 color= 'secondary'
+                                disabled={values.milestones.length === 0}
+                                sx={{ padding: '5px 10px', margin: 0 }}
+                              >
+                                <RemoveIcon sx={{ fontSize: 'small' }} />
+                                <span style={{ fontSize: 'small', marginLeft: '5px' }}>Remove Milestone</span>
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        ))
+                      ) : null}
+                      <Button
+                        onClick={() => arrayHelpers.push('')}
+                        variant="outlined"
+                        sx={{ mt: 1, textTransform: 'none' }}
+                        startIcon={<AddIcon />}
+                      >
+                        Add Milestone
+                      </Button>
+                    </Box>
+                  )}
+                />
+              </Paper>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                 <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>
                   Cancel

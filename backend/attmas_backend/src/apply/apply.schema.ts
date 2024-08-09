@@ -50,6 +50,9 @@ export class Apply {
 
   @Prop({ default: false })
   buttonsHidden: boolean;
+
+  @Prop({ type: [String], required: false })
+  milestones: string[];
 }
 
 export const ApplySchema = SchemaFactory.createForClass(Apply);

@@ -13,9 +13,46 @@ import ApplyDetailsDialog from '../projectsDetails/projectDetails';
 import booth from '../booth/booth';
 import AddComment from '../projectComment/projectComment';
 import JobDetail from '../projectCommentCard/projectCommentCard';
-import { Job } from './projectDrawerInterfacce';
-import { Apply } from './projectDrawerInterfacce';
 
+
+export interface Job {
+  _id?: string;
+  title: string;
+  description: string;
+  Budget: number;
+  Expertiselevel: string;
+  TimeFrame: string | null;
+  Category: string[];
+  Subcategorys: string[];
+  DetailsOfInnovationChallenge: string;
+  Sector: string;
+  AreaOfProduct: string;
+  ProductDescription: string;
+  username: string;
+  SelectService: string;
+  Objective: string;
+  Expectedoutcomes: string;
+  IPRownership: string;
+  currency: string;
+  status: string;
+  rejectComment?: string;
+}
+
+interface Apply {
+  _id?: string;
+  title: string;
+  description: string;
+  Budget: number;
+  currency: string;
+  TimeFrame: string | null;
+  rejectComment: string;
+  status: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  jobId: string;
+  milestones?: string[];
+}
 
 
 interface ProjectDrawerProps {
@@ -132,7 +169,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
-    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved' );
+    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved');
 
   return (
     <Dialog
@@ -151,7 +188,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       }}
     >
       <DialogTitle>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'  ,fontSize:'25px'}}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '25px' }}>
           Project Details Information
           <IconButton
             edge="start"
@@ -316,7 +353,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               )}
             </Grid>
 
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
               {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
                 <>
@@ -333,7 +370,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             <Divider orientation="horizontal" flexItem />
 
             <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
-              <DialogTitle sx={{fontSize:'25px'}}>
+              <DialogTitle sx={{ fontSize: '25px' }}>
                 Applications for Project
               </DialogTitle>
             </Box>
@@ -350,7 +387,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 />
               </Box>
             )}
-           <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+
+            <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (
                   <Card
@@ -435,6 +473,18 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
                       </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                        <b>Milestones:</b>
+                        {app.milestones && app.milestones.length > 0 ? (
+                          <ul>
+                            {app.milestones.map((milestone, index) => (
+                              <li key={index}>{milestone}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          'None'
+                        )}
+                      </Typography>
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
                       {app.status !== 'Approved' && app.status !== 'Rejected' && userType === 'Admin' && (
@@ -470,7 +520,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           </Box>
         )}
         <>
-        
+
           {approveDialogOpen.open && (
             <ApproveDialogForApply
               open={approveDialogOpen.open}
