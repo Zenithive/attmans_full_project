@@ -67,7 +67,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
       }}
     >
       <DialogTitle sx={{ m: 0, p: 2 }}>
-        Project Details
+        Apply Details
         <IconButton
           aria-label="close"
           onClick={onClose}

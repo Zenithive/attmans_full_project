@@ -357,14 +357,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     key={app._id}
                     sx={{
                       width: 300,
-                      height: 'auto',
+                      height: 230, 
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      mb: 2
+                      mb: 2,
                     }}
                   >
-                    <CardContent sx={{ flex: 1 }}>
+                    <CardContent sx={{ flex: 1, overflow: 'auto' }}>
                       <Chip
                         label={app.status}
                         variant="outlined"
@@ -377,7 +377,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         }}
                       />
                       <Typography
-                        onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner'  || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser)) ? () => {
+                        onClick={userDetails && (userType === 'Admin' || userType === 'Project Owner' || (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser)) ? () => {
                           setSelectedApply(app);
                           setDialogOpen(true);
                         } : undefined}
@@ -418,7 +418,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
                       </Typography>
                     </CardContent>
-                    <Box sx={{ p: 1 }}>
+                    <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
                       {app.status !== 'Approved' && app.status !== 'Rejected' && (userType === 'Admin') && (
                         <>
                           <Button
@@ -427,7 +427,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             onClick={() => {
                               setApproveDialogOpen({ open: true, apply: app });
                             }}
-
                             sx={{ mr: 1 }}
                           >
                             Approve
@@ -438,7 +437,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             onClick={() => {
                               setRejectDialogOpen({ open: true, apply: app });
                             }}
-
                           >
                             Reject
                           </Button>
@@ -451,6 +449,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 <Typography>No applications found.</Typography>
               )}
             </Box>
+
           </Box>
         )}
         <>
