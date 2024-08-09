@@ -106,8 +106,7 @@ const ExhibitionsPage: React.FC = () => {
 
         setBooths(response.data);
 
-        // Check if the user already has a booth
-        const userHasBooth = response.data.some((booth: Booth) => booth.exhibitionId === userDetails?._id);
+        const userHasBooth = response.data.some((booth: Booth) => booth.exhibitionId  === exhibitionId);
         setHasUserBooth(userHasBooth);
         setParticipateButtonVisible(!userHasBooth);
       } catch (error) {
