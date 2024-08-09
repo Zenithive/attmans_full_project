@@ -75,8 +75,7 @@ export class ApplyService {
   }
 
   async findAll(): Promise<Apply[]> {
-    return this.ApplyModel
-      .find()
+    return this.ApplyModel.find()
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
   }
