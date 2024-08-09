@@ -367,7 +367,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     key={app._id}
                     sx={{
                       width: 300,
-                      height: 230, 
+                      height: 250, 
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
