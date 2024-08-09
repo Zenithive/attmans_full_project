@@ -24,6 +24,7 @@ interface Exhibition {
   description: string;
   status: string;
   videoUrl: string;
+  meetingUrl: string;
   dateTime: string;
   industries: string[];
   subjects: string[];

@@ -14,6 +14,7 @@ import booth from '../booth/booth';
 import AddComment from '../projectComment/projectComment';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 
+
 export interface Job {
   _id?: string;
   title: string;
@@ -52,6 +53,7 @@ interface Apply {
   jobId: string;
   milestones?: string[];
 }
+
 
 interface ProjectDrawerProps {
   viewingJob: Job | null;
@@ -96,10 +98,35 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     fetchApplications();
   }, [fetchApplications]);
 
+  // const handleApprove = async (applicationId: string) => {
+  //   try {
+  //     if (!applicationId) return;
+  //     await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
+  //     fetchApplications();
+  //     setFilter('Approved');
+  //     setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
+  //   } catch (error) {
+  //     console.error('Error approving application:', error);
+  //   }
+  // };
+
   const handleApprove = async (applicationId: string) => {
     try {
-      if (!applicationId) return;
+      if (!applicationId || !viewingJob?._id) return;
+  
+      // First, reject all other applications for the same job
+      const applicationsToReject = applications
+        .filter(app => app._id !== applicationId && app.status !== 'Rejected' && app.status !== 'Approved');
+  
+      // Update status of all other applications to rejected
+      await Promise.all(applicationsToReject.map(app =>
+        axios.post(`${APIS.APPLY}/reject/${app._id}`, { rejectComment: 'Automatically rejected due to another application being approved.' })
+      ));
+  
+      // Then, approve the selected application
       await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
+      
+      // Refresh applications list
       fetchApplications();
       setFilter('Approved');
       setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
@@ -121,7 +148,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       console.error('Error rejecting application:', error);
     }
   };
-
 
 
   const filteredApplications = applications.filter(app => {
@@ -491,7 +517,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 <Typography>No applications found.</Typography>
               )}
             </Box>
-
           </Box>
         )}
         <>
