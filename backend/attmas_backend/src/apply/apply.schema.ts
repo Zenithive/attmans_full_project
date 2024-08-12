@@ -8,6 +8,17 @@ import {
 export type ApplyDocument = Apply & Document;
 
 @Schema()
+export class Milestone {
+  @Prop({ required: true })
+  scopeOfWork: string;
+
+  @Prop({ type: [String], required: true })
+  milestones: string[];
+}
+
+const MilestoneSchema = SchemaFactory.createForClass(Milestone);
+
+@Schema()
 export class Apply {
   @Prop({ required: true })
   title: string;
@@ -51,8 +62,8 @@ export class Apply {
   @Prop({ default: false })
   buttonsHidden: boolean;
 
-  @Prop({ type: [String], required: false })
-  milestones: string[];
+  @Prop({ type: [MilestoneSchema], required: false })
+  milestones: Milestone[];
 }
 
 export const ApplySchema = SchemaFactory.createForClass(Apply);

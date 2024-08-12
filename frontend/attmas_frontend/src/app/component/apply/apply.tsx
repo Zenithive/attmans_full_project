@@ -15,13 +15,19 @@ import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface AddApplyProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   jobTitle: string;
   jobId: string;
-  onCancel?: () => void; 
+  onCancel?: () => void;
+}
+
+interface Milestone {
+  scopeOfWork: string;
+  milestones: string[];
 }
 
 interface FormValues {
@@ -31,7 +37,7 @@ interface FormValues {
   currency: string;
   TimeFrame: Dayjs | null;
   jobId: string;
-  milestones: string[];
+  milestones: Milestone[];
 }
 
 
@@ -42,7 +48,12 @@ const validationSchema = Yup.object().shape({
   Budget: Yup.number().required('Budget is required'),
   currency: Yup.string().required('Currency is required'),
   TimeFrame: Yup.date().nullable('Date & Time is required'),
-  milestones: Yup.array().of(Yup.string().required('Milestone is required')).optional(),
+  milestones: Yup.array().of(
+    Yup.object().shape({
+      scopeOfWork: Yup.string().required('Scope of work is required'),
+      milestones: Yup.array().of(Yup.string().required('Milestone is required')).required(),
+    })
+  ).optional(),
 });
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
@@ -55,11 +66,11 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
     jobId: jobId,
-    milestones: [] as string[]
+    milestones: [{ scopeOfWork: '', milestones: [''] }],
   };
 
   const handleSubmit = async (
-    values:FormValues,
+    values: FormValues,
     { setSubmitting, resetForm }: any
   ) => {
     const applyData = {
@@ -80,7 +91,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       await axios.post(APIS.APPLY, applyData);
       pubsub.publish('ApplyCreated', { message: 'A new Apply Created' });
       pubsub.publish('toast', { message: 'Applied successfully!', severity: 'success' });
-    
+
       resetForm();
       setOpen(false);
     } catch (error) {
@@ -91,8 +102,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
   };
 
   const handleCancel = () => {
-    if (onCancel) onCancel(); 
-    setOpen(false); 
+    if (onCancel) onCancel();
+    setOpen(false);
   };
 
   return (
@@ -181,54 +192,71 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                   onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                 />
               </LocalizationProvider>
-              <Paper elevation={3} sx={{ p: 2, mt: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                 Add Your  Milestones
-                </Typography>
-                <FieldArray
-                  name="milestones"
-                  render={(arrayHelpers) => (
-                    <Box>
-                      {values.milestones && values.milestones.length > 0 ? (
-                        values.milestones.map((milestone, index) => (
-                          <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
-                            <TextField
-                              placeholder="Milestone..."
-                              name={`milestones[${index}]`}
-                              value={milestone}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              fullWidth
-                              error={touched.milestones && Boolean(errors.milestones)}
-                              helperText={touched.milestones && errors.milestones}
-                            />
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <IconButton
-                                onClick={() => arrayHelpers.remove(index)}
-                                aria-label="remove milestone"
-                                 color= 'secondary'
-                                disabled={values.milestones.length === 0}
-                                sx={{ padding: '5px 10px', margin: 0 }}
-                              >
-                                <RemoveIcon sx={{ fontSize: 'small' }} />
-                                <span style={{ fontSize: 'small', marginLeft: '5px' }}>Remove Milestone</span>
-                              </IconButton>
+              <FieldArray
+                name="milestones"
+                render={(arrayHelpers) => (
+                  <Box>
+                    {values.milestones.map((milestoneGroup, index) => (
+                      <Paper key={index} elevation={3} sx={{ p: 2, mt: 3 }}>
+                        <Typography variant="h6" gutterBottom sx={{marginBottom:'20px'}}>
+                          Scope of Work
+                          <IconButton
+                          onClick={() => arrayHelpers.remove(index)}
+                          color='secondary'
+                          sx={{float:'right'}}
+                        >
+                          <DeleteIcon/>
+          
+                        </IconButton>
+                        </Typography>
+                  
+                        <TextField
+                          label="Scope of Work"
+                          name={`milestones[${index}].scopeOfWork`}
+                          value={milestoneGroup.scopeOfWork}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          multiline
+                          rows={4}
+                          fullWidth
+                          error={!!(errors.milestones && touched.milestones)}
+                          helperText={<ErrorMessage name="Scope of Work" />}
+                        />
+                        <FieldArray
+                          name={`milestones[${index}].milestones`}
+                          render={(milestoneHelpers) => (
+                            <Box>
+                              {milestoneGroup.milestones.length > 0 && (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+                                  <TextField
+                                    placeholder="Milestone..."
+                                    name={`milestones[${index}].milestones[0]`}
+                                    value={milestoneGroup.milestones[0]}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    error={!!(errors.milestones && touched.milestones)}
+                                    helperText={<ErrorMessage name="Milestone" />}
+                                  />
+                                </Box>
+                              )}
                             </Box>
-                          </Box>
-                        ))
-                      ) : null}
-                      <Button
-                        onClick={() => arrayHelpers.push('')}
-                        variant="outlined"
-                        sx={{ mt: 1, textTransform: 'none' }}
-                        startIcon={<AddIcon />}
-                      >
-                        Add Milestone
-                      </Button>
-                    </Box>
-                  )}
-                />
-              </Paper>
+                          )}
+                        />
+                      </Paper>
+                    ))}
+                    <Button
+                      onClick={() => arrayHelpers.push({ scopeOfWork: '', milestones: [''] })}
+                      variant="outlined"
+                      sx={{ mt: 1, textTransform: 'none' }}
+                      startIcon={<AddIcon />}
+                    >
+                      Add Scope of Work
+                    </Button>
+                  </Box>
+                )}
+              />
+
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                 <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>
                   Cancel
