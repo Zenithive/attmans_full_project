@@ -98,35 +98,10 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     fetchApplications();
   }, [fetchApplications]);
 
-  // const handleApprove = async (applicationId: string) => {
-  //   try {
-  //     if (!applicationId) return;
-  //     await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
-  //     fetchApplications();
-  //     setFilter('Approved');
-  //     setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
-  //   } catch (error) {
-  //     console.error('Error approving application:', error);
-  //   }
-  // };
-
   const handleApprove = async (applicationId: string) => {
     try {
-      if (!applicationId || !viewingJob?._id) return;
-  
-      // First, reject all other applications for the same job
-      const applicationsToReject = applications
-        .filter(app => app._id !== applicationId && app.status !== 'Rejected' && app.status !== 'Approved');
-  
-      // Update status of all other applications to rejected
-      await Promise.all(applicationsToReject.map(app =>
-        axios.post(`${APIS.APPLY}/reject/${app._id}`, { rejectComment: 'Automatically rejected due to another application being approved.' })
-      ));
-  
-      // Then, approve the selected application
+      if (!applicationId) return;
       await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
-      
-      // Refresh applications list
       fetchApplications();
       setFilter('Approved');
       setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
@@ -155,7 +130,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     return app.status === filter;
   }).filter(app => {
     if (userType === 'Project Owner') {
-      return app.status === 'Approved' && currentUser === viewingJob?.username;
+      return (app.status === 'Approved' || app.status === 'Awarded') && currentUser === viewingJob?.username;
     }
     if (userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser;
@@ -170,6 +145,84 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
     (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved');
+
+
+  // const handleReward = async (applicationId: string) => {
+  //   try {
+  //     if (!applicationId) return;
+  //     await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+  //     fetchApplications();
+  //     setFilter('Rewarded');
+  //     setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
+  //   } catch (error) {
+  //     console.error('Error rewarding application:', error);
+  //   }
+  // };
+
+  // const handleReward = async (applicationId: string) => {
+  //   try {
+  //     if (!applicationId) return;
+
+  //     // Make the API call to award the selected application
+  //     await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+
+  //     // Update the status of all applications
+  //     setApplications((prevApplications) =>
+  //       prevApplications.map((app) =>
+  //         app._id === applicationId
+  //           ? { ...app, status: 'Awarded' }
+  //           : { ...app, status: 'Not Awarded' }
+  //       )
+  //     );
+
+  //     // Hide all the buttons
+  //     setButtonsHidden((prev) => {
+  //       const updated = { ...prev };
+  //       Object.keys(updated).forEach((key) => {
+  //         updated[key] = true;
+  //       });
+  //       return updated;
+  //     });
+  //   } catch (error) {
+  //     console.error('Error rewarding application:', error);
+  //   }
+  // };
+
+  const handleReward = async (applicationId: string) => {
+    try {
+      if (!applicationId) return;
+
+      // First, award the selected application
+      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+
+      // Update all other applications to "Not Awarded"
+      const updatedApplications = applications.map((app) =>
+        app._id === applicationId
+          ? { ...app, status: 'Awarded' }
+          : { ...app, status: 'Not Awarded' }
+      );
+
+      // Make an API call to update all applications' statuses on the server
+      await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
+
+      // Update the local state with the new statuses
+      setApplications(updatedApplications);
+
+      // Hide all the buttons
+      setButtonsHidden((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((key) => {
+          updated[key] = true;
+        });
+        return updated;
+      });
+    } catch (error) {
+      console.error('Error rewarding application:', error);
+    }
+  };
+
+
+
 
   return (
     <Dialog
@@ -402,17 +455,36 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     }}
                   >
                     <CardContent sx={{ flex: 1 }}>
+                     
+
                       <Chip
                         label={app.status}
                         variant="outlined"
                         sx={{
-                          borderColor: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
-                          color: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
+                          borderColor: app.status === 'Approved'
+                            ? 'green'
+                            : app.status === 'Rejected'
+                              ? 'red'
+                              : app.status === 'Awarded'
+                                ? 'blue'
+                                : app.status === 'Not Awarded'
+                                  ? 'grey'
+                                  : 'default',
+                          color: app.status === 'Approved'
+                            ? 'green'
+                            : app.status === 'Rejected'
+                              ? 'red'
+                              : app.status === 'Awarded'
+                                ? 'blue'
+                                : app.status === 'Not Awarded'
+                                  ? 'grey'
+                                  : 'default',
                           borderRadius: '16px',
                           float: 'right',
                           mb: 2,
                         }}
                       />
+
                       <Typography
                         onClick={
                           userDetails &&
@@ -485,31 +557,55 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           'None'
                         )}
                       </Typography>
+
+
+
+                      {app.status !== 'Awarded' && userType === 'Project Owner' && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => {
+                            if (app._id) {
+                              handleReward(app._id);
+                            }
+                          }}
+                        >
+                          Award
+                        </Button>
+                      )}
+
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                      {app.status !== 'Approved' && app.status !== 'Rejected' && userType === 'Admin' && (
-                        <>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => {
-                              setApproveDialogOpen({ open: true, apply: app });
-                            }}
-                            sx={{ mr: 1 }}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="contained"
-                            color="secondary"
-                            onClick={() => {
-                              setRejectDialogOpen({ open: true, apply: app });
-                            }}
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
+
+
+                      {app.status !== 'Approved' &&
+                        app.status !== 'Rejected' &&
+                        app.status !== 'Awarded' &&
+                        app.status !== 'Not Awarded' &&
+                        userType === 'Admin' && (
+                          <>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => {
+                                setApproveDialogOpen({ open: true, apply: app });
+                              }}
+                              sx={{ mr: 1 }}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              onClick={() => {
+                                setRejectDialogOpen({ open: true, apply: app });
+                              }}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+
                     </Box>
                   </Card>
                 ))
@@ -564,3 +660,25 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 };
 
 export default ProjectDrawer;
+
+
+
+
+
+
+
+
+
+
+ {/* <Chip
+                        label={app.status}
+                        variant="outlined"
+                        sx={{
+                          borderColor: app.status === 'Approved' 
+                          ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
+                          color: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
+                          borderRadius: '16px',
+                          float: 'right',
+                          mb: 2,
+                        }}
+                      /> */}

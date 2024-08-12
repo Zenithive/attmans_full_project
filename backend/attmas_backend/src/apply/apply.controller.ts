@@ -10,15 +10,27 @@ import {
 import { ApplyService } from './apply.service';
 import { CreateApplyDto } from './apply.dto';
 import { Apply } from './apply.schema';
+import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
 
 @Controller('Apply')
 export class ApplyController {
-  constructor(private readonly applyService: ApplyService) {}
+  constructor(private readonly applyService: ApplyService) { }
 
   @Post()
   async create(@Body() createApplyDto: CreateApplyDto): Promise<Apply> {
     return this.applyService.create(createApplyDto);
   }
+
+  @Post('reward/:id')
+  async rewardApplication(@Param('id') id: string): Promise<Apply> {
+    return this.applyService.rewardApplication(id);
+  }
+
+  @Post('updateStatuses')
+  async updateStatuses(@Body() updateStatusesDto: UpdateStatusesDto): Promise<void> {
+    return this.applyService.updateStatuses(updateStatusesDto);
+  }
+
 
   @Get()
   async findAll(): Promise<Apply[]> {

@@ -4,13 +4,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Apply, ApplyDocument } from './apply.schema';
 import { CreateApplyDto } from './apply.dto';
 import { User, UserDocument } from 'src/users/user.schema';
 import { EmailService } from 'src/common/service/email.service';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 import { UsersService } from 'src/users/users.service';
+import { ObjectId } from 'mongoose';
+// import { ObjectId } from 'typeorm';
+// import mongoose from 'mongoose';
+import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
 
 @Injectable()
 export class ApplyService {
@@ -167,5 +171,74 @@ export class ApplyService {
     return this.ApplyModel.find({ jobId })
       .populate('userId', 'firstName lastName username')
       .exec();
+  }
+
+ 
+  // async rewardApplication(id: string): Promise<Apply> {
+  //   // Use findById to automatically handle ObjectId conversion
+  //   const application = await this.ApplyModel.findById(id).where('status').equals('Approved').exec();
+    
+  //   if (!application) {
+  //     throw new NotFoundException(`Application with id ${id} and reward status 'Pending' not found`);
+  //   }
+    
+  //   application.status = 'Awarded';
+  //   await application.save();
+    
+  //   return application;
+  // }
+
+  async rewardApplication(id: string): Promise<Apply> {
+    const application = await this.ApplyModel.findById(id).exec();
+    
+    if (!application || application.status !== 'Approved') {
+      throw new NotFoundException(`Application with id ${id} and status 'Approved' not found`);
+    }
+
+    // First, update the status of the selected application to 'Awarded'
+    application.status = 'Awarded';
+    await application.save();
+
+    // Get all other applications and set their status to 'Not Awarded'
+    const otherApplications = await this.ApplyModel.find({
+      _id: { $ne: id },
+      status: { $in: ['Approved', 'Awarded'] },
+    }).exec();
+
+    const updatedApplications = otherApplications.map(app => ({
+      _id: app._id.toString(),
+      status: 'Not Awarded',
+    }));
+
+    await this.updateStatuses({ applications: updatedApplications });
+
+    return application;
+  }
+  
+
+  // async updateStatuses(updateUnawaredDto: UpdateUnawaredDto): Promise<void> {
+  //   const { applications } = updateUnawaredDto;
+  //   for (const app of applications) {
+  //     const application = await this.ApplyModel.findById(app._id).exec();
+  //     if (!application) {
+  //       throw new NotFoundException(`Application with id ${app._id} not found`);
+  //     }
+  //     application.status = 'Not Awarded';
+  //     await application.save();
+  //   }
+  // }
+
+  async updateStatuses(updateStatusesDto: UpdateStatusesDto): Promise<void> {
+    const { applications } = updateStatusesDto;
+
+    // Update the status of each application
+    const bulkOperations = applications.map(app => ({
+      updateOne: {
+        filter: { _id: app._id },
+        update: { status: app.status },
+      },
+    }));
+
+    await this.ApplyModel.bulkWrite(bulkOperations);
   }
 }

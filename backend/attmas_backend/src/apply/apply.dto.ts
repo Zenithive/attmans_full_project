@@ -45,6 +45,10 @@ export class CreateApplyDto {
   @IsString()
   lastName: string;
 
+
+  // @IsString()
+  // rewarded: string;
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

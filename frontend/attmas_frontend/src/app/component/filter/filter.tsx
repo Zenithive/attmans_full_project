@@ -28,6 +28,8 @@ const StatusFilter: React.FC<StatusFilterProps> = ({ value, onChange }) => {
       <ToggleButton value="Pending" aria-label="pending">Pending</ToggleButton>
       <ToggleButton value="Approved" aria-label="approved">Approved</ToggleButton>
       <ToggleButton value="Rejected" aria-label="rejected">Rejected</ToggleButton>
+      <ToggleButton value="Awarded" aria-label="awarded">Awarded</ToggleButton>
+      <ToggleButton value="Not Awarded" aria-label="not-awarded">Not Awarded</ToggleButton>
     </ToggleButtonGroup>
   );
 };
