@@ -61,6 +61,10 @@ export class CreateApplyDto {
   @IsString()
   lastName: string;
 
+
+  // @IsString()
+  // rewarded: string;
+
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => MilestoneDto)

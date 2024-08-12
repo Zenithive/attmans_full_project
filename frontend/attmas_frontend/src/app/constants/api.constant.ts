@@ -7,6 +7,10 @@ export const APIS = {
     LOGOUT: `${SERVER_URL}/auth/logout`,
     JOBS: `${SERVER_URL}/jobs`,
     APPLY: `${SERVER_URL}/apply`,
+    // APPLYFORREWARD: `${SERVER_URL}/Apply/applyforreward`,
+    APPLYFORREWARD: `${SERVER_URL}/Apply`,
+    NOTAWARED: `${SERVER_URL}/Apply`,
+
 
 
     //****** Profile API url ******//
