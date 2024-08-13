@@ -553,6 +553,20 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
                       </Typography>
+
+                      {app.status !== 'Awarded' && userType === 'Project Owner' && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => {
+                            if (app._id) {
+                              handleReward(app._id);
+                            }
+                          }}
+                        >
+                          Award
+                        </Button> 
+                      )}
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
 
