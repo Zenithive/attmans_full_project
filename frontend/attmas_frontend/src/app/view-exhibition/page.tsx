@@ -409,7 +409,7 @@ const ExhibitionsPage: React.FC = () => {
           }}>
             <h1>Booth Details</h1>
             {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
-              <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} />
+              <StatusFilter value={statusFilter} onChange={handleStatusFilterChange}   options={["All", "Pending", "Approved", "Rejected"]}/>
             )}
           </Box>
           {userType !== 'Visitors' && (

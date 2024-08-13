@@ -437,6 +437,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       setFilter(newStatus);
                     }
                   }}
+                  options={["All", "Pending", "Approved", "Rejected", "Awarded", "Not Awarded"]}
                 />
               </Box>
             )}
