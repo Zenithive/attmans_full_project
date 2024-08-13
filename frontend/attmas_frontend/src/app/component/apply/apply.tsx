@@ -60,7 +60,6 @@ const validationSchema = Yup.object().shape({
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  const [showMilestones, setShowMilestones] = React.useState(false);
 
   const initialValues = {
     title: jobTitle,
@@ -208,19 +207,10 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                       <Paper key={index} elevation={3} sx={{ p: 2, mt: 3 }}>
                         <Typography variant="h5" gutterBottom sx={{ marginBottom: '40px' }}>
                           Scope of Work
-                          <Tooltip title="Delete Scope of Work">
-                            <IconButton
-                              onClick={() => arrayHelpers.remove(index)}
-                              color='secondary'
-                              sx={{ float: 'right' }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
                         </Typography>
 
                         <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
-                          Add Specific activities, deliverables,timelines,and/or quality guidelines to ensure successful execution of the project.
+                          Add Specific activities, deliverables, timelines, and/or quality guidelines to ensure successful execution of the project.
                         </Typography >
                         <TextField
                           label="Scope of Work"
@@ -235,46 +225,53 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                           fullWidth
                           error={!!(errors.milestones && touched.milestones)}
                           helperText={<ErrorMessage name="Scope of Work" />}
-                        />
-
-                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
-                          Add milestones to help you break up the scope of work into smaller deliverables to track progress of the project. These can be viewed and modified by the client.
-                        </Typography >
-                        <FieldArray
-                          name={`milestones[${index}].milestones`}
-                          render={(milestoneHelpers) => (
-                            <Box>
-                              {milestoneGroup.milestones.length > 0 && (
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                                  <TextField
-                                    placeholder="Milestone..."
-                                    name={`milestones[${index}].milestones[0]`}
-                                    value={milestoneGroup.milestones[0]}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    fullWidth
-                                    multiline
-                                    error={!!(errors.milestones && touched.milestones)}
-                                    helperText={<ErrorMessage name="Milestone" />}
-                                  />
-                                </Box>
-                              )}
-                            </Box>
-                          )}
-                        />
-                      </Paper>
-                    ))}
-                    <Button
-                      onClick={() => arrayHelpers.push({ scopeOfWork: '', milestones: [''] })}
-                      variant="outlined"
-                      sx={{ mt: 1, textTransform: 'none' ,marginBottom:'40px'}}
-                      startIcon={<AddIcon />}
-                    >
-                      Add Scope of Work
-                    </Button>
-                  </Box>
-                )}
-              />
+                          />
+  
+                          <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
+                            Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client.
+                          </Typography >
+                          <FieldArray
+                            name={`milestones[${index}].milestones`}
+                            render={(milestoneHelpers) => (
+                              <Box>
+                                {milestoneGroup.milestones.map((milestone, milestoneIndex) => (
+                                  <Box key={milestoneIndex} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+                                    <TextField
+                                      placeholder="Milestone..."
+                                      name={`milestones[${index}].milestones[${milestoneIndex}]`}
+                                      value={milestone}
+                                      onChange={handleChange}
+                                      onBlur={handleBlur}
+                                      fullWidth
+                                      multiline
+                                      error={!!(errors.milestones && touched.milestones)}
+                                      helperText={<ErrorMessage name="Milestone..." />}
+                                    />
+                                    <IconButton
+                                      onClick={() => milestoneHelpers.remove(milestoneIndex)}
+                                      color='secondary'
+                                    >
+                                      <RemoveIcon />
+                                    </IconButton>
+                                  </Box>
+                                ))}
+                                <Button
+                                  onClick={() => milestoneHelpers.push('')}
+                                  variant="outlined"
+                                  sx={{ mt: 1, textTransform: 'none', marginBottom: '20px' }}
+                                  startIcon={<AddIcon />}
+                                >
+                                  Add Milestone
+                                </Button>
+                              </Box>
+                            )}
+                          />
+                        </Paper>
+                      ))}
+                    </Box>
+                  )}
+                />
+                         
 
               <Typography variant="h6" sx={{fontSize: 'small' }}>
                 What have been the flaws in current solution?*

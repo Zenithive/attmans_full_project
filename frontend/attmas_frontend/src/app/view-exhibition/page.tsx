@@ -44,7 +44,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { productName: string; productDescription: string; productType: string; price: number; currency: string; videourlForproduct: string; }[];
+  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; }[];
   userId: {
     firstName: string;
     lastName: string;
@@ -385,12 +385,19 @@ const ExhibitionsPage: React.FC = () => {
                 }}
               >
                 <CardContent>
-                  <Typography variant="h6">
-                    {exhibition.title}, ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
+                  <Typography variant="h6" sx={{fontSize:'x-large'}}>
+                    {exhibition.title}, <Box sx={{fontSize:'medium',fontWeight:'400',position:'relative',left:'22%',bottom:'28px',
+                    '@media (max-width: 767px)':{
+                      position:'relative',
+                      left:'0%',
+                      top:'20%',
+                      bottom:'20%'
+                    }    
+                    }}>({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})</Box>
                   </Typography>
-                  <Typography variant="h6">{exhibition.description}</Typography>
-                  <Typography variant="h6">{exhibition.industries}</Typography>
-                  <Typography variant="h6">{exhibition.subjects}</Typography>
+                  <Typography variant="h5" sx={{fontSize:'medium'}}>{exhibition.description}</Typography>
+                  <Typography variant="h5" sx={{fontSize:'medium'}}>{exhibition.industries}</Typography>
+                  <Typography variant="h5" sx={{fontSize:'medium'}}>{exhibition.subjects}</Typography>
                 </CardContent>
               </Card>
             </Box>
@@ -443,38 +450,19 @@ const ExhibitionsPage: React.FC = () => {
                     <Grid item xs={12} sm={6} md={4} key={booth._id}>
                       <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
                         <CardContent>
-                          <Typography
-                            onClick={userDetails && (userType === 'Admin' || userType === 'Innovators') ? () => {
-                              setSelectedBooth(booth);
-                              setDialogOpen(true);
-                            } : undefined}
-                            style={{
-                              cursor: userDetails && (userType === 'Admin' || userType === 'Innovators') ? 'pointer' : 'default',
-                              display: 'inline-block',
-                            }}
-                          >
-                            {(userDetails && (userType === 'Admin' || userType === 'Innovators')) ? (
-                              <Tooltip
-                                title="Click here to see Booth details"
-                                arrow
-                                placement="top"
-                                PopperProps={{
-                                  modifiers: [
-                                    {
-                                      name: 'offset',
-                                      options: {
-                                        offset: [0, -10],
-                                      },
-                                    },
-                                  ],
-                                }}
-                              >
+                          <Typography>
                                 <h2>{booth.title}</h2>
-                              </Tooltip>
-                            ) : (
-                              <h2>{booth.title}</h2>
-                            )}
                           </Typography>
+
+                          <Button
+                                    sx={{ position: 'relative', float: 'right', bottom: '55px' }}
+                                    onClick={() => {
+                                      setSelectedBooth(booth);
+                                      setDialogOpen(true)
+                                    }}
+                                  >
+                                    View Details
+                          </Button>
                           {exhibitions.map((exhibition) => (
                             <Box key={exhibition._id}>
                               {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
