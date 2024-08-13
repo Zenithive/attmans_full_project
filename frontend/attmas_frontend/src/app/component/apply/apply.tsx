@@ -253,6 +253,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     fullWidth
+                                    multiline
                                     error={!!(errors.milestones && touched.milestones)}
                                     helperText={<ErrorMessage name="Milestone" />}
                                   />

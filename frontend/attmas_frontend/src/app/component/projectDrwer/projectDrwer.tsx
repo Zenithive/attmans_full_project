@@ -57,6 +57,8 @@ interface Apply {
   username: string;
   jobId: string;
   milestones: Milestone[];
+  availableSolution: string;
+  SolutionUSP: string;
 }
 
 

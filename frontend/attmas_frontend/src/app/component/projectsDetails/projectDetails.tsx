@@ -36,6 +36,8 @@ interface Apply {
   firstName: string;
   lastName: string;
   milestones: Milestone[];
+  availableSolution: string;
+  SolutionUSP: string;
 }
 
 interface ProjectDetailsDialogProps {
@@ -124,6 +126,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 <TextField
                   label="Description"
                   value={apply.description}
+                  multiline
                   fullWidth
                   disabled
                   sx={{ mb: 2 }}
@@ -159,6 +162,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                           <TextField
                             label="Scope of Work"
                             value={milestone.scopeOfWork}
+                            multiline
                             fullWidth
                             disabled
                             sx={{
@@ -170,6 +174,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                           <TextField
                             label="Milestones"
                             value={milestone.milestones}
+                            multiline
                             fullWidth
                             disabled
                           />
@@ -178,6 +183,26 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </CardContent>
                   </Card>
                 ))}
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Other available solutions"
+                  value={`${apply.availableSolution}`}
+                  fullWidth
+                  multiline
+                  disabled
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Solution USP"
+                  value={`${apply.SolutionUSP}`}
+                  fullWidth
+                  multiline
+                  disabled
+                  sx={{ mb: 2 }}
+                />
               </Grid>
               {apply.rejectComment && (
                 <Grid item xs={12}>
