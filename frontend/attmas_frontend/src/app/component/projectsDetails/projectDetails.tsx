@@ -184,26 +184,30 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   </Card>
                 ))}
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Other available solutions"
-                  value={`${apply.availableSolution}`}
-                  fullWidth
-                  multiline
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Solution USP"
-                  value={`${apply.SolutionUSP}`}
-                  fullWidth
-                  multiline
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
+              {apply.availableSolution && (
+                <Grid item xs={12}>
+                  <TextField
+                    label="Other available solutions"
+                    value={apply.availableSolution}
+                    fullWidth
+                    multiline
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+              )}
+                {apply.SolutionUSP && (
+                <Grid item xs={12}>
+                  <TextField
+                    label="Solution USP"
+                    value={apply.SolutionUSP}
+                    fullWidth
+                    multiline
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+              )}
               {apply.rejectComment && (
                 <Grid item xs={12}>
                   <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
