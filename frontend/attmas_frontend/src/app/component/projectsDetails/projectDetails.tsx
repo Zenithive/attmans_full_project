@@ -11,12 +11,19 @@ import {
   TextField,
   Button,
   Divider,
+  CardContent,
+  Card,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
 
+
+interface Milestone {
+  scopeOfWork: string;
+  milestones: string[];
+}
 interface Apply {
   _id?: string;
   title: string;
@@ -28,6 +35,7 @@ interface Apply {
   status: string;
   firstName: string;
   lastName: string;
+  milestones: Milestone[];
 }
 
 interface ProjectDetailsDialogProps {
@@ -37,7 +45,9 @@ interface ProjectDetailsDialogProps {
   jobId: string; 
   canAddComment: boolean; 
   onCommentSubmitted: () => void; 
+  
 }
+
 
 const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose, apply, jobId, canAddComment, onCommentSubmitted }) => {
   const [jobDetailKey, setJobDetailKey] = useState<number>(0);
@@ -136,6 +146,38 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   disabled
                   sx={{ mb: 2 }}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                {apply.milestones.map((milestone, index) => (
+                  <Card key={index} variant="outlined" sx={{ mb: 2 }}>
+                    <CardContent>
+                      <Typography variant="h6" sx={{ mb: 2 }}>
+                        Milestone {index + 1}
+                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <TextField
+                            label="Scope of Work"
+                            value={milestone.scopeOfWork}
+                            fullWidth
+                            disabled
+                            sx={{
+                              mb: 2,
+                             }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            label="Milestones"
+                            value={milestone.milestones}
+                            fullWidth
+                            disabled
+                          />
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                ))}
               </Grid>
               {apply.rejectComment && (
                 <Grid item xs={12}>

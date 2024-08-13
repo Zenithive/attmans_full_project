@@ -324,7 +324,6 @@ const Jobs = () => {
     }, []);
     
 
-
     return (
 
         <Box
@@ -526,13 +525,6 @@ const Jobs = () => {
                         onClick={handleAllAppliesClicks}
                         sx={{ ml: 2 }} // Add some margin if needed
                     /> )}
-
-
-
-
-
-
-
 
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (

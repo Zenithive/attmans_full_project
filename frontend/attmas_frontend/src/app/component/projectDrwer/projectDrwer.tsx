@@ -38,6 +38,11 @@ export interface Job {
   rejectComment?: string;
 }
 
+interface Milestone {
+  scopeOfWork: string;
+  milestones: string[];
+}
+
 interface Apply {
   _id?: string;
   title: string;
@@ -51,7 +56,7 @@ interface Apply {
   lastName: string;
   username: string;
   jobId: string;
-  milestones?: string[];
+  milestones: Milestone[];
 }
 
 
@@ -545,35 +550,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                        <b>Milestones:</b>
-                        {app.milestones && app.milestones.length > 0 ? (
-                          <ul>
-                            {app.milestones.map((milestone, index) => (
-                              <li key={index}>{milestone}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          'None'
-                        )}
-                      </Typography>
-
-
-
-                      {app.status !== 'Awarded' && userType === 'Project Owner' && (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => {
-                            if (app._id) {
-                              handleReward(app._id);
-                            }
-                          }}
-                        >
-                          Award
-                        </Button>
-                      )}
-
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
 
@@ -670,15 +646,3 @@ export default ProjectDrawer;
 
 
 
- {/* <Chip
-                        label={app.status}
-                        variant="outlined"
-                        sx={{
-                          borderColor: app.status === 'Approved' 
-                          ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
-                          color: app.status === 'Approved' ? 'green' : app.status === 'Rejected' ? 'red' : 'default',
-                          borderRadius: '16px',
-                          float: 'right',
-                          mb: 2,
-                        }}
-                      /> */}
