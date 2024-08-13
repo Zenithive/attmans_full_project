@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography } from '@mui/material';
+import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -58,6 +58,7 @@ const validationSchema = Yup.object().shape({
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const [showMilestones, setShowMilestones] = React.useState(false);
 
   const initialValues = {
     title: jobTitle,
@@ -111,7 +112,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       sx={{ '& .MuiDrawer-paper': { width: '50%', borderRadius: 3, pr: 10, mr: -8, '@media (max-width: 767px)': { width: '116%' } } }}
       anchor="right"
       open={open}
-      onClose={() => setOpen(false)}
+      onClose={() => handleCancel}
     >
       <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
         <h2>Create Apply</h2>
@@ -192,6 +193,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                   onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                 />
               </LocalizationProvider>
+
               <FieldArray
                 name="milestones"
                 render={(arrayHelpers) => (
@@ -200,14 +202,15 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                       <Paper key={index} elevation={3} sx={{ p: 2, mt: 3 }}>
                         <Typography variant="h6" gutterBottom sx={{marginBottom:'20px'}}>
                           Scope of Work
+                          <Tooltip title="Delete Scope of Work">
                           <IconButton
-                          onClick={() => arrayHelpers.remove(index)}
-                          color='secondary'
-                          sx={{float:'right'}}
-                        >
-                          <DeleteIcon/>
-          
-                        </IconButton>
+                            onClick={() => arrayHelpers.remove(index)}
+                            color='secondary'
+                            sx={{ float: 'right' }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          </Tooltip>
                         </Typography>
                   
                         <TextField

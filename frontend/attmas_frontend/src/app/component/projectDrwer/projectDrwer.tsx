@@ -38,6 +38,11 @@ export interface Job {
   rejectComment?: string;
 }
 
+interface Milestone {
+  scopeOfWork: string;
+  milestones: string[];
+}
+
 interface Apply {
   _id?: string;
   title: string;
@@ -51,7 +56,7 @@ interface Apply {
   lastName: string;
   username: string;
   jobId: string;
-  milestones?: string[];
+  milestones: Milestone[];
 }
 
 
@@ -472,18 +477,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       </Typography>
                       <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                         <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                        <b>Milestones:</b>
-                        {app.milestones && app.milestones.length > 0 ? (
-                          <ul>
-                            {app.milestones.map((milestone, index) => (
-                              <li key={index}>{milestone}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          'None'
-                        )}
                       </Typography>
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
