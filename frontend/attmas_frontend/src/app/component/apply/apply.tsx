@@ -37,6 +37,8 @@ interface FormValues {
   currency: string;
   TimeFrame: Dayjs | null;
   jobId: string;
+  availableSolution: string;
+  SolutionUSP: string;
   milestones: Milestone[];
 }
 
@@ -68,6 +70,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     TimeFrame: null as Dayjs | null,
     jobId: jobId,
     milestones: [{ scopeOfWork: '', milestones: [''] }],
+    availableSolution: '',
+    SolutionUSP: '',
   };
 
   const handleSubmit = async (
@@ -86,6 +90,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       lastName: userDetails.lastName,
       jobId: values.jobId,
       milestones: values.milestones,
+      availableSolution: values.availableSolution,
+      SolutionUSP: values.SolutionUSP,
     };
 
     try {
@@ -200,31 +206,40 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                   <Box>
                     {values.milestones.map((milestoneGroup, index) => (
                       <Paper key={index} elevation={3} sx={{ p: 2, mt: 3 }}>
-                        <Typography variant="h6" gutterBottom sx={{marginBottom:'20px'}}>
+                        <Typography variant="h5" gutterBottom sx={{ marginBottom: '40px' }}>
                           Scope of Work
                           <Tooltip title="Delete Scope of Work">
-                          <IconButton
-                            onClick={() => arrayHelpers.remove(index)}
-                            color='secondary'
-                            sx={{ float: 'right' }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
+                            <IconButton
+                              onClick={() => arrayHelpers.remove(index)}
+                              color='secondary'
+                              sx={{ float: 'right' }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
                           </Tooltip>
                         </Typography>
-                  
+
+                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
+                          Add Specific activities, deliverables,timelines,and/or quality guidelines to ensure successful execution of the project.
+                        </Typography >
                         <TextField
                           label="Scope of Work"
                           name={`milestones[${index}].scopeOfWork`}
                           value={milestoneGroup.scopeOfWork}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          color='secondary'
                           multiline
+                          sx={{ marginBottom: '40px' }}
                           rows={4}
                           fullWidth
                           error={!!(errors.milestones && touched.milestones)}
                           helperText={<ErrorMessage name="Scope of Work" />}
                         />
+
+                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
+                          Add milestones to help you break up the scope of work into smaller deliverables to track progress of the project. These can be viewed and modified by the client.
+                        </Typography >
                         <FieldArray
                           name={`milestones[${index}].milestones`}
                           render={(milestoneHelpers) => (
@@ -251,13 +266,47 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                     <Button
                       onClick={() => arrayHelpers.push({ scopeOfWork: '', milestones: [''] })}
                       variant="outlined"
-                      sx={{ mt: 1, textTransform: 'none' }}
+                      sx={{ mt: 1, textTransform: 'none' ,marginBottom:'40px'}}
                       startIcon={<AddIcon />}
                     >
                       Add Scope of Work
                     </Button>
                   </Box>
                 )}
+              />
+
+              <Typography variant="h6" sx={{fontSize: 'small' }}>
+                What have been the flaws in current solution?*
+              </Typography >
+              <TextField
+                placeholder="Write about other available solutions"
+                name='availableSolution'
+                value={values.availableSolution}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                multiline
+                rows={4}
+                sx={{marginBottom:'20px'}}
+                fullWidth
+                error={!!(errors.availableSolution && touched.availableSolution)}
+                helperText={<ErrorMessage name="availableSolution" />}
+              />
+
+
+              <Typography variant="h6" sx={{fontSize: 'medium' }}>
+                Positive and unique results do we expect to see from your solution?*
+              </Typography >
+              <TextField
+                placeholder="Write your solution USP here"
+                name='SolutionUSP'
+                value={values.SolutionUSP}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                multiline
+                rows={5}
+                fullWidth
+                error={!!(errors.SolutionUSP && touched.SolutionUSP)}
+                helperText={<ErrorMessage name="SolutionUSP" />}
               />
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
