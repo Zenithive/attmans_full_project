@@ -6,7 +6,7 @@ interface Booth {
     _id: string;
     title: string;
     description: string;
-    products: { productName: string; productDescription: string; productType: string; price: number; currency: string; }[];
+    products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; }[];
     userId: {
       firstName: string;
       lastName: string;

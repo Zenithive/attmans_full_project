@@ -26,7 +26,7 @@ interface Product {
   productName: string;
   productDescription: string;
   productType: string;
-  price: number;
+  productPrice: number;
   currency: string;
   videourlForproduct: string;
 }
@@ -103,7 +103,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
              </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant="h6" component="div" sx={{ mb: 2 ,'@media (max-width: 767px)':{
+                  <Typography variant="h5" component="div" sx={{ mb: 2 ,'@media (max-width: 767px)':{
                   position:'relative',top:'10px'}}}>
                     <Box fontWeight="bold">Title: {booth.title}</Box>
                   </Typography>
@@ -147,7 +147,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                             <TableCell>{product.productName}</TableCell>
                             <TableCell>{product.productDescription}</TableCell>
                             <TableCell>{product.productType}</TableCell>
-                            <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.price}</TableCell>
+                            <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</TableCell>
                             <TableCell>
                               <Tooltip
                                 title="Play Video"
@@ -165,7 +165,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                                 }}
                               >
                                 <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
-                                  <YouTubeIcon style={{ fontSize: '40px',position:'relative',right:'10px' }}/>
+                                  <YouTubeIcon style={{ fontSize: '40px',position:'relative' }}/>
                                 </IconButton>
                               </Tooltip>
                             </TableCell>

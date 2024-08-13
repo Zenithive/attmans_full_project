@@ -402,6 +402,15 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   sx={{ mb: 2 }}
                 />
               </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Time Frame"
+                  value={dayjs(viewingJob.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                  fullWidth
+                  disabled
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
               {viewingJob.rejectComment && (
                 <Grid item xs={12}>
                   <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>

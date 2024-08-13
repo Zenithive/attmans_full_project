@@ -28,7 +28,6 @@ import { CustomChip } from './projectinterface';
 
 
 
-
 const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -574,7 +573,7 @@ const Jobs = () => {
                                             </a>
                                             <span style={{ fontSize: 'small', color: "#616161" }}>
                                                 ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                                <Box sx={{
+                                                <Grid item xs={12} sx={{
                                                     position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
                                                         position: 'relative',
                                                         top: '65px',
@@ -585,7 +584,7 @@ const Jobs = () => {
                                                         label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                                         color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
                                                     />
-                                                </Box>
+                                                </Grid>
                                             </span>
                                             <Box sx={{
                                                 fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
@@ -608,23 +607,10 @@ const Jobs = () => {
 
                                         <Box sx={{ marginTop: '10px' }}>
 
-                                            <Typography variant="body2">{job.Budget}</Typography>
+                                            <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                            <Box sx={{ float: 'right', left: '22%', position: 'relative', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                                {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
-                                                        onClick={() => handleApplyClick(job.title, job)}
-                                                        sx={{ float: 'right' }}
-                                                    >
-                                                        Apply
-                                                    </Button>
-                                                )}
-
-
-
+                                            <Box sx={{position: 'sticky',float:'right',left:'92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
                                                 {userDetails.userType === 'Project Owner' && (
                                                     <>
                                                         <Tooltip title="Edit" arrow>
@@ -682,6 +668,18 @@ const Jobs = () => {
                                                     )}
                                                 </Menu>
                                             </Box>
+                                            <Box sx={{position:'relative',bottom:'10px'}}>
+                                            {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        onClick={() => handleApplyClick(job.title, job)}
+                                                        sx={{ float: 'right' }}
+                                                    >
+                                                        Apply
+                                                    </Button>
+                                                )}
+                                         </Box>
                                         </Box>
 
                                     </CardContent>
