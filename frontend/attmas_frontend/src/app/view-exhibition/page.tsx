@@ -330,7 +330,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
 
 
-            {(!userType || userType === 'Visitors') && (
+            {(!userType) && (
               <Button
                 variant="contained"
                 color="primary"
