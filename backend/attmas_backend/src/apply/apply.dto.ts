@@ -61,7 +61,6 @@ export class CreateApplyDto {
   @IsString()
   lastName: string;
 
-
   // @IsString()
   // rewarded: string;
 
@@ -70,4 +69,12 @@ export class CreateApplyDto {
   @Type(() => MilestoneDto)
   @IsArray()
   milestones?: MilestoneDto[];
+
+  @IsOptional()
+  @IsString()
+  availableSolution: string;
+
+  @IsOptional()
+  @IsString()
+  SolutionUSP: string;
 }

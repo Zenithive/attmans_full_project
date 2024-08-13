@@ -52,7 +52,7 @@ export class Apply {
 
   @Prop({ default: 'Pending' })
   status: string;
-  
+
   // @Prop({ default: 'Pending' })
   // rewarded: string;
 
@@ -67,6 +67,12 @@ export class Apply {
 
   @Prop({ type: [MilestoneSchema], required: false })
   milestones: Milestone[];
+
+  @Prop({ required: false })
+  availableSolution: string;
+
+  @Prop({ required: false })
+  SolutionUSP: string;
 }
 
 export const ApplySchema = SchemaFactory.createForClass(Apply);
