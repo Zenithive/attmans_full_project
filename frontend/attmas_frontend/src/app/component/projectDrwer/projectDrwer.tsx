@@ -565,7 +565,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           }}
                         >
                           Award
-                        </Button>
+                        </Button> 
                       )}
                     </CardContent>
                     <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
