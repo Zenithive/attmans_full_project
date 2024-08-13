@@ -37,6 +37,7 @@ interface Visitor {
   username: string;
   mobileNumber: string;
   timestamps: string;
+  exhibitionId: string;
 }
 
 
@@ -330,7 +331,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
 
 
-            {(!userType) && (
+            {(!userType || userType === 'Visitors') && (
               <Button
                 variant="contained"
                 color="primary"
