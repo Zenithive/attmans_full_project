@@ -199,7 +199,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 {apply.SolutionUSP && (
                 <Grid item xs={12}>
                   <TextField
-                    label="Solution USP"
+                    label="Solution USP "
                     value={apply.SolutionUSP}
                     fullWidth
                     multiline
