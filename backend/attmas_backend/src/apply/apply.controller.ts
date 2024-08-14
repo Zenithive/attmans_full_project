@@ -22,7 +22,11 @@ export class ApplyController {
   }
 
   @Post('reward/:id')
-  async rewardApplication(@Param('id') id: string): Promise<Apply> {
+  async rewardApplication(
+    @Param('id') id: string,
+    @Body('jobId') jobId: string
+  ): Promise<Apply> {
+    // console.log(`Rewarding application with ID: ${id} for Job ID: ${jobId}`);
     return this.applyService.rewardApplication(id);
   }
 

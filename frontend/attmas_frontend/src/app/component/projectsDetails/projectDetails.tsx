@@ -18,6 +18,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
+import axios from 'axios';
+import { APIS } from '@/app/constants/api.constant';
+import ConfirmationDialog from '../projectDrwer/ConfirmationDialog';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+
 
 
 interface Milestone {
@@ -44,15 +50,28 @@ interface ProjectDetailsDialogProps {
   open: boolean;
   onClose: () => void;
   apply: Apply | null;
-  jobId: string; 
-  canAddComment: boolean; 
-  onCommentSubmitted: () => void; 
-  
+  jobId: string;
+  canAddComment: boolean;
+  onCommentSubmitted: () => void;
+
 }
 
 
 const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose, apply, jobId, canAddComment, onCommentSubmitted }) => {
   const [jobDetailKey, setJobDetailKey] = useState<number>(0);
+  const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+  const [applications, setApplications] = useState<Apply[]>([]);
+  const [isAwardButtonVisible, setIsAwardButtonVisible] = useState(true);
+
+  const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
+
+
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -65,192 +84,285 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     }
   };
 
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      sx={{
-        '& .MuiDialog-paper': {
-          maxWidth: '50%',
-          maxHeight: '100%',
-        },
-      }}
-    >
-      <DialogTitle sx={{ m: 0, p: 2 }}>
-        Apply Details
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent dividers>
-        {apply && (
-          <Box sx={{ position: 'relative' }}>
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-                '@media (max-width: 767px)': {
-                  position: 'relative',
-                  top: '-10px',
-                  left: '5px',
-                },
-              }}
-            >
-              <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status) }}>
-                Status: {apply.status}, Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
-              </Typography>
-            </Box>
-            <Grid container spacing={2} flexDirection={'column'}>
-              <Grid item xs={12} sm={5}>
-                <TextField
-                  label="Title"
-                  value={apply.title}
-                  fullWidth
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={12}>
-                <TextField
-                  label="Description"
-                  value={apply.description}
-                  multiline
-                  fullWidth
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={12}>
-                <TextField
-                  label="Applied User"
-                  value={`${apply.firstName} ${apply.lastName}`}
-                  fullWidth
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Budget"
-                  value={`${apply.currency === 'USD' ? '$' : '₹'}${apply.Budget}`}
-                  fullWidth
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                {apply.milestones.map((milestone, index) => (
-                  <Card key={index} variant="outlined" sx={{ mb: 2 }}>
-                    <CardContent>
-                      <Typography variant="h6" sx={{ mb: 2 }}>
-                        Milestone {index + 1}
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <TextField
-                            label="Scope of Work"
-                            value={milestone.scopeOfWork}
-                            multiline
-                            fullWidth
-                            disabled
-                            sx={{
-                              mb: 2,
-                             }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            label="Milestones"
-                            value={milestone.milestones}
-                            multiline
-                            fullWidth
-                            disabled
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Other available solutions"
-                  value={`${apply.availableSolution}`}
-                  fullWidth
-                  multiline
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Solution USP"
-                  value={`${apply.SolutionUSP}`}
-                  fullWidth
-                  multiline
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-              {apply.rejectComment && (
-                <Grid item xs={12}>
-                  <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'white' }}>
-                      <b>Rejection Comment:</b> {apply.rejectComment}
-                    </Typography>
-                  </Box>
-                </Grid>
-              )}
-            </Grid>
+  const handleReward = async (applicationId: string) => {
+    try {
+      if (!applicationId) return;
+      console.log("applicationId", applicationId);
 
-            {canAddComment && (
-              <>
-                <Divider orientation="horizontal" flexItem sx={{ marginBottom: '30px' }} />
-                <Grid item xs={12} sm={12}>
-                  <JobDetail key={jobDetailKey} jobId={jobId} applyId={apply._id}  onCommentSubmitted={onCommentSubmitted}/>
+
+      // First, award the selected application
+      // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+        jobId, // Include jobId in the payload
+      });
+
+      // Update all other applications to "Not Awarded"
+      const updatedApplications = applications.map((app) =>
+        app._id === applicationId
+          ? { ...app, status: 'Awarded' }
+          : { ...app, status: 'Not Awarded' }
+      );
+
+      // Make an API call to update all applications' statuses on the server
+      // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
+
+      // Update the local state with the new statuses
+      setApplications(updatedApplications);
+        // Hide the Award button
+        setIsAwardButtonVisible(false);
+
+      // Hide all the buttons
+      setButtonsHidden((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((key) => {
+          updated[key] = true;
+        });
+        return updated;
+      });
+
+    } catch (error) {
+      console.error('Error rewarding application:', error);
+    }
+  };
+
+  const handleOpenConfirmationDialog = (applicationId: string) => {
+    console.log("applicationId", applicationId);
+
+    setCurrentApplicationId(applicationId);
+    setConfirmationDialogOpen(true);
+  };
+
+  const handleCloseConfirmationDialog = () => {
+    setConfirmationDialogOpen(false);
+    setCurrentApplicationId(null);
+  };
+
+  const handleConfirm = () => {
+    if (currentApplicationId) {
+      // Perform the action with currentApplicationId
+      console.log(`Awarding application with ID: ${currentApplicationId}`);
+      handleReward(currentApplicationId)
+      // Close the dialog after confirming
+      handleCloseConfirmationDialog();
+    }
+  };
+
+  return (
+    <>
+
+      <Dialog
+        open={open}
+        onClose={onClose}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            maxWidth: '50%',
+            maxHeight: '100%',
+          },
+        }}
+      >
+        <DialogTitle sx={{ m: 0, p: 2 }}>
+          Apply Details
+          <IconButton
+            aria-label="close"
+            onClick={onClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          {apply && (
+            <Box sx={{ position: 'relative' }}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  '@media (max-width: 767px)': {
+                    position: 'relative',
+                    top: '-10px',
+                    left: '5px',
+                  },
+                }}
+              >
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status) }}>
+                  Status: {apply.status}, Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                </Typography>
+              </Box>
+              <Grid container spacing={2} flexDirection={'column'}>
+                <Grid item xs={12} sm={5}>
+                  <TextField
+                    label="Title"
+                    value={apply.title}
+                    fullWidth
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <Box
-                    sx={{
-                      backgroundColor: '#f5f5f5',
-                      padding: 2,
-                      borderRadius: 1,
-                      marginTop: '20px',
-                    }}
-                  >
-                    <AddComment
-                      jobId={jobId}
-                      applyId={apply._id}
-                      onCommentSubmitted={() => {
-                        onCommentSubmitted();
-                        setJobDetailKey((prev) => prev + 1); 
+                  <TextField
+                    label="Description"
+                    value={apply.description}
+                    multiline
+                    fullWidth
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                    label="Applied User"
+                    value={`${apply.firstName} ${apply.lastName}`}
+                    fullWidth
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Budget"
+                    value={`${apply.currency === 'USD' ? '$' : '₹'}${apply.Budget}`}
+                    fullWidth
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  {apply.milestones.map((milestone, index) => (
+                    <Card key={index} variant="outlined" sx={{ mb: 2 }}>
+                      <CardContent>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                          Milestone {index + 1}
+                        </Typography>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
+                            <TextField
+                              label="Scope of Work"
+                              value={milestone.scopeOfWork}
+                              multiline
+                              fullWidth
+                              disabled
+                              sx={{
+                                mb: 2,
+                              }}
+                            />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <TextField
+                              label="Milestones"
+                              value={milestone.milestones}
+                              multiline
+                              fullWidth
+                              disabled
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Other available solutions"
+                    value={`${apply.availableSolution}`}
+                    fullWidth
+                    multiline
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Solution USP"
+                    value={`${apply.SolutionUSP}`}
+                    fullWidth
+                    multiline
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+                {apply.rejectComment && (
+                  <Grid item xs={12}>
+                    <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
+                      <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'white' }}>
+                        <b>Rejection Comment:</b> {apply.rejectComment}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                )}
+              </Grid>
+
+              {canAddComment && (
+                <>
+                  <Divider orientation="horizontal" flexItem sx={{ marginBottom: '30px' }} />
+                  <Grid item xs={12} sm={12}>
+                    <JobDetail key={jobDetailKey} jobId={jobId} applyId={apply._id} onCommentSubmitted={onCommentSubmitted} />
+                  </Grid>
+                  <Grid item xs={12} sm={12}>
+                    <Box
+                      sx={{
+                        backgroundColor: '#f5f5f5',
+                        padding: 2,
+                        borderRadius: 1,
+                        marginTop: '20px',
                       }}
-                    />
-                  </Box>
-                </Grid>
-              </>
-            )}
-          </Box>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+                    >
+                      <AddComment
+                        jobId={jobId}
+                        applyId={apply._id}
+                        onCommentSubmitted={() => {
+                          onCommentSubmitted();
+                          setJobDetailKey((prev) => prev + 1);
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                </>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          
+        {userDetails.userType === 'Project Owner' && apply?._id && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleOpenConfirmationDialog(apply._id as string)}
+            >
+              Award
+            </Button>
+          )}
+          <Button
+  onClick={onClose}
+  sx={{
+    color: 'grey.500',
+    backgroundColor: '#757575',
+    '&:hover': {
+      backgroundColor: '#e0e0e0', // Darken the grey on hover
+    },
+  }}
+>
+  Close
+</Button>
+        </DialogActions>
+      </Dialog>
+
+      <ConfirmationDialog
+        open={confirmationDialogOpen}
+        onClose={handleCloseConfirmationDialog}
+        onConfirm={handleConfirm}
+        message="Are you sure you want to award this application?"
+      />
+
+    </>
   );
 };
 

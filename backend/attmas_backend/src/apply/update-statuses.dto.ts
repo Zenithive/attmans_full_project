@@ -8,6 +8,9 @@ class ApplicationStatusDto {
 
   @IsString()
   status: string;
+  
+  @IsString()
+  jobId: string;
 }
 
 export class UpdateStatusesDto {

@@ -13,7 +13,7 @@ import ApplyDetailsDialog from '../projectsDetails/projectDetails';
 import booth from '../booth/booth';
 import AddComment from '../projectComment/projectComment';
 import JobDetail from '../projectCommentCard/projectCommentCard';
-
+import ConfirmationDialog from './ConfirmationDialog';
 
 
 
@@ -64,7 +64,7 @@ interface Apply {
 }
 
 
-interface ProjectDrawerProps {
+export interface ProjectDrawerProps {
   viewingJob: Job | null;
   setViewingJob: React.Dispatch<React.SetStateAction<Job | null>>;
   userType: string;
@@ -164,7 +164,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
       // First, award the selected application
-      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+        jobId: viewingJob?._id // Include jobId in the payload
+      });
 
       // Update all other applications to "Not Awarded"
       const updatedApplications = applications.map((app) =>
@@ -174,7 +176,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       );
 
       // Make an API call to update all applications' statuses on the server
-      await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
+      // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
 
       // Update the local state with the new statuses
       setApplications(updatedApplications);
@@ -192,7 +194,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     }
   };
 
-  const handleOpenConfirmationDialog = (applicationId: string) => {
+ const handleOpenConfirmationDialog = (applicationId: string) => {
     console.log("applicationId", applicationId);
 
     setCurrentApplicationId(applicationId);
@@ -564,13 +566,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                               Award
                             </Button>
                           )}
-                          <Dialog open={confirmationDialogOpen} onClose={handleCloseConfirmationDialog}>
+
+
+                          {/* <Dialog open={confirmationDialogOpen} onClose={handleCloseConfirmationDialog}>
                             <DialogTitle>Confirm Action</DialogTitle>
                             <DialogContent>
                               <DialogContentText>
                                 Are you sure you want to award this application?
                               </DialogContentText>
-                              {/* Add a small comment box here */}
                               <TextField
                                 autoFocus
                                 margin="dense"
@@ -580,7 +583,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 fullWidth
                                 variant="outlined"
                                 multiline
-                                rows={2} // Adjust the rows to change the height of the comment box
+                                rows={2} 
                               />
                             </DialogContent>
                             <DialogActions>
@@ -591,7 +594,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 Confirm
                               </Button>
                             </DialogActions>
-                          </Dialog>
+                          </Dialog> */}
                         </div>
 
 
@@ -673,6 +676,13 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           </>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationDialog
+        open={confirmationDialogOpen}
+        onClose={handleCloseConfirmationDialog}
+        onConfirm={handleConfirm}
+        message="Are you sure you want to award this application?"
+      />
 
 
     </>

@@ -26,7 +26,7 @@ export class ApplyService {
     private usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
-  ) {}
+  ) { }
 
   // async create(createApplyDto: CreateApplyDto): Promise<Apply> {
   //   // console.log("CreateApplyDto", createApplyDto)
@@ -173,72 +173,63 @@ export class ApplyService {
       .exec();
   }
 
- 
-  // async rewardApplication(id: string): Promise<Apply> {
-  //   // Use findById to automatically handle ObjectId conversion
-  //   const application = await this.ApplyModel.findById(id).where('status').equals('Approved').exec();
-    
-  //   if (!application) {
-  //     throw new NotFoundException(`Application with id ${id} and reward status 'Pending' not found`);
-  //   }
-    
-  //   application.status = 'Awarded';
-  //   await application.save();
-    
-  //   return application;
-  // }
+
 
   async rewardApplication(id: string): Promise<Apply> {
+    // console.log(`Rewarding application with ID: ${id}`);
+
     const application = await this.ApplyModel.findById(id).exec();
-    
+    // console.log('Fetched application:', application);
+
     if (!application || application.status !== 'Approved') {
+      // console.log(`Application not found or not approved:`, application);
       throw new NotFoundException(`Application with id ${id} and status 'Approved' not found`);
     }
 
     // First, update the status of the selected application to 'Awarded'
     application.status = 'Awarded';
     await application.save();
+    // console.log(`Application with ID: ${id} awarded.`);
 
     // Get all other applications and set their status to 'Not Awarded'
     const otherApplications = await this.ApplyModel.find({
       _id: { $ne: id },
+      jobId: application.jobId,
       status: { $in: ['Approved', 'Awarded'] },
     }).exec();
+
+    // console.log('Other applications fetched for update:', otherApplications);
 
     const updatedApplications = otherApplications.map(app => ({
       _id: app._id.toString(),
       status: 'Not Awarded',
+      jobId: app.jobId.toString(),
     }));
+
+    // console.log('Applications to be updated:', updatedApplications);
 
     await this.updateStatuses({ applications: updatedApplications });
 
     return application;
   }
-  
-
-  // async updateStatuses(updateUnawaredDto: UpdateUnawaredDto): Promise<void> {
-  //   const { applications } = updateUnawaredDto;
-  //   for (const app of applications) {
-  //     const application = await this.ApplyModel.findById(app._id).exec();
-  //     if (!application) {
-  //       throw new NotFoundException(`Application with id ${app._id} not found`);
-  //     }
-  //     application.status = 'Not Awarded';
-  //     await application.save();
-  //   }
-  // }
 
   async updateStatuses(updateStatusesDto: UpdateStatusesDto): Promise<void> {
     const { applications } = updateStatusesDto;
 
+    // console.log('Updating statuses for applications:', applications);
+
+
     // Update the status of each application
     const bulkOperations = applications.map(app => ({
       updateOne: {
-        filter: { _id: app._id },
+        filter: { _id: app._id , jobId: app.jobId},
         update: { status: app.status },
       },
     }));
 
+    // console.log('Bulk operations prepared:', bulkOperations);
+
     await this.ApplyModel.bulkWrite(bulkOperations);
+    // console.log('Bulk operations executed.');
   }
 }
