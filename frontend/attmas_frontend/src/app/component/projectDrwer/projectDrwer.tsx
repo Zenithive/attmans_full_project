@@ -437,20 +437,20 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Box>
               )}
 
-              <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                {filteredApplications.length > 0 ? (
-                  filteredApplications.map((app) => (
-                    <Card
-                      key={app._id}
-                      sx={{
-                        width: 300,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        height: 'auto',
-                      }}
-                    >
-                      <CardContent sx={{ flex: 1 }}>
+            <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+              {filteredApplications.length > 0 ? (
+                filteredApplications.map((app) => (
+                  <Card
+                    key={app._id}
+                    sx={{
+                      width: 300,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      height: 'auto',
+                    }}
+                  >
+                    <CardContent sx={{ flex: 1 }}>
 
 
                         <Chip
@@ -481,71 +481,50 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           }}
                         />
 
-                        <Typography
-                          onClick={
-                            userDetails &&
-                              (userType === 'Admin' ||
-                                userType === 'Project Owner' ||
-                                (userType === 'Innovators' || userType === 'Freelancer') &&
-                                filteredApplications.some((app) => app.username === currentUser))
-                              ? () => {
-                                setSelectedApply(app);
-                                setDialogOpen(true);
-                              }
-                              : undefined
-                          }
-                          style={{
-                            cursor:
-                              userDetails &&
-                                (userType === 'Admin' ||
-                                  userType === 'Project Owner' ||
-                                  (userType === 'Innovators' || userType === 'Freelancer') &&
-                                  filteredApplications.some((app) => app.username === currentUser))
-                                ? 'pointer'
-                                : 'default',
-                            display: 'inline-block',
-                          }}
-                        >
-                          {userDetails &&
-                            (userType === 'Admin' ||
-                              userType === 'Project Owner' ||
-                              (userType === 'Innovators' || userType === 'Freelancer') &&
-                              filteredApplications.some((app) => app.username === currentUser)) ? (
-                            <Tooltip
-                              title="Click here to see Project details"
-                              arrow
-                              placement="top"
-                              PopperProps={{
-                                modifiers: [
-                                  {
-                                    name: 'offset',
-                                    options: {
-                                      offset: [0, -10],
-                                    },
-                                  },
-                                ],
-                              }}
-                            >
-                              <h2>{app.title}</h2>
-                            </Tooltip>
-                          ) : (
-                            <h2>{app.title}</h2>
-                          )}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Applied User:</b> {app.firstName} {app.lastName}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
-                        </Typography>
+                      <Typography variant="h6" sx={{ mb: 1 }}>
+                        {app.title}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                        <b>Applied User:</b> {app.firstName} {app.lastName}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                        <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                        <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
+                      </Typography>
+
+                      {userDetails && (
+                        (userType === 'Admin' ||
+                          userType === 'Project Owner' ||
+                          (userType === 'Innovators' || userType === 'Freelancer') &&
+                          filteredApplications.some((filteredApp) => filteredApp.username === currentUser && filteredApp._id === app._id))
+                      ) && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedApply(app);
+                              setDialogOpen(true);
+                            }}
+                            style={{
+                              textDecoration: 'underline',
+                              color: '#1976d2',
+                              fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                            }}
+                          >
+                            View Details
+                          </a>
+                        </Box>
+                      )}
+
 
                         {/* {app.status !== 'Awarded' && userType === 'Project Owner' && (
                          <Button
                           variant="contained"
                           color="primary"
+                          sx={{position:'relative',top:'20px'}}
                           onClick={() => {
                             if (app._id) {
                               handleReward(app._id);

@@ -17,7 +17,7 @@ export class ProfileService {
     @InjectModel(Categories.name)
     private readonly categories: Model<Categories>,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   async createOrUpdateForm1(
     personalProfile: PersonalProfile,
@@ -63,9 +63,6 @@ export class ProfileService {
       return Profiled;
     }
   }
-
-
-
 
   async createOrUpdateForm3(categories: Categories): Promise<Categories> {
     const existingProfile = await this.categories.findOne({
@@ -161,39 +158,40 @@ export class ProfileService {
   // }
 
   async getProfileWithUserInfo(username: string): Promise<any> {
-    return this.profileModel.aggregate([
-      {
-        $match: { username } // Match the document in the PersonalProfile collection
-      },
-      {
-        $lookup: {
-          from: 'users', // The name of the collection you want to join
-          localField: 'username',
-          foreignField: 'username',
-          as: 'user_info'
-        }
-      },
-      {
-        $unwind: {
-          path: '$user_info', // Deconstruct the user_info array
-          preserveNullAndEmptyArrays: true // Keep profiles even if no matching user is found
-        }
-      },
-      {
-        $addFields: {
-          userType: { $ifNull: ['$user_info.userType', null] } // Add userType field to the root level, if it exists
-        }
-      },
-      {
-        $project: {
-          _id: 0, // Exclude _id if you don't need it
-          'user_info': 0 // Exclude user_info field if you don't want it in the final output
-        }
-      }
-    ]).exec();
+    return this.profileModel
+      .aggregate([
+        {
+          $match: { username }, // Match the document in the PersonalProfile collection
+        },
+        {
+          $lookup: {
+            from: 'users', // The name of the collection you want to join
+            localField: 'username',
+            foreignField: 'username',
+            as: 'user_info',
+          },
+        },
+        {
+          $unwind: {
+            path: '$user_info', // Deconstruct the user_info array
+            preserveNullAndEmptyArrays: true, // Keep profiles even if no matching user is found
+          },
+        },
+        {
+          $addFields: {
+            userType: { $ifNull: ['$user_info.userType', null] }, // Add userType field to the root level, if it exists
+          },
+        },
+        {
+          $project: {
+            _id: 0, // Exclude _id if you don't need it
+            user_info: 0, // Exclude user_info field if you don't want it in the final output
+          },
+        },
+      ])
+      .exec();
   }
-  
-  
+
   // get profile photo
   async getAllProfiles(): Promise<PersonalProfile[]> {
     try {
@@ -203,11 +201,8 @@ export class ProfileService {
         .exec();
       return profiles;
     } catch (error) {
-      console.error("Error fetching profiles:", error);
+      console.error('Error fetching profiles:', error);
       throw error; // or return an empty array or some default value
     }
   }
-  
-  
-  
 }
