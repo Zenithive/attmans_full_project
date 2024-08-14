@@ -38,6 +38,7 @@ interface Visitor {
   mobileNumber: string;
   timestamps: string;
   exhibitionId: string;
+  userId:string;
 }
 
 
@@ -62,6 +63,7 @@ const ExhibitionsPage: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [booths, setBooths] = useState<Booth[]>([]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [isInterestedBtnShow, setIsInterestedBtnShow] = useState<Boolean>(true);
   const [showModal, setShowModal] = useState(false);
   const [showInterestedModal, setShowInterestedModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -129,6 +131,19 @@ const ExhibitionsPage: React.FC = () => {
           },
         });
         console.log('Fetched visitors:', response.data);
+        console.log("userDetails._id",userDetails._id);
+
+        for (let index = 0; index < response.data.length; index++) {
+          const element = response.data[index];
+          console.log("element.userId", element.userId);
+         
+          
+          
+          if(element.userId === userDetails._id){
+            setIsInterestedBtnShow(false);
+          }
+        }
+
         setVisitors(response.data);
       } catch (error) {
         console.error('Error fetching visitors:', error);
@@ -137,7 +152,8 @@ const ExhibitionsPage: React.FC = () => {
 
     fetchExhibitions();
     fetchBooths();
-    if (view === 'visitors') {
+    console.log("view",view);
+    if (view === 'boothDetails') {
       fetchVisitors();
     }
   }, [userDetails?._id, searchParams, statusFilter, view]);
@@ -331,7 +347,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
 
 
-            {(!userType || userType === 'Visitors') && (
+           {(!userType || userType === 'Visitors') && isInterestedBtnShow && (
               <Button
                 variant="contained"
                 color="primary"
