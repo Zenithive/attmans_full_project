@@ -26,9 +26,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitte
 
   const fetchComments = async () => {
     try {
-      console.log("Fetching comments...");
+      // console.log("Fetching comments...");
       const response = await axios.get(`${APIS.GET_COMMENT}/job/${jobId}/apply/${applyId}`);
-      console.log("Comments fetched:", response.data);
+      // console.log("Comments fetched:", response.data);
       setJob((prevJob: any) => ({ ...prevJob, comments: response.data }));
     } catch (error) {
       console.error('Error fetching comments:', error);
