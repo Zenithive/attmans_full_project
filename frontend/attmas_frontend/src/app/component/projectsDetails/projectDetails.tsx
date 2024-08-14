@@ -108,17 +108,17 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
       // Update the local state with the new statuses
       setApplications(updatedApplications);
-        // Hide the Award button
-        setIsAwardButtonVisible(false);
+      // Hide the Award button
+      setIsAwardButtonVisible(false);
 
       // Hide all the buttons
-      setButtonsHidden((prev) => {
-        const updated = { ...prev };
-        Object.keys(updated).forEach((key) => {
-          updated[key] = true;
-        });
-        return updated;
-      });
+      // setButtonsHidden((prev) => {
+      //   const updated = { ...prev };
+      //   Object.keys(updated).forEach((key) => {
+      //     updated[key] = true;
+      //   });
+      //   return updated;
+      // });
 
     } catch (error) {
       console.error('Error rewarding application:', error);
@@ -330,8 +330,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
           )}
         </DialogContent>
         <DialogActions>
-          
-        {userDetails.userType === 'Project Owner' && apply?._id && (
+
+          {userDetails.userType === 'Project Owner' && apply?._id && isAwardButtonVisible && (
             <Button
               variant="contained"
               color="primary"
@@ -340,18 +340,19 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
               Award
             </Button>
           )}
-          <Button
+         <Button
   onClick={onClose}
   sx={{
-    color: 'grey.500',
+    color: 'white', // Set text color to white
     backgroundColor: '#757575',
     '&:hover': {
-      backgroundColor: '#e0e0e0', // Darken the grey on hover
+      backgroundColor: '#757575', // Darken the grey on hover
     },
   }}
 >
   Close
 </Button>
+
         </DialogActions>
       </Dialog>
 

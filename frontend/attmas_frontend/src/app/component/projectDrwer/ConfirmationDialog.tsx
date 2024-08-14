@@ -17,6 +17,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
                 <TextField
                     autoFocus
                     margin="dense"
+                    color='secondary'
                     id="comment"
                     label="Add a comment (optional)"
                     type="text"
@@ -27,7 +28,16 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="primary">
+            <Button
+                    onClick={onClose}
+                    sx={{
+                        color: 'white',
+                        backgroundColor: '#757575',
+                        '&:hover': {
+                            backgroundColor: '#757575', // Darken the grey on hover
+                        },
+                    }}
+                >
                     Cancel
                 </Button>
                 <Button onClick={onConfirm} color="primary">
