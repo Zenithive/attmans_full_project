@@ -56,6 +56,7 @@ const Jobs = () => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
     const [isShowingApplies, setIsShowingApplies] = useState(false);
+    const [selectService, setSelectService] = useState<string[]>([]);
     const [applies, setApplies] = useState<Apply[]>([]);
 
     const handleApproveDialogOpen = (job: Job) => {
@@ -83,13 +84,14 @@ const Jobs = () => {
     };
 
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null) => {
+    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null,SelectServiceFilter: string[],) => {
         try {
             const response = await axios.get(APIS.JOBS, {
                 params: {
                     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
                     status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
-                    userId: filterType === 'mine' ? userId : undefined
+                    userId: filterType === 'mine' ? userId : undefined,
+                    selectService: SelectServiceFilter.join(','),
                 }
             });
 
@@ -138,11 +140,11 @@ const Jobs = () => {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus);
+            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus,selectService);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus]);
+    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus,selectService]);
 
     useEffect(() => {
         refetch();
@@ -150,7 +152,7 @@ const Jobs = () => {
 
     useEffect(() => {
         if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus);
+            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus,selectService);
         }
     }, [page]);
 
@@ -241,6 +243,7 @@ const Jobs = () => {
     const handleFilterTypeChange = (event: any, newFilterType: string) => {
         if (newFilterType !== null) {
             setFilterType(newFilterType);
+            refetch();
         }
     }
 
@@ -321,7 +324,7 @@ const Jobs = () => {
     const handleCancelApply = useCallback((jobId: string) => {
         setAppliedJobs(prev => prev.filter(id => id !== jobId));
     }, []);
-    
+
 
     return (
 
@@ -351,7 +354,7 @@ const Jobs = () => {
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
 
 
-               
+
 
             </Box>
 
@@ -511,19 +514,26 @@ const Jobs = () => {
                                 My Projects
                             </ToggleButton>
                         )}
+                        <ToggleButton value="Outsource Research and Development" aria-label="Outsource Research and Development">
+                            Outsource Research and Development
+                        </ToggleButton>
+                        <ToggleButton value="Innovative product" aria-label="Innovative product">
+                            Innovative product
+                        </ToggleButton>
+
                     </ToggleButtonGroup>
-                    </Box>
+                </Box>
             )}
 
 
-                    {userType === 'Innovators' && (
+            {userType === 'Innovators' && (
 
-                    <Chip
-                        label="All Applies"
-                        variant="outlined"
-                        onClick={handleAllAppliesClicks}
-                        sx={{ ml: 2 }} // Add some margin if needed
-                    /> )}
+                <Chip
+                    label="All Applies"
+                    variant="outlined"
+                    onClick={handleAllAppliesClicks}
+                    sx={{ ml: 2 }} // Add some margin if needed
+                />)}
 
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (
@@ -610,7 +620,7 @@ const Jobs = () => {
                                             <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                            <Box sx={{position: 'sticky',float:'right',left:'92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
+                                            <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
                                                 {userDetails.userType === 'Project Owner' && (
                                                     <>
                                                         <Tooltip title="Edit" arrow>
@@ -668,8 +678,8 @@ const Jobs = () => {
                                                     )}
                                                 </Menu>
                                             </Box>
-                                            <Box sx={{position:'relative',bottom:'10px'}}>
-                                            {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                            <Box sx={{ position: 'relative', bottom: '10px' }}>
+                                                {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
                                                     <Button
                                                         variant="contained"
                                                         color="primary"
@@ -679,7 +689,7 @@ const Jobs = () => {
                                                         Apply
                                                     </Button>
                                                 )}
-                                         </Box>
+                                            </Box>
                                         </Box>
 
                                     </CardContent>

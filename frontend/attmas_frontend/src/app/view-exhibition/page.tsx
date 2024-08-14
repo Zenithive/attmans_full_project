@@ -106,7 +106,7 @@ const ExhibitionsPage: React.FC = () => {
 
         setBooths(response.data);
 
-        const userHasBooth = response.data.some((booth: Booth) => booth.exhibitionId  === exhibitionId);
+        const userHasBooth = response.data.some((booth: Booth) => booth.exhibitionId === exhibitionId);
         setHasUserBooth(userHasBooth);
         setParticipateButtonVisible(!userHasBooth);
       } catch (error) {
@@ -341,7 +341,7 @@ const ExhibitionsPage: React.FC = () => {
               </Button>
             )}
 
-            {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && (  
+            {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && (
               <Button
                 variant="contained"
                 color="primary"
@@ -385,19 +385,20 @@ const ExhibitionsPage: React.FC = () => {
                 }}
               >
                 <CardContent>
-                  <Typography variant="h6" sx={{fontSize:'x-large'}}>
-                    {exhibition.title}, <Box sx={{fontSize:'medium',fontWeight:'400',position:'relative',left:'22%',bottom:'28px',
-                    '@media (max-width: 767px)':{
-                      position:'relative',
-                      left:'0%',
-                      top:'20%',
-                      bottom:'20%'
-                    }    
+                  <Typography variant="h6" sx={{ fontSize: 'x-large' }}>
+                    {exhibition.title}, <Box sx={{
+                      fontSize: 'medium', fontWeight: '400', position: 'relative', left: '22%', bottom: '28px',
+                      '@media (max-width: 767px)': {
+                        position: 'relative',
+                        left: '0%',
+                        top: '20%',
+                        bottom: '20%'
+                      }
                     }}>({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})</Box>
                   </Typography>
-                  <Typography variant="h5" sx={{fontSize:'medium'}}>{exhibition.description}</Typography>
-                  <Typography variant="h5" sx={{fontSize:'medium'}}>{exhibition.industries}</Typography>
-                  <Typography variant="h5" sx={{fontSize:'medium'}}>{exhibition.subjects}</Typography>
+                  <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.description}</Typography>
+                  <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.industries}</Typography>
+                  <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.subjects}</Typography>
                 </CardContent>
               </Card>
             </Box>
@@ -416,7 +417,7 @@ const ExhibitionsPage: React.FC = () => {
           }}>
             <h1>Booth Details</h1>
             {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
-              <StatusFilter value={statusFilter} onChange={handleStatusFilterChange}   options={["All", "Pending", "Approved", "Rejected"]}/>
+              <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} options={["All", "Pending", "Approved", "Rejected"]} />
             )}
           </Box>
           {userType !== 'Visitors' && (
@@ -451,34 +452,50 @@ const ExhibitionsPage: React.FC = () => {
                       <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
                         <CardContent>
                           <Typography>
-                                <h2>{booth.title}</h2>
+                            <h2>{booth.title}</h2>
                           </Typography>
 
-                          <Button
-                                    sx={{ position: 'relative', float: 'right', bottom: '55px' }}
-                                    onClick={() => {
-                                      setSelectedBooth(booth);
-                                      setDialogOpen(true)
-                                    }}
-                                  >
-                                    View Details
-                          </Button>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedBooth(booth);
+                              setDialogOpen(true);
+                            }}
+                            style={{
+                              textDecoration: 'underline',
+                              color: '#1976d2',
+                              fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                              position: 'relative', float: 'right', bottom: '55px'
+                            }}
+                          >
+                            View Details
+                          </a>
+
                           {exhibitions.map((exhibition) => (
                             <Box key={exhibition._id}>
                               {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
                                 dayjs(exhibition.dateTime).isSame(dayjs(exhibition.serverDate), 'day') && (
-                                  <Button
-                                    sx={{ position: 'relative', float: 'right', bottom: '55px' }}
-                                    onClick={() => {
+                                  <a
+                                    href="#"
+                                    onClick={(e) => {
+                                      e.preventDefault();
                                       setSelectedBooth(booth);
-                                      setDialogOpen(true)
+                                      setDialogOpen(true);
+                                    }}
+                                    style={{
+                                      textDecoration: 'underline',
+                                      color: '#1976d2',
+                                      fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol" !importent',
+                                      position: 'relative', float: 'right', bottom: '55px'
                                     }}
                                   >
                                     View Details
-                                  </Button>
+                                  </a>
                                 )}
                             </Box>
                           ))}
+
                           <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
                           <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                           <Box sx={{

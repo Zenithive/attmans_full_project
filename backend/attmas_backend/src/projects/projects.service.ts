@@ -68,6 +68,7 @@ export class JobsService {
     Subcategorys?: string[],
     Expertiselevel?: string[],
     status?: string,
+    SelectService?: string[],
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
@@ -90,6 +91,10 @@ export class JobsService {
 
     if (status) {
       filter.status = status;
+    }
+
+    if (SelectService && SelectService.length > 0) {
+      filter.SelectService = { $in: SelectService };
     }
 
     console.log('Applied Filters:', filter);
