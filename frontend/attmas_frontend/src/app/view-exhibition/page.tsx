@@ -386,16 +386,33 @@ const ExhibitionsPage: React.FC = () => {
                 }}
               >
                 <CardContent>
-                  <Typography variant="h6" sx={{ fontSize: 'x-large' }}>
-                    {exhibition.title}, <Box sx={{
-                      fontSize: 'medium', fontWeight: '400', position: 'relative', left: '22%', bottom: '28px',
-                      '@media (max-width: 767px)': {
-                        position: 'relative',
-                        left: '0%',
-                        top: '20%',
-                        bottom: '20%'
-                      }
-                    }}>({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})</Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: 'x-large',
+                      flexWrap: 'wrap', 
+                      marginBottom:'20px'
+                    }}
+                  >
+                    <Box sx={{ flexShrink: 0 }}>
+                      {exhibition.title},
+                    </Box>
+                    <Box
+                      sx={{
+                        fontSize: 'medium',
+                        fontWeight: '400',
+                        ml: 2, 
+                        flexShrink: 0, 
+                        '@media (max-width: 767px)': {
+                          fontSize: 'small', 
+                          ml: 1, 
+                        }
+                      }}
+                    >
+                      ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
+                    </Box>
                   </Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.description}</Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.industries}</Typography>
