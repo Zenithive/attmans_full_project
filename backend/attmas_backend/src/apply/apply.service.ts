@@ -28,12 +28,7 @@ export class ApplyService {
     private readonly emailService2: EmailService2,
   ) {}
 
-  // async create(createApplyDto: CreateApplyDto): Promise<Apply> {
-  //   // console.log("CreateApplyDto", createApplyDto)
-  //   const createdApply = new this.ApplyModel(createApplyDto);
-  //   // console.log("createdApply", createdApply)
-  //   return createdApply.save();
-  // }
+ 
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     const existingApplication = await this.ApplyModel.findOne({
@@ -173,19 +168,6 @@ export class ApplyService {
       .exec();
   }
 
-  // async rewardApplication(id: string): Promise<Apply> {
-  //   // Use findById to automatically handle ObjectId conversion
-  //   const application = await this.ApplyModel.findById(id).where('status').equals('Approved').exec();
-
-  //   if (!application) {
-  //     throw new NotFoundException(`Application with id ${id} and reward status 'Pending' not found`);
-  //   }
-
-  //   application.status = 'Awarded';
-  //   await application.save();
-
-  //   return application;
-  // }
 
   async rewardApplication(id: string, jobId: string, comment: string): Promise<Apply> {
     // console.log(`Rewarding application with ID: ${id}`);
@@ -245,17 +227,7 @@ export class ApplyService {
     return application;
   }
 
-  // async updateStatuses(updateUnawaredDto: UpdateUnawaredDto): Promise<void> {
-  //   const { applications } = updateUnawaredDto;
-  //   for (const app of applications) {
-  //     const application = await this.ApplyModel.findById(app._id).exec();
-  //     if (!application) {
-  //       throw new NotFoundException(`Application with id ${app._id} not found`);
-  //     }
-  //     application.status = 'Not Awarded';
-  //     await application.save();
-  //   }
-  // }
+ 
 
   async updateStatuses(updateStatusesDto: UpdateStatusesDto): Promise<void> {
     const { applications } = updateStatusesDto;
