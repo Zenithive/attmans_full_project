@@ -84,6 +84,7 @@ export class JobsService {
     if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
+    console.log('Subcategorys', Subcategorys);
 
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
@@ -96,8 +97,9 @@ export class JobsService {
     if (SelectService && SelectService.length > 0) {
       filter.SelectService = { $in: SelectService };
     }
+    console.log('SelectService', SelectService);
 
-    console.log('Applied Filters:', filter);
+    // console.log('Applied Filters:', filter);
 
     return this.jobsModel
       .find(filter)

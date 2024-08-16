@@ -96,4 +96,7 @@ export const APIS = {
     GET_INTERESTED_EXHIBITIONS: `${SERVER_URL}/interested-users/user-interests`, 
     SHOW_INTEREST: `${SERVER_URL}/interested-users`, 
 
+    USER_APPLICATIONS: (userId: any) => `${SERVER_URL}/Apply/user/${userId}`,
+
+
 }

@@ -14,7 +14,7 @@ import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
 
 @Controller('Apply')
 export class ApplyController {
-  constructor(private readonly applyService: ApplyService) { }
+  constructor(private readonly applyService: ApplyService) {}
 
   @Post()
   async create(@Body() createApplyDto: CreateApplyDto): Promise<Apply> {
@@ -24,17 +24,19 @@ export class ApplyController {
   @Post('reward/:id')
   async rewardApplication(
     @Param('id') id: string,
-    @Body('jobId') jobId: string
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    @Body('jobId') jobId: string,
   ): Promise<Apply> {
     // console.log(`Rewarding application with ID: ${id} for Job ID: ${jobId}`);
     return this.applyService.rewardApplication(id);
   }
 
   @Post('updateStatuses')
-  async updateStatuses(@Body() updateStatusesDto: UpdateStatusesDto): Promise<void> {
+  async updateStatuses(
+    @Body() updateStatusesDto: UpdateStatusesDto,
+  ): Promise<void> {
     return this.applyService.updateStatuses(updateStatusesDto);
   }
-
 
   @Get()
   async findAll(): Promise<Apply[]> {
