@@ -62,6 +62,7 @@ const validationSchema = Yup.object().shape({
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const [fetchError, setFetchError] = React.useState<string | null>(null);
 
   const initialValues = {
     title: jobTitle,
@@ -311,6 +312,25 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 error={!!(errors.SolutionUSP && touched.SolutionUSP)}
                 helperText={<ErrorMessage name="SolutionUSP" />}
               />
+
+                <Typography
+                    variant="body2"
+                    align="center"
+                    mt={4}
+                    mb={3}
+                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
+                >
+                    Please Note: <br />
+                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
+                </Typography>
+
+                
+                {fetchError && (
+                    <Typography color="error" align="center" mt={2}>
+                        {fetchError}
+                    </Typography>
+                )}
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                 <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>
