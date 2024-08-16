@@ -38,4 +38,44 @@ export class EmailService {
       console.error('Error sending email:', error);
     }
   }
+
+  async sendAwardedEmail({
+    to,
+    applicationTitle,
+  }: {
+    to: string;
+    applicationTitle: string;
+  }): Promise<void> {
+    const subject = 'Congratulations! Your Application Has Been Awarded';
+    const text = `Dear Applicant,
+
+Congratulations!
+
+We are pleased to inform you that your application for the job titled '${applicationTitle}' has been awarded. 
+
+Thank you for your interest and effort.
+
+Best regards,
+Your Team`;
+    await this.sendEmail({ to, subject, text });
+  }
+
+  async sendNotAwardedEmail({
+    to,
+    applicationTitle,
+  }: {
+    to: string;
+    applicationTitle: string;
+  }): Promise<void> {
+    const subject = 'Application Update: Not Awarded';
+    const text = `Dear Applicant,
+
+Thank you for applying for the job titled '${applicationTitle}'.
+
+We appreciate your interest, but unfortunately, your application was not selected for this opportunity. We encourage you to apply for other roles or opportunities with us in the future.
+
+Best regards,
+Your Team`;
+    await this.sendEmail({ to, subject, text });
+  }
 }

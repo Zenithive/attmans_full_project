@@ -11,6 +11,17 @@ class ApplicationStatusDto {
   
   @IsString()
   jobId: string;
+
+  @IsString()
+  comment_Reward_Nonreward: string;
+
+  @IsString()
+  userId: string;
+  
+  @IsString()
+  username: string;
+
+
 }
 
 export class UpdateStatusesDto {

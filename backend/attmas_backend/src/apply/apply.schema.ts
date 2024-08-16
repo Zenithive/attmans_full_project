@@ -53,8 +53,8 @@ export class Apply {
   @Prop({ default: 'Pending' })
   status: string;
 
-  // @Prop({ default: 'Pending' })
-  // rewarded: string;
+  @Prop({ default: 'Pending' })
+  comment_Reward_Nonreward: string;
 
   @Prop({ required: false })
   rejectComment: string;

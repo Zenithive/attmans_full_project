@@ -157,7 +157,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     userType === 'Admin' ||
     (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved');
 
-  const handleReward = async (applicationId: string) => {
+  const handleReward = async (applicationId: string, Comment:string) => {
     try {
       if (!applicationId) return;
       console.log("applicationId", applicationId);
@@ -165,7 +165,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
       // First, award the selected application
       await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
-        jobId: viewingJob?._id // Include jobId in the payload
+        jobId: viewingJob?._id, // Include jobId in the payload
+        Comment
       });
 
       // Update all other applications to "Not Awarded"
@@ -175,10 +176,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           : { ...app, status: 'Not Awarded' }
       );
 
-      // Make an API call to update all applications' statuses on the server
-      // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
-
-      // Update the local state with the new statuses
+      
       setApplications(updatedApplications);
 
       // Hide all the buttons
@@ -206,11 +204,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     setCurrentApplicationId(null);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (comment:string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
       console.log(`Awarding application with ID: ${currentApplicationId}`);
-      handleReward(currentApplicationId)
+      handleReward(currentApplicationId, comment)
       // Close the dialog after confirming
       handleCloseConfirmationDialog();
     }
@@ -519,23 +517,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         </Box>
                       )}
 
-
-                        {/* {app.status !== 'Awarded' && userType === 'Project Owner' && (
-                         <Button
-                          variant="contained"
-                          color="primary"
-                          sx={{position:'relative',top:'20px'}}
-                          onClick={() => {
-                            if (app._id) {
-                              handleReward(app._id);
-                            }
-                          }}
-                        >
-                          Award
-                        </Button>  
-                         )}  */}
-
-
                       </CardContent>
                       <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
 
@@ -545,35 +526,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                               Award
                             </Button>
                           )}
-
-
-                          {/* <Dialog open={confirmationDialogOpen} onClose={handleCloseConfirmationDialog}>
-                            <DialogTitle>Confirm Action</DialogTitle>
-                            <DialogContent>
-                              <DialogContentText>
-                                Are you sure you want to award this application?
-                              </DialogContentText>
-                              <TextField
-                                autoFocus
-                                margin="dense"
-                                id="comment"
-                                label="Add a comment (optional)"
-                                type="text"
-                                fullWidth
-                                variant="outlined"
-                                multiline
-                                rows={2} 
-                              />
-                            </DialogContent>
-                            <DialogActions>
-                              <Button onClick={handleCloseConfirmationDialog} color="primary">
-                                Cancel
-                              </Button>
-                              <Button onClick={handleConfirm} color="primary">
-                                Confirm
-                              </Button>
-                            </DialogActions>
-                          </Dialog> */}
                         </div>
 
 
@@ -662,20 +614,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
         onConfirm={handleConfirm}
         message="Are you sure you want to award this application?"
       />
-
-
     </>
   );
 };
 
 export default ProjectDrawer;
-
-
-
-
-
-
-
-
-
-

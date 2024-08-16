@@ -24,11 +24,14 @@ export class ApplyController {
   @Post('reward/:id')
   async rewardApplication(
     @Param('id') id: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @Body('jobId') jobId: string,
+    @Body() body: { jobId: string; Comment?: string } // Handle both jobId and optional comment
   ): Promise<Apply> {
-    // console.log(`Rewarding application with ID: ${id} for Job ID: ${jobId}`);
-    return this.applyService.rewardApplication(id);
+    const { jobId, Comment } = body;
+    console.log(`Rewarding application with ID: ${id} for Job ID: ${jobId}`);
+    if (Comment) {
+      console.log(`Comment: ${Comment}`);
+    }
+    return this.applyService.rewardApplication(id, jobId, Comment); // Pass the comment to the service
   }
 
   @Post('updateStatuses')
