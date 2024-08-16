@@ -84,7 +84,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     }
   };
 
-  const handleReward = async (applicationId: string) => {
+  const handleReward = async (applicationId: string,Comment:string) => {
     try {
       if (!applicationId) return;
       console.log("applicationId", applicationId);
@@ -92,8 +92,13 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
       // First, award the selected application
       // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+      // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+      //   jobId, // Include jobId in the payload
+      // });
+
       await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
         jobId, // Include jobId in the payload
+        Comment
       });
 
       // Update all other applications to "Not Awarded"
@@ -137,11 +142,11 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     setCurrentApplicationId(null);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (comment:string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
       console.log(`Awarding application with ID: ${currentApplicationId}`);
-      handleReward(currentApplicationId)
+      handleReward(currentApplicationId,comment)
       // Close the dialog after confirming
       handleCloseConfirmationDialog();
     }
