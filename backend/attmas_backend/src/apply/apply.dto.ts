@@ -64,17 +64,17 @@ export class CreateApplyDto {
   @IsString()
   comment_Reward_Nonreward: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => MilestoneDto)
   @IsArray()
   milestones?: MilestoneDto[];
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   availableSolution: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   SolutionUSP: string;
 }

@@ -55,11 +55,14 @@ const validationSchema = Yup.object().shape({
       scopeOfWork: Yup.string().required('Scope of work is required'),
       milestones: Yup.array().of(Yup.string().required('Milestone is required')).required(),
     })
-  ).optional(),
+  ),
+  availableSolution: Yup.string().required('you have to give solution'),
+  SolutionUSP: Yup.string().required('Solution USP is required'),
 });
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const [fetchError, setFetchError] = React.useState<string | null>(null);
 
   const initialValues = {
     title: jobTitle,
@@ -225,55 +228,58 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                           fullWidth
                           error={!!(errors.milestones && touched.milestones)}
                           helperText={<ErrorMessage name="Scope of Work" />}
-                          />
-  
-                          <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
-                            Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client.
-                          </Typography >
-                          <FieldArray
-                            name={`milestones[${index}].milestones`}
-                            render={(milestoneHelpers) => (
-                              <Box>
-                                {milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                  <Box key={milestoneIndex} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                                    <TextField
-                                      placeholder="Milestone..."
-                                      name={`milestones[${index}].milestones[${milestoneIndex}]`}
-                                      value={milestone}
-                                      onChange={handleChange}
-                                      onBlur={handleBlur}
-                                      fullWidth
-                                      multiline
-                                      error={!!(errors.milestones && touched.milestones)}
-                                      helperText={<ErrorMessage name="Milestone..." />}
-                                    />
+                        />
+
+                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
+                          Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client.
+                        </Typography >
+                        <FieldArray
+                          name={`milestones[${index}].milestones`}
+                          render={(milestoneHelpers) => (
+                            <Box>
+                              {milestoneGroup.milestones.map((milestone, milestoneIndex) => (
+                                <Box key={milestoneIndex} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+                                  <TextField
+                                    placeholder="Milestone..."
+                                    name={`milestones[${index}].milestones[${milestoneIndex}]`}
+                                    value={milestone}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    multiline
+                                    error={!!(errors.milestones && touched.milestones)}
+                                    helperText={<ErrorMessage name={`milestones[${index}].milestones[${milestoneIndex}]`} />}
+                                  />
+                                  {milestoneIndex > 0 && (
                                     <IconButton
                                       onClick={() => milestoneHelpers.remove(milestoneIndex)}
                                       color='secondary'
                                     >
-                                      <RemoveIcon />
+                                      <DeleteIcon />
                                     </IconButton>
-                                  </Box>
-                                ))}
-                                <Button
-                                  onClick={() => milestoneHelpers.push('')}
-                                  variant="outlined"
-                                  sx={{ mt: 1, textTransform: 'none', marginBottom: '20px' }}
-                                  startIcon={<AddIcon />}
-                                >
-                                  Add Milestone
-                                </Button>
-                              </Box>
-                            )}
-                          />
-                        </Paper>
-                      ))}
-                    </Box>
-                  )}
-                />
-                         
+                                  )}
+                                </Box>
+                              ))}
+                              <Button
+                                onClick={() => milestoneHelpers.push('')}
+                                variant="outlined"
+                                sx={{ mt: 1, textTransform: 'none', marginBottom: '20px' }}
+                                startIcon={<AddIcon />}
+                              >
+                                Add Milestone
+                              </Button>
+                            </Box>
+                          )}
+                        />
 
-              <Typography variant="h6" sx={{fontSize: 'small' }}>
+                      </Paper>
+                    ))}
+                  </Box>
+                )}
+              />
+
+
+              <Typography variant="h6" sx={{ fontSize: 'small' }}>
                 What have been the flaws in current solution?*
               </Typography >
               <TextField
@@ -284,14 +290,14 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 onBlur={handleBlur}
                 multiline
                 rows={4}
-                sx={{marginBottom:'20px'}}
+                sx={{ marginBottom: '20px' }}
                 fullWidth
                 error={!!(errors.availableSolution && touched.availableSolution)}
                 helperText={<ErrorMessage name="availableSolution" />}
               />
 
 
-              <Typography variant="h6" sx={{fontSize: 'medium' }}>
+              <Typography variant="h6" sx={{ fontSize: 'medium' }}>
                 Positive and unique results do we expect to see from your solution?*
               </Typography >
               <TextField
@@ -306,6 +312,25 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 error={!!(errors.SolutionUSP && touched.SolutionUSP)}
                 helperText={<ErrorMessage name="SolutionUSP" />}
               />
+
+                <Typography
+                    variant="body2"
+                    align="center"
+                    mt={4}
+                    mb={3}
+                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
+                >
+                    Please Note: <br />
+                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
+                </Typography>
+
+                
+                {fetchError && (
+                    <Typography color="error" align="center" mt={2}>
+                        {fetchError}
+                    </Typography>
+                )}
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                 <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>

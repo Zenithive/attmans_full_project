@@ -56,8 +56,10 @@ const Jobs = () => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
     const [isShowingApplies, setIsShowingApplies] = useState(false);
-    const [selectService, setSelectService] = useState<string[]>([]);
+    const [showingMyApplies, setShowingMyApplies] = useState(false);
     const [applies, setApplies] = useState<Apply[]>([]);
+    const [selectedServices, setSelectedServices] = useState<string[]>([]);
+    const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
 
     const handleApproveDialogOpen = (job: Job) => {
         setApproveDialogOpen({ open: true, job });
@@ -84,18 +86,19 @@ const Jobs = () => {
     };
 
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null,SelectServiceFilter: string[],) => {
+    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
         try {
+            console.log('Fetch Jobs Params:', { page, CategoryesFilter, SubcategorysFilter, ExpertiselevelFilter, statusFilter, filterType, selectedServices });
+
             const response = await axios.get(APIS.JOBS, {
                 params: {
                     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
                     status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
                     userId: filterType === 'mine' ? userId : undefined,
-                    selectService: SelectServiceFilter.join(','),
-                }
-            });
+                    SelectService: selectedServices.join(','),
 
-            console.log("Project response", response);
+                }
+            })
 
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -111,7 +114,7 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, filterType, userType]);
+    }, [userId, filterType, userType, selectedServices]);
 
 
     ///////////   All Applies fetch   ////////////
@@ -119,40 +122,69 @@ const Jobs = () => {
     const fetchApplies = useCallback(async () => {
         try {
             console.log('Fetching applies...');
-            const response = await axios.get(APIS.APPLIED_APPLICATION);
+            const response = await axios.get(`${APIS.APPLIED_APPLICATION}`);
             console.log('Applies fetched:', response.data);
             setApplies(response.data);
+            setIsShowingApplies(true);
+            setShowingMyApplies(false);
         } catch (error) {
             console.error('Error fetching applies:', error);
         }
     }, []);
 
-    const handleAllAppliesClicks = async () => {
-        console.log('All Applies button clicked');
-        if (!isShowingApplies) {
-            await fetchApplies();
+    const fetchMyApplies = useCallback(async () => {
+        try {
+            const response = await axios.get(`${APIS.USER_APPLICATIONS(userDetails._id)}`);
+            setApplies(response.data);
+            setIsShowingApplies(true);
+            setShowingMyApplies(true);
+        } catch (error) {
+            console.error('Error fetching my applies:', error);
         }
-        setIsShowingApplies(!isShowingApplies);
+    }, [userDetails._id]);
+
+
+    const resetApplies = async () => {
+        setApplies([]);
+        setIsShowingApplies(false);
+        setShowingMyApplies(false);
+        await refetch();
     };
+
+    const handleFilterChanges = async (event: React.MouseEvent<HTMLElement>, newFilter: 'all' | 'my' | undefined) => {
+        if (newFilter === null) {
+            await resetApplies(); 
+            setSelectedFilter(undefined); 
+        } else {
+            setSelectedFilter(newFilter);
+    
+            if (newFilter === 'all') {
+                await fetchApplies(); 
+            } else if (newFilter === 'my') {
+                await fetchMyApplies(); 
+            }
+        }
+    };
+    
 
     const refetch = useCallback(async () => {
         try {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus,selectService);
+            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus,selectService]);
+    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus, filterType, selectedServices]);
 
     useEffect(() => {
         refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType]);
+    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
 
     useEffect(() => {
         if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus,selectService);
+            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
         }
     }, [page]);
 
@@ -236,9 +268,6 @@ const Jobs = () => {
     }, [userId]);
 
 
-    const handleFilterChange = useCallback(() => {
-        refetch();
-    }, [refetch]);
 
     const handleFilterTypeChange = (event: any, newFilterType: string) => {
         if (newFilterType !== null) {
@@ -246,6 +275,14 @@ const Jobs = () => {
             refetch();
         }
     }
+
+    const handleServiceChange = (
+        event: React.MouseEvent<HTMLElement>,
+        newServices: string[],
+    ) => {
+        setSelectedServices(newServices);
+    };
+
 
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
@@ -503,6 +540,7 @@ const Jobs = () => {
                             </ToggleButton>
                         )} */}
 
+
                         <ToggleButton value="all" aria-label="all exhibitions">
                             All Projects
                         </ToggleButton>
@@ -514,26 +552,67 @@ const Jobs = () => {
                                 My Projects
                             </ToggleButton>
                         )}
-                        <ToggleButton value="Outsource Research and Development" aria-label="Outsource Research and Development">
-                            Outsource Research and Development
-                        </ToggleButton>
-                        <ToggleButton value="Innovative product" aria-label="Innovative product">
-                            Innovative product
-                        </ToggleButton>
 
                     </ToggleButtonGroup>
                 </Box>
             )}
 
+            {(userType === 'Project Owner') &&(
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        position: 'relative',
+                        left: '20%',
+                        bottom: '30px',
 
-            {userType === 'Innovators' && (
+                        '@media (max-width: 767px)': {
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            mt: 4,
+                            position: 'relative',
+                            left: '28px'
+                        },
+                    }}
+                >
 
-                <Chip
-                    label="All Applies"
-                    variant="outlined"
-                    onClick={handleAllAppliesClicks}
-                    sx={{ ml: 2 }} // Add some margin if needed
-                />)}
+                    <ToggleButtonGroup
+                        value={selectedServices}
+                        onChange={handleServiceChange}
+                        aria-label="Select Service"
+                        sx={{ height: "30px" }}
+                    >
+                        <ToggleButton value="Outsource Research and Development ">
+                            Outsource Research and Development
+                        </ToggleButton>
+                        <ToggleButton value="Innovative product">
+                            Innovative Product
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+            )}
+
+
+            {(userType === 'Innovators' || userType === 'Freelancer') && (
+
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <ToggleButtonGroup
+                        value={selectedFilter}
+                        exclusive
+                        onChange={handleFilterChanges}
+                        aria-label="Apply Filter"
+                        sx={{ height: "30px",ml:2 }}
+                    >
+                        <ToggleButton value="all">
+                            All 
+                        </ToggleButton>
+                        <ToggleButton value="my">
+                           My Projects
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </Box>
+            )}
 
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (
@@ -543,18 +622,18 @@ const Jobs = () => {
                                 <CardContent>
                                     <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <Box>
-                                            Bid on : {apply.title}
+                                            {apply.title}
                                         </Box>
                                         <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
                                             {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                         </Box>
                                     </Typography>
                                     <Typography variant="body1" sx={{ mt: 1 }}>
-                                        Bid Money: {apply.currency} {apply.Budget}
+                                       {apply.currency} {apply.Budget}
                                     </Typography>
 
                                     <Typography variant="body1">
-                                        Bid Person Name: {apply.firstName} {apply.lastName}
+                                        User Name: {apply.firstName} {apply.lastName}
                                     </Typography>
 
                                 </CardContent>

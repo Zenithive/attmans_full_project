@@ -65,13 +65,13 @@ export class Apply {
   @Prop({ default: false })
   buttonsHidden: boolean;
 
-  @Prop({ type: [MilestoneSchema], required: false })
+  @Prop({ type: [MilestoneSchema], required: true })
   milestones: Milestone[];
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   availableSolution: string;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   SolutionUSP: string;
 }
 
