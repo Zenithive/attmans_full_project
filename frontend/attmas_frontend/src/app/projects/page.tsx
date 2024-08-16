@@ -594,7 +594,7 @@ const Jobs = () => {
             )}
 
 
-            {userType === 'Innovators' || userType === 'Freelancer' && (
+            {(userType === 'Innovators' || userType === 'Freelancer') && (
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
                     <ToggleButtonGroup
