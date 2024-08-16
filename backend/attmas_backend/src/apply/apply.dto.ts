@@ -61,8 +61,8 @@ export class CreateApplyDto {
   @IsString()
   lastName: string;
 
-  // @IsString()
-  // rewarded: string;
+  @IsString()
+  comment_Reward_Nonreward: string;
 
   @IsOptional()
   @ValidateNested({ each: true })

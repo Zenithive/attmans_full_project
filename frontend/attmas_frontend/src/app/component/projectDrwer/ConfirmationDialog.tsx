@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField } from '@mui/material';
 
 interface ConfirmationDialogProps {
     open: boolean;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (comment: string) => void; // Modify to receive a comment
     message: string;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, onConfirm, message }) => {
+    const [comment, setComment] = useState('');
+
+    const handleConfirm = () => {
+        onConfirm(comment); // Pass the comment to the onConfirm function
+        setComment(''); // Reset comment input after confirmation
+    };
+
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>Confirmation</DialogTitle>
@@ -25,10 +32,12 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
                     variant="outlined"
                     multiline
                     rows={2}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)} // Update comment state
                 />
             </DialogContent>
             <DialogActions>
-            <Button
+                <Button
                     onClick={onClose}
                     sx={{
                         color: 'white',
@@ -40,7 +49,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
                 >
                     Cancel
                 </Button>
-                <Button onClick={onConfirm} color="primary">
+                <Button onClick={handleConfirm} color="primary">
                     Confirm
                 </Button>
             </DialogActions>
