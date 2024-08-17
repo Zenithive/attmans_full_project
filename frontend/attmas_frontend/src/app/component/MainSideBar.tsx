@@ -25,7 +25,7 @@ export const drawerWidth = 240;
 export default function MainSideBar() {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   console.log("userDetails", userDetails.userType);
-  
+
   const [isClient, setIsClient] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -33,7 +33,7 @@ export default function MainSideBar() {
     setIsClient(true);
   }, []);
 
-  const router = useRouter(); 
+  const router = useRouter();
   const pathName = usePathname();
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -78,7 +78,7 @@ export default function MainSideBar() {
         <BusinessIcon sx={{ fontSize: 22 }} />
       ),
       Name: "Project Owner",
-      isVisible: isAdmin 
+      isVisible: isAdmin
     },
     {
       path: '/projects',
@@ -87,6 +87,15 @@ export default function MainSideBar() {
       ),
       Name: "Projects",
       isVisible: (isAdmin || isFreelancer || isProjectOwner || isInnovator)
+    },
+
+    {
+      path: '/myproject',
+      icon: () => (
+        <WorkIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "My Project",
+      isVisible: (isFreelancer || isProjectOwner || isInnovator)
     },
     {
       path: '/exhibition',
@@ -138,16 +147,16 @@ export default function MainSideBar() {
           <List>
             {SIDEBAR_LIST_NAVS.map((navItem, index) => (
               <>
-              {navItem.isVisible ? <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
-                <ListItemButton selected={pathName === navItem.path} sx={{ borderRadius: 3 }}>
-                  <ListItemIcon sx={{ minWidth: 40 }}>
-                    {navItem.icon()}
-                  </ListItemIcon>
-                  {(!isMobile || isHovered) && (
-                    <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
-                  )}
-                </ListItemButton>
-              </ListItem> : ""}
+                {navItem.isVisible ? <ListItem key={index} disablePadding onClick={() => handleNavigation(navItem.path)}>
+                  <ListItemButton selected={pathName === navItem.path} sx={{ borderRadius: 3 }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {navItem.icon()}
+                    </ListItemIcon>
+                    {(!isMobile || isHovered) && (
+                      <ListItemText primary={navItem.Name} primaryTypographyProps={{ fontSize: '1.15rem' }} />
+                    )}
+                  </ListItemButton>
+                </ListItem> : ""}
               </>
             ))}
           </List>
