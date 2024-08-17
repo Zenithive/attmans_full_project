@@ -272,7 +272,6 @@ const Jobs = () => {
     const handleFilterTypeChange = (event: any, newFilterType: string) => {
         if (newFilterType !== null) {
             setFilterType(newFilterType);
-            refetch();
         }
     }
 

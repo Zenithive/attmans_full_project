@@ -27,6 +27,8 @@ export interface Job {
   Category: string[];
   Subcategorys: string[];
   DetailsOfInnovationChallenge: string;
+  firstName:string,
+  lastName:string,
   Sector: string;
   AreaOfProduct: string;
   ProductDescription: string;
@@ -58,7 +60,6 @@ interface Apply {
   lastName: string;
   username: string;
   jobId: string;
-  milestones: Milestone[];
   availableSolution: string;
   SolutionUSP: string;
 }
