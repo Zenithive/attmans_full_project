@@ -17,6 +17,7 @@ import { Job, Apply } from '../projects/projectinterface';
 import { Expertiselevel } from '../projects/projectinterface';
 import { getSubcategorys } from '../projects/projectinterface';
 import { CustomChip } from '../projects/projectinterface';
+import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 
 
 
@@ -370,7 +371,7 @@ const myproject = () => {
                                     <CardContent>
                                         <Typography variant="h5">
 
-                                            <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
+                                        <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
                                                 {job.title}    ,
                                             </a>
                                             <span style={{ fontSize: 'small', color: "#616161" }}>
@@ -452,24 +453,16 @@ const myproject = () => {
                         </Box>
                     </InfiniteScroll>
                 )}
+
+        <MyProjectDrawer
+        viewingJob={viewingJob}
+        setViewingJob={setViewingJob}
+        userType={userType} handleApproveDialogOpen={function (job: Job): void {
+            throw new Error('Function not implemented.');
+        } } handleRejectDialogOpen={function (job: Job): void {
+            throw new Error('Function not implemented.');
+        } }            />
             </Box>
-
-
-            <AddApply
-                open={applyOpen}
-                setOpen={setApplyOpen}
-                jobTitle={jobTitle}
-                jobId={selectedJobId}
-            />
-
-            <ProjectDrawer
-                viewingJob={viewingJob}
-                setViewingJob={setViewingJob}
-                userType={userType} handleApproveDialogOpen={function (job: Job): void {
-                    throw new Error('Function not implemented.');
-                } } handleRejectDialogOpen={function (job: Job): void {
-                    throw new Error('Function not implemented.');
-                } }            />
 
         </Box>
     );
