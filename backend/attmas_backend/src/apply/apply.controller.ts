@@ -5,6 +5,7 @@ import {
   Body,
   NotFoundException,
   Param,
+  Query,
 } from '@nestjs/common';
 
 import { ApplyService } from './apply.service';
@@ -45,6 +46,13 @@ export class ApplyController {
   async findAll(): Promise<Apply[]> {
     return this.applyService.findAll();
   }
+
+  @Get('applyformyProject')
+  async findAllMyProject(@Query('userId') userId: string): Promise<Apply[]> {
+    console.log('UserId received in controller:', userId); // Log the received userId
+    return this.applyService.findAllMyProject(userId);
+  }
+
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Apply> {

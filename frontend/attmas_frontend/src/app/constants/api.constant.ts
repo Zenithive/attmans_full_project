@@ -101,4 +101,10 @@ export const APIS = {
     MILESTONES: `${SERVER_URL}/milestones`,
 
     GET_MILESTONES: `${SERVER_URL}/milestones`,
+
+
+
+
+
+    GET_APPLIES_FOR_MYPROJECT : `${SERVER_URL}/Apply/applyformyProject`,
 }

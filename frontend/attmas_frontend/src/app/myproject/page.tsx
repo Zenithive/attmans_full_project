@@ -42,6 +42,8 @@ const myproject = () => {
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
 
+    const [projects, setProjects] = useState<Job[]>([]);
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
 
@@ -89,7 +91,27 @@ const myproject = () => {
     }, [userId, filterType, userType, selectedServices]);
 
 
-    ///////////   All Applies fetch   ////////////
+   
+
+
+    const fetchAllProjects = useCallback(async () => {
+        try {
+            const response = await axios.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
+                params: {
+                    userId: userDetails._id, // Include userId in the request
+                },
+            });
+            console.log('Fetched Projects:', response.data); // Log the response data
+            setProjects(response.data);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    }, [userDetails._id]);
+    
+
+    useEffect(() => {
+        fetchAllProjects(); // Fetch all projects on component mount
+    }, [fetchAllProjects]);
 
 
     const refetch = useCallback(async () => {
