@@ -46,7 +46,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; }[];
+  products: { name: string; description: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; }[];
   userId: {
     firstName: string;
     lastName: string;
@@ -485,7 +485,9 @@ const ExhibitionsPage: React.FC = () => {
                     <Grid item xs={12} sm={6} md={4} key={booth._id}>
                       <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
                         <CardContent>
-                          <Typography>
+                          <Typography sx={{width:'69%','@media (max-width: 767px)': {
+                            width:'50%'
+                          }}}>
                             <h2>{booth.title}</h2>
                           </Typography>
 

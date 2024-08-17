@@ -80,27 +80,42 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     values: FormValues,
     { setSubmitting, resetForm }: any
   ) => {
-    const applyData = {
-      title: values.title,
-      description: values.description,
-      TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
-      currency: values.currency,
-      Budget: values.Budget,
-      userId: userDetails._id,
-      username: userDetails.username,
-      firstName: userDetails.firstName,
-      lastName: userDetails.lastName,
-      jobId: values.jobId,
-      milestones: values.milestones,
-      availableSolution: values.availableSolution,
-      SolutionUSP: values.SolutionUSP,
-    };
 
     try {
-      await axios.post(APIS.APPLY, applyData);
+      const applyData = {
+        title: values.title,
+        description: values.description,
+        TimeFrame: values.TimeFrame ? values.TimeFrame.toISOString() : null,
+        currency: values.currency,
+        Budget: values.Budget,
+        userId: userDetails._id,
+        username: userDetails.username,
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        jobId: values.jobId,
+        availableSolution: values.availableSolution,
+        SolutionUSP: values.SolutionUSP,
+      };
+  
+      const applyResponse = await axios.post(APIS.APPLY, applyData);
+      const applyId = applyResponse.data._id; 
+  
+
+      const milestonePromises = values.milestones.map(milestone =>
+        axios.post(APIS.MILESTONES, {
+          scopeOfWork: milestone.scopeOfWork,
+          milestones: milestone.milestones,
+          userId: userDetails._id,
+          jobId: values.jobId,
+          applyId: applyId, 
+        })
+      );
+      
+      await Promise.all(milestonePromises);
+  
       pubsub.publish('ApplyCreated', { message: 'A new Apply Created' });
       pubsub.publish('toast', { message: 'Applied successfully!', severity: 'success' });
-
+  
       resetForm();
       setOpen(false);
     } catch (error) {

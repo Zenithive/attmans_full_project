@@ -48,6 +48,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
+    const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -115,6 +116,18 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         },
     });
 
+
+    const handleFocus = () => {
+        setLabel("Share Solution");
+      };
+    
+   
+      const handleBlur = () => {
+        if (!formik.values.patentDetails) {
+          setLabel("Provide details about the research product or solution that you intend to commercialize");
+        }
+      };
+    
 
 
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -335,10 +348,14 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                                 rows={4}
                                                 id="patentDetails"
                                                 color='secondary'
-                                                label="Provide details about the research product or solution that you intend to commercialize"
+                                                label={label}
                                                 name="patentDetails"
                                                 onChange={formik.handleChange}
-                                                onBlur={formik.handleBlur}
+                                                onBlur={(e) => {
+                                                    formik.handleBlur(e);
+                                                    handleBlur(); 
+                                                  }}
+                                                onFocus={handleFocus}
                                                 value={formik.values.patentDetails}
                                                 error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
                                                 helperText={formik.touched.patentDetails && formik.errors.patentDetails}
