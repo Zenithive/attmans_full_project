@@ -98,5 +98,7 @@ export const APIS = {
 
     USER_APPLICATIONS: (userId: any) => `${SERVER_URL}/Apply/user/${userId}`,
 
+    MILESTONES: `${SERVER_URL}/milestones`,
 
+    GET_MILESTONES: `${SERVER_URL}/milestones`,
 }

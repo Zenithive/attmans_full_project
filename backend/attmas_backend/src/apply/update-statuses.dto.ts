@@ -1,5 +1,5 @@
 // update-statuses.dto.ts
-import { IsArray, IsObject, IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class ApplicationStatusDto {
@@ -8,7 +8,7 @@ class ApplicationStatusDto {
 
   @IsString()
   status: string;
-  
+
   @IsString()
   jobId: string;
 
@@ -17,11 +17,9 @@ class ApplicationStatusDto {
 
   @IsString()
   userId: string;
-  
+
   @IsString()
   username: string;
-
-
 }
 
 export class UpdateStatusesDto {
