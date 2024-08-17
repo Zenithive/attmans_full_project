@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -41,7 +41,6 @@ interface Apply {
   status: string;
   firstName: string;
   lastName: string;
-  milestones: Milestone[];
   availableSolution: string;
   SolutionUSP: string;
 }
@@ -68,8 +67,15 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
 
-
+  useEffect(() => {
+    if (apply?._id) {
+      axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
+        .then(response => setMilestones(response.data))
+        .catch(error => console.error('Error fetching milestones:', error));
+    }
+  }, [apply]);
 
 
 
@@ -235,11 +241,11 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  {apply.milestones.map((milestone, index) => (
+                  {milestones.map((milestone, index) => (
                     <Card key={index} variant="outlined" sx={{ mb: 2 }}>
                       <CardContent>
                         <Typography variant="h6" sx={{ mb: 2 }}>
-                          Milestone {index + 1}
+                          Milestone
                         </Typography>
                         <Grid container spacing={2}>
                           <Grid item xs={12}>
@@ -249,20 +255,27 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                               multiline
                               fullWidth
                               disabled
-                              sx={{
-                                mb: 2,
-                              }}
+                              sx={{ mb: 2 }}
                             />
                           </Grid>
                           <Grid item xs={12}>
-                            <TextField
-                              label="Milestones"
-                              value={milestone.milestones}
-                              multiline
-                              fullWidth
-                              disabled
-                            />
+                            {milestone.milestones.length > 0 ? (
+                              milestone.milestones.map((m, index) => (
+                                <TextField
+                                  key={index}
+                                  label={`Milestone ${index + 1}`}
+                                  value={m}
+                                  multiline
+                                  fullWidth
+                                  disabled
+                                  sx={{ mb: 2 }}
+                                />
+                              ))
+                            ) : (
+                              <Typography>No milestones available</Typography>
+                            )}
                           </Grid>
+
                         </Grid>
                       </CardContent>
                     </Card>
@@ -271,7 +284,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 <Grid item xs={12}>
                   <TextField
                     label="Other available solutions"
-                    value={`${apply.availableSolution}`}
+                    value={apply.availableSolution}
                     fullWidth
                     multiline
                     disabled
@@ -281,7 +294,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 <Grid item xs={12}>
                   <TextField
                     label="Solution USP"
-                    value={`${apply.SolutionUSP}`}
+                    value={apply.SolutionUSP}
                     fullWidth
                     multiline
                     disabled
@@ -340,18 +353,18 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
               Award
             </Button>
           )}
-         <Button
-  onClick={onClose}
-  sx={{
-    color: 'white', // Set text color to white
-    backgroundColor: '#757575',
-    '&:hover': {
-      backgroundColor: '#757575', // Darken the grey on hover
-    },
-  }}
->
-  Close
-</Button>
+          <Button
+            onClick={onClose}
+            sx={{
+              color: 'white', // Set text color to white
+              backgroundColor: '#757575',
+              '&:hover': {
+                backgroundColor: '#757575', // Darken the grey on hover
+              },
+            }}
+          >
+            Close
+          </Button>
 
         </DialogActions>
       </Dialog>

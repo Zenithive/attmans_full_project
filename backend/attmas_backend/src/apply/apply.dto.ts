@@ -1,22 +1,6 @@
-import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 
-export class MilestoneDto {
-  @IsNotEmpty()
-  @IsString()
-  scopeOfWork: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  milestones: string[];
-}
 export class CreateApplyDto {
   @IsNotEmpty()
   @IsString()
@@ -63,12 +47,6 @@ export class CreateApplyDto {
 
   @IsString()
   comment_Reward_Nonreward: string;
-
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => MilestoneDto)
-  @IsArray()
-  milestones?: MilestoneDto[];
 
   @IsNotEmpty()
   @IsString()

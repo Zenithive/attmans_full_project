@@ -17,14 +17,16 @@ import {
   Button,
   Tooltip,
   Grid,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
 
 interface Product {
-  productName: string;
-  productDescription: string;
+  name: string;
+  description: string;
   productType: string;
   productPrice: number;
   currency: string;
@@ -67,7 +69,6 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
     setVideoOpen(false);
     setSelectedVideoUrl(null);
   };
-
   
   return (
     <>
@@ -144,8 +145,8 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                       <TableBody>
                         {booth.products.map((product, index) => (
                           <TableRow key={index}>
-                            <TableCell>{product.productName}</TableCell>
-                            <TableCell>{product.productDescription}</TableCell>
+                            <TableCell>{product.name}</TableCell>
+                            <TableCell>{product.description}</TableCell>
                             <TableCell>{product.productType}</TableCell>
                             <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</TableCell>
                             <TableCell>

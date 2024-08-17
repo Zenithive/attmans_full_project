@@ -15,7 +15,6 @@ import { UsersService } from 'src/users/users.service';
 // import mongoose from 'mongoose';
 import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
 
-
 @Injectable()
 export class ApplyService {
   [x: string]: any;
@@ -27,8 +26,6 @@ export class ApplyService {
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
   ) {}
-
- 
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     const existingApplication = await this.ApplyModel.findOne({
@@ -168,8 +165,11 @@ export class ApplyService {
       .exec();
   }
 
-
-  async rewardApplication(id: string, jobId: string, comment: string): Promise<Apply> {
+  async rewardApplication(
+    id: string,
+    jobId: string,
+    comment: string,
+  ): Promise<Apply> {
     // console.log(`Rewarding application with ID: ${id}`);
 
     const application = await this.ApplyModel.findById(id).exec();
@@ -182,7 +182,9 @@ export class ApplyService {
 
     // First, update the status of the selected application to 'Awarded'
     application.status = 'Awarded';
-    application.comment_Reward_Nonreward = comment || 'congratulation , you are the 100% confirm person for the Project who is awarded';
+    application.comment_Reward_Nonreward =
+      comment ||
+      'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
     // console.log(`Application with ID: ${id} awarded.`);
 
@@ -197,9 +199,10 @@ export class ApplyService {
       _id: app._id.toString(),
       status: 'Not Awarded',
       jobId: app.jobId.toString(),
-      comment_Reward_Nonreward: 'Thank you for your application. Although we cannot award this application, we value your interest and encourage you to apply for other roles or opportunities with us in the future.', // Default comment
-      userId:app.userId.toString(),
-      username:app.username.toString()
+      comment_Reward_Nonreward:
+        'Thank you for your application. Although we cannot award this application, we value your interest and encourage you to apply for other roles or opportunities with us in the future.', // Default comment
+      userId: app.userId.toString(),
+      username: app.username.toString(),
     }));
 
     // console.log('Applications to be updated:', updatedApplications);
@@ -227,8 +230,6 @@ export class ApplyService {
     return application;
   }
 
- 
-
   async updateStatuses(updateStatusesDto: UpdateStatusesDto): Promise<void> {
     const { applications } = updateStatusesDto;
 
@@ -238,7 +239,10 @@ export class ApplyService {
     const bulkOperations = applications.map((app) => ({
       updateOne: {
         filter: { _id: app._id, jobId: app.jobId },
-        update: { status: app.status, comment_Reward_Nonreward: app.comment_Reward_Nonreward || '' },
+        update: {
+          status: app.status,
+          comment_Reward_Nonreward: app.comment_Reward_Nonreward || '',
+        },
       },
     }));
 

@@ -24,7 +24,7 @@ export class ApplyController {
   @Post('reward/:id')
   async rewardApplication(
     @Param('id') id: string,
-    @Body() body: { jobId: string; Comment?: string } // Handle both jobId and optional comment
+    @Body() body: { jobId: string; Comment?: string }, // Handle both jobId and optional comment
   ): Promise<Apply> {
     const { jobId, Comment } = body;
     console.log(`Rewarding application with ID: ${id} for Job ID: ${jobId}`);
