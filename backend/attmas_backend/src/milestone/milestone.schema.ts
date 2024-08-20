@@ -8,8 +8,21 @@ export class Milestone {
   @Prop({ required: true })
   scopeOfWork: string;
 
-  @Prop({ type: [String], required: true })
-  milestones: string[];
+  @Prop({
+    type: [
+      {
+        name: { type: String, required: true },
+        isCommentSubmitted: { type: Boolean, default: false },
+        status: { type: String, default: 'Pending' },
+      },
+    ],
+    required: true,
+  })
+  milestones: {
+    name: string;
+    isCommentSubmitted: boolean;
+    status: string;
+  }[];
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })
   applyId: Types.ObjectId;
@@ -20,8 +33,11 @@ export class Milestone {
   @Prop({ type: Types.ObjectId, ref: 'Job', required: true })
   jobId: Types.ObjectId;
 
-  @Prop({ default: 'Pending' })
-  status: string;
+  @Prop({ type: [String], default: [] })
+  milstonSubmitcomments: string[];
+
+  @Prop({ default: false })
+  isCommentSubmitted: boolean;
 }
 
 export const MilestoneSchema = SchemaFactory.createForClass(Milestone);

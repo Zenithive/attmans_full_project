@@ -20,4 +20,24 @@ export class MilestonesController {
   ): Promise<Milestone[]> {
     return this.milestonesService.getMilestonesByApplyId(applyId);
   }
+
+  @Post('/submit-comment')
+  async submitComment(
+    @Body('applyId') applyId: string,
+    @Body('milestoneIndex') milestoneIndex: number,
+    @Body('comment') comment: string,
+  ): Promise<void> {
+    return this.milestonesService.submitComment(
+      applyId,
+      milestoneIndex,
+      comment,
+    );
+  }
+
+  @Get('/comments/:applyId')
+  async getSubmittedComments(
+    @Param('applyId') applyId: string,
+  ): Promise<string[]> {
+    return this.milestonesService.getSubmittedComments(applyId);
+  }
 }

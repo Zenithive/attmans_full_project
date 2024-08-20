@@ -28,7 +28,12 @@ import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 
 interface Milestone {
   scopeOfWork: string;
-  milestones: string[];
+  milestones: {
+      name: string;
+      isCommentSubmitted: boolean;
+  }[];
+  isCommentSubmitted?: boolean;
+  status?: string;
 }
 interface Apply {
   _id?: string;
@@ -68,6 +73,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [commentsFetched, setCommentsFetched] = useState<boolean>(false);
 
   useEffect(() => {
     if (apply?._id) {
@@ -76,7 +82,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         .catch(error => console.error('Error fetching milestones:', error));
     }
   }, [apply]);
-
 
 
   const getStatusColor = (status: string) => {
@@ -269,7 +274,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                 <TextField
                                   key={index}
                                   label={`Milestone ${index + 1}`}
-                                  value={m}
+                                  value={m.name}
                                   multiline
                                   fullWidth
                                   disabled
@@ -321,7 +326,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 <>
                   <Divider orientation="horizontal" flexItem sx={{ marginBottom: '30px' }} />
                   <Grid item xs={12} sm={12}>
-                    <JobDetail key={jobDetailKey} jobId={jobId} applyId={apply._id} onCommentSubmitted={onCommentSubmitted} />
+                    <JobDetail key={jobDetailKey} jobId={jobId} applyId={apply._id} />
                   </Grid>
                   <Grid item xs={12} sm={12}>
                     <Box

@@ -4,8 +4,23 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
+
+class MilestoneItemDto {
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  isCommentSubmitted?: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  status: string;
+}
 
 export class CreateMilestoneDto {
   @IsNotEmpty()
@@ -13,8 +28,9 @@ export class CreateMilestoneDto {
   scopeOfWork: string;
 
   @IsArray()
-  @IsString({ each: true })
-  milestones: string[];
+  @ValidateNested({ each: true })
+  @Type(() => MilestoneItemDto)
+  milestones: MilestoneItemDto[];
 
   @IsNotEmpty()
   @IsMongoId()
@@ -29,6 +45,7 @@ export class CreateMilestoneDto {
   jobId: Types.ObjectId;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsArray()
+  @IsString({ each: true })
+  milstonSubmitcomments?: string[];
 }

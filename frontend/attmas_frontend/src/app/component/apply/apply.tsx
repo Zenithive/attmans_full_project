@@ -28,6 +28,7 @@ interface AddApplyProps {
 interface Milestone {
   scopeOfWork: string;
   milestones: string[];
+  comments: string[];
 }
 
 interface FormValues {
@@ -71,7 +72,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
     jobId: jobId,
-    milestones: [{ scopeOfWork: '', milestones: [''] }],
+    milestones: [{ scopeOfWork: '', milestones: [''] ,comments: ['']}],
     availableSolution: '',
     SolutionUSP: '',
   };
@@ -80,7 +81,6 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     values: FormValues,
     { setSubmitting, resetForm }: any
   ) => {
-
     try {
       const applyData = {
         title: values.title,
@@ -96,35 +96,38 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
         availableSolution: values.availableSolution,
         SolutionUSP: values.SolutionUSP,
       };
-  
+    
       const applyResponse = await axios.post(APIS.APPLY, applyData);
       const applyId = applyResponse.data._id; 
-  
-
-      const milestonePromises = values.milestones.map(milestone =>
-        axios.post(APIS.MILESTONES, {
+    
+      const milestonePromises = values.milestones.map(milestone => {
+        const formattedMilestone = {
           scopeOfWork: milestone.scopeOfWork,
-          milestones: milestone.milestones,
+          milestones: milestone.milestones.map(milestoneItem => ({ name: milestoneItem })),
           userId: userDetails._id,
           jobId: values.jobId,
           applyId: applyId, 
-        })
-      );
+          comments: milestone.comments,
+        };
+  
+        return axios.post(APIS.MILESTONES, formattedMilestone);
+      });
       
       await Promise.all(milestonePromises);
-  
+    
       pubsub.publish('ApplyCreated', { message: 'A new Apply Created' });
       pubsub.publish('toast', { message: 'Applied successfully!', severity: 'success' });
-  
+    
       resetForm();
       setOpen(false);
     } catch (error) {
       console.error('Error creating apply:', error);
+      setFetchError('An error occurred while creating the apply.');
     } finally {
       setSubmitting(false);
     }
   };
-
+  
   const handleCancel = () => {
     if (onCancel) onCancel();
     setOpen(false);

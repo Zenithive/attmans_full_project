@@ -19,14 +19,16 @@ import {
   Grid,
   useMediaQuery,
   useTheme,
+  Card,
+  CardContent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
 
 interface Product {
-  name: string;
-  description: string;
+  productName: string;
+  productDescription: string;
   productType: string;
   productPrice: number;
   currency: string;
@@ -59,6 +61,10 @@ interface BoothDetailsDialogProps {
 const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, booth, renderVideo }) => {
   const [videoOpen, setVideoOpen] = useState(false);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+  
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleVideoOpen = (url: string) => {
     setSelectedVideoUrl(url);
@@ -69,7 +75,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
     setVideoOpen(false);
     setSelectedVideoUrl(null);
   };
-  
+
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth sx={{ 
@@ -95,24 +101,20 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
         </DialogTitle>
         <DialogContent dividers>
           {booth && (
-             <Box sx={{ position: 'relative' }}>
-             <Box sx={{ position: 'absolute', top: 16, right: 16 ,  '@media (max-width: 767px)': {
-              position:'relative',top:'-10px',left:'5px'}}}>
-               <Typography variant="body1" color="text.secondary">
-                 Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
-               </Typography>
-             </Box>
+            <Box sx={{ position: 'relative' }}>
+              <Box sx={{ position: 'absolute', top: 16, right: 16, '@media (max-width: 767px)': { position: 'relative', top: '-10px', left: '5px' } }}>
+                <Typography variant="body1" color="text.secondary">
+                  Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
+                </Typography>
+              </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <Typography variant="h5" component="div" sx={{ mb: 2 ,'@media (max-width: 767px)':{
-                  position:'relative',top:'10px'}}}>
+                  <Typography variant="h5" component="div" sx={{ mb: 2, '@media (max-width: 767px)': { position: 'relative', top: '10px' } }}>
                     <Box fontWeight="bold">Title: {booth.title}</Box>
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="h6" component="div" sx={{ mb: 2 ,'@media (max-width: 767px)':{
-                    position:'relative',
-                  }}}>
+                  <Typography variant="h6" component="div" sx={{ mb: 2, '@media (max-width: 767px)': { position: 'relative' } }}>
                     Description: {booth.description}
                   </Typography>
                 </Grid>
@@ -131,50 +133,87 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <TableContainer component={Paper}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell><strong>Name</strong></TableCell>
-                          <TableCell><strong>Description</strong></TableCell>
-                          <TableCell><strong>Type</strong></TableCell>
-                          <TableCell><strong>Price</strong></TableCell>
-                          <TableCell><strong>Video</strong></TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {booth.products.map((product, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.description}</TableCell>
-                            <TableCell>{product.productType}</TableCell>
-                            <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</TableCell>
-                            <TableCell>
-                              <Tooltip
-                                title="Play Video"
-                                placement="top"
-                                arrow
-                                PopperProps={{
-                                  modifiers: [
-                                    {
-                                      name: 'offset',
-                                      options: {
-                                        offset: [0, -10],
-                                      },
-                                    },
-                                  ],
-                                }}
-                              >
-                                <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
-                                  <YouTubeIcon style={{ fontSize: '40px',position:'relative' }}/>
-                                </IconButton>
-                              </Tooltip>
-                            </TableCell>
+                  {!isMobile ? (
+                    <TableContainer component={Paper}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell><strong>Name</strong></TableCell>
+                            <TableCell><strong>Description</strong></TableCell>
+                            <TableCell><strong>Type</strong></TableCell>
+                            <TableCell><strong>Price</strong></TableCell>
+                            <TableCell><strong>Video</strong></TableCell>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                        </TableHead>
+                        <TableBody>
+                          {booth.products.map((product, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{product.productName}</TableCell>
+                              <TableCell>{product.productDescription}</TableCell>
+                              <TableCell>{product.productType}</TableCell>
+                              <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</TableCell>
+                              <TableCell>
+                                <Tooltip
+                                  title="Play Video"
+                                  placement="top"
+                                  arrow
+                                  PopperProps={{
+                                    modifiers: [
+                                      {
+                                        name: 'offset',
+                                        options: {
+                                          offset: [0, -10],
+                                        },
+                                      },
+                                    ],
+                                  }}
+                                >
+                                  <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
+                                    <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  ) : (
+                    booth.products.map((product, index) => (
+                      <Card key={index} sx={{ mb: 2}}>
+                        <CardContent>
+                          <Typography variant="body1"><strong>Name:</strong> {product.productName}</Typography>
+                          <Typography variant="body1"><strong>Description:</strong> {product.productDescription}</Typography>
+                          <Typography variant="body1"><strong>Type:</strong> {product.productType}</Typography>
+                          <Typography variant="body1"><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
+                          <Box sx={{ mt: 1 ,'@media (max-width: 767px)': {
+                        position: 'relative',
+                        float: 'right',
+                        bottom: '45px'}}}>
+                            <Tooltip
+                              title="Play Video"
+                              placement="top"
+                              arrow
+                              PopperProps={{
+                                modifiers: [
+                                  {
+                                    name: 'offset',
+                                    options: {
+                                      offset: [0, -10],
+                                    },
+                                  },
+                                ],
+                              }}
+                            >
+                              <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
+                                <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </Grid>
               </Grid>
             </Box>
@@ -188,11 +227,11 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
       </Dialog>
 
       <Dialog open={videoOpen} onClose={handleVideoClose} maxWidth="md" fullWidth sx={{
-         '& .MuiDialog-paper': {
-            '@media (max-width: 767px)':{
-              maxWidth:'100%'
-            }
+        '& .MuiDialog-paper': {
+          '@media (max-width: 767px)': {
+            maxWidth: '100%'
           }
+        }
       }}>
         <DialogTitle>
           Product Video
@@ -221,7 +260,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                 height: 'auto',
               },
             }}>
-                  {renderVideo(selectedVideoUrl, window.innerWidth < 768 ? window.innerWidth - 40 : 850, window.innerWidth < 768 ? 200 : 500)}
+              {renderVideo(selectedVideoUrl, window.innerWidth < 768 ? window.innerWidth - 40 : 850, window.innerWidth < 768 ? 200 : 500)}
             </Box>
           )}
         </DialogContent>
