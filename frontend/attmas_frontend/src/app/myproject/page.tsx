@@ -573,13 +573,13 @@ const myproject = () => {
                 jobId={selectedJobId}
             />
 
-            <ProjectDrawer
+            <MyProjectDrawer
                 viewingJob={viewingJob}
                 setViewingJob={setViewingJob}
                 userType={userType} 
-                handleApproveDialogOpen={function (job: Job): void {
+                handleApproveDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
-                } } handleRejectDialogOpen={function (job: Job): void {
+                } } handleRejectDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
                 } }            />
 
