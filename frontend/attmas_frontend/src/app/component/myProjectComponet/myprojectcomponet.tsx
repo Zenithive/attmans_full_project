@@ -355,22 +355,22 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                                                                             <CardContent>
                                                                                                 <Typography variant="h6" sx={{ mb: 4 }}>
                                                                                                     Milestone {milestoneIndex + 1}
-                                                                                            
-                                                                                                {milestone.isCommentSubmitted && (
 
-                                                                                                    <Chip
-                                                                                                        label="Milestone submitted"
-                                                                                                        variant="outlined"
-                                                                                                        sx={{
-                                                                                                            borderColor: 'green',
-                                                                                                            color: 'green',
-                                                                                                            borderRadius: '16px',
-                                                                                                            position:'relative',
-                                                                                                            float:'right'
-                                                                                                        }}
-                                                                                                    />
-                                                                                                )}
-                                                                                                 </Typography>
+                                                                                                    {milestone.isCommentSubmitted && (
+
+                                                                                                        <Chip
+                                                                                                            label="Milestone submitted"
+                                                                                                            variant="outlined"
+                                                                                                            sx={{
+                                                                                                                borderColor: 'green',
+                                                                                                                color: 'green',
+                                                                                                                borderRadius: '16px',
+                                                                                                                position: 'relative',
+                                                                                                                float: 'right'
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    )}
+                                                                                                </Typography>
 
                                                                                                 <TextField
                                                                                                     label={`Milestone ${milestoneIndex + 1}`}
