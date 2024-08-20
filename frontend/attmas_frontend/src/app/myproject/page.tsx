@@ -472,9 +472,88 @@ const myproject = () => {
                                 </Card>
                             ))}
                         </Box>
+
+                        
+
+
                     </InfiniteScroll>
                 )}
             </Box>
+
+
+            <Box sx={{ mt: 2 }}>
+            {projects.map((project) => (
+                <Card key={project._id} sx={{ mb: 2 }}>
+                    <CardContent>
+                        <Typography variant="h5">
+                            <a  style={{ cursor: 'pointer' }}>
+                                {project.title},
+                            </a>
+                            <span style={{ fontSize: 'small', color: "#616161" }}>
+                                ({dayjs(project.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                <Box sx={{
+                                    position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
+                                        position: 'relative',
+                                        top: '65px',
+                                        left: '69%'
+                                    }
+                                }}>
+                                    <Chip
+                                        label={project.status === 'Completed' ? 'Completed' : project.status === 'In Progress' ? 'In Progress' : 'Not Started'}
+                                        color={project.status === 'Completed' ? 'success' : project.status === 'In Progress' ? 'warning' : 'default'}
+                                    />
+                                </Box>
+                            </span>
+                            <Box sx={{
+                                fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
+                                    position: 'relative', top: '40px', right: '100px'
+                                }
+                            }}>
+                            </Box>
+                            <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
+                                <Chip
+                                    // label={project.category}
+                                    variant="outlined"
+                                    color='secondary'
+                                    sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
+                                />
+                            </Box>
+                        </Typography>
+
+                        <Box sx={{ marginTop: '10px' }}>
+                            {/* <Typography variant="body2">{project.budgetCurrency === 'USD' ? '$' : '₹'}{project.budgetAmount}</Typography> */}
+                            {/* <Typography variant="caption">{project.tags.join(', ')}</Typography> */}
+
+                            <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
+                                <IconButton
+                                    aria-controls="simple-menu"
+                                    aria-haspopup="true"
+                                    onClick={handleClick}
+                                    sx={{ display: { xs: 'block', md: 'none' } }}
+                                >
+                                    <MoreVertIcon />
+                                </IconButton>
+                                <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                    PaperProps={{
+                                        sx: {
+                                            border: '1px solid',
+                                            boxShadow: 'none',
+                                        },
+                                    }}
+                                >
+                                    {/* Menu items can be added here */}
+                                </Menu>
+                            </Box>
+                        </Box>
+                    </CardContent>
+                </Card>
+            ))}
+        </Box>
 
 
             <AddApply
@@ -487,7 +566,8 @@ const myproject = () => {
             <ProjectDrawer
                 viewingJob={viewingJob}
                 setViewingJob={setViewingJob}
-                userType={userType} handleApproveDialogOpen={function (job: Job): void {
+                userType={userType} 
+                handleApproveDialogOpen={function (job: Job): void {
                     throw new Error('Function not implemented.');
                 } } handleRejectDialogOpen={function (job: Job): void {
                     throw new Error('Function not implemented.');
