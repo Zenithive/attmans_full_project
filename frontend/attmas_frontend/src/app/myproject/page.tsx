@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -18,7 +18,8 @@ import { Expertiselevel } from '../projects/projectinterface';
 import { getSubcategorys } from '../projects/projectinterface';
 import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
-
+import CloseIcon from '@mui/icons-material/Close'; // Import CloseIcon
+import ConfirmationCancelDialog from './ConfirmationCancelDialog';
 
 
 const myproject = () => {
@@ -43,7 +44,15 @@ const myproject = () => {
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
 
+    const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+
+    const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
+
+
+
+
     const [projects, setProjects] = useState<Apply[]>([]);
+
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
@@ -182,6 +191,57 @@ const myproject = () => {
             return userType === 'Admin' || job.status === 'Approved';
         });
     }, [jobs, userType, selectedStatus]);
+
+
+    const handleOpenConfirmationDialog = (projectId: string) => {
+        console.log("projectId", projectId);
+
+        setCurrentApplicationId(projectId);
+        setConfirmationDialogOpen(true);
+    };
+
+
+    const handleCloseConfirmationDialog = () => {
+        setConfirmationDialogOpen(false);
+        setCurrentApplicationId(null);
+    };
+
+    const handleConfirm = async (comment: string) => {
+        if (currentApplicationId) {
+
+            console.log(`Cancel application with ID: ${currentApplicationId}`);
+            handleCancel(currentApplicationId, comment)
+            // Close the dialog after confirming
+            handleCloseConfirmationDialog();
+
+        }
+    };
+
+
+
+    const handleCancel = async (projectId: string, comment?: string) => {
+        try {
+            if (!projectId) return;
+
+            // Ensure status is always "Closed"
+            const status = 'Project Finished and close ';
+
+            // Use a default comment if none is provided
+            const defaultComment = 'No comment provided When Project is closed ';
+            const finalComment = comment || defaultComment;
+
+            // Make a POST request to update the project with the provided status and comment
+            await axios.post(`${APIS.CLOSED_PROJECT}/${projectId}`, {
+                status,
+                comment: finalComment,
+            });
+
+        } catch (error) {
+            console.error('Error updating project:', error);
+        }
+    };
+
+
 
     return (
         <Box
@@ -350,7 +410,7 @@ const myproject = () => {
                 </Box>
             )}
 
-            
+
 
 
             <Box sx={{ mt: 2 }}>
@@ -425,11 +485,36 @@ const myproject = () => {
                                                             color='secondary'
                                                             sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
                                                         />
+
+
                                                     </Box>
                                                 </Typography>
                                                 <Box sx={{ marginTop: '10px' }}>
                                                     <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                                     <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+
+                                                    <Button
+                                                        onClick={() => handleOpenConfirmationDialog(job._id as string)}
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            bottom: 0,
+                                                            right: 0,
+                                                            margin: 1,
+                                                            minWidth: 'auto',
+                                                            padding: 1,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            borderRadius: '22px',
+                                                            backgroundColor: 'grey',
+                                                            color: 'white',
+                                                            '&:hover': {
+                                                                backgroundColor: 'error.dark',
+                                                            },
+                                                        }}
+                                                        startIcon={<CloseIcon />}
+                                                    >
+                                                        Close
+                                                    </Button>
                                                     <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
                                                         <IconButton
                                                             aria-controls="simple-menu"
@@ -452,6 +537,7 @@ const myproject = () => {
                                                                 },
                                                             }}
                                                         >
+
                                                             {/* Menu items can be added here */}
                                                         </Menu>
                                                     </Box>
@@ -477,7 +563,10 @@ const myproject = () => {
 
 
 
-            <Box sx={{ mt: 2 }}>
+
+
+
+            <Box sx={{ mt: 2, position: 'relative' }}>
                 {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
                     <>
                         {projects.length > 0 ? (
@@ -516,19 +605,50 @@ const myproject = () => {
                                                     fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
                                                 }}>
                                                     <Chip
-                                                        label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                        color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                        label={project.jobDetails.status}
+                                                        color={
+                                                            project.jobDetails.status === 'Approved'
+                                                                ? 'success'
+                                                                : project.jobDetails.status === 'Rejected'
+                                                                    ? 'error'
+                                                                    : 'default'
+                                                        }
                                                     />
+
+
+                                                    <Button
+                                                        onClick={() => handleOpenConfirmationDialog(project.jobDetails._id)}
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            bottom: 0,
+                                                            right: 0,
+                                                            margin: 1,
+                                                            minWidth: 'auto',
+                                                            padding: 1,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            borderRadius: '22px',
+                                                            backgroundColor: 'grey',
+                                                            color: 'white',
+                                                            '&:hover': {
+                                                                backgroundColor: 'error.dark',
+                                                            },
+                                                        }}
+                                                        startIcon={<CloseIcon />}
+                                                    >
+                                                        Close
+                                                    </Button>
                                                 </Box>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <IconButton
+                                                    <Button
                                                         aria-controls="simple-menu"
                                                         aria-haspopup="true"
                                                         onClick={handleClick}
                                                         sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        endIcon={<MoreVertIcon />}
                                                     >
-                                                        <MoreVertIcon />
-                                                    </IconButton>
+                                                        More
+                                                    </Button>
                                                     <Menu
                                                         id="simple-menu"
                                                         anchorEl={anchorEl}
@@ -554,6 +674,15 @@ const myproject = () => {
                         )}
                     </>
                 )}
+                {/* Close Button */}
+
+                {/* Confirmation Dialog */}
+                <ConfirmationCancelDialog
+                    open={confirmationDialogOpen}
+                    onClose={handleCloseConfirmationDialog}
+                    onConfirm={handleConfirm}
+                    message="Are you sure you want to close this application?"
+                />
             </Box>
 
 

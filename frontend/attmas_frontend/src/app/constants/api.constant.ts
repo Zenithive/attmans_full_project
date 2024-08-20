@@ -107,4 +107,6 @@ export const APIS = {
 
 
     GET_APPLIES_FOR_MYPROJECT : `${SERVER_URL}/Apply/applyformyProject`,
+
+    CLOSED_PROJECT: `${SERVER_URL}/jobs/update-status-closecomment`
 }

@@ -7,6 +7,10 @@ export class CreateJobsDto {
   @IsString()
   title: string;
 
+
+  @IsString()
+  commentWhenProjectClose: string;
+
   @IsNotEmpty()
   @IsString()
   description: string;
@@ -87,6 +91,9 @@ export class UpdateJobsDto {
   @IsNotEmpty()
   @IsString()
   title?: string;
+
+  @IsString()
+  commentWhenProjectClose: string;
 
   @IsNotEmpty()
   @IsString()
