@@ -19,8 +19,15 @@ export class MilestonesService {
   ) {}
 
   async create(createMilestoneDto: CreateMilestoneDto): Promise<Milestone> {
-    const { scopeOfWork, milestones, userId, applyId, jobId, status } =
-      createMilestoneDto;
+    console.log('Received DTO:', createMilestoneDto);
+    const {
+      scopeOfWork,
+      milestones,
+      userId,
+      applyId,
+      jobId,
+      milstonSubmitcomments,
+    } = createMilestoneDto;
 
     const user = await this.userModel.findById(userId);
     if (!user) {
@@ -43,7 +50,7 @@ export class MilestonesService {
       userId,
       jobId,
       applyId,
-      status: status || 'Pending',
+      milstonSubmitcomments: milstonSubmitcomments || [],
     });
 
     return milestone.save();
@@ -51,5 +58,37 @@ export class MilestonesService {
 
   async getMilestonesByApplyId(applyId: string): Promise<Milestone[]> {
     return this.milestoneModel.find({ applyId }).exec();
+  }
+
+  async submitComment(
+    applyId: string,
+    milestoneIndex: number,
+    comment: string,
+  ): Promise<void> {
+    const milestone = await this.milestoneModel.findOne({ applyId });
+    if (!milestone) {
+      throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
+    }
+
+    // Ensure the milestone exists before updating
+    if (milestone.milestones[milestoneIndex]) {
+      // Update the specific milestone's status and comment
+      milestone.milestones[milestoneIndex].isCommentSubmitted = true;
+      milestone.milestones[milestoneIndex].status = 'Submitted';
+    }
+
+    // Update comments array if needed
+    milestone.milstonSubmitcomments[milestoneIndex] = comment;
+
+    await milestone.save();
+  }
+
+  async getSubmittedComments(applyId: string): Promise<string[]> {
+    const milestone = await this.milestoneModel.findOne({ applyId });
+    if (!milestone) {
+      throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
+    }
+
+    return milestone.milstonSubmitcomments;
   }
 }
