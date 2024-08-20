@@ -39,14 +39,13 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitte
     fetchJobDetails();
   }, [jobId]);
 
-  // useEffect(() => {
-  //   fetchComments();
-  // }, [jobId, applyId]);
+  useEffect(() => {
+    fetchComments();
+  }, [jobId, applyId]);
 
 
   useEffect(() => {
     if (onCommentSubmitted) {
-      onCommentSubmitted(); 
       fetchComments();
     }
   }, [onCommentSubmitted]);
