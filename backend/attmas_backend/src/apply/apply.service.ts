@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Apply, ApplyDocument } from './apply.schema';
 import { CreateApplyDto } from './apply.dto';
 import { User, UserDocument } from 'src/users/user.schema';
@@ -75,6 +75,162 @@ export class ApplyService {
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
   }
+
+
+
+  // async findAllMyProject(userId: string): Promise<Apply[]> {
+  //   console.log('UserId received:', userId); // Log the received userId
+  
+  //   // Check if userId is a valid ObjectId
+  //   if (!Types.ObjectId.isValid(userId)) {
+  //     throw new Error('Invalid userId format');
+  //   }
+  
+  //   // Query to find documents with the given userId and status 'Awarded'
+  //   return this.ApplyModel.find({ 
+  //       userId: userId, 
+  //       status: 'Awarded' 
+  //     })
+  //     .populate('userId', 'firstName lastName username', this.userModel)
+  //     .exec()
+  //     .then(results => {
+  //       console.log("Results:", results); // Log the results
+  //       return results;
+  //     });
+  // }
+
+
+  // async findAllMyProject(userId: string): Promise<Apply[]> {
+  //   console.log('UserId received:', userId); // Log the received userId
+  
+  //   // Check if userId is a valid ObjectId
+  //   if (!Types.ObjectId.isValid(userId)) {
+  //     throw new Error('Invalid userId format');
+  //   }
+  
+  //   return this.ApplyModel.aggregate([
+  //     // Stage 1: Match documents by userId and status
+  //     {
+  //       $match: {
+  //         userId: userId,
+  //         status: 'Awarded',
+  //       },
+  //     },
+  //     // Stage 2: Lookup to get job details from the Job collection
+  //     {
+  //       $lookup: {
+  //         from: 'jobs', // Name of the Job collection
+  //         localField: 'jobId', // Field from Apply collection
+  //         foreignField: '_id', // Field from Job collection
+  //         as: 'jobDetails' // Output array field
+  //       },
+  //     },
+  //     // Stage 3: Unwind the jobDetails array to get individual job detail documents
+  //     {
+  //       $unwind: {
+  //         path: '$jobDetails',
+  //         preserveNullAndEmptyArrays: true,
+  //       },
+  //     },
+  //     // Stage 4: Project fields to include in the result
+  //     {
+  //       $project: {
+  //         jobTitle: '$jobDetails.title',
+  //         jobCurrency: '$jobDetails.currency',
+  //         description: '$jobDetails.description',
+  //         Objective: '$jobDetails.Objective',
+  //         Expectedoutcomes: '$jobDetails.Expectedoutcomes',
+  //         IPRownership: '$jobDetails.IPRownership',
+  //         Expertiselevel: '$jobDetails.Expertiselevel',
+  //         DetailsOfInnovationChallenge: '$jobDetails.DetailsOfInnovationChallenge',
+  //         Sector: '$jobDetails.Sector',
+  //         AreaOfProduct: '$jobDetails.AreaOfProduct',
+  //         ProductDescription: '$jobDetails.ProductDescription',
+  //         Category: '$jobDetails.Category',
+  //         Subcategorys: '$jobDetails.Subcategorys',
+  //         SelectService: '$jobDetails.SelectService',
+  //         TimeFrame: '$jobDetails.TimeFrame',
+  //         Budget: '$jobDetails.Budget',
+  //         userId: 1,
+  //         status: 1,
+  //         buttonsHidden: 1,
+  //         username: '$userId.username', // Assuming you also want to include username from the Apply document
+  //         createdAt: 1,
+  //         comments: 1,
+  //         firstName: '$userId.firstName', // Assuming you have populated this field
+  //         lastName: '$userId.lastName', // Assuming you have populated this field
+  //       },
+  //     },
+  //   ])
+  //   .then(results => {
+  //     console.log("Results:", results); // Log the results
+  //     return results;
+  //   });
+  // }
+
+  async findAllMyProject(userId: string): Promise<any[]> {
+    console.log('UserId received:', userId); // Log the received userId
+  
+    // Check if userId is a valid ObjectId
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new Error('Invalid userId format');
+    }
+
+    try{
+
+    const results = await this.ApplyModel.aggregate([
+      // Stage 1: Match documents by userId and status
+      {
+        $match: {
+          userId: userId,
+          status: 'Awarded',
+        },
+      },
+      // Stage 2: Project fields for debugging before lookup
+      {
+        $project: {
+          _id: 1, // Include the document's _id
+          title: 1, // Include title from Apply collection
+        },
+      },
+      // Stage 3: Lookup to get job details from the jobs collection
+      {
+        $lookup: {
+          from: 'jobs', // Ensure this matches the actual collection name
+          localField: 'title', // Field in Apply collection
+          foreignField: 'title', // Field in Job collection
+          as: 'jobDetails', // Output array field
+        },
+      },
+      // Stage 4: Unwind the jobDetails array
+      {
+        $unwind: {
+          path: '$jobDetails',
+          preserveNullAndEmptyArrays: true, // Keep results even if no matching job
+        },
+      },
+      // Stage 5: Project final fields including the sector from jobDetails
+      {
+        $project: {
+          _id: 1, // Include the document's _id
+          title: 1, // Include title for reference
+          jobDetails: 1, // Include entire jobDetails for debugging
+        },
+      },
+    ]);
+
+    // Log the results to see values of title and jobDetails
+    console.log("Aggregation Results:", JSON.stringify(results, null, 2));
+
+    return results;
+  } catch (error) {
+    console.error('Aggregation error:', error);
+    throw new Error('Error fetching projects');
+  }
+}
+  
+  
+  
 
   async findJobWithUser(id: string): Promise<ApplyDocument | null> {
     return this.ApplyModel.findById(id).populate('user').exec();
