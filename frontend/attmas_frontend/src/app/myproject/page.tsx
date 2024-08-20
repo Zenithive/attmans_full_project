@@ -43,7 +43,7 @@ const myproject = () => {
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
 
-    const [projects, setProjects] = useState<Job[]>([]);
+    const [projects, setProjects] = useState<Apply[]>([]);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
@@ -92,7 +92,7 @@ const myproject = () => {
     }, [userId, filterType, userType, selectedServices]);
 
 
-   
+
 
 
     const fetchAllProjects = useCallback(async () => {
@@ -108,7 +108,7 @@ const myproject = () => {
             console.error('Error fetching projects:', error);
         }
     }, [userDetails._id]);
-    
+
 
     useEffect(() => {
         fetchAllProjects(); // Fetch all projects on component mount
@@ -350,220 +350,213 @@ const myproject = () => {
                 </Box>
             )}
 
+            
+
+
             <Box sx={{ mt: 2 }}>
-                {isShowingApplies ? (
-                    <Box>
-                        {applies.map((apply) => (
-                            <Card key={apply._id} sx={{ mb: 2 }}>
-                                <CardContent>
-                                    <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Box>
-                                            {apply.title}
-                                        </Box>
-                                        <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                            {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
-                                        </Box>
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ mt: 1 }}>
-                                        {apply.currency} {apply.Budget}
-                                    </Typography>
-
-                                    <Typography variant="body1">
-                                        User Name: {apply.firstName} {apply.lastName}
-                                    </Typography>
-
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </Box>
-                ) : (
-                    // Render job listings
-                    <InfiniteScroll
-                        key={appliedJobs.join(',')}
-                        dataLength={jobs.length}
-                        next={() => setPage(prev => prev + 1)}
-                        hasMore={hasMore}
-                        loader={<Typography>Loading...</Typography>}
-                        endMessage={<Typography>No more Projects</Typography>}
-                    >
-
-                        <Box sx={{ mt: 2 }}>
-                            {filteredJobs.map((job) => (
-                                <Card key={job._id} sx={{ mb: 2 }}>
-                                    <CardContent>
-                                        <Typography variant="h5">
-
-                                        <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
-                                                {job.title}    ,
-                                            </a>
-                                            <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                                <Grid item xs={12} sx={{
-                                                    position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
-                                                        position: 'relative',
-                                                        top: '65px',
-                                                        left: '69%'
-                                                    }
-                                                }}>
-                                                    <CustomChip
-                                                        label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                        color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-                                                    />
-                                                </Grid>
-                                            </span>
-                                            <Box sx={{
-                                                fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
-                                                    position: 'relative', top: '40px', right: '100px'
-                                                }
-                                            }}>
-                                                {job.Expertiselevel}
-                                            </Box>
-
-
-                                            <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
-                                                <Chip
-                                                    label={job.SelectService}
-                                                    variant="outlined"
-                                                    color='secondary'
-                                                    sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
-                                                />
-                                            </Box>
-                                        </Typography>
-
-                                        <Box sx={{ marginTop: '10px' }}>
-
-                                            <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
-                                            <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-
-                                            <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-
-
-                                                <IconButton
-                                                    aria-controls="simple-menu"
-                                                    aria-haspopup="true"
-                                                    onClick={handleClick}
-                                                    sx={{ display: { xs: 'block', md: 'none' } }}
-                                                >
-                                                    <MoreVertIcon />
-                                                </IconButton>
-
-
-                                                <Menu
-                                                    id="simple-menu"
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl)}
-                                                    onClose={handleClose}
-                                                    PaperProps={{
-                                                        sx: {
-                                                            border: '1px solid',
-                                                            boxShadow: 'none',
-                                                        },
-                                                    }}
-                                                >
-
-                                                </Menu>
-                                            </Box>
-                                            <Box sx={{ position: 'relative', bottom: '10px' }}>
-
-                                            </Box>
-                                        </Box>
-
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </Box>
-
-                        
-
-
-                    </InfiniteScroll>
+                {userDetails.userType === 'Project Owner' && (
+                    <>
+                        {isShowingApplies ? (
+                            <Box>
+                                {applies.map((apply) => (
+                                    <Card key={apply._id} sx={{ mb: 2 }}>
+                                        <CardContent>
+                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box>
+                                                    {apply.title}
+                                                </Box>
+                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                    {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                </Box>
+                                            </Typography>
+                                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                                {apply.currency} {apply.Budget}
+                                            </Typography>
+                                            <Typography variant="body1">
+                                                User Name: {apply.firstName} {apply.lastName}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </Box>
+                        ) : (
+                            <InfiniteScroll
+                                key={appliedJobs.join(',')}
+                                dataLength={jobs.length}
+                                next={() => setPage(prev => prev + 1)}
+                                hasMore={hasMore}
+                                loader={<Typography>Loading...</Typography>}
+                                endMessage={<Typography>No more Projects</Typography>}
+                            >
+                                <Box sx={{ mt: 2 }}>
+                                    {filteredJobs.map((job) => (
+                                        <Card key={job._id} sx={{ mb: 2 }}>
+                                            <CardContent>
+                                                <Typography variant="h5">
+                                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
+                                                        {job.title},
+                                                    </a>
+                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                        ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                        <Grid item xs={12} sx={{
+                                                            position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
+                                                                position: 'relative',
+                                                                top: '65px',
+                                                                left: '69%'
+                                                            }
+                                                        }}>
+                                                            <CustomChip
+                                                                label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                                color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+                                                            />
+                                                        </Grid>
+                                                    </span>
+                                                    <Box sx={{
+                                                        fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
+                                                            position: 'relative', top: '40px', right: '100px'
+                                                        }
+                                                    }}>
+                                                        {job.Expertiselevel}
+                                                    </Box>
+                                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
+                                                        <Chip
+                                                            label={job.SelectService}
+                                                            variant="outlined"
+                                                            color='secondary'
+                                                            sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
+                                                        />
+                                                    </Box>
+                                                </Typography>
+                                                <Box sx={{ marginTop: '10px' }}>
+                                                    <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
+                                                    <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+                                                    <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
+                                                        <IconButton
+                                                            aria-controls="simple-menu"
+                                                            aria-haspopup="true"
+                                                            onClick={handleClick}
+                                                            sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        >
+                                                            <MoreVertIcon />
+                                                        </IconButton>
+                                                        <Menu
+                                                            id="simple-menu"
+                                                            anchorEl={anchorEl}
+                                                            keepMounted
+                                                            open={Boolean(anchorEl)}
+                                                            onClose={handleClose}
+                                                            PaperProps={{
+                                                                sx: {
+                                                                    border: '1px solid',
+                                                                    boxShadow: 'none',
+                                                                },
+                                                            }}
+                                                        >
+                                                            {/* Menu items can be added here */}
+                                                        </Menu>
+                                                    </Box>
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </Box>
+                            </InfiniteScroll>
+                        )}
+                        <MyProjectDrawer
+                            viewingJob={viewingJob}
+                            setViewingJob={setViewingJob}
+                            userType={userType}
+                            handleApproveDialogOpen={() => {/* Handle approve dialog */ }}
+                            handleRejectDialogOpen={() => {/* Handle reject dialog */ }}
+                        />
+                    </>
                 )}
-
-        <MyProjectDrawer
-        viewingJob={viewingJob}
-        setViewingJob={setViewingJob}
-        userType={userType} handleApproveDialogOpen={function (job: Job): void {
-            throw new Error('Function not implemented.');
-        } } handleRejectDialogOpen={function (job: Job): void {
-            throw new Error('Function not implemented.');
-        } }            />
             </Box>
 
 
+
+
+
             <Box sx={{ mt: 2 }}>
-            {projects.map((project) => (
-                <Card key={project._id} sx={{ mb: 2 }}>
-                    <CardContent>
-                        <Typography variant="h5">
-                            <a  style={{ cursor: 'pointer' }}>
-                                {project.title},
-                            </a>
-                            <span style={{ fontSize: 'small', color: "#616161" }}>
-                                ({dayjs(project.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                <Box sx={{
-                                    position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
-                                        position: 'relative',
-                                        top: '65px',
-                                        left: '69%'
-                                    }
-                                }}>
-                                    <Chip
-                                        label={project.status === 'Completed' ? 'Completed' : project.status === 'In Progress' ? 'In Progress' : 'Not Started'}
-                                        color={project.status === 'Completed' ? 'success' : project.status === 'In Progress' ? 'warning' : 'default'}
-                                    />
-                                </Box>
-                            </span>
-                            <Box sx={{
-                                fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
-                                    position: 'relative', top: '40px', right: '100px'
-                                }
-                            }}>
+                {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                    <>
+                        {projects.length > 0 ? (
+                            <Box>
+                                {projects.map((project) => (
+                                    <Card key={project._id} sx={{ mb: 2 }}>
+                                        <CardContent>
+                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box
+                                                    onClick={() => handleViewJob(project.jobDetails)}
+                                                    sx={{ cursor: 'pointer' }}
+                                                >
+                                                    {project.jobDetails.title}
+                                                </Box>
+                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                </Box>
+                                            </Typography>
+                                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                                {project.jobDetails.currency} {project.jobDetails.Budget}
+                                            </Typography>
+                                            <Typography variant="body1">
+                                                User Name: {project.jobDetails.firstName} {project.jobDetails.lastName}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Description: {project.jobDetails.description}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Category: {project.jobDetails.Category.join(', ')}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Subcategories: {project.jobDetails.Subcategorys.join(', ')}
+                                            </Typography>
+                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box sx={{
+                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
+                                                }}>
+                                                    <Chip
+                                                        label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                        color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                    />
+                                                </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <IconButton
+                                                        aria-controls="simple-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={handleClick}
+                                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                                    >
+                                                        <MoreVertIcon />
+                                                    </IconButton>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                border: '1px solid',
+                                                                boxShadow: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                    </Menu>
+                                                </Box>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                ))}
                             </Box>
-                            <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
-                                <Chip
-                                    // label={project.category}
-                                    variant="outlined"
-                                    color='secondary'
-                                    sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
-                                />
-                            </Box>
-                        </Typography>
+                        ) : (
+                            <Typography>No projects available</Typography>
+                        )}
+                    </>
+                )}
+            </Box>
 
-                        <Box sx={{ marginTop: '10px' }}>
-                            {/* <Typography variant="body2">{project.budgetCurrency === 'USD' ? '$' : '₹'}{project.budgetAmount}</Typography> */}
-                            {/* <Typography variant="caption">{project.tags.join(', ')}</Typography> */}
 
-                            <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                <IconButton
-                                    aria-controls="simple-menu"
-                                    aria-haspopup="true"
-                                    onClick={handleClick}
-                                    sx={{ display: { xs: 'block', md: 'none' } }}
-                                >
-                                    <MoreVertIcon />
-                                </IconButton>
-                                <Menu
-                                    id="simple-menu"
-                                    anchorEl={anchorEl}
-                                    keepMounted
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleClose}
-                                    PaperProps={{
-                                        sx: {
-                                            border: '1px solid',
-                                            boxShadow: 'none',
-                                        },
-                                    }}
-                                >
-                                    {/* Menu items can be added here */}
-                                </Menu>
-                            </Box>
-                        </Box>
-                    </CardContent>
-                </Card>
-            ))}
-        </Box>
 
 
             <AddApply
@@ -576,12 +569,12 @@ const myproject = () => {
             <MyProjectDrawer
                 viewingJob={viewingJob}
                 setViewingJob={setViewingJob}
-                userType={userType} 
+                userType={userType}
                 handleApproveDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
-                } } handleRejectDialogOpen={function (): void {
+                }} handleRejectDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
-                } }            />
+                }} />
 
         </Box>
     );
