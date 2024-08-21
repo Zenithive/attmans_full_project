@@ -12,13 +12,11 @@ import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import { Category, Subcategorys } from '@/app/constants/categories';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ProjectDrawer from '../component/projectDrwer/projectDrwer';
 import { Job, Apply } from '../projects/projectinterface';
 import { Expertiselevel } from '../projects/projectinterface';
 import { getSubcategorys } from '../projects/projectinterface';
 import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
-import CloseIcon from '@mui/icons-material/Close'; // Import CloseIcon
 import ConfirmationCancelDialog from './ConfirmationCancelDialog';
 
 
@@ -419,7 +417,7 @@ const myproject = () => {
                         {isShowingApplies ? (
                             <Box>
                                 {applies.map((apply) => (
-                                    <Card key={apply._id} sx={{ mb: 2 }}>
+                                    <Card key={apply._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                                 <Box>
@@ -450,7 +448,7 @@ const myproject = () => {
                             >
                                 <Box sx={{ mt: 2 }}>
                                     {filteredJobs.map((job) => (
-                                        <Card key={job._id} sx={{ mb: 2 }}>
+                                        <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
                                             <CardContent>
                                                 <Typography variant="h5">
                                                     <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
@@ -485,14 +483,11 @@ const myproject = () => {
                                                             color='secondary'
                                                             sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
                                                         />
-
-
                                                     </Box>
                                                 </Typography>
                                                 <Box sx={{ marginTop: '10px' }}>
                                                     <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                                     <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-
                                                     <Button
                                                         onClick={() => handleOpenConfirmationDialog(job._id as string)}
                                                         sx={{
@@ -511,36 +506,9 @@ const myproject = () => {
                                                                 backgroundColor: 'error.dark',
                                                             },
                                                         }}
-                                                        startIcon={<CloseIcon />}
                                                     >
                                                         Close
                                                     </Button>
-                                                    <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                                        <IconButton
-                                                            aria-controls="simple-menu"
-                                                            aria-haspopup="true"
-                                                            onClick={handleClick}
-                                                            sx={{ display: { xs: 'block', md: 'none' } }}
-                                                        >
-                                                            <MoreVertIcon />
-                                                        </IconButton>
-                                                        <Menu
-                                                            id="simple-menu"
-                                                            anchorEl={anchorEl}
-                                                            keepMounted
-                                                            open={Boolean(anchorEl)}
-                                                            onClose={handleClose}
-                                                            PaperProps={{
-                                                                sx: {
-                                                                    border: '1px solid',
-                                                                    boxShadow: 'none',
-                                                                },
-                                                            }}
-                                                        >
-
-                                                            {/* Menu items can be added here */}
-                                                        </Menu>
-                                                    </Box>
                                                 </Box>
                                             </CardContent>
                                         </Card>
@@ -558,6 +526,7 @@ const myproject = () => {
                     </>
                 )}
             </Box>
+
 
 
 
@@ -585,21 +554,19 @@ const myproject = () => {
                                                     {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                                 </Box>
                                             </Typography>
+                                            
+                                            
+
                                             <Typography variant="body1" sx={{ mt: 1 }}>
                                                 {project.jobDetails.currency} {project.jobDetails.Budget}
                                             </Typography>
-                                            <Typography variant="body1">
-                                                User Name: {project.jobDetails.firstName} {project.jobDetails.lastName}
-                                            </Typography>
+                                           
+                                           
+
                                             <Typography variant="body2" sx={{ mt: 1 }}>
-                                                Description: {project.jobDetails.description}
+                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
                                             </Typography>
-                                            <Typography variant="body2" sx={{ mt: 1 }}>
-                                                Category: {project.jobDetails.Category.join(', ')}
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ mt: 1 }}>
-                                                Subcategories: {project.jobDetails.Subcategorys.join(', ')}
-                                            </Typography>
+
                                             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
                                                 <Box sx={{
                                                     fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
@@ -634,7 +601,6 @@ const myproject = () => {
                                                                 backgroundColor: 'error.dark',
                                                             },
                                                         }}
-                                                        startIcon={<CloseIcon />}
                                                     >
                                                         Close
                                                     </Button>
