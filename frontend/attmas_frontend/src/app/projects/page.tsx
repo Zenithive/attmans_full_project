@@ -699,7 +699,7 @@ const Jobs = () => {
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
                                             <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                                {userDetails.userType === 'Project Owner' && (
+                                                {userDetails.userType === 'Project Owner' && job.username === userDetails.username &&(
                                                     <>
                                                         <Tooltip title="Edit" arrow>
                                                             <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
@@ -738,7 +738,7 @@ const Jobs = () => {
                                                     }}
                                                 >
                                                     <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
-                                                    {userDetails.userType === 'Project Owner' && (
+                                                    {userDetails.userType === 'Project Owner' &&  job.username === userDetails.username &&(
                                                         <>
                                                             <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
                                                                 <ListItemIcon>
