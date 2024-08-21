@@ -153,19 +153,19 @@ const Jobs = () => {
 
     const handleFilterChanges = async (event: React.MouseEvent<HTMLElement>, newFilter: 'all' | 'my' | undefined) => {
         if (newFilter === null) {
-            await resetApplies(); 
-            setSelectedFilter(undefined); 
+            await resetApplies();
+            setSelectedFilter(undefined);
         } else {
             setSelectedFilter(newFilter);
-    
+
             if (newFilter === 'all') {
-                await fetchApplies(); 
+                await fetchApplies();
             } else if (newFilter === 'my') {
-                await fetchMyApplies(); 
+                await fetchMyApplies();
             }
         }
     };
-    
+
 
     const refetch = useCallback(async () => {
         try {
@@ -556,7 +556,7 @@ const Jobs = () => {
                 </Box>
             )}
 
-            {(userType === 'Project Owner') &&(
+            {(userType === 'Project Owner') && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -601,13 +601,13 @@ const Jobs = () => {
                         exclusive
                         onChange={handleFilterChanges}
                         aria-label="Apply Filter"
-                        sx={{ height: "30px",ml:2 }}
+                        sx={{ height: "30px", ml: 2 }}
                     >
                         <ToggleButton value="all">
-                            All 
+                            All
                         </ToggleButton>
                         <ToggleButton value="my">
-                           My Projects
+                            My Projects
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Box>
@@ -628,7 +628,7 @@ const Jobs = () => {
                                         </Box>
                                     </Typography>
                                     <Typography variant="body1" sx={{ mt: 1 }}>
-                                       {apply.currency} {apply.Budget}
+                                        {apply.currency} {apply.Budget}
                                     </Typography>
 
                                     <Typography variant="body1">
@@ -654,52 +654,46 @@ const Jobs = () => {
                             {filteredJobs.map((job) => (
                                 <Card key={job._id} sx={{ mb: 2 }}>
                                     <CardContent>
-                                        <Typography variant="h5">
+                                        <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
 
-                                            <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
-                                                {job.title}    ,
-                                            </a>
-                                            <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                                <Grid item xs={12} sx={{
-                                                    position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
-                                                        position: 'relative',
-                                                        top: '65px',
-                                                        left: '69%'
-                                                    }
-                                                }}>
+                                            <Box sx={{ width: '50%','@media (max-width: 767px)': {width:'100%'} }}>
+                                                <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+                                                    {job.title},
+                                                </a>
+                                                <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                    ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                </span>
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
                                                     <CustomChip
                                                         label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                                         color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
                                                     />
-                                                </Grid>
-                                            </span>
-                                            <Box sx={{
-                                                fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
-                                                    position: 'relative', top: '40px', right: '100px'
-                                                }
-                                            }}>
-                                                {job.Expertiselevel}
+                                                </Box>
+
+                                                <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                    <Chip
+                                                        label={job.SelectService}
+                                                        variant="outlined"
+                                                        color='secondary'
+                                                    />
+                                                </Box>
+
+                                                <Box sx={{ flexShrink: 0, fontSize: 'small', fontWeight: 'bolder' }}>
+                                                    {job.Expertiselevel}
+                                                </Box>
                                             </Box>
 
-
-                                            <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
-                                                <Chip
-                                                    label={job.SelectService}
-                                                    variant="outlined"
-                                                    color='secondary'
-                                                    sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
-                                                />
-                                            </Box>
                                         </Typography>
-
                                         <Box sx={{ marginTop: '10px' }}>
 
                                             <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
                                             <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
-                                                {userDetails.userType === 'Project Owner' && job.username === userDetails.username &&(
+                                                {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (
                                                     <>
                                                         <Tooltip title="Edit" arrow>
                                                             <IconButton onClick={() => handleEditJob(job)} sx={{ '@media (max-width: 767px)': { display: 'none' } }}>
@@ -738,7 +732,7 @@ const Jobs = () => {
                                                     }}
                                                 >
                                                     <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
-                                                    {userDetails.userType === 'Project Owner' &&  job.username === userDetails.username &&(
+                                                    {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (
                                                         <>
                                                             <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
                                                                 <ListItemIcon>
