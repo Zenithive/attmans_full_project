@@ -10,6 +10,8 @@ export class CreateJobsDto {
 
   @IsString()
   commentWhenProjectClose: string;
+  @IsString()
+  commentWhenProjectCloseByAdmin: string;
 
   @IsNotEmpty()
   @IsString()
@@ -94,6 +96,9 @@ export class UpdateJobsDto {
 
   @IsString()
   commentWhenProjectClose: string;
+  
+  @IsString()
+  commentWhenProjectCloseByAdmin: string;
 
   @IsNotEmpty()
   @IsString()

@@ -13,7 +13,9 @@ import ApplyDetailsDialog from '../projectsDetails/projectDetails';
 import booth from '../booth/booth';
 import AddComment from '../projectComment/projectComment';
 import JobDetail from '../projectCommentCard/projectCommentCard';
+import ConfirmCloseBox from './ConfirmCloseBox';
 import ConfirmationDialog from './ConfirmationDialog';
+import ConfirmationDialogWithCommentForCancel from './ConfirmationDialogWithCommentForCancel';
 
 
 
@@ -27,8 +29,8 @@ export interface Job {
   Category: string[];
   Subcategorys: string[];
   DetailsOfInnovationChallenge: string;
-  firstName:string,
-  lastName:string,
+  firstName: string,
+  lastName: string,
   Sector: string;
   AreaOfProduct: string;
   ProductDescription: string;
@@ -95,6 +97,12 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const currentUser = userDetails.username;
 
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const fetchApplications = useCallback(async () => {
     if (viewingJob?._id) {
       try {
@@ -156,9 +164,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
-    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved'  || app.status === 'Awarded');
+    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved' || app.status === 'Awarded');
 
-  const handleReward = async (applicationId: string, Comment:string) => {
+  const handleReward = async (applicationId: string, Comment: string) => {
     try {
       if (!applicationId) return;
       console.log("applicationId", applicationId);
@@ -177,7 +185,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           : { ...app, status: 'Not Awarded' }
       );
 
-      
+
       setApplications(updatedApplications);
 
       // Hide all the buttons
@@ -193,7 +201,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     }
   };
 
- const handleOpenConfirmationDialog = (applicationId: string) => {
+  const handleOpenConfirmationDialog = (applicationId: string) => {
     console.log("applicationId", applicationId);
 
     setCurrentApplicationId(applicationId);
@@ -205,7 +213,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     setCurrentApplicationId(null);
   };
 
-  const handleConfirm = (comment:string) => {
+  const handleConfirm = (comment: string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
       console.log(`Awarding application with ID: ${currentApplicationId}`);
@@ -215,6 +223,70 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     }
   };
 
+
+
+  // close conformation 
+  const handleCloseClick = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmClose = async (id: string, comment: string) => {
+    setConfirmOpen(false);
+    try {
+      // Send the POST request to close the project, including the ID in the URL
+      await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
+        comment,     // Include the comment in the request body
+        status: 'Project Closed by Admin' // Include the status in the request body
+      });
+
+      // Optionally handle the response or update UI
+      console.log('Project successfully closed');
+    } catch (error) {
+      // Handle error (e.g., display an error message)
+      console.error('Error closing the project:', error);
+    }
+  };
+
+  const handleCancelClose = () => {
+    setConfirmOpen(false);
+  };
+
+
+
+  ////////////////////////////////////
+
+
+  const handleCancelClick2: () => void = () => {
+    console.log('Cancel button clicked');
+    setIsDialogOpen(true);
+    console.log('isDialogOpen:', isDialogOpen);
+  };
+
+  
+
+  const handleConfirmDialog2 = async (id: string, comment: string) => {
+    console.log('User comment:', comment);
+    // Add your logic here, e.g., cancel an operation, submit the comment, etc.
+    setIsDialogOpen(false);
+    
+   try {
+      // Send the POST request to close the project, including the ID in the URL
+      await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
+        comment,     // Include the comment in the request body
+        status: 'Approved' // Include the status in the request body
+      });
+
+      // Optionally handle the response or update UI
+      console.log('Project successfully closed');
+    } catch (error) {
+      // Handle error (e.g., display an error message)
+      console.error('Error closing the project:', error);
+    }
+  };
+
+  const handleCloseDialog2 = () => {
+    setIsDialogOpen(false);
+  };
 
 
   return (
@@ -402,7 +474,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && (
+                {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && viewingJob.status !== 'Project Closed by Admin' && viewingJob.status !== 'Project Finished and close' && (
                   <>
                     <Button onClick={() => handleApproveDialogOpen(viewingJob)}>
                       Approve
@@ -413,6 +485,35 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   </>
                 )}
               </Box>
+
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                {userType === 'Admin' && viewingJob.status === 'Project Closed by Admin' || viewingJob.status === 'Project Finished and close' &&   (
+                  <>
+                    <Button onClick={handleCancelClick2}>Cancel</Button>
+                    <Button onClick={handleCloseClick}>Close</Button>
+
+                  </>
+                )}
+
+                {/* Render the ConfirmCloseBox */}
+                <ConfirmCloseBox
+                  open={confirmOpen}
+                  onClose={handleCancelClose}
+                  onConfirm={handleConfirmClose}
+                  id={viewingJob._id || 'default-id'}
+                />
+
+                <ConfirmationDialogWithCommentForCancel
+                  open={isDialogOpen}
+                  onClose={handleCloseDialog2}
+                  onConfirm={handleConfirmDialog2}
+                  id={viewingJob._id || 'default-id'}
+                
+                />
+
+              </Box>
+
 
               <Divider orientation="horizontal" flexItem />
 
@@ -436,20 +537,20 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Box>
               )}
 
-            <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-              {filteredApplications.length > 0 ? (
-                filteredApplications.map((app) => (
-                  <Card
-                    key={app._id}
-                    sx={{
-                      width: 300,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      height: 'auto',
-                    }}
-                  >
-                    <CardContent sx={{ flex: 1 }}>
+              <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                {filteredApplications.length > 0 ? (
+                  filteredApplications.map((app) => (
+                    <Card
+                      key={app._id}
+                      sx={{
+                        width: 300,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        height: 'auto',
+                      }}
+                    >
+                      <CardContent sx={{ flex: 1 }}>
 
 
                         <Chip
@@ -480,43 +581,43 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           }}
                         />
 
-                      <Typography variant="h6" sx={{ mb: 1 }}>
-                        {app.title}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                        <b>Applied User:</b> {app.firstName} {app.lastName}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                        <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                        <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
-                      </Typography>
+                        <Typography variant="h6" sx={{ mb: 1 }}>
+                          {app.title}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                          <b>Applied User:</b> {app.firstName} {app.lastName}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                          <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                          <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
+                        </Typography>
 
-                      {userDetails && (
-                        (userType === 'Admin' ||
-                          userType === 'Project Owner' ||
-                          (userType === 'Innovators' || userType === 'Freelancer') &&
-                          filteredApplications.some((filteredApp) => filteredApp.username === currentUser && filteredApp._id === app._id))
-                      ) && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                          <a
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setSelectedApply(app);
-                              setDialogOpen(true);
-                            }}
-                            style={{
-                              textDecoration: 'underline',
-                              color: '#1976d2',
-                              fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
-                            }}
-                          >
-                            View Details
-                          </a>
-                        </Box>
-                      )}
+                        {userDetails && (
+                          (userType === 'Admin' ||
+                            userType === 'Project Owner' ||
+                            (userType === 'Innovators' || userType === 'Freelancer') &&
+                            filteredApplications.some((filteredApp) => filteredApp.username === currentUser && filteredApp._id === app._id))
+                        ) && (
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                              <a
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setSelectedApply(app);
+                                  setDialogOpen(true);
+                                }}
+                                style={{
+                                  textDecoration: 'underline',
+                                  color: '#1976d2',
+                                  fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                                }}
+                              >
+                                View Details
+                              </a>
+                            </Box>
+                          )}
 
                       </CardContent>
                       <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>

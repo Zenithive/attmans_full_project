@@ -301,6 +301,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                                     <TextField
                                                         label="Product Description"
                                                         name="ProductDescription"
+                                                        multiline
                                                         color='secondary'
                                                         variant="outlined"
                                                         value={values.ProductDescription}

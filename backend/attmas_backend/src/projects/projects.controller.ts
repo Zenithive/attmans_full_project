@@ -18,7 +18,7 @@ import { Jobs } from './projects.schema';
 
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(private readonly jobsService: JobsService) { }
 
   @Post()
   async create(@Body() createJobsDto: CreateJobsDto): Promise<Jobs> {
@@ -102,15 +102,15 @@ export class JobsController {
 
 
   @Post('update-status-closecomment/:id')
-async updateStatusAndComment(
-  @Param('id') id: string,
-  @Body() updateData: { status: string; comment: string },
-): Promise<Jobs> {
+  async updateStatusAndComment(
+    @Param('id') id: string,
+    @Body() updateData: { status: string; comment: string },
+  ): Promise<Jobs> {
     const { comment } = updateData;
-    
+
     // Set status to "Closed"
     const status = 'Project Finished and close';
-    
+
     // Log the ID, status, and comment
     console.log(`Updating job with ID: ${id}`);
     console.log(`Status: ${status}`);
@@ -118,6 +118,22 @@ async updateStatusAndComment(
 
     // Pass the ID, status, and comment to the service method
     return this.jobsService.updateStatusAndComment(id, status, comment);
-}
+  }
+
+
+  @Post('update-status-closecommentByAdmin/:id')
+  async updateStatusAndCommentByAdmin(
+    @Param('id') id: string,
+    @Body() updateData: { status: string; comment: string },
+  ): Promise<Jobs> {
+    const { comment, status } = updateData;
+
+    console.log(`Admin closing project with ID: ${id}`);
+    console.log(`Status: ${status}`);
+    console.log(`Comment: ${comment}`);
+
+    return this.jobsService.updateStatusAndCommentByAdmin(id, status, comment);
+  }
+
 
 }
