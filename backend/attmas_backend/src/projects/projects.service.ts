@@ -26,7 +26,7 @@ export class JobsService {
     private readonly emailService: EmailService2,
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
-  ) {}
+  ) { }
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
     const createdJobs = new this.jobsModel(createJobsDto);
@@ -259,7 +259,7 @@ export class JobsService {
     // Find the job by ID
     const job = await this.jobsModel.findById(id);
     if (!job) {
-        throw new NotFoundException(`Job with id ${id} not found`);
+      throw new NotFoundException(`Job with id ${id} not found`);
     }
 
     // Update the status and comment fields
@@ -268,6 +268,31 @@ export class JobsService {
 
     // Save the updated job back to the database
     return job.save();
-}
+  }
+
+
+  async updateStatusAndCommentByAdmin(id: string, status: string, comment: string): Promise<Jobs> {
+    console.log(`Admin updating job with ID: ${id}`);
+    console.log(`Status: ${status}`);
+    console.log(`Comment: ${comment}`);
+
+    // Find the job by ID
+    const job = await this.jobsModel.findById(id);
+    if (!job) {
+      console.log(`Job with ID ${id} not found`);
+      throw new NotFoundException(`Job with id ${id} not found`);
+    }
+
+    // Update the status and comment fields
+    job.status = status;
+    job.commentWhenProjectCloseByAdmin = comment;
+
+    // Save the updated job back to the database
+    const updatedJob = await job.save();
+    console.log('Job updated successfully by admin:', updatedJob);
+
+    return updatedJob;
+  }
+
 
 }
