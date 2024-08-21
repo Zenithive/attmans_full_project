@@ -14,12 +14,13 @@ import {
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import ProductTable, { Product } from '../ProductTable';
+import { userType } from '@/app/services/user.access.service';
 
 interface FormValues {
     qualification: string;
@@ -51,6 +52,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const dispatch = useAppDispatch();
 
     const validationSchema = Yup.object({
         qualification: Yup.string().required('Qualification is required'),
@@ -100,6 +103,18 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 console.log('Form submitted successfully:', response.data);
 
                 setLoading(false);
+                const user1 = {
+                    token: userDetails.token,
+                    username: userDetails.username,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    mobileNumber: userDetails.mobileNumber,
+                    _id: userDetails._id,
+                    userType: values.userType as userType
+                };
+
+                dispatch(addUser(user1));
+
                 pubsub.publish('toast', {
                     message: 'Profile updated successfully!',
                     severity: 'success',
@@ -119,15 +134,15 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const handleFocus = () => {
         setLabel("Share Solution");
-      };
-    
-   
-      const handleBlur = () => {
+    };
+
+
+    const handleBlur = () => {
         if (!formik.values.patentDetails) {
-          setLabel("Provide details about the research product or solution that you intend to commercialize");
+            setLabel("Provide details about the research product or solution that you intend to commercialize");
         }
-      };
-    
+    };
+
 
 
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -353,8 +368,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                                 onChange={formik.handleChange}
                                                 onBlur={(e) => {
                                                     formik.handleBlur(e);
-                                                    handleBlur(); 
-                                                  }}
+                                                    handleBlur();
+                                                }}
                                                 onFocus={handleFocus}
                                                 value={formik.values.patentDetails}
                                                 error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
