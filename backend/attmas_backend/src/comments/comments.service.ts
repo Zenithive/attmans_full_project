@@ -47,6 +47,20 @@ export class CommentsService {
 
     console.log('apply', apply);
 
+    let commentStatus = 'Pending';
+    if (user.userType === 'Admin' && apply.status !== 'Approved') {
+      commentStatus = 'Approving Comment';
+    }
+
+    if (
+      (user.userType === 'Admin' ||
+        user.userType === 'Innovators' ||
+        user.userType === 'Freelancer' ||
+        user.userType === 'Project Owner') &&
+      (apply.status === 'Approved' || apply.status === 'Awarded')
+    ) {
+      commentStatus = 'Appliction Comment';
+    }
     const comment = new this.commentModel({
       commentText,
       createdBy,
@@ -56,6 +70,7 @@ export class CommentsService {
       userType: user.userType,
       jobId,
       applyId,
+      status: commentStatus,
     });
 
     console.log('comment', comment);

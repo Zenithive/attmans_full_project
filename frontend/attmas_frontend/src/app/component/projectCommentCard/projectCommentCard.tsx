@@ -11,7 +11,7 @@ interface JobDetailProps {
   onCommentSubmitted?: () => void;
 }
 
-const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitted}) => {
+const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitted }) => {
   const [job, setJob] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
 
@@ -26,9 +26,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitte
 
   const fetchComments = async () => {
     try {
-      // console.log("Fetching comments...");
       const response = await axios.get(`${APIS.GET_COMMENT}/job/${jobId}/apply/${applyId}`);
-      // console.log("Comments fetched:", response.data);
       setJob((prevJob: any) => ({ ...prevJob, comments: response.data }));
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -43,14 +41,12 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitte
     fetchComments();
   }, [jobId, applyId]);
 
-
   useEffect(() => {
     if (onCommentSubmitted) {
       fetchComments();
     }
   }, [onCommentSubmitted]);
 
-  
   const toggleComments = () => {
     setExpanded((prev) => !prev);
   };
@@ -58,9 +54,20 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitte
   if (!job) return <Typography>Loading...</Typography>;
 
   return (
-    <Box sx={{ width: '100%', padding: 2, border: '1px solid #ddd', borderRadius: '20px',marginTop:'20px' , backgroundColor: '#f5f5f5' }}>
+    <Box
+      sx={{
+        width: '100%',
+        padding: { xs: 1, sm: 2 },
+        border: '1px solid #ddd',
+        borderRadius: '20px',
+        marginTop: { xs: 1, sm: 2 },
+        backgroundColor: '#f5f5f5',
+      }}
+    >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6">Comments</Typography>
+        <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+          Comments
+        </Typography>
         <IconButton onClick={toggleComments}>
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </IconButton>
@@ -69,24 +76,52 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId ,applyId ,onCommentSubmitte
       {expanded && (
         <Box
           sx={{
-            maxHeight: 300, 
-            overflowY: 'auto', 
+            maxHeight: { xs: 200, sm: 300 },
+            overflowY: 'auto',
             marginTop: 2,
-            paddingRight: 1, 
+            paddingRight: 1,
           }}
         >
           {job.comments.length > 0 ? (
             job.comments.map((comment: any, index: number) => (
-              <Paper key={index} sx={{ padding: 2, marginBottom: 1 }}>
-                <Typography variant="body2">
+              <Paper
+                key={index}
+                sx={{
+                  padding: { xs: 1, sm: 2 },
+                  marginBottom: 1,
+                  position: 'relative',
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ whiteSpace: 'pre', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                >
                   <strong>{comment.firstName} {comment.lastName}:</strong> {comment.commentText}
                 </Typography>
-                <Typography variant="caption" color="textSecondary">
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                >
                   {new Date(comment.createdAt).toLocaleString()}
                 </Typography>
-                <Typography variant="body2" sx={{float:'right', position:'relative',bottom:'20px'}}>
-                  <strong>{comment.userType}</strong>
-                </Typography>
+
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: { xs: 4, sm: 8 },
+                    right: { xs: 4, sm: 8 },
+                    textAlign: 'right',
+                    fontSize: { xs: '0.75rem', sm: '1rem' },
+                  }}
+                >
+                  <Typography variant="body2">
+                    <strong>{comment.userType}</strong>
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'grey' }}>
+                    {comment.status}
+                  </Typography>
+                </Box>
               </Paper>
             ))
           ) : (

@@ -430,7 +430,7 @@ const ExhibitionsPage: React.FC = () => {
                       ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
                     </Box>
                   </Typography>
-                  <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.description}</Typography>
+                  <Typography variant="h5" sx={{ fontSize: 'medium',marginBottom:'10px' }}>{exhibition.description}</Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.industries}</Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.subjects}</Typography>
                 </CardContent>
@@ -455,7 +455,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
           </Box>
           {userType !== 'Visitors' && (
-            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '22px' }}>
+            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '22px' ,'@media (max-width: 767px)': {position:'relative',bottom:'0px',marginBottom:'20px'}}}>
               <ToggleButtonGroup
                 value={view}
                 exclusive
