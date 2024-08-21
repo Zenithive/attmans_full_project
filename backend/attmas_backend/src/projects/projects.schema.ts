@@ -75,7 +75,6 @@ export class Jobs {
   @Prop({ default: 'Pending' })
   status: string;
 
-
   @Prop({ default: 'Pending' })
   commentWhenProjectClose: string;
 
