@@ -42,6 +42,8 @@ const myproject = () => {
     const [applies, setApplies] = useState<Apply[]>([]);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
+    const [apply, setApply] = useState<Apply | null>(null);
+    const [applications, setApplications] = useState<Apply[]>([]);
 
     const [projects, setProjects] = useState<Apply[]>([]);
 
@@ -56,6 +58,21 @@ const myproject = () => {
         setAnchorEl(null);
     };
 
+
+    const fetchApplications = useCallback(async () => {
+        if (viewingJob?._id) {
+          try {
+            const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
+            setApplications(response.data);
+          } catch (error) {
+            console.error('Error fetching applications:', error);
+          }
+        }
+      }, [viewingJob]);
+
+      const handleCommentSubmitted = () => {
+        fetchApplications();
+      };
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
         try {
@@ -111,7 +128,8 @@ const myproject = () => {
 
 
     useEffect(() => {
-        fetchAllProjects(); // Fetch all projects on component mount
+        fetchAllProjects();
+         // Fetch all projects on component mount
     }, [fetchAllProjects]);
 
 
@@ -350,9 +368,6 @@ const myproject = () => {
                 </Box>
             )}
 
-            
-
-
             <Box sx={{ mt: 2 }}>
                 {userDetails.userType === 'Project Owner' && (
                     <>
@@ -468,14 +483,13 @@ const myproject = () => {
                             userType={userType}
                             handleApproveDialogOpen={() => {/* Handle approve dialog */ }}
                             handleRejectDialogOpen={() => {/* Handle reject dialog */ }}
+                            onCommentSubmitted={handleCommentSubmitted}
+        
                         />
+                    
                     </>
                 )}
             </Box>
-
-
-
-
 
             <Box sx={{ mt: 2 }}>
                 {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
@@ -572,9 +586,12 @@ const myproject = () => {
                 userType={userType}
                 handleApproveDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
-                }} handleRejectDialogOpen={function (): void {
+                }} 
+                handleRejectDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
-                }} />
+                }}
+                onCommentSubmitted={handleCommentSubmitted}
+                />
 
         </Box>
     );
