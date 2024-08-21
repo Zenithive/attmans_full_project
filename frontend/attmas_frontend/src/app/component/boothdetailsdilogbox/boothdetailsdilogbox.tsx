@@ -103,7 +103,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
           {booth && (
             <Box sx={{ position: 'relative' }}>
               <Box sx={{ position: 'absolute', top: 16, right: 16, '@media (max-width: 767px)': { position: 'relative', top: '-10px', left: '5px' } }}>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" sx={{'@media (max-width: 767px)': {fontSize:'1.25rem'}}} color="text.secondary">
                   Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
                 </Typography>
               </Box>
@@ -114,8 +114,8 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="h6" component="div" sx={{ mb: 2, '@media (max-width: 767px)': { position: 'relative' } }}>
-                    Description: {booth.description}
+                  <Typography variant="body1"  sx={{ mb: 2 ,fontSize:'1.25rem', '@media (max-width: 767px)': { position: 'relative',fontSize:'1.25rem' } }}>
+                  <strong>Description: </strong>{booth.description}
                   </Typography>
                 </Grid>
                 {booth.rejectComment && (
@@ -182,10 +182,10 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                     booth.products.map((product, index) => (
                       <Card key={index} sx={{ mb: 2}}>
                         <CardContent>
-                          <Typography variant="body1"><strong>Name:</strong> {product.productName}</Typography>
-                          <Typography variant="body1"><strong>Description:</strong> {product.productDescription}</Typography>
-                          <Typography variant="body1"><strong>Type:</strong> {product.productType}</Typography>
-                          <Typography variant="body1"><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
+                          <Typography variant="body1" sx={{marginBottom:'15px', fontSize:'1.25rem'}}><strong>Name:</strong> {product.productName}</Typography>
+                          <Typography variant="body1" sx={{marginBottom:'15px',fontSize:'1.25rem'}}><strong>Description:</strong> {product.productDescription}</Typography>
+                          <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Type:</strong> {product.productType}</Typography>
+                          <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
                           <Box sx={{ mt: 1 ,'@media (max-width: 767px)': {
                         position: 'relative',
                         float: 'right',

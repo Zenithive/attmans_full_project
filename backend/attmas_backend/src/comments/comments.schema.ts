@@ -28,6 +28,9 @@ export class Comment {
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })
   applyId: Types.ObjectId;
+
+  @Prop({ required: true, default: 'Pending' })
+  status: string;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
