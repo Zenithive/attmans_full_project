@@ -262,14 +262,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     console.log('isDialogOpen:', isDialogOpen);
   };
 
-  
+
 
   const handleConfirmDialog2 = async (id: string, comment: string) => {
     console.log('User comment:', comment);
     // Add your logic here, e.g., cancel an operation, submit the comment, etc.
     setIsDialogOpen(false);
-    
-   try {
+
+    try {
       // Send the POST request to close the project, including the ID in the URL
       await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
         comment,     // Include the comment in the request body
@@ -487,12 +487,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               </Box>
 
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                {userType === 'Admin' && viewingJob.status === 'Project Closed by Admin' || viewingJob.status === 'Project Finished and close' &&   (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                {userType === 'Admin' && (viewingJob.status === 'Project Closed by Admin' || viewingJob.status === 'Project Finished and close') && (
                   <>
-                    <Button onClick={handleCancelClick2}>Cancel</Button>
+                    <Button sx={{ mr: 1 }} onClick={handleCancelClick2}>Cancel</Button>
                     <Button onClick={handleCloseClick}>Close</Button>
-
                   </>
                 )}
 
@@ -509,7 +508,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   onClose={handleCloseDialog2}
                   onConfirm={handleConfirmDialog2}
                   id={viewingJob._id || 'default-id'}
-                
+
                 />
 
               </Box>
