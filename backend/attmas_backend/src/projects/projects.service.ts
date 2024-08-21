@@ -253,4 +253,21 @@ export class JobsService {
     job.comments.push(comment);
     return job.save();
   }
+
+
+  async updateStatusAndComment(id: string, status: string, comment: string): Promise<Jobs> {
+    // Find the job by ID
+    const job = await this.jobsModel.findById(id);
+    if (!job) {
+        throw new NotFoundException(`Job with id ${id} not found`);
+    }
+
+    // Update the status and comment fields
+    job.status = status;
+    job.commentWhenProjectClose = comment;
+
+    // Save the updated job back to the database
+    return job.save();
+}
+
 }

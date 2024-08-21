@@ -99,4 +99,25 @@ export class JobsController {
   ) {
     return this.jobsService.addComment(jobId, addCommentDto);
   }
+
+
+  @Post('update-status-closecomment/:id')
+async updateStatusAndComment(
+  @Param('id') id: string,
+  @Body() updateData: { status: string; comment: string },
+): Promise<Jobs> {
+    const { comment } = updateData;
+    
+    // Set status to "Closed"
+    const status = 'Project Finished and close';
+    
+    // Log the ID, status, and comment
+    console.log(`Updating job with ID: ${id}`);
+    console.log(`Status: ${status}`);
+    console.log(`Comment: ${comment}`);
+
+    // Pass the ID, status, and comment to the service method
+    return this.jobsService.updateStatusAndComment(id, status, comment);
+}
+
 }
