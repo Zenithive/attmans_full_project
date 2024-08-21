@@ -156,7 +156,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
-    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved');
+    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved'  || app.status === 'Awarded');
 
   const handleReward = async (applicationId: string, Comment:string) => {
     try {
