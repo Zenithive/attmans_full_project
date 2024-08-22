@@ -16,8 +16,13 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
         setComment(''); // Reset comment input after confirmation
     };
 
+    const handleClose = () => {
+        setComment(''); // Reset comment when closing the dialog
+        onClose(); // Trigger the onClose prop function
+    };
+
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Confirmation</DialogTitle>
             <DialogContent>
                 <DialogContentText>{message}</DialogContentText>
@@ -38,7 +43,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
             </DialogContent>
             <DialogActions>
                 <Button
-                    onClick={onClose}
+                    onClick={handleClose}
                     sx={{
                         color: 'white',
                         backgroundColor: '#757575',

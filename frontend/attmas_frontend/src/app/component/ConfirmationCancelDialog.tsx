@@ -17,14 +17,20 @@ const ConfirmationCancelDialog: FC<ConfirmationDialogProps> = ({ open, onClose, 
         setComment('');
     };
 
+    const handleClose = () => {
+        setComment('');  // Reset the comment when closing the dialog
+        onClose();       // Close the dialog
+    };
+
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={handleClose}>
             <DialogTitle>Confirm</DialogTitle>
             <DialogContent>
             <DialogContentText>{message}</DialogContentText>
                 
                 <TextField
                     label="Comment"
+                    color='secondary'
                     multiline
                     rows={4}
                     value={comment}
@@ -34,7 +40,7 @@ const ConfirmationCancelDialog: FC<ConfirmationDialogProps> = ({ open, onClose, 
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="primary">
+                <Button onClick={handleClose} color="primary">
                     Cancel
                 </Button>
                 <Button onClick={handleConfirm} color="secondary">

@@ -40,7 +40,8 @@ const Jobs = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
-    const [filterType, setFilterType] = useState("all");
+    // const [filterType, setFilterType] = useState("all");
+    
     const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; jobs: Job | null }>({ open: false, jobs: null });
     const [approveDialogOpen, setApproveDialogOpen] = useState<{
         open: boolean;
@@ -60,6 +61,10 @@ const Jobs = () => {
     const [applies, setApplies] = useState<Apply[]>([]);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
+
+    const [filterType, setFilterType] = useState(() => {
+        return userDetails.userType === 'Freelancer' ? 'Innovative Products' : 'all';
+    });
 
     const handleApproveDialogOpen = (job: Job) => {
         setApproveDialogOpen({ open: true, job });
@@ -269,18 +274,11 @@ const Jobs = () => {
 
 
 
-    const handleFilterTypeChange = (event: any, newFilterType: string) => {
-        if (newFilterType !== null) {
-            setFilterType(newFilterType);
+    const handleFilterTypeChange = (event: any, newFilter: string) => {
+        if (newFilter  !== null) {
+            setFilterType(newFilter);
         }
     }
-
-    const handleServiceChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newServices: string[],
-    ) => {
-        setSelectedServices(newServices);
-    };
 
 
     // Function to handle viewing job details
@@ -346,15 +344,29 @@ const Jobs = () => {
         }
     }, [refetch, viewingJob]);
 
-    const filteredJobs = useMemo(() => {
-        return jobs.filter(job => {
-            if (userType === 'Admin' && selectedStatus) {
-                return job.status === selectedStatus;
-            }
-            return userType === 'Admin' || job.status === 'Approved';
-        });
+    // const filteredJobs = useMemo(() => {
+    //     return jobs.filter(job => {
+    //         if (userType === 'Admin' && selectedStatus) {
+    //             return job.status === selectedStatus;
+    //         }
+    //         return userType === 'Admin' || job.status === 'Approved';
+    //     });
 
-    }, [jobs, userType, selectedStatus]);
+    // }, [jobs, userType, selectedStatus]);
+
+    // Filter jobs based on the selected filter type
+    const filteredJobs = jobs.filter((job) => {
+        if (filterType === 'Innovative Products') {
+            return job.SelectService.includes('Innovative product');
+        }
+        if (filterType === 'Outsource Research and Development') {
+            return job.SelectService.includes('Outsource Research and Development ');
+        }
+        if (filterType === 'mine') {
+            return job.username === userDetails.username;
+        }
+        return true; // Return all jobs if no specific filter is selected
+    });
 
 
     const handleCancelApply = useCallback((jobId: string) => {
@@ -507,7 +519,7 @@ const Jobs = () => {
 
             )}
 
-            {(userType === 'Project Owner') && (
+            {/* {(userType === 'Project Owner') && ( */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -530,67 +542,28 @@ const Jobs = () => {
                         aria-label="filter exhibitions"
                         sx={{ height: "30px" }}
                     >
-                        {/* <ToggleButton value="all" aria-label="all exhibitions">
-                            All ProjectS
-                        </ToggleButton>
-                        {userType === 'Project Owner' && (
-                            <ToggleButton value="mine" aria-label="my exhibitions">
-                                My Projects
-                            </ToggleButton>
-                        )} */}
+
 
 
                         <ToggleButton value="all" aria-label="all exhibitions">
                             All Projects
                         </ToggleButton>
-
-
-
-                        {userType === 'Project Owner' && (
-                            <ToggleButton value="mine" aria-label="my exhibitions">
-                                My Projects
-                            </ToggleButton>
-                        )}
-
-                    </ToggleButtonGroup>
-                </Box>
-            )}
-
-            {(userType === 'Project Owner') && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        position: 'relative',
-                        left: '20%',
-                        bottom: '30px',
-
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px'
-                        },
-                    }}
-                >
-
-                    <ToggleButtonGroup
-                        value={selectedServices}
-                        onChange={handleServiceChange}
-                        aria-label="Select Service"
-                        sx={{ height: "30px" }}
-                    >
-                        <ToggleButton value="Outsource Research and Development ">
+                        <ToggleButton value="Innovative Products" aria-label="Innovative Products">
+                            Innovative Products
+                        </ToggleButton>
+                        <ToggleButton value="Outsource Research and Development" aria-label="Outsource Research and Development">
                             Outsource Research and Development
                         </ToggleButton>
-                        <ToggleButton value="Innovative product">
-                            Innovative Product
+                        <ToggleButton value="mine" aria-label="my exhibitions">
+                            My Projects
                         </ToggleButton>
+
+
                     </ToggleButtonGroup>
                 </Box>
-            )}
+            {/* )} */}
+
+
 
 
             {(userType === 'Innovators' || userType === 'Freelancer') && (
@@ -656,7 +629,7 @@ const Jobs = () => {
                                     <CardContent>
                                         <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
 
-                                            <Box sx={{ width: '50%','@media (max-width: 767px)': {width:'100%'} }}>
+                                            <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
                                                 <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
                                                     {job.title},
                                                 </a>

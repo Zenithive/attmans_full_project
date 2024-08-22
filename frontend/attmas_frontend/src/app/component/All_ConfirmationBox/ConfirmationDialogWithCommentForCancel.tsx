@@ -17,12 +17,18 @@ const ConfirmationDialogWithCommentForCancel: FC<ConfirmationDialogWithCommentPr
     onClose();
   };
 
+  const handleClose = () => {
+    setComment(''); // Reset comment when closing the dialog
+    onClose(); // Trigger the onClose prop function
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Are you sure you want to cancel?</DialogTitle>
       <DialogContent>
         <TextField
           label="Add a comment (optional)"
+          color='secondary'
           fullWidth
           multiline
           rows={4}
@@ -31,7 +37,7 @@ const ConfirmationDialogWithCommentForCancel: FC<ConfirmationDialogWithCommentPr
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
         <Button onClick={handleConfirm} color="secondary">
