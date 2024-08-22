@@ -62,7 +62,7 @@ export default function MainSideBar() {
         <GroupIcon sx={{ fontSize: 22 }} />
       ),
       Name: "Innovators",
-      isVisible: (isAdmin || isProjectOwner)
+      isVisible: (isAdmin )
     },
     {
       path: '/freelancers',
@@ -70,7 +70,7 @@ export default function MainSideBar() {
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
       Name: "Freelancers",
-      isVisible: (isAdmin || isProjectOwner)
+      isVisible: (isAdmin )
     },
     {
       path: '/projectowner',
