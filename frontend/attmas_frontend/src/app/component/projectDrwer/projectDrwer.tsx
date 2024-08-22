@@ -13,9 +13,9 @@ import ApplyDetailsDialog from '../projectsDetails/projectDetails';
 import booth from '../booth/booth';
 import AddComment from '../projectComment/projectComment';
 import JobDetail from '../projectCommentCard/projectCommentCard';
-import ConfirmCloseBox from './ConfirmCloseBox';
-import ConfirmationDialog from './ConfirmationDialog';
-import ConfirmationDialogWithCommentForCancel from './ConfirmationDialogWithCommentForCancel';
+import ConfirmCloseBox from '../All_ConfirmationBox/ConfirmCloseBox';
+import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
+import ConfirmationDialogWithCommentForCancel from '../All_ConfirmationBox/ConfirmationDialogWithCommentForCancel';
 
 
 

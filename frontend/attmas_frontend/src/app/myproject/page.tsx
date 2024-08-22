@@ -17,7 +17,7 @@ import { Expertiselevel } from '../projects/projectinterface';
 import { getSubcategorys } from '../projects/projectinterface';
 import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
-import ConfirmationCancelDialog from './ConfirmationCancelDialog';
+import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 
 
 const myproject = () => {
@@ -547,14 +547,6 @@ const myproject = () => {
                     </>
                 )}
             </Box>
-
-
-
-
-
-
-
-
 
             <Box sx={{ mt: 2, position: 'relative' }}>
                 {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (

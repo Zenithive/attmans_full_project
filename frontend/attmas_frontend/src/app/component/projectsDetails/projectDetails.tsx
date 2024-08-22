@@ -20,7 +20,7 @@ import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
-import ConfirmationDialog from '../projectDrwer/ConfirmationDialog';
+import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 

@@ -16,8 +16,13 @@ const ConfirmCloseBox: React.FC<ConfirmCloseBoxProps> = ({ open, onClose, onConf
     setComment(''); // Clear the comment after confirmation
   };
 
+  const handleClose = () => {
+    setComment(''); // Clear the comment when closing the dialog
+    onClose(); // Trigger the onClose prop function to close the dialog
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Confirm Close</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -27,6 +32,7 @@ const ConfirmCloseBox: React.FC<ConfirmCloseBoxProps> = ({ open, onClose, onConf
           autoFocus
           margin="dense"
           label="Comment"
+          color='secondary'
           fullWidth
           multiline
           rows={4}
@@ -36,7 +42,7 @@ const ConfirmCloseBox: React.FC<ConfirmCloseBoxProps> = ({ open, onClose, onConf
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={handleClose} color="secondary">
           Cancel
         </Button>
         <Button onClick={handleConfirm} color="primary">
