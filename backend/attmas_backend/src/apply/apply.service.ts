@@ -76,20 +76,18 @@ export class ApplyService {
       .exec();
   }
 
-
-
   // async findAllMyProject(userId: string): Promise<Apply[]> {
   //   console.log('UserId received:', userId); // Log the received userId
-  
+
   //   // Check if userId is a valid ObjectId
   //   if (!Types.ObjectId.isValid(userId)) {
   //     throw new Error('Invalid userId format');
   //   }
-  
+
   //   // Query to find documents with the given userId and status 'Awarded'
-  //   return this.ApplyModel.find({ 
-  //       userId: userId, 
-  //       status: 'Awarded' 
+  //   return this.ApplyModel.find({
+  //       userId: userId,
+  //       status: 'Awarded'
   //     })
   //     .populate('userId', 'firstName lastName username', this.userModel)
   //     .exec()
@@ -99,15 +97,14 @@ export class ApplyService {
   //     });
   // }
 
-
   // async findAllMyProject(userId: string): Promise<Apply[]> {
   //   console.log('UserId received:', userId); // Log the received userId
-  
+
   //   // Check if userId is a valid ObjectId
   //   if (!Types.ObjectId.isValid(userId)) {
   //     throw new Error('Invalid userId format');
   //   }
-  
+
   //   return this.ApplyModel.aggregate([
   //     // Stage 1: Match documents by userId and status
   //     {
@@ -170,67 +167,63 @@ export class ApplyService {
 
   async findAllMyProject(userId: string): Promise<any[]> {
     console.log('UserId received:', userId); // Log the received userId
-  
+
     // Check if userId is a valid ObjectId
     if (!Types.ObjectId.isValid(userId)) {
       throw new Error('Invalid userId format');
     }
 
-    try{
+    try {
+      const results = await this.ApplyModel.aggregate([
+        // Stage 1: Match documents by userId and status
+        {
+          $match: {
+            userId: userId,
+            status: 'Awarded',
+          },
+        },
+        // Stage 2: Project fields for debugging before lookup
+        {
+          $project: {
+            _id: 1, // Include the document's _id
+            title: 1, // Include title from Apply collection
+          },
+        },
+        // Stage 3: Lookup to get job details from the jobs collection
+        {
+          $lookup: {
+            from: 'jobs', // Ensure this matches the actual collection name
+            localField: 'title', // Field in Apply collection
+            foreignField: 'title', // Field in Job collection
+            as: 'jobDetails', // Output array field
+          },
+        },
+        // Stage 4: Unwind the jobDetails array
+        {
+          $unwind: {
+            path: '$jobDetails',
+            preserveNullAndEmptyArrays: true, // Keep results even if no matching job
+          },
+        },
+        // Stage 5: Project final fields including the sector from jobDetails
+        {
+          $project: {
+            _id: 1, // Include the document's _id
+            title: 1, // Include title for reference
+            jobDetails: 1, // Include entire jobDetails for debugging
+          },
+        },
+      ]);
 
-    const results = await this.ApplyModel.aggregate([
-      // Stage 1: Match documents by userId and status
-      {
-        $match: {
-          userId: userId,
-          status: 'Awarded',
-        },
-      },
-      // Stage 2: Project fields for debugging before lookup
-      {
-        $project: {
-          _id: 1, // Include the document's _id
-          title: 1, // Include title from Apply collection
-        },
-      },
-      // Stage 3: Lookup to get job details from the jobs collection
-      {
-        $lookup: {
-          from: 'jobs', // Ensure this matches the actual collection name
-          localField: 'title', // Field in Apply collection
-          foreignField: 'title', // Field in Job collection
-          as: 'jobDetails', // Output array field
-        },
-      },
-      // Stage 4: Unwind the jobDetails array
-      {
-        $unwind: {
-          path: '$jobDetails',
-          preserveNullAndEmptyArrays: true, // Keep results even if no matching job
-        },
-      },
-      // Stage 5: Project final fields including the sector from jobDetails
-      {
-        $project: {
-          _id: 1, // Include the document's _id
-          title: 1, // Include title for reference
-          jobDetails: 1, // Include entire jobDetails for debugging
-        },
-      },
-    ]);
+      // Log the results to see values of title and jobDetails
+      console.log('Aggregation Results:', JSON.stringify(results, null, 2));
 
-    // Log the results to see values of title and jobDetails
-    console.log("Aggregation Results:", JSON.stringify(results, null, 2));
-
-    return results;
-  } catch (error) {
-    console.error('Aggregation error:', error);
-    throw new Error('Error fetching projects');
+      return results;
+    } catch (error) {
+      console.error('Aggregation error:', error);
+      throw new Error('Error fetching projects');
+    }
   }
-}
-  
-  
-  
 
   async findJobWithUser(id: string): Promise<ApplyDocument | null> {
     return this.ApplyModel.findById(id).populate('user').exec();

@@ -68,18 +68,18 @@ const myproject = () => {
 
     const fetchApplications = useCallback(async () => {
         if (viewingJob?._id) {
-          try {
-            const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
-            setApplications(response.data);
-          } catch (error) {
-            console.error('Error fetching applications:', error);
-          }
+            try {
+                const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
+                setApplications(response.data);
+            } catch (error) {
+                console.error('Error fetching applications:', error);
+            }
         }
-      }, [viewingJob]);
+    }, [viewingJob]);
 
-      const handleCommentSubmitted = () => {
+    const handleCommentSubmitted = () => {
         fetchApplications();
-      };
+    };
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
         try {
@@ -136,7 +136,7 @@ const myproject = () => {
 
     useEffect(() => {
         fetchAllProjects();
-         // Fetch all projects on component mount
+        // Fetch all projects on component mount
     }, [fetchAllProjects]);
 
 
@@ -521,7 +521,7 @@ const myproject = () => {
                                                             backgroundColor: 'grey',
                                                             color: 'white',
                                                             '&:hover': {
-                                                                backgroundColor: 'error.dark',
+                                                                backgroundColor: '#cc4800',
                                                             },
                                                         }}
                                                     >
@@ -541,9 +541,9 @@ const myproject = () => {
                             handleApproveDialogOpen={() => {/* Handle approve dialog */ }}
                             handleRejectDialogOpen={() => {/* Handle reject dialog */ }}
                             onCommentSubmitted={handleCommentSubmitted}
-        
+
                         />
-                    
+
                     </>
                 )}
             </Box>
@@ -567,14 +567,14 @@ const myproject = () => {
                                                     {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                                 </Box>
                                             </Typography>
-                                            
-                                            
+
+
 
                                             <Typography variant="body1" sx={{ mt: 1 }}>
                                                 {project.jobDetails.currency} {project.jobDetails.Budget}
                                             </Typography>
-                                           
-                                           
+
+
 
                                             <Typography variant="body2" sx={{ mt: 1 }}>
                                                 {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
@@ -611,7 +611,7 @@ const myproject = () => {
                                                             backgroundColor: 'grey',
                                                             color: 'white',
                                                             '&:hover': {
-                                                                backgroundColor: 'error.dark',
+                                                                backgroundColor: '#cc4800',
                                                             },
                                                         }}
                                                     >
@@ -680,12 +680,12 @@ const myproject = () => {
                 userType={userType}
                 handleApproveDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
-                }} 
+                }}
                 handleRejectDialogOpen={function (): void {
                     throw new Error('Function not implemented.');
                 }}
                 onCommentSubmitted={handleCommentSubmitted}
-                />
+            />
 
         </Box>
     );

@@ -236,6 +236,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                 label="Description"
                 name="description"
                 color="secondary"
+                multiline
                 value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
