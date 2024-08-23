@@ -139,25 +139,33 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                   }
                 }}
               />
-              <label htmlFor="profile-photo">
-                <IconButton component="span" sx={{ width: 100, height: 100, mb: 2 }}>
-                  <Avatar
-                    alt="Profile Photo"
-                    src={profilePhotoURL || ''}
-                    sx={{ width: 100, height: 100, mb: 2, mx: 'auto' }}
-                  />
-                  <CameraAltIcon
-                    sx={{
-                      position: 'absolute',
-                      bottom: 0,
-                      right: 0,
-                      color: 'white',
-                      backgroundColor: 'grey',
-                      borderRadius: '50%',
-                    }}
-                  />
-                </IconButton>
-              </label>
+
+              <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                <label htmlFor="profile-photo">
+                  <IconButton component="span" sx={{ width: 100, height: 100, mb: 2 }}>
+                    <Avatar
+                      alt="Profile Photo"
+                      src={profilePhotoURL || ''}
+                      sx={{ width: 100, height: 100, mb: 2, mx: 'auto' }}
+                    />
+                    <CameraAltIcon
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0,
+                        color: 'white',
+                        backgroundColor: 'grey',
+                        borderRadius: '50%',
+                      }}
+                    />
+                  </IconButton>
+
+                </label>
+                <Box>
+                  <Box component="h3">Headline</Box>
+                  <Box component="span">Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.</Box>
+                </Box>
+              </Box>
 
               <ProfileFormFields />
               <LoadingButton
