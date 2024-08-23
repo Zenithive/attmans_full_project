@@ -365,7 +365,7 @@ const ExhibitionsPage: React.FC = () => {
                 onClick={handleJoinLiveClick}
                 sx={{ position: 'absolute', right: '330px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
               >
-                Join Live
+                Webinar
               </Button>
             )}
           </Box>
