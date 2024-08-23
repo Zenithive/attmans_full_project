@@ -40,7 +40,7 @@ export class UsersController {
   async getUsersByUserType(
     @Query('userType') userType: string,
     @Query('page') page = '1',
-    @Query('limit') limit = '5',
+    @Query('limit') limit = '10',
     @Query('filter') filter = '',
     @Query('category') category = '',
     @Query('subCategory') subCategory = '',
