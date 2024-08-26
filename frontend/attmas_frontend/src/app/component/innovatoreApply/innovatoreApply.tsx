@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip, Grid, Card, CardContent, Chip } from '@mui/material';
+import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip, Grid, Card, CardContent, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
@@ -73,6 +73,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
     const [loading, setLoading] = React.useState<boolean>(true);
     const [subcategories, setSelectedValues] = React.useState<string[]>([]);
     const [categories, setCategories] = React.useState([]);
+    const [products, setProducts] = React.useState<Product[]>([]);
 
 
     const initialValues = {
@@ -171,6 +172,18 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
         setOpen(false);
     };
 
+    const handleRemoveProduct = (index: number) => {
+        const updatedProducts = products.filter((_, i) => i !== index);
+        setProducts(updatedProducts);
+    };
+
+    const handleProductChange = (index: number, updatedProduct: Product) => {
+        const updatedProducts = products.map((product, i) =>
+            i === index ? updatedProduct : product
+        );
+        setProducts(updatedProducts);
+    };
+
     return (
         <Drawer
             sx={{
@@ -264,7 +277,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         }}
                                     />
                                 </Box>
-                                <Box sx={{ flex: '1 1 45%' }}>
+                                <Box sx={{ flex: '1 1 45%',marginBottom:'30px' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DateTimePicker
                                             label="Time Frame"
@@ -279,7 +292,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                     </LocalizationProvider>
                                 </Box>
                             </Box>
-                            <Box
+                            {/* <Box
                                 sx={{
                                     marginTop: 8,
                                     padding: 4,
@@ -287,250 +300,160 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                     borderRadius: 2,
                                     boxShadow: 5,
                                 }}
-                            >
-                                <Typography component="h1" variant="h5" align="center" sx={{ marginBottom: '20px' }}>
-                                    Work Experience
-                                </Typography>
-                                {fetchError && (
-                                    <Typography color="error" align="center" mt={2}>
-                                        {fetchError}
-                                    </Typography>
-                                )}
-                                {workExperience && (
-                                    <Paper elevation={3} sx={{ padding: 3 }}>
-                                        <Grid container spacing={2}>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Qualification"
-                                                    value={workExperience.qualification}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Organization"
-                                                    value={workExperience.organization}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Sector"
-                                                    value={workExperience.sector}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Work Address"
-                                                    value={workExperience.workAddress}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Designation"
-                                                    value={workExperience.designation}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="User Type"
-                                                    value={workExperience.userType}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            {workExperience.userType === 'Innovators' && (
-                                                <>
-                                                    <Grid item xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            label="Product to Market"
-                                                            value={workExperience.productToMarket}
-                                                            InputProps={{ readOnly: true }}
-                                                            sx={{ marginBottom: '20px' }}
-                                                            variant="outlined"
-                                                        />
-                                                    </Grid>
-                                                    {workExperience.productToMarket === 'Yes' && (
-                                                        <Grid container spacing={2}>
-                                                            <Grid item xs={12}>
-                                                                <Typography variant="h6">Products:</Typography>
-                                                            </Grid>
-                                                            {workExperience.products.map((product, index) => (
-                                                                <Grid item xs={12} sm={6} md={4} key={index}>
-                                                                    <Card variant="outlined">
-                                                                        <CardContent>
-                                                                            <Typography variant="subtitle1" gutterBottom sx={{ marginBottom: '20px' }}>
-                                                                                Product {index + 1}
-                                                                            </Typography>
-                                                                            <TextField
-                                                                                fullWidth
-                                                                                label="Product Name"
-                                                                                value={product.productName}
-                                                                                InputProps={{ readOnly: true }}
-                                                                                variant="outlined"
-                                                                                sx={{ marginBottom: 2 }}
-                                                                            />
-                                                                            <TextField
-                                                                                fullWidth
-                                                                                label="Product Type"
-                                                                                value={product.productType}
-                                                                                InputProps={{ readOnly: true }}
-                                                                                variant="outlined"
-                                                                                sx={{ marginBottom: 2 }}
-                                                                            />
-                                                                            <TextField
-                                                                                fullWidth
-                                                                                label="Product Description"
-                                                                                value={product.productDescription}
-                                                                                InputProps={{ readOnly: true }}
-                                                                                variant="outlined"
-                                                                                sx={{ marginBottom: 2 }}
-                                                                            />
-                                                                            <TextField
-                                                                                fullWidth
-                                                                                label="Product Price"
-                                                                                value={product.productPrice}
-                                                                                InputProps={{ readOnly: true }}
-                                                                                variant="outlined"
-                                                                                sx={{ marginBottom: 2 }}
-                                                                            />
-                                                                            <TextField
-                                                                                fullWidth
-                                                                                label="Currency"
-                                                                                value={product.currency}
-                                                                                InputProps={{ readOnly: true }}
-                                                                                variant="outlined"
-                                                                                sx={{ marginBottom: 2 }}
-                                                                            />
-                                                                            {product.videourlForproduct && (
-                                                                                <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2, float: 'right' }}>
-                                                                                    <Tooltip title="Watch Video">
-                                                                                        <IconButton
-                                                                                            component="a"
-                                                                                            href={product.videourlForproduct}
-                                                                                            target="_blank"
-                                                                                            rel="noopener noreferrer"
-                                                                                        >
-                                                                                            <YouTubeIcon sx={{ color: 'red' }} />
-                                                                                        </IconButton>
-                                                                                    </Tooltip>
-                                                                                </Box>
-                                                                            )}
-                                                                        </CardContent>
-                                                                    </Card>
-                                                                </Grid>
-                                                            ))}
-                                                        </Grid>
-                                                    )}
-                                                </>
-                                            )}
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Do you have a patent?"
-                                                    value={workExperience.hasPatent}
-                                                    InputProps={{ readOnly: true }}
-                                                    variant="outlined"
-                                                />
-                                            </Grid>
-                                            {workExperience.hasPatent === 'Yes' && (
-                                                <Grid item xs={12}>
-                                                    <TextField
-                                                        fullWidth
-                                                        multiline
-                                                        rows={4}
-                                                        label="Patent Details"
-                                                        value={workExperience.patentDetails}
-                                                        InputProps={{ readOnly: true }}
-                                                        variant="outlined"
-                                                    />
-                                                </Grid>
-                                            )}
-                                        </Grid>
-                                    </Paper>
-                                )}
-                            </Box>
-
-                            <Paper elevation={3} sx={{ p: 4, maxWidth: 1200, margin: '0 auto' }}>
-                                <Typography component="h1" variant="h5" align="center" sx={{ marginBottom: '40px' }}>
-                                    Subject Matter Expertise
-                                </Typography>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12} sm={12}>
-                                        <Typography variant="h6" sx={{ marginBottom: 1 }}>
-                                            Categories
-                                        </Typography>
-                                        <TextField
-                                            fullWidth
-                                            sx={{ width: '100%' }}
-                                            value={categories.join(', ')}
-                                            variant="outlined"
-                                            multiline
-                                            disabled
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={12}>
-                                        <Typography variant="h6" sx={{ marginBottom: 1 }}>
-                                            Subcategories
-                                        </Typography>
-                                        <TextField
-                                            fullWidth
-                                            sx={{ width: '100%' }}
-                                            value={subcategories.join(', ')}
-                                            variant="outlined"
-                                            multiline
-                                            disabled
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Paper>
-
-                            <Typography
-                                variant="body2"
-                                align="center"
-                                mt={4}
-                                mb={3}
-                                sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
-                            >
-                                Please Note: <br />
-                                If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
-                                Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
-                            </Typography>
-
+                            > */}
                             {fetchError && (
                                 <Typography color="error" align="center" mt={2}>
                                     {fetchError}
                                 </Typography>
                             )}
+                            {workExperience && (
+                                <Paper elevation={3} sx={{ padding: 3 }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Qualification"
+                                                value={workExperience.qualification}
+                                                InputProps={{ readOnly: true }}
+                                                variant="outlined"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Organization"
+                                                value={workExperience.organization}
+                                                InputProps={{ readOnly: true }}
+                                                variant="outlined"
+                                                color="secondary"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Sector"
+                                                value={workExperience.sector}
+                                                InputProps={{ readOnly: true }}
+                                                variant="outlined"
+                                                color="secondary"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Work Address"
+                                                value={workExperience.workAddress}
+                                                InputProps={{ readOnly: true }}
+                                                variant="outlined"
+                                                color="secondary"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} sx={{ marginBottom: '40px' }}>
+                                            <TextField
+                                                fullWidth
+                                                label="Designation"
+                                                value={workExperience.designation}
+                                                InputProps={{ readOnly: true }}
+                                                variant="outlined"
+                                                color="secondary"
+                                            />
+                                        </Grid>
 
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                                <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Create'}
-                                </Button>
-                            </Box>
+                                        <>
+                                            <Box sx={{position:'relative',left:'1.5%',width:'98%',marginBottom:'20px'}}>
+                                                <Paper elevation={3} sx={{ p: 4, maxWidth: 1800, margin: '0 auto' }}>
+                                                    <Typography component="h1" variant="h5" align="center" sx={{ marginBottom: '40px' }}>
+                                                        Products
+                                                    </Typography>
+                                                    <ProductTable
+                                                        products={workExperience.products}
+                                                        onRemove={handleRemoveProduct}
+                                                        onChange={handleProductChange}
+                                                        readOnly={true} 
+                                                    />
+                                                </Paper>
+                                            </Box>
+
+                                        </>
+
+                                        <Grid item xs={12} sm={6} sx={{marginBottom:'20px'}}>
+                                            <TextField
+                                                fullWidth
+                                                label="Do you have a patent?"
+                                                value={workExperience.hasPatent}
+                                                InputProps={{ readOnly: true }}
+                                                variant="outlined"
+                                            />
+                                        </Grid>
+                                        {workExperience.hasPatent === 'Yes' && (
+                                            <Grid item xs={12} > 
+                                                <TextField
+                                                    fullWidth
+                                                    multiline
+                                                    rows={4}
+                                                    label="Patent Details"
+                                                    value={workExperience.patentDetails}
+                                                    InputProps={{ readOnly: true }}
+                                                    variant="outlined"
+                                                />
+                                            </Grid>
+                                        )}
+                                    </Grid>
+                                    <Grid container spacing={3}>
+                                <Grid item xs={12} sm={12}>
+                                    <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                        Categories
+                                    </Typography>
+                                    <TextField
+                                        fullWidth
+                                        sx={{ width: '100%' }}
+                                        value={categories.join(', ')}
+                                        variant="outlined"
+                                        multiline
+                                        disabled
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={12}>
+                                    <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                        Subcategories
+                                    </Typography>
+                                    <TextField
+                                        fullWidth
+                                        sx={{ width: '100%' }}
+                                        value={subcategories.join(', ')}
+                                        variant="outlined"
+                                        multiline
+                                        disabled
+                                    />
+                                </Grid>
+                            </Grid>
+                                </Paper>
+                            )}
                         </Box>
+
+                        
+
+
+
+                        {fetchError && (
+                            <Typography color="error" align="center" mt={2}>
+                                {fetchError}
+                            </Typography>
+                        )}
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                            <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="contained"
+                                type="submit"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Create'}
+                            </Button>
+                        </Box>
+                        {/* </Box> */}
                     </Form>
                 )}
             </Formik>
