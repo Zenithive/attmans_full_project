@@ -5,7 +5,7 @@ import { SignUp } from '../component/SignUp/signup';
 const Page: React.FC = () => {
   return (
     <>
-      <SignUp />
+      <SignUp interestType={'InterestedUserForExhibition'} />
     </>
   );
 };
