@@ -248,13 +248,13 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
             console.error('Error fetching comments:', error);
         }
     };
-    
+
     const handleCommentSubmitted = () => {
         if (viewingJob?._id) {
             fetchCommentsForJob(viewingJob._id);
         }
     };
-    
+
 
     return (
         <>
@@ -270,7 +270,11 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         overflow: 'hidden',
                         p: 2,
                         backgroundColor: '#f9f9f9',
+                        '@media (max-width: 767px)': {
+                                maxWidth:'100%'
+                            }
                     }
+    
                 }}
             >
                 <DialogTitle>
@@ -354,144 +358,153 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 </DialogTitle>
                             </Box>
                             <Box p={2}>
-    {filteredApplications.length > 0 ? (
-        <Grid container spacing={2}>
-            {filteredApplications.map((app) => (
-                <Grid item xs={12} key={app._id}>
-                    <Box sx={{ border: '1px solid #ddd', borderRadius: '4px', p: 2 }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                                <Box sx={{ flex: 1 }}>
-                                    <TextField
-                                        label="Title"
-                                        value={app.title}
-                                        fullWidth
-                                        disabled
-                                        sx={{ mb: 1 }}
-                                    />
-                                </Box>
-                                <Box sx={{ flex: 1 }}>
-                                    <TextField
-                                        label="Applied User"
-                                        value={`${app.firstName} ${app.lastName}`}
-                                        fullWidth
-                                        disabled
-                                        sx={{ mb: 1 }}
-                                    />
-                                </Box>
-                            </Box>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    {milestones[app._id!]?.length > 0 ? (
-                                        milestones[app._id!].map((milestoneGroup, groupIndex) => (
-                                            <Grid container spacing={2} key={groupIndex}>
-                                                {milestoneGroup.milestones.length > 0 ? (
-                                                    milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                                        <Grid item xs={12} key={milestoneIndex}>
-                                                            <Card variant="outlined" sx={{ mb: 1 }}>
-                                                                <CardContent>
-                                                                    <Typography variant="h6" sx={{ mb: 4 }}>
-                                                                        Milestone {milestoneIndex + 1}
+                                {filteredApplications.length > 0 ? (
+                                    <Grid container spacing={2}>
+                                        {filteredApplications.map((app) => (
+                                            <Grid item xs={12} key={app._id}>
+                                                <Box sx={{
+                                                    border: '1px solid #ddd', borderRadius: '4px', p: 2, '@media (max-width: 767px)': {
+                                                        position: 'relative',
+                                                        width: '135%',
+                                                        right: '18%'
+                                                    }
+                                                }}>
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <TextField
+                                                                    label="Title"
+                                                                    value={app.title}
+                                                                    fullWidth
+                                                                    multiline
+                                                                    disabled
+                                                                    sx={{ mb: 1 }}
+                                                                />
+                                                            </Box>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <TextField
+                                                                    label="Applied User"
+                                                                    value={`${app.firstName} ${app.lastName}`}
+                                                                    fullWidth
+                                                                    multiline
+                                                                    disabled
+                                                                    sx={{ mb: 1 }}
+                                                                />
+                                                            </Box>
+                                                        </Box>
+                                                        <Grid container spacing={2}>
+                                                            <Grid item xs={12}>
+                                                                {milestones[app._id!]?.length > 0 ? (
+                                                                    milestones[app._id!].map((milestoneGroup, groupIndex) => (
+                                                                        <Grid container spacing={2} key={groupIndex}>
+                                                                            {milestoneGroup.milestones.length > 0 ? (
+                                                                                milestoneGroup.milestones.map((milestone, milestoneIndex) => (
+                                                                                    <Grid item xs={12} key={milestoneIndex}>
+                                                                                        <Card variant="outlined" sx={{ mb: 1 }}>
+                                                                                            <CardContent>
+                                                                                                <Typography variant="h6" sx={{ mb: 4 }}>
+                                                                                                    Milestone {milestoneIndex + 1}
 
-                                                                        {milestone.isCommentSubmitted && (
-                                                                            <Chip
-                                                                                label="Milestone submitted"
-                                                                                variant="outlined"
-                                                                                sx={{
-                                                                                    borderColor: 'green',
-                                                                                    color: 'green',
-                                                                                    borderRadius: '16px',
-                                                                                    position: 'relative',
-                                                                                    float: 'right'
-                                                                                }}
-                                                                            />
-                                                                        )}
-                                                                    </Typography>
+                                                                                                    {milestone.isCommentSubmitted && (
+                                                                                                        <Chip
+                                                                                                            label="Milestone submitted"
+                                                                                                            variant="outlined"
+                                                                                                            sx={{
+                                                                                                                borderColor: 'green',
+                                                                                                                color: 'green',
+                                                                                                                borderRadius: '16px',
+                                                                                                                position: 'relative',
+                                                                                                                float: 'right'
+                                                                                                            }}
+                                                                                                        />
+                                                                                                    )}
+                                                                                                </Typography>
 
-                                                                    <TextField
-                                                                        label={`Milestone ${milestoneIndex + 1}`}
-                                                                        value={milestone.name}
-                                                                        multiline
-                                                                        fullWidth
-                                                                        disabled
-                                                                        sx={{ mb: 2 }}
-                                                                    />
+                                                                                                <TextField
+                                                                                                    label={`Milestone ${milestoneIndex + 1}`}
+                                                                                                    value={milestone.name}
+                                                                                                    multiline
+                                                                                                    fullWidth
+                                                                                                    disabled
+                                                                                                    sx={{ mb: 2 }}
+                                                                                                />
 
-                                                                    {milestone.isCommentSubmitted ? (
-                                                                        <>
-                                                                            {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer') && (
-                                                                                <TextField
-                                                                                    label="Submitted Milestone"
-                                                                                    value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
-                                                                                    multiline
-                                                                                    rows={4}
-                                                                                    fullWidth
-                                                                                    disabled
-                                                                                    sx={{ mb: 2, color: 'blue' }}
-                                                                                />
+                                                                                                {milestone.isCommentSubmitted ? (
+                                                                                                    <>
+                                                                                                        {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer') && (
+                                                                                                            <TextField
+                                                                                                                label="Submitted Milestone"
+                                                                                                                value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
+                                                                                                                multiline
+                                                                                                                rows={4}
+                                                                                                                fullWidth
+                                                                                                                disabled
+                                                                                                                sx={{ mb: 2, color: 'blue' }}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </>
+                                                                                                ) : (
+                                                                                                    (userType === 'Innovators' || userType === 'Freelancer') && (
+                                                                                                        <>
+                                                                                                            <TextField
+                                                                                                                label="Submit Milestone"
+                                                                                                                color="secondary"
+                                                                                                                multiline
+                                                                                                                rows={4}
+                                                                                                                value={milestoneComments[`${app._id}-${milestoneIndex}`] || ''}
+                                                                                                                onChange={(e) => handleCommentChange(app._id!, milestoneIndex, e.target.value)}
+                                                                                                                error={commentErrors[`${app._id}-${milestoneIndex}`]}
+                                                                                                                helperText={commentErrors[`${app._id}-${milestoneIndex}`] ? "Comment is required" : ""}
+                                                                                                                fullWidth
+                                                                                                                sx={{ mb: 2 }}
+                                                                                                            />
+                                                                                                            <Button
+                                                                                                                onClick={() => handleMilestoneSubmit(app._id!, milestoneIndex)}
+                                                                                                                disabled={milestone.isCommentSubmitted || isSubmitting}
+                                                                                                                sx={{ marginBottom: '40px' }}
+                                                                                                            >
+                                                                                                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Milestone'}
+                                                                                                            </Button>
+                                                                                                        </>
+                                                                                                    )
+                                                                                                )}
+
+                                                                                            </CardContent>
+                                                                                        </Card>
+                                                                                    </Grid>
+                                                                                ))
+                                                                            ) : (
+                                                                                <Typography>No milestones available</Typography>
                                                                             )}
-                                                                        </>
-                                                                    ) : (
-                                                                        (userType === 'Innovators' || userType === 'Freelancer') && (
-                                                                            <>
-                                                                                <TextField
-                                                                                    label="Submit Milestone"
-                                                                                    color="secondary"
-                                                                                    multiline
-                                                                                    rows={4}
-                                                                                    value={milestoneComments[`${app._id}-${milestoneIndex}`] || ''}
-                                                                                    onChange={(e) => handleCommentChange(app._id!, milestoneIndex, e.target.value)}
-                                                                                    error={commentErrors[`${app._id}-${milestoneIndex}`]}
-                                                                                    helperText={commentErrors[`${app._id}-${milestoneIndex}`] ? "Comment is required" : ""}
-                                                                                    fullWidth
-                                                                                    sx={{ mb: 2 }}
-                                                                                />
-                                                                                <Button
-                                                                                    onClick={() => handleMilestoneSubmit(app._id!, milestoneIndex)}
-                                                                                    disabled={milestone.isCommentSubmitted || isSubmitting}
-                                                                                    sx={{ marginBottom: '40px' }}
-                                                                                >
-                                                                                    {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Milestone'}
-                                                                                </Button>
-                                                                            </>
-                                                                        )
-                                                                    )}
-
-                                                                </CardContent>
-                                                            </Card>
+                                                                        </Grid>
+                                                                    ))
+                                                                ) : (
+                                                                    <Typography>No milestones available</Typography>
+                                                                )}
+                                                            </Grid>
                                                         </Grid>
-                                                    ))
-                                                ) : (
-                                                    <Typography>No milestones available</Typography>
-                                                )}
+                                                        <Box sx={{position:'relative'}}>
+                                                        <JobDetail key={jobDetailKey} jobId={viewingJob._id || ''} applyId={app._id} onCommentSubmitted={onCommentSubmitted} />
+                                                        {viewingJob && (
+                                                            <AddComment
+                                                                jobId={viewingJob._id || ''}
+                                                                applyId={app._id}
+                                                                onCommentSubmitted={() => {
+                                                                    onCommentSubmitted();
+                                                                    setJobDetailKey((prev) => prev + 1);
+                                                                }}
+                                                            />
+                                                        )}
+                                                        </Box>
+                                                    </Box>
+                                                </Box>
                                             </Grid>
-                                        ))
-                                    ) : (
-                                        <Typography>No milestones available</Typography>
-                                    )}
-                                </Grid>
-                            </Grid>
-
-                            <JobDetail key={jobDetailKey} jobId={viewingJob._id || ''} applyId={app._id} onCommentSubmitted={onCommentSubmitted} />
-                            {viewingJob && (
-                                <AddComment
-                                    jobId={viewingJob._id || ''}
-                                    applyId={app._id}
-                                    onCommentSubmitted={() => {
-                                        onCommentSubmitted();
-                                        setJobDetailKey((prev) => prev + 1);
-                                      }}
-                                />
-                            )}
-                        </Box>
-                    </Box>
-                </Grid>
-            ))}
-        </Grid>
-    ) : (
-        <Typography>No applications available</Typography>
-    )}
-</Box>
+                                        ))}
+                                    </Grid>
+                                ) : (
+                                    <Typography>No applications available</Typography>
+                                )}
+                            </Box>
 
                         </Box>
                     )}

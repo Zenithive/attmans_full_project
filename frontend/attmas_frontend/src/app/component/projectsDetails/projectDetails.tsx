@@ -175,6 +175,9 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
           '& .MuiDialog-paper': {
             maxWidth: '50%',
             maxHeight: '100%',
+            '@media (max-width: 767px)': {
+              maxWidth: '100%',
+            },
           },
         }}
       >

@@ -405,7 +405,7 @@ const myproject = () => {
                             justifyContent: 'space-between',
                             mt: 4,
                             position: 'relative',
-                            left: '28px'
+                            left: '28px',
                         },
                     }}
                 >
@@ -414,7 +414,7 @@ const myproject = () => {
                         value={selectedServices}
                         onChange={handleServiceChange}
                         aria-label="Select Service"
-                        sx={{ height: "30px" }}
+                        sx={{ height: "50px", right: '26px', position: 'relative' }}
                     >
                         <ToggleButton value="Outsource Research and Development ">
                             Outsource Research and Development
@@ -425,6 +425,7 @@ const myproject = () => {
                     </ToggleButtonGroup>
                 </Box>
             )}
+
 
 
 
@@ -468,40 +469,38 @@ const myproject = () => {
                                     {filteredJobs.map((job) => (
                                         <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
                                             <CardContent>
-                                                <Typography variant="h5">
-                                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer' }}>
-                                                        {job.title},
-                                                    </a>
-                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                        ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
-                                                        <Grid item xs={12} sx={{
-                                                            position: 'relative', bottom: "24px", width: 'fit-content', left: '62%', '@media (max-width: 767px)': {
-                                                                position: 'relative',
-                                                                top: '65px',
-                                                                left: '69%'
-                                                            }
-                                                        }}>
+                                                <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+
+                                                    <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
+                                                        <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+                                                            {job.title},
+                                                        </a>
+                                                        <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                            ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                        </span>
+                                                    </Box>
+
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                        <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
                                                             <CustomChip
                                                                 label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                                                 color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
                                                             />
-                                                        </Grid>
-                                                    </span>
-                                                    <Box sx={{
-                                                        fontSize: 'small', fontWeight: "bolder", float: "right", position: 'relative', bottom: '47px', '@media (max-width: 767px)': {
-                                                            position: 'relative', top: '40px', right: '100px'
-                                                        }
-                                                    }}>
-                                                        {job.Expertiselevel}
+                                                        </Box>
+
+                                                        <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                            <Chip
+                                                                label={job.SelectService}
+                                                                variant="outlined"
+                                                                color='secondary'
+                                                            />
+                                                        </Box>
+
+                                                        <Box sx={{ flexShrink: 0, fontSize: 'small', fontWeight: 'bolder' }}>
+                                                            {job.Expertiselevel}
+                                                        </Box>
                                                     </Box>
-                                                    <Box sx={{ fontSize: 'small', fontWeight: "bolder", float: "right", bottom: '56px', right: '20px', position: 'relative', '@media (max-width: 767px)': { position: 'relative', bottom: '30px' } }}>
-                                                        <Chip
-                                                            label={job.SelectService}
-                                                            variant="outlined"
-                                                            color='secondary'
-                                                            sx={{ '@media (max-width: 767px)': { position: 'relative', bottom: '10px' } }}
-                                                        />
-                                                    </Box>
+
                                                 </Typography>
                                                 <Box sx={{ marginTop: '10px' }}>
                                                     <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
@@ -513,6 +512,7 @@ const myproject = () => {
                                                             bottom: 0,
                                                             right: 0,
                                                             margin: 1,
+                                                            width:'8%',
                                                             minWidth: 'auto',
                                                             padding: 1,
                                                             display: 'flex',
@@ -523,6 +523,9 @@ const myproject = () => {
                                                             '&:hover': {
                                                                 backgroundColor: '#cc4800',
                                                             },
+                                                            '@media (max-width: 767px)': {
+                                                                width:'20%',
+                                                            }
                                                         }}
                                                     >
                                                         Close

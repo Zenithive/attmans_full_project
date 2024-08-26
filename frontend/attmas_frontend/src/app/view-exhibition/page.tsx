@@ -38,7 +38,8 @@ interface Visitor {
   mobileNumber: string;
   timestamps: string;
   exhibitionId: string;
-  userId:string;
+  userId: string;
+  interestType: string;
 }
 
 
@@ -78,6 +79,7 @@ const ExhibitionsPage: React.FC = () => {
   const [hasUserBooth, setHasUserBooth] = useState(false);
   const [view, setView] = useState('boothDetails');
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
+  const [interestType, setInterestType] = useState('Visitors');
 
 
 
@@ -105,7 +107,6 @@ const ExhibitionsPage: React.FC = () => {
             status: statusFilter === 'All' ? '' : statusFilter,
           },
         });
-        console.log("response Booth", response);
 
         setBooths(response.data);
 
@@ -121,6 +122,8 @@ const ExhibitionsPage: React.FC = () => {
     const fetchVisitors = async () => {
       try {
         const exhibitionId = searchParams.get('exhibitionId');
+        const boothId = searchParams.get('boothId');
+        console.log('boothId', boothId)
         if (!exhibitionId) {
           console.error('id not found');
           return;
@@ -131,15 +134,15 @@ const ExhibitionsPage: React.FC = () => {
           },
         });
         console.log('Fetched visitors:', response.data);
-        console.log("userDetails._id",userDetails._id);
+        console.log("userDetails._id", userDetails._id);
 
         for (let index = 0; index < response.data.length; index++) {
           const element = response.data[index];
           console.log("element.userId", element.userId);
-         
-          
-          
-          if(element.userId === userDetails._id){
+
+
+
+          if (element.userId === userDetails._id) {
             setIsInterestedBtnShow(false);
           }
         }
@@ -152,11 +155,35 @@ const ExhibitionsPage: React.FC = () => {
 
     fetchExhibitions();
     fetchBooths();
-    console.log("view",view);
+    console.log("view", view);
     if (view === 'boothDetails') {
       fetchVisitors();
+
     }
+
   }, [userDetails?._id, searchParams, statusFilter, view]);
+
+  const fetchVisitorforinterestType = async () => {
+    try {
+      const response = await axios.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
+        params: { interestType },
+      });
+      setVisitors(response.data);
+    } catch (error) {
+      console.error('Error fetching visitors:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVisitorforinterestType();
+  }, [interestType]);
+
+
+  const handleInterestTypeChange = (event: any, newInterestType: React.SetStateAction<string> | null) => {
+    if (newInterestType !== null) {
+      setInterestType(newInterestType);
+    }
+  };
 
 
   const handleCreateBooth = async (boothData: any) => {
@@ -347,7 +374,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
 
 
-           {(!userType || userType === 'Visitors') && isInterestedBtnShow && (
+            {(!userType || userType === 'Visitors') && isInterestedBtnShow && (
               <Button
                 variant="contained"
                 color="primary"
@@ -370,7 +397,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
           </Box>
           <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
-          <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} exhibitionId={exhibitionId} />
+          <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} exhibitionId={exhibitionId} interestType={'InterestedUserForExhibition'} />
         </Box>
         <div>
           {exhibitions.map((exhibition) => (
@@ -408,8 +435,8 @@ const ExhibitionsPage: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       fontSize: 'x-large',
-                      flexWrap: 'wrap', 
-                      marginBottom:'20px'
+                      flexWrap: 'wrap',
+                      marginBottom: '20px'
                     }}
                   >
                     <Box sx={{ flexShrink: 0 }}>
@@ -419,18 +446,18 @@ const ExhibitionsPage: React.FC = () => {
                       sx={{
                         fontSize: 'medium',
                         fontWeight: '400',
-                        ml: 2, 
-                        flexShrink: 0, 
+                        ml: 2,
+                        flexShrink: 0,
                         '@media (max-width: 767px)': {
-                          fontSize: 'small', 
-                          ml: 1, 
+                          fontSize: 'small',
+                          ml: 1,
                         }
                       }}
                     >
                       ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
                     </Box>
                   </Typography>
-                  <Typography variant="h5" sx={{ fontSize: 'medium',marginBottom:'10px' }}>{exhibition.description}</Typography>
+                  <Typography variant="h5" sx={{ fontSize: 'medium', marginBottom: '10px' }}>{exhibition.description}</Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.industries}</Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.subjects}</Typography>
                 </CardContent>
@@ -454,8 +481,9 @@ const ExhibitionsPage: React.FC = () => {
               <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} options={["All", "Pending", "Approved", "Rejected"]} />
             )}
           </Box>
+
+            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '22px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
           {userType !== 'Visitors' && (
-            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '22px' ,'@media (max-width: 767px)': {position:'relative',bottom:'0px',marginBottom:'20px'}}}>
               <ToggleButtonGroup
                 value={view}
                 exclusive
@@ -466,8 +494,24 @@ const ExhibitionsPage: React.FC = () => {
                 {userDetails && userType === 'Admin' ?
                   <ToggleButton value="visitors">Visitors</ToggleButton> : ""}
               </ToggleButtonGroup>
-            </Box>
           )}
+            </Box>
+
+          <Box>
+            {view === 'visitors' && (
+              <ToggleButtonGroup
+                value={interestType}
+                exclusive
+                onChange={handleInterestTypeChange}
+                aria-label="interest type selection"
+              >
+                <ToggleButton value="InterestedUserForExhibition">Exhibition Visitors</ToggleButton>
+                <ToggleButton value="InterestedUserForBooth">Booth Visitors</ToggleButton>
+              </ToggleButtonGroup>
+            )}
+
+          </Box>
+
           {view === 'boothDetails' && (
             <>
               <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
@@ -485,9 +529,11 @@ const ExhibitionsPage: React.FC = () => {
                     <Grid item xs={12} sm={6} md={4} key={booth._id}>
                       <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
                         <CardContent>
-                          <Typography sx={{width:'69%','@media (max-width: 767px)': {
-                            width:'50%'
-                          }}}>
+                          <Typography sx={{
+                            width: '69%', '@media (max-width: 767px)': {
+                              width: '50%'
+                            }
+                          }}>
                             <h2>{booth.title}</h2>
                           </Typography>
 
@@ -611,6 +657,9 @@ const ExhibitionsPage: React.FC = () => {
                         </Typography>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
                           {visitor.mobileNumber}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {visitor.interestType}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Date: {dayjs(visitor.timestamps).format('MMMM D, YYYY h:mm A')}

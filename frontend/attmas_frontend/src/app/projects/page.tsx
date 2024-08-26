@@ -406,7 +406,7 @@ const Jobs = () => {
 
             </Box>
 
-            {userDetails.userType === 'Project Owner' && (
+        
                 <Box sx={{
                     mt: {
                         xs: 2, md: 0, float: 'right', position: 'relative', bottom: '20px', '@media (max-width: 767px)': {
@@ -418,7 +418,7 @@ const Jobs = () => {
                 }}>
                     <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
                 </Box>
-            )}
+        
             <Box sx={{
                 position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
                     position: 'relative',
@@ -531,7 +531,8 @@ const Jobs = () => {
                             justifyContent: 'space-between',
                             mt: 4,
                             position: 'relative',
-                            left: '28px'
+                            left: '28px',
+                            marginBottom:'20%'
                         },
                     }}
                 >

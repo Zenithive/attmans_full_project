@@ -26,7 +26,7 @@ export class JobsService {
     private readonly emailService: EmailService2,
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
-  ) { }
+  ) {}
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
     const createdJobs = new this.jobsModel(createJobsDto);
@@ -121,13 +121,17 @@ export class JobsService {
   }
 
   async update(id: string, updateJobsDto: UpdateJobsDto): Promise<Jobs> {
-    console.log('id', { _id: id });
-    const existingJob = await this.jobsModel.findById({ _id: id });
+    console.log('id', id);
+
+    const existingJob = await this.jobsModel.findById({ _id: id }).exec();
     console.log('existingJob', existingJob);
+
     if (!existingJob) {
-      throw new NotFoundException(`Jobs with id ${id} not found`);
+      throw new NotFoundException(`Job with id ${id} not found`);
     }
+
     Object.assign(existingJob, updateJobsDto);
+
     return existingJob.save();
   }
 
@@ -254,8 +258,11 @@ export class JobsService {
     return job.save();
   }
 
-
-  async updateStatusAndComment(id: string, status: string, comment: string): Promise<Jobs> {
+  async updateStatusAndComment(
+    id: string,
+    status: string,
+    comment: string,
+  ): Promise<Jobs> {
     // Find the job by ID
     const job = await this.jobsModel.findById(id);
     if (!job) {
@@ -270,8 +277,11 @@ export class JobsService {
     return job.save();
   }
 
-
-  async updateStatusAndCommentByAdmin(id: string, status: string, comment: string): Promise<Jobs> {
+  async updateStatusAndCommentByAdmin(
+    id: string,
+    status: string,
+    comment: string,
+  ): Promise<Jobs> {
     console.log(`Admin updating job with ID: ${id}`);
     console.log(`Status: ${status}`);
     console.log(`Comment: ${comment}`);
@@ -293,6 +303,4 @@ export class JobsService {
 
     return updatedJob;
   }
-
-
 }

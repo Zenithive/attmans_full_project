@@ -20,6 +20,7 @@ interface SignUpProps {
   onSignUpSuccess?: () => void;
   userType?: string;
   isAllProfileCompleted?: boolean;
+  interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth'; 
 }
 
 function Copyright(props: any) {
