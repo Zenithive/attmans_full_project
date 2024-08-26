@@ -13,7 +13,7 @@ export class ProductInfo {
   @Prop({ required: false })
   productType: string;
 
-  @Prop({ required: false,type: Number })
+  @Prop({ required: false, type: Number })
   productPrice: string;
 
   @Prop({ required: false })
@@ -48,7 +48,7 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   userType: string;
-  
+
   @Prop({ required: false })
   patentDetails: string;
 

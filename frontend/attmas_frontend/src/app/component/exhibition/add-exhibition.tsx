@@ -60,7 +60,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
     const initialValues = React.useMemo(() => ({
         title: '',
         description: '',
-        status: '',
+        status: editingExhibition ? (editingExhibition.status || '') : 'open',
         videoUrl: '',
         meetingUrl: '',
         dateTime: null as Dayjs | null,
@@ -161,7 +161,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                     initialValues={editingExhibition ? {
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
-                        status: editingExhibition.status || '',
+                        status: editingExhibition ? editingExhibition.status : 'open',
                         videoUrl: editingExhibition.videoUrl || '',
                         meetingUrl: editingExhibition.meetingUrl || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
@@ -228,9 +228,9 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     error={!!(errors.meetingUrl && touched.meetingUrl)}
                                     helperText={<ErrorMessage name="meetingUrl" />}
                                 />
-                                {editingExhibition && (
+                              
                                     <FormControl fullWidth>
-                                        <InputLabel id="status-label">Status</InputLabel>
+                                        <InputLabel id="status-label" color='secondary'>Status</InputLabel>
                                         <Select
                                             labelId="status-label"
                                             id="status"
@@ -241,12 +241,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                             onBlur={handleBlur}
                                             label="Status"
                                         >
-                                            <MenuItem value="cancel">cancel </MenuItem>
                                             <MenuItem value="open">open</MenuItem>
                                             <MenuItem value="close">close</MenuItem>
                                         </Select>
                                     </FormControl>
-                                )}
+                               
                                 <Autocomplete
                                     multiple
                                     options={industries}

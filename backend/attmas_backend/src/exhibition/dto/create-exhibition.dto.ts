@@ -72,7 +72,7 @@ export class UpdateExhibitionDto {
 
   @IsUrl()
   videoUrl?: string;
-  
+
   @IsUrl()
   meetingUrl?: string;
 }

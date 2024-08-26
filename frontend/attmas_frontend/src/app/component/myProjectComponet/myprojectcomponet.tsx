@@ -320,6 +320,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
+                                {!(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
                                 <Grid item xs={12} sm={6}>
                                     <TextField
                                         label="Owner Name"
@@ -329,6 +330,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
+                                )}
                                 {userDetails && (
                                     userType === 'Project Owner' ||
                                     (userType === 'Innovators' || userType === 'Freelancer')

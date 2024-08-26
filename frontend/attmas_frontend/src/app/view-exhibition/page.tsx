@@ -60,6 +60,13 @@ interface Booth {
   rejectComment?: string;
 }
 
+const ExhibitionClosedMessage = () => (
+  <Box sx={{ textAlign: 'center', padding: '20px' }}>
+    <Typography variant="h4">The exhibition is closed</Typography>
+    <Typography variant="body1">Sorry, but this exhibition is no longer available.</Typography>
+  </Box>
+);
+
 const ExhibitionsPage: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [booths, setBooths] = useState<Booth[]>([]);
@@ -79,7 +86,7 @@ const ExhibitionsPage: React.FC = () => {
   const [hasUserBooth, setHasUserBooth] = useState(false);
   const [view, setView] = useState('boothDetails');
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
-  const [interestType, setInterestType] = useState('Visitors');
+  const [interestType, setInterestType] = useState<string>('');
 
 
 
@@ -131,6 +138,8 @@ const ExhibitionsPage: React.FC = () => {
         const response = await axios.get(`${APIS.GET_VISITORS}`, {
           params: {
             exhibitionId,
+            interestType,
+            
           },
         });
         console.log('Fetched visitors:', response.data);
@@ -159,23 +168,24 @@ const ExhibitionsPage: React.FC = () => {
     if (view === 'boothDetails') {
       fetchVisitors();
 
-    }
+    } 
 
-  }, [userDetails?._id, searchParams, statusFilter, view]);
-
-  const fetchVisitorforinterestType = async () => {
-    try {
-      const response = await axios.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
-        params: { interestType },
-      });
-      setVisitors(response.data);
-    } catch (error) {
-      console.error('Error fetching visitors:', error);
-    }
-  };
+  }, [userDetails?._id, searchParams, statusFilter, view,interestType]);
 
   useEffect(() => {
-    fetchVisitorforinterestType();
+    if (interestType) {
+      const fetchVisitorforinterestType = async () => {
+        try {
+          const response = await axios.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
+            params: { interestType },
+          });
+          setVisitors(response.data);
+        } catch (error) {
+          console.error('Error fetching visitors:', error);
+        }
+      };
+      fetchVisitorforinterestType();
+    }
   }, [interestType]);
 
 
@@ -318,8 +328,10 @@ const ExhibitionsPage: React.FC = () => {
     }
   };
 
-  const handleViewChange = (event: React.MouseEvent<HTMLElement>, newView: string) => {
-    setView(newView);
+  const handleViewChange = (event: any, newView: string | null) => {
+    if (newView) {
+      setView(newView);
+    }
   };
 
   const handleJoinLiveClick = () => {
@@ -334,22 +346,28 @@ const ExhibitionsPage: React.FC = () => {
     return exhibitionDate.isSame(currentDate);
   };
 
+  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === 'close';
+
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Exhibitions and Booths</title>
       </Head>
+      {selectedExhibition === null ? (
+        <Typography>Loading exhibition...</Typography>
+      ) : isExhibitionClosed(selectedExhibition) ? (
+        <ExhibitionClosedMessage />
+      ) : (
       <Box sx={{
         display: 'flex', flexDirection: 'column', overflowX: 'hidden', '@media (max-width: 767px)': {
           overflowX: 'hidden'
         }
       }}>
+      
         <Box sx={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
           <Box sx={{ '@media (max-width: 767px)': { position: 'relative', right: '34px' } }}><h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1></Box>
-
-
-
           <Box sx={{
             '@media (max-width: 767px)': {
               position: 'relative', left: '72px', top: '10px'
@@ -477,40 +495,45 @@ const ExhibitionsPage: React.FC = () => {
             }
           }}>
             <h1>Booth Details</h1>
+
+            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
+              {userType !== 'Visitors' && (
+                <ToggleButtonGroup
+                  value={view}
+                  exclusive
+                  onChange={handleViewChange}
+                  aria-label="view selection"
+                >
+                  <ToggleButton value="boothDetails">Booth Details</ToggleButton>
+                  {userDetails && userType === 'Admin' ?
+                    <ToggleButton value="visitors">Visitors</ToggleButton> : ""}
+                </ToggleButtonGroup>
+              )}
+            </Box>
+
+            {view === 'visitors' && (
+              <Box sx={{ position: 'relative', marginBottom: '50px', left: '58%' }}>
+                <ToggleButtonGroup
+                  value={interestType}
+                  exclusive
+                  onChange={handleInterestTypeChange}
+                  aria-label="interest type selection"
+                >
+                  
+                  <ToggleButton value="InterestedUserForExhibition">Exhibition Visitors</ToggleButton>
+                  <ToggleButton value="InterestedUserForBooth">Booth Visitors</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+            )}
+
+          </Box>
+
+          <Box sx={{ position: 'relative', top: '50px', right: '20px', marginBottom: '20px' }}>
             {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
               <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} options={["All", "Pending", "Approved", "Rejected"]} />
             )}
           </Box>
 
-            <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '22px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
-          {userType !== 'Visitors' && (
-              <ToggleButtonGroup
-                value={view}
-                exclusive
-                onChange={handleViewChange}
-                aria-label="view selection"
-              >
-                <ToggleButton value="boothDetails">Booth Details</ToggleButton>
-                {userDetails && userType === 'Admin' ?
-                  <ToggleButton value="visitors">Visitors</ToggleButton> : ""}
-              </ToggleButtonGroup>
-          )}
-            </Box>
-
-          <Box>
-            {view === 'visitors' && (
-              <ToggleButtonGroup
-                value={interestType}
-                exclusive
-                onChange={handleInterestTypeChange}
-                aria-label="interest type selection"
-              >
-                <ToggleButton value="InterestedUserForExhibition">Exhibition Visitors</ToggleButton>
-                <ToggleButton value="InterestedUserForBooth">Booth Visitors</ToggleButton>
-              </ToggleButtonGroup>
-            )}
-
-          </Box>
 
           {view === 'boothDetails' && (
             <>
@@ -536,7 +559,7 @@ const ExhibitionsPage: React.FC = () => {
                           }}>
                             <h2>{booth.title}</h2>
                           </Typography>
-
+                          {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
                           <a
                             href="#"
                             onClick={(e) => {
@@ -553,7 +576,7 @@ const ExhibitionsPage: React.FC = () => {
                           >
                             View Details
                           </a>
-
+                        )}
                           {exhibitions.map((exhibition) => (
                             <Box key={exhibition._id}>
                               {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
@@ -697,6 +720,7 @@ const ExhibitionsPage: React.FC = () => {
           )}
         </div>
       </Box>
+      )}
     </>
   );
 };
