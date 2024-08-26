@@ -53,7 +53,6 @@ export class ApplyController {
     return this.applyService.findAllMyProject(userId);
   }
 
-
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Apply> {
     const apply = await this.applyService.findJobWithUser(id);

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Put,
 } from '@nestjs/common';
 import { JobsService } from './projects.service';
 import {
@@ -18,7 +19,7 @@ import { Jobs } from './projects.schema';
 
 @Controller('jobs')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) { }
+  constructor(private readonly jobsService: JobsService) {}
 
   @Post()
   async create(@Body() createJobsDto: CreateJobsDto): Promise<Jobs> {
@@ -57,12 +58,13 @@ export class JobsController {
     return job;
   }
 
-  @Post(':id')
+  @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateJobsDto: UpdateJobsDto,
   ): Promise<Jobs> {
     const updatedJob = await this.jobsService.update(id, updateJobsDto);
+    console.log('updatedJob', updatedJob);
     if (!updatedJob) {
       throw new NotFoundException(`Job with id ${id} not found`);
     }
@@ -100,7 +102,6 @@ export class JobsController {
     return this.jobsService.addComment(jobId, addCommentDto);
   }
 
-
   @Post('update-status-closecomment/:id')
   async updateStatusAndComment(
     @Param('id') id: string,
@@ -120,7 +121,6 @@ export class JobsController {
     return this.jobsService.updateStatusAndComment(id, status, comment);
   }
 
-
   @Post('update-status-closecommentByAdmin/:id')
   async updateStatusAndCommentByAdmin(
     @Param('id') id: string,
@@ -134,6 +134,4 @@ export class JobsController {
 
     return this.jobsService.updateStatusAndCommentByAdmin(id, status, comment);
   }
-
-
 }

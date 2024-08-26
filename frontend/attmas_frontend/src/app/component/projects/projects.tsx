@@ -22,8 +22,6 @@ import SubjectMatterExpertise from '../SubjectMatterExpertise';
 
 
 
-
-
 interface Jobs {
     Sector: string;
     AreaOfProduct: string;
@@ -54,17 +52,17 @@ interface AddJobsProps {
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Scope of work is required'),
-    SelectService: Yup.string().required('Select-Service is required'),
-    Expertiselevel: Yup.string(),
-    Objective: Yup.string().required('Objective is required'),
-    IPRownership: Yup.string().required('IPR-ownerShip is required'),
-    Expectedoutcomes: Yup.string().required('Expected out comes is required'),
+    // SelectService: Yup.array().of(Yup.string()).required('Select Service is required'),
     DetailsOfInnovationChallenge: Yup.string(),
     ProductDescription: Yup.string(),
     AreaOfProduct: Yup.string(),
     Sector: Yup.string(),
-    Budget: Yup.number().required("Budget is required"),
-    TimeFrame: Yup.date().nullable('Date & Time is required'),
+    Expertiselevel: Yup.string(),
+    Objective: Yup.string().required('Objective is required'),
+    IPRownership: Yup.string().required('IPR ownership is required'),
+    Expectedoutcomes: Yup.string().required('Expected outcomes are required'),
+    Budget: Yup.number().required('Budget is required'),
+    TimeFrame: Yup.date().nullable().required('Date & Time are required'),
     categoryforCategory: Yup.array().of(Yup.string()),
     Subcategory: Yup.array().of(Yup.string()),
     currency: Yup.string().required('Currency is required')
@@ -81,7 +79,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     const initialValues = React.useMemo(() => ({
         title: '',
         description: '',
-        SelectService: "",
+        SelectService: '',
         Expertiselevel: '',
         Budget: 0,
         Expectedoutcomes: '',
@@ -99,7 +97,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         ProductDescription: '',
         currency: 'INR',
 
-    }), []);
+    }), [userDetails]);
 
     React.useEffect(() => {
         if (editingJobs) {
@@ -145,12 +143,13 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
         try {
             if (editingJobs) {
+                console.log('Updating job with id:', editingJobs._id,jobsData);
                 await axios.put(`${APIS.JOBS}/${editingJobs._id}`, jobsData);
                 pubsub.publish('JobUpdated', { message: 'Jobs updated' });
                 pubsub.publish('toast', { message: 'Edit Project successfully!', severity: 'success' });
 
             } else {
-                const response = await axios.post(APIS.JOBS, jobsData);
+                     await axios.post(APIS.JOBS, jobsData);
                 //onAddJobs(response.data);
                 pubsub.publish('JobCreated', { message: 'A new Job Created' });
                 pubsub.publish('toast', { message: 'Create Project successfully!', severity: 'success' });
@@ -169,7 +168,9 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
     return (
         <>
-            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'> Create Projects</Button>
+            {userDetails.userType === 'Project Owner' && (
+            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'>{editingJobs ? 'Edit Project' : 'Create Project'}</Button>
+        )}
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 ,'@media (max-width: 767px)':{
                 width:'116%'
             }} }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
@@ -238,7 +239,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         color='secondary'
                                         id="SelectService"
                                         name="SelectService"
-                                        value={values.SelectService}
+                                        value={values.SelectService} 
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         label="Select Service"

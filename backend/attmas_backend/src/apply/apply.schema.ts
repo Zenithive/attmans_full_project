@@ -59,6 +59,9 @@ export class Apply {
 
   @Prop({ required: false })
   SolutionUSP: string;
+
+  @Prop({ required: true, enum: ['InnovatorsApply', 'FreelancerApply'] })
+  applyType: string;
 }
 
 export const ApplySchema = SchemaFactory.createForClass(Apply);

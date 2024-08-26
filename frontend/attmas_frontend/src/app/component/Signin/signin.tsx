@@ -25,6 +25,8 @@ interface SignInProps {
   showLinks?: boolean;
   onSignInSuccess?: () => void;
   exhibitionId?: string | null;
+  boothId?: string | null;
+  interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth'; 
 }
 
 function Copyright(props: any) {
@@ -40,7 +42,7 @@ function Copyright(props: any) {
   );
 }
 
-export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId }: SignInProps) => {
+export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibitionId ,boothId,interestType}: SignInProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -79,12 +81,15 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           userId: res._id,
           userType: res.userType,
           exhibitionId: exhibitionId || null,
+          boothId: boothId || null,
           firstName: res.firstName,
           lastName: res.lastName,
           mobileNumber: res.mobileNumber,
+          interestType: interestType,
         };
 
-        if (exhibitionId) {
+       
+        if (exhibitionId || boothId) {
           await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
         }
 

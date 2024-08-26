@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateApplyDto {
@@ -55,4 +55,8 @@ export class CreateApplyDto {
   @IsNotEmpty()
   @IsString()
   SolutionUSP: string;
+
+  @IsNotEmpty()
+  @IsEnum(['innovatorsApply', 'FreelancerApply'])
+  applyType: string;
 }

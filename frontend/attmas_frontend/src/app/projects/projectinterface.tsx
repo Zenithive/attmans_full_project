@@ -41,6 +41,7 @@ export interface Apply {
     jobId: string;
     firstName: string;
     lastName: string;
+    applyType:string;
 }
 
 export const Expertiselevel = [

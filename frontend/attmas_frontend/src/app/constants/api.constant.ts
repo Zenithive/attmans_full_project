@@ -78,6 +78,7 @@ export const APIS = {
 
     GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
     GET_VISITORS:  `${SERVER_URL}/interested-users`,
+    GET_VISITORS2: '/interested-users/filter-visitors',
     ADD_VISITOR: `${SERVER_URL}/interested-users`,
 
 
@@ -111,4 +112,8 @@ export const APIS = {
     CLOSED_PROJECT: `${SERVER_URL}/jobs/update-status-closecomment`, 
 
     CLOSED_BY_ADMIN: `${SERVER_URL}/jobs/update-status-closecommentByAdmin`,
+
+    GET_BOOTH_VISITORS_BY_EXHIBITION: `${SERVER_URL}/booth-visitors-by-exhibition`,
+
+    GET_VISITORS_BY_INTEREST_TYPE:`${SERVER_URL}/interested-users/visitors-by-interest-type`
 }
