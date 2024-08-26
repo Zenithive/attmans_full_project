@@ -13,7 +13,7 @@ const Page = () => {
 
   return (
     <div>
-      {isLogin ? <SignIn toggleForm={toggleForm} /> : <SignUp/>}
+      {isLogin ? <SignIn toggleForm={toggleForm} interestType={'InterestedUserForExhibition'} /> : <SignUp interestType={'InterestedUserForExhibition'}/>}
     </div>
   );
 };
