@@ -15,6 +15,7 @@ import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
 import { InterestedUserModule } from './intrestedUser/interestedUser.module';
 import { CommentsModule } from './comments/comments.module';
 import { MilestonesModule } from './milestone/milestone.module';
+import { ProposalModule } from './proposal/proposal.module';
 
 dotenv.config();
 console.log('process.env.MONGO_URL', process.env.URI);
@@ -36,6 +37,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     InterestedUserModule,
     CommentsModule,
     MilestonesModule,
+    ProposalModule
   ],
   controllers: [AppController],
   providers: [AppService],

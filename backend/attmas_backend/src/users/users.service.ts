@@ -200,7 +200,6 @@ export class UsersService {
       ])
       .exec();
 
-
     // if (categories || subCategory) {
     //   const usernames = users.map((user) => user.username);
 

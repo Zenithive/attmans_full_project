@@ -52,7 +52,7 @@ const MyProducts: React.FC<MyProductsProps> = ({ products, setProducts }) => {
         </TableHead>
         <TableBody>
           {Array.isArray(products) && products.map((product, index) => (
-            <TableRow key={index}>
+            <TableRow key={index}>   
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.description}</TableCell>
               <TableCell>{product.productType}</TableCell>

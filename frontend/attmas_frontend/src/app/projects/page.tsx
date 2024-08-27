@@ -25,6 +25,7 @@ import { Job, Apply } from './projectinterface';
 import { Expertiselevel } from './projectinterface';
 import { getSubcategorys } from './projectinterface';
 import { CustomChip } from './projectinterface';
+import { AddApplyForInnovatores } from '../component/innovatoreApply/innovatoreApply';
 
 
 
@@ -32,6 +33,7 @@ const Jobs = () => {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
+    const [applyOpenForInnovators, setApplyOpenForInnovators] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
@@ -61,6 +63,7 @@ const Jobs = () => {
     const [applies, setApplies] = useState<Apply[]>([]);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const [filterType, setFilterType] = useState(() => {
         return userDetails.userType === 'Freelancer' ? 'Innovative Products' : 'all';
@@ -272,6 +275,22 @@ const Jobs = () => {
         }
     }, [userId]);
 
+    const handleApplyClickForInnovators = useCallback(async (title: string, job: Job) => {
+        try {
+            setApplyOpenForInnovators(true);
+            setJobTitle(title);
+            setSelectedJobId(job._id || '');
+
+            setAppliedJobs(prev => [...prev, job._id || '']);
+
+            await axios.post(`${APIS.APPLY}`, { userId, jobId: job._id, title });
+
+            setApplyOpenForInnovators(false);
+        } catch (error) {
+            console.error('Error applying for job:', error);
+        }
+    }, [userId]);
+
 
 
     const handleFilterTypeChange = (event: any, newFilter: string) => {
@@ -287,6 +306,7 @@ const Jobs = () => {
         setIsApproved(job.status === 'Approved');
         setIsRejected(job.status === 'Rejected');
         setApplyOpen(false);
+        setApplyOpenForInnovators(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
 
@@ -403,19 +423,19 @@ const Jobs = () => {
 
             </Box>
 
-            {userDetails.userType === 'Project Owner' && (
-                <Box sx={{
-                    mt: {
-                        xs: 2, md: 0, float: 'right', position: 'relative', bottom: '20px', '@media (max-width: 767px)': {
-                            position: 'relative',
-                            float: 'right',
-                            top: '0px'
-                        }
+
+            <Box sx={{
+                mt: {
+                    xs: 2, md: 0, float: 'right', position: 'relative', bottom: '20px', '@media (max-width: 767px)': {
+                        position: 'relative',
+                        float: 'right',
+                        top: '0px'
                     }
-                }}>
-                    <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-                </Box>
-            )}
+                }
+            }}>
+                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+            </Box>
+
             <Box sx={{
                 position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
                     position: 'relative',
@@ -528,7 +548,8 @@ const Jobs = () => {
                         justifyContent: 'space-between',
                         mt: 4,
                         position: 'relative',
-                        left: '28px'
+                        left: '28px',
+                        marginBottom: '20%'
                     },
                 }}
             >
@@ -721,12 +742,22 @@ const Jobs = () => {
                                                 </Menu>
                                             </Box>
                                             <Box sx={{ position: 'relative', bottom: '10px' }}>
-                                                {(userType === 'Freelancer' || userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                                {(userType === 'Freelancer') && !appliedJobs.includes(job._id || '') && (
                                                     <Button
                                                         variant="contained"
                                                         color="primary"
                                                         onClick={() => handleApplyClick(job.title, job)}
                                                         sx={{ float: 'right' }}
+                                                    >
+                                                        Apply
+                                                    </Button>
+                                                )}
+                                                {(userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="secondary"
+                                                        onClick={() => handleApplyClickForInnovators(job.title, job)}
+                                                        sx={{ float: 'right', marginRight: '10px' }}
                                                     >
                                                         Apply
                                                     </Button>
@@ -750,6 +781,13 @@ const Jobs = () => {
                 jobId={selectedJobId}
                 onCancel={() => handleCancelApply(selectedJobId)}
             />
+
+            <AddApplyForInnovatores
+                open={applyOpenForInnovators}
+                setOpen={setApplyOpenForInnovators}
+                jobTitle={jobTitle}
+                jobId={selectedJobId}
+                onCancel={() => handleCancelApply(selectedJobId)} />
 
             <DeleteConfirmationDialog
                 open={confirmDelete.open}

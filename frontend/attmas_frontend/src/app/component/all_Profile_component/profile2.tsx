@@ -21,6 +21,8 @@ import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import ProductTable, { Product } from '../ProductTable';
 import { userType } from '@/app/services/user.access.service';
+import AddProductModal2 from './AddProductModal2';
+import NewProductTable from './NewProductTable';
 
 interface FormValues {
     qualification: string;
@@ -51,6 +53,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
 
+    const [showAddProductModal, setShowAddProductModal] = useState(false);
+
+    const [openModal, setOpenModal] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const dispatch = useAppDispatch();
@@ -67,8 +74,20 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             Yup.object().shape({
                 productName: Yup.string().nullable(),
                 productDescription: Yup.string().nullable(),
-                productType: Yup.string().nullable(),
-                productPrice: Yup.string().nullable(),
+                productQuantity: Yup.number().nullable(),
+                videourlForproduct: Yup.string().nullable(),
+                // productType: Yup.string().nullable(),
+                technologyused: Yup.string().nullable(),
+                targetaudience: Yup.string().nullable(),
+                problemaddressed: Yup.string().nullable(),
+                productPrice: Yup.number().nullable(),
+                intellectualpropertyconsiderations: Yup.string().nullable(),
+                CompetitiveAdvantages: Yup.string().nullable(),
+                feasibilityofthesolution: Yup.string().nullable(),
+                stageofdevelopmentdropdown: Yup.string().nullable(),
+                howdoesthesolutionwork: Yup.string().nullable(),
+                challengesorrisks: Yup.string().nullable(),
+                potentialbenefits: Yup.string().nullable(),
                 currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
             })
         ),
@@ -80,56 +99,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         // }),
     });
 
-    const formik = useFormik<FormValues>({
-        initialValues: {
-            qualification: '',
-            organization: '',
-            sector: '',
-            workAddress: '',
-            designation: '',
-            userType: '',
-            productToMarket: '',
-            products: [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
-            hasPatent: 'No',
-            patentDetails: '',
-            username: userDetails.username,
-            userId: userDetails._id,
-        },
-        validationSchema,
-        onSubmit: async (values) => {
-            setLoading(true);
-            try {
-                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
-                console.log('Form submitted successfully:', response.data);
 
-                setLoading(false);
-                const user1 = {
-                    token: userDetails.token,
-                    username: userDetails.username,
-                    firstName: userDetails.firstName,
-                    lastName: userDetails.lastName,
-                    mobileNumber: userDetails.mobileNumber,
-                    _id: userDetails._id,
-                    userType: values.userType as userType
-                };
-
-                dispatch(addUser(user1));
-
-                pubsub.publish('toast', {
-                    message: 'Profile updated successfully!',
-                    severity: 'success',
-                });
-                onNext();
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                setLoading(false);
-                pubsub.publish('toast', {
-                    message: 'Failed to update profile. Please try again later.',
-                    severity: 'error',
-                });
-            }
-        },
-    });
 
 
     const handleFocus = () => {
@@ -166,11 +136,96 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         setShowProductDetails(value === 'Yes');
     };
 
+    const handleAddProduct = () => {
+        setShowAddProductModal(true); // Open the modal
+        setOpenModal(true)
+    };
+
+
+
+    // // Handle saving the new product
+    // const handleSaveProduct = (newProduct: Product) => {
+    //     console.log('New Product:', newProduct);
+    //     setProducts([...products, newProduct]);
+    // };
+    const handleSaveProduct = (newProduct: Product) => {
+        console.log('New Product:', newProduct);
+        setProducts((prevProducts) => [...prevProducts, newProduct]);
+        formik.setFieldValue('products', [...formik.values.products, newProduct]);
+    };
+
+    const handleViewProduct = (id: string) => {
+        // Implement view product logic here
+    };
+
+    const handleEditProduct = (id: string) => {
+        // Implement edit product logic here
+    };
+
+    const handleDeleteProduct = (id: string) => {
+        const updatedProducts = products.filter(product => product.id !== id);
+        setProducts(updatedProducts);
+        formik.setFieldValue('products', updatedProducts);
+    };
+
+
     const handleProductChange = (index: number, updatedProduct: Product) => {
         const updatedProducts = [...formik.values.products];
         updatedProducts[index] = updatedProduct;
         formik.setFieldValue('products', updatedProducts);
     };
+
+    const formik = useFormik<FormValues>({
+        initialValues: {
+            qualification: '',
+            organization: '',
+            sector: '',
+            workAddress: '',
+            designation: '',
+            userType: '',
+            productToMarket: '',
+            products: [],
+            hasPatent: 'No',
+            patentDetails: '',
+            username: userDetails.username,
+            userId: userDetails._id,
+        },
+        validationSchema,
+        onSubmit: async (values) => {
+            setLoading(true);
+            console.log("Submitting products:", values.products);
+            try {
+                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
+                console.log('Form submitted successfully:', response.data);
+
+                setLoading(false);
+                const user1 = {
+                    token: userDetails.token,
+                    username: userDetails.username,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    mobileNumber: userDetails.mobileNumber,
+                    _id: userDetails._id,
+                    userType: values.userType as userType
+                };
+
+                dispatch(addUser(user1));
+
+                pubsub.publish('toast', {
+                    message: 'Profile updated successfully!',
+                    severity: 'success',
+                });
+                onNext();
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                setLoading(false);
+                pubsub.publish('toast', {
+                    message: 'Failed to update profile. Please try again later.',
+                    severity: 'error',
+                });
+            }
+        },
+    });
 
     return (
         <Container component="main" maxWidth="md">
@@ -380,36 +435,40 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 </>
                             ) : ""}
 
-
                             {isInnovator && showProductDetails && (
-                                <>
-                                    <Grid item xs={12}>
-                                        <ProductTable
-                                            products={formik.values.products}
-                                            onRemove={(index: number) => {
-                                                const updatedProducts = [...formik.values.products];
-                                                updatedProducts.splice(index, 1);
-                                                formik.setFieldValue('products', updatedProducts);
-                                            }}
-                                            onChange={(index: number, updatedProduct: Product) => handleProductChange(index, updatedProduct)}
-                                        />
+                                <Grid item xs={12}>
+                                    <Button variant="contained" onClick={handleAddProduct}>
+                                        Add Product
+                                    </Button>
+                                    {/* ProductTable and other relevant UI components */}
+                                </Grid>
 
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Button
-                                            onClick={() => {
-                                                const updatedProducts = [...formik.values.products, { productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }];
-                                                formik.setFieldValue('products', updatedProducts);
-                                            }}
-                                        >
-                                            Add Product
-                                        </Button>
-                                    </Grid>
-                                </>
+
                             )}
 
 
+                            <AddProductModal2
+                                open={showAddProductModal}
+                                onClose={() => setShowAddProductModal(false)}
+                                onSave={handleSaveProduct}
+                            />
+
+
+                            {isInnovator && showProductDetails && (
+
+                                <NewProductTable
+                                    products={formik.values.products}
+                                    onView={handleViewProduct}
+                                    onEdit={handleEditProduct}
+                                    onDelete={handleDeleteProduct}
+                                />
+
+                            )}
+
+
+
                             {/* *********** back and back *************** */}
+
 
                             <Grid item xs={12}>
                                 <Button
@@ -451,16 +510,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                     </Box>
                 </FormikProvider>
 
-                {/* Added sentences at the end of the form
-                <Typography variant="body2" color="text.secondary" align="center" mt={4}>
-                    <i>
-                        <b>
-                            Please Note: <br />
-                            If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
-                            Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
-                        </b>
-                    </i>
-                </Typography> */}
+
 
                 {/* Added sentences at the end of the form */}
                 <Typography

@@ -63,6 +63,7 @@ const EditProfile3: React.FC = () => {
       try {
         const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`);
         const userData = response.data;
+        console.log('userData',userData);
         formik.setValues({
           ...formik.values,
           subcategories: userData.subcategories || [],
