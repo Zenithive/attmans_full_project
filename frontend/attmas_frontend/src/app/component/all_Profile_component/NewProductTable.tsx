@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconB
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import { Product } from '../ProductTable'; // Assuming Product interface includes productPrice and currency
 
 interface NewProductTableProps {
@@ -31,9 +32,9 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onView, onE
                 <TableHead>
                     <TableRow>
                         <TableCell>Product Name</TableCell>
-                        <TableCell>Price & Currency</TableCell> {/* Updated header */}
+                        <TableCell>Price</TableCell> {/* Updated header */}
                         <TableCell>Quantity</TableCell>
-                        <TableCell>Video URL</TableCell>
+                        <TableCell>Video</TableCell> {/* Updated header */}
                         <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
@@ -43,7 +44,16 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onView, onE
                             <TableCell>{product.productName}</TableCell>
                             <TableCell>{`${getCurrencySymbol(product.currency)} ${product.productPrice}`}</TableCell> {/* Combined price and currency */}
                             <TableCell>{product.productQuantity}</TableCell>
-                            <TableCell>{product.videourlForproduct}</TableCell>
+                            <TableCell>
+                                {product.videourlForproduct && (
+                                    <IconButton
+                                        aria-label="watch video"
+                                        onClick={() => window.open(product.videourlForproduct, '_blank')}
+                                    >
+                                        <YouTubeIcon />
+                                    </IconButton>
+                                )}
+                            </TableCell>
                             <TableCell>
                                 <IconButton onClick={() => onView(product.id)} aria-label="view">
                                     <VisibilityIcon />
