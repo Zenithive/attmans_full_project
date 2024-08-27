@@ -21,6 +21,7 @@ import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import ProductTable, { Product } from '../ProductTable';
 import { userType } from '@/app/services/user.access.service';
+import AddProductModal2 from './AddProductModal2';
 
 interface FormValues {
     qualification: string;
@@ -51,6 +52,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
 
+    const [showAddProductModal, setShowAddProductModal] = useState(false);
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const dispatch = useAppDispatch();
@@ -67,8 +70,20 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             Yup.object().shape({
                 productName: Yup.string().nullable(),
                 productDescription: Yup.string().nullable(),
+                productQuantity: Yup.string().nullable(),
+                videourlForproduct: Yup.string().nullable(),
                 productType: Yup.string().nullable(),
+                technologyused: Yup.string().nullable(),
+                targetaudience: Yup.string().nullable(),
+                problemaddressed: Yup.string().nullable(),
                 productPrice: Yup.string().nullable(),
+                intellectualpropertyconsiderations: Yup.string().nullable(),
+                CompetitiveAdvantages: Yup.string().nullable(),
+                feasibilityofthesolution: Yup.string().nullable(),
+                stageofdevelopmentdropdown: Yup.string().nullable(),
+                howdoesthesolutionwork: Yup.string().nullable(),
+                challengesorrisks: Yup.string().nullable(),
+                potentialbenefits: Yup.string().nullable(),
                 currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
             })
         ),
@@ -89,7 +104,25 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             designation: '',
             userType: '',
             productToMarket: '',
-            products: [{ productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }],
+            products: [{
+                productName: '',
+                productDescription: '',
+                productType: '',
+                productPrice: '',
+                currency: 'INR',
+                productQuantity: '',
+                videourlForproduct: '',
+                targetaudience: '',
+                problemaddressed: '',
+                technologyused: '',
+                stageofdevelopmentdropdown: '',
+                intellectualpropertyconsiderations: '',
+                CompetitiveAdvantages: '',
+                feasibilityofthesolution: '',
+                howdoesthesolutionwork: '',
+                potentialbenefits: '',
+                challengesorrisks: ''
+            }],
             hasPatent: 'No',
             patentDetails: '',
             username: userDetails.username,
@@ -164,6 +197,52 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         const value = event.target.value as string;
         formik.handleChange(event);
         setShowProductDetails(value === 'Yes');
+    };
+
+    const handleAddProduct = () => {
+        setShowAddProductModal(true); // Open the modal
+    };
+
+    const handleSaveProduct = (
+        productName: string,
+        productDescription: string,
+        productQuantity: string,
+        videourlForproduct: string,
+        targetaudience: string,
+        problemaddressed: string,
+        technologyused: string,
+        intellectualpropertyconsiderations: string,
+        stageofdevelopmentdropdown: string,
+        CompetitiveAdvantages: string,
+        feasibilityofthesolution: string,
+        howdoesthesolutionwork: string,
+        potentialbenefits: string,
+        challengesorrisks: string,
+        productPrice: string,
+        currency: string,
+
+    ) => {
+        const newProduct = {
+            productName,
+            productDescription,
+            videourlForproduct,
+            productQuantity,
+            targetaudience,
+            problemaddressed,
+            technologyused,
+            intellectualpropertyconsiderations,
+            stageofdevelopmentdropdown,
+            CompetitiveAdvantages,
+            feasibilityofthesolution,
+            howdoesthesolutionwork,
+            potentialbenefits,
+            challengesorrisks,
+
+            productType: '',
+            productPrice: '',
+            currency: 'INR'
+        };
+        formik.setFieldValue('products', [...formik.values.products, newProduct]);
     };
 
     const handleProductChange = (index: number, updatedProduct: Product) => {
@@ -380,34 +459,21 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 </>
                             ) : ""}
 
-
                             {isInnovator && showProductDetails && (
-                                <>
-                                    <Grid item xs={12}>
-                                        <ProductTable
-                                            products={formik.values.products}
-                                            onRemove={(index: number) => {
-                                                const updatedProducts = [...formik.values.products];
-                                                updatedProducts.splice(index, 1);
-                                                formik.setFieldValue('products', updatedProducts);
-                                            }}
-                                            onChange={(index: number, updatedProduct: Product) => handleProductChange(index, updatedProduct)}
-                                        />
-
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Button
-                                            onClick={() => {
-                                                const updatedProducts = [...formik.values.products, { productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }];
-                                                formik.setFieldValue('products', updatedProducts);
-                                            }}
-                                        >
-                                            Add Product
-                                        </Button>
-                                    </Grid>
-                                </>
+                                <Grid item xs={12}>
+                                    <Button variant="contained" onClick={handleAddProduct}>
+                                        Add Product
+                                    </Button>
+                                    {/* ProductTable and other relevant UI components */}
+                                </Grid>
                             )}
 
+
+                            <AddProductModal2
+                                open={showAddProductModal}
+                                onClose={() => setShowAddProductModal(false)}
+                                onSave={handleSaveProduct}
+                            />
 
                             {/* *********** back and back *************** */}
 
@@ -451,16 +517,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                     </Box>
                 </FormikProvider>
 
-                {/* Added sentences at the end of the form
-                <Typography variant="body2" color="text.secondary" align="center" mt={4}>
-                    <i>
-                        <b>
-                            Please Note: <br />
-                            If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
-                            Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
-                        </b>
-                    </i>
-                </Typography> */}
+
 
                 {/* Added sentences at the end of the form */}
                 <Typography

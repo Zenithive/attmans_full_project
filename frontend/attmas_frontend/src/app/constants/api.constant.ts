@@ -37,6 +37,11 @@ export const APIS = {
 
 
 
+    PROPOSAL: `${SERVER_URL}/proposals`,
+
+
+
+
     
 
 

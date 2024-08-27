@@ -11,16 +11,49 @@ export class ProductInfo {
   productDescription: string;
 
   @Prop({ required: false })
+  productQuantity: string;
+
+  @Prop({ required: false })
   productType: string;
 
-  @Prop({ required: false,type: Number })
-  productPrice: string;
+  @Prop({ required: false, type: Number })
+  productPrice: number;
 
   @Prop({ required: false })
   currency: string;
 
   @Prop({ required: false })
   videourlForproduct: string;
+
+  @Prop({ required: false })
+  targetaudience: string;
+
+  @Prop({ required: false })
+  problemaddressed: string;
+
+  @Prop({ required: false })
+  technologyused: string;
+
+  @Prop({ required: false })
+  stageofdevelopmentdropdown: string;
+
+  @Prop({ required: false })
+  intellectualpropertyconsiderations: string;
+
+  @Prop({ required: false })
+  CompetitiveAdvantages: string;
+
+  @Prop({ required: false })
+  feasibilityofthesolution: string;
+
+  @Prop({ required: false })
+  howdoesthesolutionwork: string;
+
+  @Prop({ required: false })
+  potentialbenefits: string;
+
+  @Prop({ required: false })
+  challengesorrisks: string;
 }
 
 export const ProductInfoSchema = SchemaFactory.createForClass(ProductInfo);

@@ -22,8 +22,18 @@ export interface Product {
     productPrice: string;
     currency: string;
     videourlForproduct?: string;
+    productQuantity: string;
+    targetaudience: string;
+    problemaddressed: string;
+    technologyused: string;
+    stageofdevelopmentdropdown: string;
+    intellectualpropertyconsiderations: string;
+    CompetitiveAdvantages: string;
+    feasibilityofthesolution: string;
+    howdoesthesolutionwork: string;
+    potentialbenefits: string;
+    challengesorrisks: string;
 }
-
 interface ProductTableProps {
     products: Product[];
     onRemove: (index: number) => void;
