@@ -35,7 +35,7 @@ interface AddProductModalProps2 {
     onSave: (productDetails: Product) => void;
 }
 
-const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSave }) => {
+const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSave}) => {
     const [productName, setProductName] = React.useState('');
     const [productDescription, setProductDescription] = React.useState('');
     const [productQuantity, setProductQuantity] = React.useState(0);
@@ -71,6 +71,28 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
         setProductPrice(0);
         setCurrency('INR');
     };
+
+    // React.useEffect(() => {
+    //     if (selectedProduct) {
+    //         setProductName(selectedProduct.productName || '');
+    //         setProductDescription(selectedProduct.productDescription || '');
+    //         setProductQuantity(selectedProduct.productQuantity || '');
+    //         setVideourlForproduct(selectedProduct.videourlForproduct || '');
+    //         setTargetaudience(selectedProduct.targetaudience || '');
+    //         setProblemaddressed(selectedProduct.problemaddressed || '');
+    //         setTechnologyused(selectedProduct.technologyused || '');
+    //         setStageofdevelopmentdropdown(selectedProduct.stageofdevelopmentdropdown || '');
+    //         setIntellectualpropertyconsiderations(selectedProduct.intellectualpropertyconsiderations || '');
+    //         setCompetitiveAdvantages(selectedProduct.CompetitiveAdvantages || '');
+    //         setFeasibilityofthesolution(selectedProduct.feasibilityofthesolution || '');
+    //         setHowdoesthesolutionwork(selectedProduct.howdoesthesolutionwork || '');
+    //         setPotentialbenefits(selectedProduct.potentialbenefits || '');
+    //         setChallengesorrisks(selectedProduct.challengesorrisks || '');
+    //         setProductPrice(selectedProduct.productPrice || '');
+    //         setCurrency(selectedProduct.currency || '');
+    //     }
+    // }, [selectedProduct]);
+    
 
     const handleSave = () => {
         const newProduct = {
@@ -121,7 +143,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                 }}
             >
                 <Typography variant="h6" component="h2" mb={2}>
-                    Add Product Details
+                    {/* {readOnly ? 'View Product Details' : 'Add Product Details'} */}
                 </Typography>
 
                 <Grid container spacing={2}>
@@ -132,6 +154,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={productName}
                             onChange={(e) => setProductName(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -144,6 +167,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={productDescription}
                             onChange={(e) => setProductDescription(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -156,6 +180,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={howdoesthesolutionwork}
                             onChange={(e) => setHowdoesthesolutionwork(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -177,6 +202,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={videourlForproduct}
                             onChange={(e) => setVideourlForproduct(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -213,6 +239,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={stageofdevelopmentdropdown}
                             onChange={(e) => setStageofdevelopmentdropdown(e.target.value)}
+                            // InputProps={{ readOnly }}
                         >
                             <MenuItem value="prototype">Prototype</MenuItem>
                             <MenuItem value="market-ready">Market-Ready</MenuItem>
@@ -228,6 +255,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={intellectualpropertyconsiderations}
                             onChange={(e) => setIntellectualpropertyconsiderations(e.target.value)}
+                            // InputProps={{ readOnly }}
                         >
                             <MenuItem value="yes">Yes</MenuItem>
                             <MenuItem value="no">No</MenuItem>
@@ -241,6 +269,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={targetaudience}
                             onChange={(e) => setTargetaudience(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -251,6 +280,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={technologyused}
                             onChange={(e) => setTechnologyused(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -263,9 +293,9 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={problemaddressed}
                             onChange={(e) => setProblemaddressed(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
-
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
@@ -275,6 +305,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={CompetitiveAdvantages}
                             onChange={(e) => setCompetitiveAdvantages(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -287,6 +318,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={feasibilityofthesolution}
                             onChange={(e) => setFeasibilityofthesolution(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -299,6 +331,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={potentialbenefits}
                             onChange={(e) => setPotentialbenefits(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -311,6 +344,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             value={challengesorrisks}
                             onChange={(e) => setChallengesorrisks(e.target.value)}
+                            // InputProps={{ readOnly }}
                         />
                     </Grid>
 
@@ -318,9 +352,11 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                         <Button variant="outlined" onClick={handleClose}>
                             Cancel
                         </Button>
-                        <Button variant="contained" onClick={handleSave}>
-                            Save
-                        </Button>
+                        {/* {!readOnly && ( */}
+                            <Button variant="contained" onClick={handleSave}>
+                                Save
+                            </Button>
+                        {/* // )} */}
                     </Grid>
                 </Grid>
             </Box>
