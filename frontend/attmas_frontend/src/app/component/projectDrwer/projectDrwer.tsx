@@ -42,6 +42,8 @@ export interface Job {
   currency: string;
   status: string;
   rejectComment?: string;
+  userId?: UserSchema;
+  createdAt?: string;
 }
 
 interface Milestone {
@@ -104,6 +106,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const fetchApplications = useCallback(async () => {
+    console.log(userDetails, "viewingJob", viewingJob)
     if (viewingJob?._id) {
       try {
         const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
@@ -326,35 +329,59 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
         </DialogTitle>
         <DialogContent>
           {viewingJob && (
-            <Box>
+            <Box sx={{pt: 1}}>
               {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right', mb: 2 }} />}
               {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right', mb: 2 }} />}
 
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={userType === "Admin" ? 6 : 12}>
                   <TextField
                     label="Title"
                     value={viewingJob.title}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
+                {userType === "Admin" ? <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Project Owner"
+                    value={`${viewingJob?.userId?.firstName} ${viewingJob?.userId?.firstName}`}
+                    fullWidth
+                    color='secondary'
+                    aria-readonly
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>: ''}
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Select Service"
                     value={viewingJob.SelectService}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    label="Created Date"
+                    value={dayjs(viewingJob.createdAt).format('MMMM D, YYYY h:mm A')}
+                    fullWidth
+                    color='secondary'
+                    aria-readonly
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <TextField
                     label="Description"
                     value={viewingJob.description}
                     fullWidth
-                    disabled
+                    multiline
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -363,18 +390,21 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     label="Expertise Level"
                     value={viewingJob.Expertiselevel}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
-                {viewingJob.SelectService === 'Innovative product' && (
+                {viewingJob.SelectService[0] === 'Innovative product' && (
                   <>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         label="Details Of Innovation Challenge"
                         value={viewingJob.DetailsOfInnovationChallenge}
                         fullWidth
-                        disabled
+                        multiline
+                        color='secondary'
+                        aria-readonly
                         sx={{ mb: 2 }}
                       />
                     </Grid>
@@ -383,7 +413,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         label="Sector"
                         value={viewingJob.Sector}
                         fullWidth
-                        disabled
+                        color='secondary'
+                        aria-readonly
                         sx={{ mb: 2 }}
                       />
                     </Grid>
@@ -392,7 +423,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         label="Area Of Product"
                         value={viewingJob.AreaOfProduct}
                         fullWidth
-                        disabled
+                        color='secondary'
+                        aria-readonly
                         sx={{ mb: 2 }}
                       />
                     </Grid>
@@ -401,7 +433,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         label="Product Description"
                         value={viewingJob.ProductDescription}
                         fullWidth
-                        disabled
+                        multiline
+                        color='secondary'
+                        aria-readonly
                         sx={{ mb: 2 }}
                       />
                     </Grid>
@@ -412,7 +446,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     label="Budget"
                     value={`${viewingJob.currency === 'USD' ? '$' : '₹'} ${viewingJob.Budget}`}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -421,7 +456,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     label="Category"
                     value={viewingJob.Category.join(', ')}
                     fullWidth
-                    disabled
+                    multiline
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -430,7 +467,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     label="Subcategories"
                     value={viewingJob.Subcategorys.join(', ')}
                     fullWidth
-                    disabled
+                    multiline
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -439,7 +478,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     label="Objective"
                     value={viewingJob.Objective}
                     fullWidth
-                    disabled
+                    multiline
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -448,16 +489,20 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     label="Expected Outcomes"
                     value={viewingJob.Expectedoutcomes}
                     fullWidth
-                    disabled
+                    multiline
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <TextField
                     label="IPR Ownership"
                     value={viewingJob.IPRownership}
                     fullWidth
-                    disabled
+                    multiline
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -473,10 +518,10 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               </Grid>
 
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                 {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && viewingJob.status !== 'Project Closed by Admin' && viewingJob.status !== 'Project Finished and close' && (
                   <>
-                    <Button onClick={() => handleApproveDialogOpen(viewingJob)}>
+                    <Button sx={{mr: 2}} onClick={() => handleApproveDialogOpen(viewingJob)}>
                       Approve
                     </Button>
                     <Button onClick={() => handleRejectDialogOpen(viewingJob)}>

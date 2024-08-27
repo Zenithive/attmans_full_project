@@ -258,6 +258,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                                         label="Details of Innovation Challenge"
                                                         name="DetailsOfInnovationChallenge"
                                                         color='secondary'
+                                                        multiline
                                                         variant="outlined"
                                                         value={values.DetailsOfInnovationChallenge}
                                                         onChange={handleChange}
