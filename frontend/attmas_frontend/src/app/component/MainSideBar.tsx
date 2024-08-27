@@ -98,6 +98,14 @@ export default function MainSideBar() {
       isVisible: (isFreelancer || isProjectOwner || isInnovator)
     },
     {
+      path: '/proposal',
+      icon: () => (
+        <WorkIcon sx={{ fontSize: 22 }} />
+      ),
+      Name: "Proposal",
+      isVisible: (isFreelancer || isProjectOwner )
+    },
+    {
       path: '/exhibition',
       icon: () => (
         <Diversity1Icon sx={{ fontSize: 22 }} />
