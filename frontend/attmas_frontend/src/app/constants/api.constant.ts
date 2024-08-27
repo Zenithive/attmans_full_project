@@ -71,17 +71,17 @@ export const APIS = {
 
 
     //****** FreeLancers and Innovators API url ******//
-    FREELANCERS: `${SERVER_URL}/users/by-type?userType=Freelancer`,
-    INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
+    FREELANCERS: `${SERVER_URL}/users/filters?userType=Freelancer`,
+    INNOVATORS: `${SERVER_URL}/users/filters?userType=Innovators`,
     INNOVATORSFOREXIBITION: `${SERVER_URL}/users/by-type1?userType=Innovators`,
-    PROJECTOWNERS: `${SERVER_URL}/users/by-type?userType=Project Owner`,
+    PROJECTOWNERS: `${SERVER_URL}/users/filters?userType=Project Owner`,
 
     CATEGORIES: `${SERVER_URL}/profile/categories`,
 
 
 
 
-    GET_INNOVATORS: `${SERVER_URL}/users/by-type?userType=Innovators`,
+    GET_INNOVATORS: `${SERVER_URL}/users/filters?userType=Innovators`,
     GET_VISITORS:  `${SERVER_URL}/interested-users`,
     GET_VISITORS2: '/interested-users/filter-visitors',
     ADD_VISITOR: `${SERVER_URL}/interested-users`,

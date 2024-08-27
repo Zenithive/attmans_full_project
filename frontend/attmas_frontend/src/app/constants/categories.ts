@@ -370,54 +370,6 @@ export interface Subcategory {
   subcategories?: Subcategory[];
 }
 
-// export const subcategories: Subcategory[] = [
-//   {
-//     name: 'Chemistry',
-//     subcategories: [
-//       {
-//         name: 'Analytical Chemistry',
-//       },
-//       {
-//         name: 'Biochemistry',
-//         subcategories: [
-//           {
-//             name: 'Biomaterials',
-//           },
-//         ],
-//       },
-//     ],
-//   },
-//   {
-//     name: 'Engineering',
-//     subcategories: [
-//       {
-//         name: 'Mechanical Engineering',
-//       },
-//       {
-//         name: 'Electrical Engineering',
-//       },
-//     ],
-//   },
-// ];
-
-
-// export const categories: string[] = [
-//   "Agriculture",
-//   "Chemicals",
-//   "Electronics",
-//   "Energy",
-//   "Environmental and waste management",
-//   "Food and beverage",
-//   "Healthcare",
-//   "Medical devices and equipment",
-//   "Mining and metals",
-//   "Real estate and construction",
-//   "Textiles",
-// ];
-
-
-// constants/categories.ts
-
 export const categories: string[] = [
   "Agriculture",
   "Chemicals",

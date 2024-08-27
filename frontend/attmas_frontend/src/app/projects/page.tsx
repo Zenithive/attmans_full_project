@@ -188,7 +188,7 @@ const Jobs = () => {
 
     useEffect(() => {
         refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
+    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices, userId]);
 
     useEffect(() => {
         if (page > 1) {
@@ -420,9 +420,6 @@ const Jobs = () => {
                 }}
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
-
-
-
 
             </Box>
 

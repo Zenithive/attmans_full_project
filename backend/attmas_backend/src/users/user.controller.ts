@@ -36,25 +36,31 @@ export class UsersController {
     return { msg: 'Test message validate.' };
   }
 
-  @Get('by-type')
+  @Get('filters')
   async getUsersByUserType(
     @Query('userType') userType: string,
     @Query('page') page = '1',
     @Query('limit') limit = '10',
-    @Query('filter') filter = '',
-    @Query('category') category = '',
+    @Query('categories') categories = '',
     @Query('subCategory') subCategory = '',
+    @Query('firstName') firstName = '',
+    @Query('lastName') lastName = '',
+    @Query('mobileNumber') mobileNumber = '',
+    @Query('username') username = '',
   ) {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
-    const users = await this.usersService.findUsersByUserType(
+    const users = await this.usersService.findUsersByUserType({
       userType,
       pageNumber,
       limitNumber,
-      filter,
-      category,
+      categories,
       subCategory,
-    );
+      firstName,
+      lastName,
+      mobileNumber,
+      username,
+    });
     return users;
   }
 

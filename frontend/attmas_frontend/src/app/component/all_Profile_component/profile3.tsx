@@ -9,26 +9,12 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
-import { options } from '@/app/constants/categories';
+import { categories, options } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise'; // Import the new component
 
 interface ProfileForm3Props {
   onPrevious: () => void;
 }
-
-const industryOptions = [
-  "Chemicals",
-  "Agriculture",
-  "Electronics",
-  "Energy",
-  "Environmental and waste management",
-  "Food and beverage",
-  "Healthcare",
-  "Medical devices and equipment",
-  "Mining and metals",
-  "Real estate and construction",
-  "Textiles",
-];
 
 const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [loading, setLoading] = useState(false);
@@ -146,7 +132,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             <Autocomplete
               multiple
               id="categories"
-              options={industryOptions}
+              options={categories}
               disableCloseOnSelect
               getOptionLabel={(option) => option}
               value={formik.values.categories}

@@ -423,6 +423,7 @@ import { useState } from 'react';
 import UserDrawer from './UserNameSeperate/UserDrawer';
 import { ProductForBooth } from './ProductTableForBooth';
 import UserFullName from './UserNameSeperate/UserFullName';
+import Filters, { FilterColumn } from './filter/filter.component';
 
 interface User {
   _id: string;
@@ -452,7 +453,46 @@ interface UserListProps {
 }
 
 const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
+  const column:Array<FilterColumn> = [
+    {
+      name: "First Name",
+      value: '',
+      type: "Texbox",
+      key: 'firstName'
+    },
+    {
+      name: "Last Name",
+      value: '',
+      type: "Texbox",
+      key: 'lastName'
+    },
+    {
+      name: "Username",
+      value: '',
+      type: "Texbox",
+      key: 'username'
+    },
+    {
+      name: "Mobile Number",
+      value: '',
+      type: "Texbox",
+      key: 'mobileNumber'
+    },
+    {
+      name: "Category",
+      value: '',
+      type: "Category",
+      key: 'categories'
+    },
+    {
+      name: "Subject Matter Expertise",
+      value: '',
+      type: "SubCategory",
+      key: 'subCategory'
+    }
+  ];
   const [rowData, setRowData] = React.useState<User[]>([]);
+  const [filter, setFilter] = useState('');
   const [categoryData, setCategoryData] = React.useState<CategoryData[]>([]);
   const [filterText, setFilterText] = React.useState<string>('');
   const [filterVisible, setFilterVisible] = React.useState<boolean>(false);
@@ -478,10 +518,24 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
     fetchCategories();
   }, []);
 
+  const changeFilterOrPage = (paramStr: string) => {
+    if(paramStr && paramStr.length){
+      setFilter(paramStr);
+    }else{
+      setFilter('');
+    }
+
+    setPage(1);
+  }
+
   const fetchUsers = async () => {
     try {
+      // const response = await axios.get<User[]>(
+      //   `${apiUrl}&page=${page}&limit=20&filter=${filterText}&category=${selectedCategory ?? ''}&subCategory=${selectedSubCategory ?? ''}`
+      // );
+
       const response = await axios.get<User[]>(
-        `${apiUrl}&page=${page}&limit=20&filter=${filterText}&category=${selectedCategory ?? ''}&subCategory=${selectedSubCategory ?? ''}`
+        `${apiUrl}&page=${page}&limit=20&${filter}`
       );
 
       if (response.data.length < 6) {
@@ -497,7 +551,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 
   React.useEffect(() => {
     fetchUsers();
-  }, [filterText, selectedCategory, selectedSubCategory]);
+  }, [filterText, selectedCategory, selectedSubCategory, filter]);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterText(event.target.value);
@@ -553,16 +607,20 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   };
 
   return (
-    <>
-      <Box sx={{ padding: 2 }}>
-        <Typography variant="h4" sx={{ marginBottom: 2 }}>
-          {title}
-        </Typography>
-
-        <IconButton onClick={toggleFilterVisibility} aria-label="filter">
+    <Box
+      sx={{
+        background: '#f0f0f0',
+        p: 2,
+        borderRadius: 1,
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.8)', // Adding shadow here
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4" sx={{width: 250, fontSize: 28, fontWeight: 'bold'}}>{title}</Typography>
+        {/* <IconButton onClick={toggleFilterVisibility}>
           <FilterAltIcon />
-        </IconButton>
-
+        </IconButton> */}
+        <Filters column={column} onFilter={changeFilterOrPage}></Filters>
         {filterVisible && (
           <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
             <TextField
@@ -574,7 +632,6 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
               sx={{ flex: 1 }} // Ensures the text field takes up available space
             />
 
-
             <Autocomplete
               options={categories}
               value={selectedCategory}
@@ -582,20 +639,11 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
               renderInput={(params) => <TextField {...params} label="Category" />}
               sx={{ flex: 1 }} // Ensures the autocomplete takes up available space
             />
-
-
-            {/* Uncomment and adjust as needed for subcategories */}
-            {/* <Autocomplete
-      options={subcategories1}
-      value={selectedSubCategory}
-      onChange={handleSubCategoryChange}
-      renderInput={(params) => <TextField {...params} label="Sub Category" />}
-      sx={{ flex: 1 }} // Ensures the autocomplete takes up available space
-    /> */}
           </Box>
         )}
 
 
+      </Box>
         <InfiniteScroll
           dataLength={rowData.length}
           next={fetchUsers}
@@ -614,6 +662,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     p: 2,
+                    cursor: 'pointer',
                     position: 'relative' // Create positioning context
                   }}
                   onClick={() => handleUserClick(user)}
@@ -660,7 +709,6 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
             ))}
           </Grid>
         </InfiniteScroll>
-      </Box>
 
       {selectedUser && (
         <UserDrawer
@@ -671,7 +719,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
           setProductDetails={setProductDetails}
         />
       )}
-    </>
+    </Box>
   );
 };
 

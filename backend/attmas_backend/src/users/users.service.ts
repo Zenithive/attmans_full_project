@@ -75,30 +75,61 @@ export class UsersService {
     return user.save();
   }
 
-  async findUsersByUserType(
-    userType: string,
-    page: number,
-    limit: number,
-    filter: string,
-    category: string,
-    subCategory: string,
-  ): Promise<any[]> {
-    const skip = (page - 1) * limit;
+  async findUsersByUserType({
+    userType,
+    pageNumber,
+    limitNumber,
+    categories,
+    subCategory,
+    firstName,
+    lastName,
+    mobileNumber,
+    username,
+  }: {
+    userType: string;
+    pageNumber: number;
+    limitNumber: number;
+    categories: string;
+    subCategory: string;
+    firstName: string;
+    lastName: string;
+    mobileNumber: string;
+    username: string;
+  }): Promise<any[]> {
+    const skip = (pageNumber - 1) * limitNumber;
     const filterQuery: any = { userType };
 
-    if (filter) {
-      filterQuery.$or = [
-        { firstName: new RegExp(filter, 'i') },
-        { lastName: new RegExp(filter, 'i') },
-      ];
+    const allNativeFiltersArray = {
+      firstName,
+      lastName,
+      mobileNumber,
+      username,
+    };
+
+    for (const key in allNativeFiltersArray) {
+      if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+        const element = allNativeFiltersArray[key];
+        if (element) {
+          filterQuery[key] = new RegExp(element, 'i');
+        }
+        // if (!filterQuery.$or) {
+        //   filterQuery.$or = [{ [key]: new RegExp(element, 'i') }];
+        // } else {
+        //   filterQuery.$or.push({ [key]: new RegExp(element, 'i') });
+        // }
+      }
     }
+
+    // if (filter) {
+    //   filterQuery.$or = [
+    //     { firstName: new RegExp(filter, 'i') },
+    //     { lastName: new RegExp(filter, 'i') },
+    //   ];
+    // }
 
     // Aggregate users with their personal profile data
     const users = await this.userModel
       .aggregate([
-        { $match: filterQuery },
-        { $skip: skip },
-        { $limit: limit },
         {
           $lookup: {
             from: 'personalprofiles',
@@ -139,6 +170,19 @@ export class UsersService {
           },
         },
         {
+          $match: {
+            ...filterQuery,
+            ...(categories && {
+              'categoryData.categories': { $in: categories.split(',') },
+            }),
+            ...(subCategory && {
+              'categoryData.subcategories': { $in: subCategory.split(',') },
+            }),
+          },
+        },
+        { $skip: skip },
+        { $limit: limitNumber },
+        {
           $project: {
             _id: 1,
             firstName: 1,
@@ -156,27 +200,29 @@ export class UsersService {
       ])
       .exec();
 
-    if (category || subCategory) {
-      const usernames = users.map((user) => user.username);
+    // if (categories || subCategory) {
+    //   const usernames = users.map((user) => user.username);
 
-      const categoryFilter: any = { username: { $in: usernames } };
-      if (category) {
-        categoryFilter['categories'] = category;
-      }
-      if (subCategory) {
-        categoryFilter['subcategories'] = subCategory;
-      }
+    //   const categoryFilter: any = { username: { $in: usernames } };
+    //   if (categories) {
+    //     categoryFilter['categories'] = categories;
+    //   }
+    //   if (subCategory) {
+    //     categoryFilter['subcategories'] = subCategory;
+    //   }
 
-      // Apply additional filtering based on category and subcategory
-      const categoryData = await this.categoriesModel
-        .find(categoryFilter)
-        .exec();
-      const filteredUsernames = new Set(
-        categoryData.map((cat) => cat.username),
-      );
+    //   // Apply additional filtering based on category and subcategory
+    //   const categoryData = await this.categoriesModel
+    //     .find(categoryFilter)
+    //     .exec();
+    //   const filteredUsernames = new Set(
+    //     categoryData.map((cat) => cat.username),
+    //   );
 
-      return users.filter((user) => filteredUsernames.has(user.username));
-    }
+    //   console.log('filteredUsernames', filteredUsernames);
+
+    //   return users.filter((user) => filteredUsernames.has(user.username));
+    // }
 
     return users;
   }
