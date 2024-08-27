@@ -9,27 +9,13 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
-import { options } from '@/app/constants/categories';
+import { categories, options } from '@/app/constants/categories';
 
 type Option = {
   label: string;
   value: string;
   children?: Option[];
 };
-
-const industryOptions = [
-  "Chemicals",
-  "Agriculture",
-  "Electronics",
-  "Energy",
-  "Environmental and waste management",
-  "Food and beverage",
-  "Healthcare",
-  "Medical devices and equipment",
-  "Mining and metals",
-  "Real estate and construction",
-  "Textiles",
-];
 
 const EditProfile3: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -212,7 +198,7 @@ const EditProfile3: React.FC = () => {
             <Autocomplete
               multiple
               id="categories"
-              options={industryOptions}
+              options={categories}
               disableCloseOnSelect
               getOptionLabel={(option) => option}
               value={formik.values.categories}

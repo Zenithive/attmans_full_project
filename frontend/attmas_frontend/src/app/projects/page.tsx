@@ -41,7 +41,7 @@ const Jobs = () => {
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     // const [filterType, setFilterType] = useState("all");
-    
+
     const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; jobs: Job | null }>({ open: false, jobs: null });
     const [approveDialogOpen, setApproveDialogOpen] = useState<{
         open: boolean;
@@ -185,7 +185,7 @@ const Jobs = () => {
 
     useEffect(() => {
         refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
+    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices, userId]);
 
     useEffect(() => {
         if (page > 1) {
@@ -275,7 +275,7 @@ const Jobs = () => {
 
 
     const handleFilterTypeChange = (event: any, newFilter: string) => {
-        if (newFilter  !== null) {
+        if (newFilter !== null) {
             setFilterType(newFilter);
         }
     }
@@ -401,9 +401,6 @@ const Jobs = () => {
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
 
-
-
-
             </Box>
 
             {userDetails.userType === 'Project Owner' && (
@@ -520,47 +517,47 @@ const Jobs = () => {
             )}
 
             {/* {(userType === 'Project Owner') && ( */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        marginTop: '-15px',
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px'
-                        },
-                    }}
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    marginTop: '-15px',
+                    '@media (max-width: 767px)': {
+                        width: '100%',
+                        justifyContent: 'space-between',
+                        mt: 4,
+                        position: 'relative',
+                        left: '28px'
+                    },
+                }}
+            >
+                <ToggleButtonGroup
+                    value={filterType}
+                    exclusive
+                    onChange={handleFilterTypeChange}
+                    aria-label="filter exhibitions"
+                    sx={{ height: "30px" }}
                 >
-                    <ToggleButtonGroup
-                        value={filterType}
-                        exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter exhibitions"
-                        sx={{ height: "30px" }}
-                    >
 
 
 
-                        <ToggleButton value="all" aria-label="all exhibitions">
-                            All Projects
-                        </ToggleButton>
-                        <ToggleButton value="Innovative Products" aria-label="Innovative Products">
-                            Innovative Products
-                        </ToggleButton>
-                        <ToggleButton value="Outsource Research and Development" aria-label="Outsource Research and Development">
-                            Outsource Research and Development
-                        </ToggleButton>
-                        <ToggleButton value="mine" aria-label="my exhibitions">
-                            My Projects
-                        </ToggleButton>
+                    <ToggleButton value="all" aria-label="all exhibitions">
+                        All Projects
+                    </ToggleButton>
+                    <ToggleButton value="Innovative Products" aria-label="Innovative Products">
+                        Innovative Products
+                    </ToggleButton>
+                    <ToggleButton value="Outsource Research and Development" aria-label="Outsource Research and Development">
+                        Outsource Research and Development
+                    </ToggleButton>
+                    <ToggleButton value="mine" aria-label="my exhibitions">
+                        My Projects
+                    </ToggleButton>
 
 
-                    </ToggleButtonGroup>
-                </Box>
+                </ToggleButtonGroup>
+            </Box>
             {/* )} */}
 
 

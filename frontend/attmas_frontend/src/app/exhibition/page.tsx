@@ -17,6 +17,7 @@ import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 import EditProfile from '../component/EditProfileComponents/editUserProfile';
+import { categories } from '../constants/categories';
 
 interface Exhibition {
   _id?: string;
@@ -31,20 +32,6 @@ interface Exhibition {
   userId?: string;
   username: string;
 }
-
-const industries =[
-  "Agriculture",
-  "Chemicals",
-  "Electronics",
-  "Energy",
-  "Environmental and waste management",
-  "Food and beverage",
-  "Healthcare",
-  "Medical devices and equipment",
-  "Mining and metals",
-  "Real estate and construction",
-  "Textiles"
-];
 
 const subjects = [
   {
@@ -434,7 +421,7 @@ const Exhibition = () => {
           '@media (max-width: 767px)': { width: '100%', right: '0' }
         }}
         size='small'
-        options={industries}
+        options={categories}
         value={selectedIndustries}
         onChange={(event, value) => setSelectedIndustries(value)}
         renderInput={(params) => (

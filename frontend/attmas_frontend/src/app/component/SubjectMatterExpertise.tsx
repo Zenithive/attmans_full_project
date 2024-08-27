@@ -97,7 +97,7 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
         className="button-with-label"
         style={{ minHeight: '57.5px', borderWidth: isOpen ? '2px' : '1px' }}
       >
-        {isOpen && (
+        {(isOpen || selectedValues.length > 0) && (
           <span className="button-label">Subject Matter Expertise</span>
         )}
 
@@ -112,7 +112,7 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
             />
           ))
         ) : (
-          !buttonClicked && (
+          !isOpen && (
             <span style={{ color: '#666666', fontSize: '1.2 rem' }}>Subject Matter Expertise</span>
           )
         )}
@@ -175,6 +175,7 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
           position: relative;
           margin-right: 10px;
           width: 100%;
+          min-width: 200px;
           border-radius: 20px;
           background-color: white;
           min-height: 57px;
