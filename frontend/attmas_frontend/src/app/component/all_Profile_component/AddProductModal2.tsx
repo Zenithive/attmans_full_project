@@ -53,6 +53,25 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
     const [productPrice, setProductPrice] = React.useState(0);
     const [currency, setCurrency] = React.useState('INR');
 
+    const reset = () => {
+        setProductName('');
+        setProductDescription('');
+        setProductQuantity(0);
+        setVideourlForproduct('');
+        setTargetaudience('');
+        setProblemaddressed('');
+        setTechnologyused('');
+        setStageofdevelopmentdropdown('');
+        setIntellectualpropertyconsiderations('');
+        setCompetitiveAdvantages('');
+        setFeasibilityofthesolution('');
+        setHowdoesthesolutionwork('');
+        setPotentialbenefits('');
+        setChallengesorrisks('');
+        setProductPrice(0);
+        setCurrency('INR');
+    };
+
     const handleSave = () => {
         const newProduct = {
             id: Date.now().toString(),
@@ -74,11 +93,17 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
             currency
         };
         onSave(newProduct);
+        reset(); 
+        onClose();
+    };
+
+    const handleClose = () => {
+        reset(); // Reset the form fields when the modal closes
         onClose();
     };
 
     return (
-        <Modal open={open} onClose={onClose}>
+        <Modal open={open} onClose={handleClose}>
             <Box
                 sx={{
                     position: 'absolute',
@@ -290,7 +315,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     </Grid>
 
                     <Grid item xs={12} display="flex" justifyContent="space-between" mt={2}>
-                        <Button variant="outlined" onClick={onClose}>
+                        <Button variant="outlined" onClick={handleClose}>
                             Cancel
                         </Button>
                         <Button variant="contained" onClick={handleSave}>
