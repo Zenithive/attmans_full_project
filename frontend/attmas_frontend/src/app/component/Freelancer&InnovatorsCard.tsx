@@ -585,18 +585,6 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   };
 
   const handleUserClick = (user: User) => {
-    const fetchProductDetailsForUser = async () => {
-      try {
-        const response = await axios.get<ProductForBooth[]>(
-          `${APIS.PRODUCTNAME}?username=${user.username}`
-        );
-        setProductDetails(response.data || []);
-      } catch (error) {
-        console.error("Error fetching product details:", error);
-      }
-    };
-
-    fetchProductDetailsForUser();
     setSelectedUser(user);
     setDrawerOpen(true);
   };
@@ -714,9 +702,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
         <UserDrawer
           open={drawerOpen}
           onClose={handleDrawerClose}
-          user={selectedUser}
-          productDetails={productDetails}
-          setProductDetails={setProductDetails}
+          username={selectedUser.username}
         />
       )}
     </Box>

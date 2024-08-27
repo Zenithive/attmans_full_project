@@ -16,6 +16,7 @@ import JobDetail from '../projectCommentCard/projectCommentCard';
 import ConfirmCloseBox from '../All_ConfirmationBox/ConfirmCloseBox';
 import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import ConfirmationDialogWithCommentForCancel from '../All_ConfirmationBox/ConfirmationDialogWithCommentForCancel';
+import UserDrawer from '../UserNameSeperate/UserDrawer';
 
 
 
@@ -87,6 +88,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const isApproved = viewingJob?.status === 'Approved';
   const isRejected = viewingJob?.status === 'Rejected';
   const [filter, setFilter] = useState<string>('All');
+  const [selectedUser, setSelectedUser] = React.useState<string>('');
+  const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
   const [applications, setApplications] = useState<Apply[]>([]);
   const [selectedApply, setSelectedApply] = useState<Apply | null>(null);
   const [approveDialogOpen, setApproveDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
@@ -120,6 +123,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
+
+  const handleUserClick = (username: string) => {
+    setSelectedUser(username);
+    setDrawerOpen(true);
+  };
 
   const handleApprove = async (applicationId: string) => {
     try {
@@ -163,6 +171,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const handleCommentSubmitted = () => {
     fetchApplications();
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedUser('');
   };
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
@@ -346,12 +359,13 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 {userType === "Admin" ? <Grid item xs={12} sm={6}>
                   <TextField
+                    onClick={() => handleUserClick(viewingJob?.userId?.username || "")}
                     label="Project Owner"
                     value={`${viewingJob?.userId?.firstName} ${viewingJob?.userId?.firstName}`}
                     fullWidth
                     color='secondary'
                     aria-readonly
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 2, cursor: "pointer" }}
                   />
                 </Grid>: ''}
                 <Grid item xs={12} sm={6}>
@@ -760,6 +774,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
         onConfirm={handleConfirm}
         message="Are you sure you want to award this application?"
       />
+
+      {selectedUser ? (
+        <UserDrawer
+          open={drawerOpen}
+          onClose={handleDrawerClose}
+          username={selectedUser}
+        />
+      ) : ""}
     </>
   );
 };

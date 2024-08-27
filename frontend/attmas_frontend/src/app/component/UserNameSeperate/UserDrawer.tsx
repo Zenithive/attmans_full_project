@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, TextField, IconButton, Drawer
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ProductTable, { Product } from '../ProductTable';
 import { ProductForBooth } from '../ProductTableForBooth';
+import axios from 'axios';
+import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 
 interface User {
   _id: string;
@@ -23,13 +25,14 @@ interface User {
 interface UserDrawerProps {
   open: boolean;
   onClose: () => void;
-  user: User | null;
-  productDetails: ProductForBooth[];
-  setProductDetails: React.Dispatch<React.SetStateAction<ProductForBooth[]>>;
+  username: string;
 }
 
-const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDetails, setProductDetails }) => {
-  if (!user) return null;
+const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
+
+
+  const [productDetails, setProductDetails] = useState<ProductForBooth[]>([]);
+  const [user, setUser] = useState<User>({} as User);
 
   const convertToProductForBooth = (product: Product): ProductForBooth => {
     return {
@@ -54,6 +57,39 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
     };
   };
 
+  useEffect(() => {
+    fetchProductDetailsForUser();
+  }, [user.username])
+
+  useEffect(() => {
+    if(username){
+      fetchUserDetailsUsingUsername();
+    }
+  }, [username])
+
+  const fetchProductDetailsForUser = async () => {
+    try {
+      const response = await axios.get<ProductForBooth[]>(
+        `${APIS.PRODUCTNAME}?username=${user.username}`
+      );
+      setProductDetails(response.data || []);
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
+  };
+
+  const fetchUserDetailsUsingUsername = async () => {
+    try {
+      const response = await axios.get<User[]>(
+        `${SERVER_URL}/users/filters?&page=1&limit=20&username=${username}`
+      );
+
+      setUser(response.data[0] || []);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
   const productArray: Product[] = productDetails.map(convertToProductForBooth);
 
   return (
@@ -61,6 +97,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
       anchor="right"
       open={open}
       onClose={onClose}
+      sx={{zIndex: 1300}}
       PaperProps={{
         sx: {
           borderRadius: "20px 0px 0px 20px",
@@ -98,7 +135,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
               variant="outlined"
               color="secondary"
               fullWidth
-              disabled
+              aria-readonly
               sx={{ width: "50%" }}
             />
 
@@ -109,7 +146,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
               variant="outlined"
               color="secondary"
               fullWidth
-              disabled
+              aria-readonly
               sx={{ width: "50%" }}
             />
           </Box>
@@ -121,7 +158,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
               InputProps={{ readOnly: true }}
               variant="outlined"
               color="secondary"
-              disabled
+              aria-readonly
               fullWidth
               sx={{ width: "50%" }}
             />
@@ -133,7 +170,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
               variant="outlined"
               color="secondary"
               fullWidth
-              disabled
+              aria-readonly
               sx={{ width: "50%" }}
             />
           </Box>
@@ -145,7 +182,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
               InputProps={{ readOnly: true }}
               variant="outlined"
               color="secondary"
-              disabled
+              aria-readonly
               fullWidth
               sx={{ width: "50%" }}
             />
@@ -157,7 +194,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
               variant="outlined"
               color="secondary"
               fullWidth
-              disabled
+              aria-readonly
               sx={{ width: "50%" }}
             />
           </Box>
@@ -165,22 +202,24 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               label="Categories"
-              value={user.categories.join(', ')}
+              value={user?.categories?.join(', ')}
               InputProps={{ readOnly: true }}
               variant="outlined"
               color="secondary"
+              multiline
               fullWidth
-              disabled
+              aria-readonly
             />
 
             <TextField
               label="Subcategories"
-              value={user.subcategories.join(', ')}
+              value={user?.subcategories?.join(', ')}
               InputProps={{ readOnly: true }}
               variant="outlined"
               color="secondary"
               fullWidth
-              disabled
+              multiline
+              aria-readonly
             />
           </Box>
 
