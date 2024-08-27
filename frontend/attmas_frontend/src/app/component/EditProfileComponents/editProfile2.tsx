@@ -75,8 +75,8 @@ const EditProfile2: React.FC = () => {
             userType: '',
             productToMarket: '',
             products: [{
-                productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR',
-                productQuantity: '',
+                productName: '', productDescription: '', productPrice: 0, currency: 'INR',
+                productQuantity: 0,
                 targetaudience: '',
                 problemaddressed: '',
                 technologyused: '',
@@ -86,7 +86,8 @@ const EditProfile2: React.FC = () => {
                 feasibilityofthesolution: '',
                 howdoesthesolutionwork: '',
                 potentialbenefits: '',
-                challengesorrisks: ''
+                challengesorrisks: '',
+                id: ''
             }],
             hasPatent: 'No',
             patentDetails: '',

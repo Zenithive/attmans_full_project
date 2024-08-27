@@ -66,7 +66,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
         currency: "INR",
         videourlForproduct: "",
       },
-    ] as ProductForBooth[],
+    ] as unknown as ProductForBooth[],
     userId: userDetails._id,
     username: userDetails.username,
     exhibitionId: exhibitionId || "",

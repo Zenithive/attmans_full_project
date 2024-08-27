@@ -18,13 +18,14 @@ import CurrencyPriceInput from './CurrencyPriceInput';
 
 export interface ProductForBooth {
   _id?: string;
+  id: string;
   productName: string;
   productDescription: string;
   productType: string;
-  productPrice: string;
+  productPrice: number;
   currency: string;
   videourlForproduct?: string;
-  productQuantity: string;
+  productQuantity: number;
   targetaudience: string;
   problemaddressed: string;
   technologyused: string;
@@ -135,12 +136,17 @@ const ProductTableForBooth: React.FC<ProductTableProps> = ({
                 />
               </TableCell>
               <TableCell>
+
+
                 <CurrencyPriceInput
                   price={product.productPrice}
                   currency={product.currency}
                   onPriceChange={(value) => handleCurrencyPriceChange(index, 'productPrice', value)}
                   onCurrencyChange={(value) => handleCurrencyPriceChange(index, 'currency', value)}
                 />
+
+
+
               </TableCell>
               <TableCell>
                 <TextField

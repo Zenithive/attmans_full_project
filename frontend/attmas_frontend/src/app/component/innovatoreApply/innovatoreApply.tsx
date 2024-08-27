@@ -439,8 +439,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                                     open={viewProductModalOpen}
                                                     onClose={() => setViewProductModalOpen(false)}
                                                     onSave={() => { }}
-                                                    readOnly={true}
-                                                    selectedProduct={selectedProduct}
+                                                    // readOnly={true}
+                                                    // selectedProduct={selectedProduct}
                                                 />
                                             </Box>
 

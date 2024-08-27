@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {
   Box, Typography, TextField, IconButton, Drawer
 } from '@mui/material';
@@ -14,8 +14,8 @@ interface User {
   username: string;
   userType: string;
   personalProfilePhoto?: string;
-  categories: string[]; // New field for categories
-  subcategories: string[]; // New field for subcategories
+  categories: string[];
+  subcategories: string[];
   sector: string;
   organization: string;
 }
@@ -30,6 +30,31 @@ interface UserDrawerProps {
 
 const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDetails, setProductDetails }) => {
   if (!user) return null;
+
+  const convertToProductForBooth = (product: Product): ProductForBooth => {
+    return {
+      id: product.id, // Ensure id is handled correctly
+      productName: product.productName,
+      productDescription: product.productDescription,
+      productPrice: 0,
+      currency: product.currency,
+      videourlForproduct: product.videourlForproduct,
+      productQuantity: 0, // Provide a default value or handle this appropriately
+      targetaudience: '',
+      problemaddressed: '',
+      technologyused: '',
+      stageofdevelopmentdropdown: '',
+      intellectualpropertyconsiderations: '',
+      CompetitiveAdvantages: '',
+      feasibilityofthesolution: '',
+      howdoesthesolutionwork: '',
+      potentialbenefits: '',
+      challengesorrisks: '',
+      productType: '' // Provide a default value or handle this appropriately
+    };
+  };
+
+  const productArray: Product[] = productDetails.map(convertToProductForBooth);
 
   return (
     <Drawer
@@ -161,16 +186,20 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, user, productDet
 
           {user.userType === 'Innovators' && (
             <ProductTable
-              products={productDetails}
+              products={productArray}
               onRemove={(index) => {
-                const updatedProducts = productDetails.filter((_, i) => i !== index);
-                setProductDetails(updatedProducts);
+                const updatedProducts = productArray.filter((_, i) => i !== index);
+                setProductDetails(
+                    updatedProducts.map(product => convertToProductForBooth(product))
+                );
               }}
               onChange={(index, updatedProduct) => {
-                const updatedProducts = productDetails.map((product, i) =>
+                const updatedProducts = productArray.map((product, i) =>
                   i === index ? updatedProduct : product
                 );
-                setProductDetails(updatedProducts);
+                setProductDetails(
+                    updatedProducts.map(product => convertToProductForBooth(product))
+                );
               }}
               showActions={false}
               readOnly={true}

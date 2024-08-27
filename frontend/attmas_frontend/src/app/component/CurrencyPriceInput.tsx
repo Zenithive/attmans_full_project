@@ -2,7 +2,7 @@ import React from 'react';
 import { TextField, Select, MenuItem, InputAdornment } from '@mui/material';
 
 interface CurrencyPriceInputProps {
-  price: string;
+  price: number;
   currency: string;
   onPriceChange: (price: string) => void;
   onCurrencyChange: (currency: string) => void;

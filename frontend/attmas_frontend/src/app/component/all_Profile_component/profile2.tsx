@@ -22,6 +22,7 @@ import { pubsub } from '@/app/services/pubsub.service';
 import ProductTable, { Product } from '../ProductTable';
 import { userType } from '@/app/services/user.access.service';
 import AddProductModal2 from './AddProductModal2';
+import NewProductTable from './NewProductTable';
 
 interface FormValues {
     qualification: string;
@@ -54,6 +55,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const [showAddProductModal, setShowAddProductModal] = useState(false);
 
+    const [openModal, setOpenModal] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const dispatch = useAppDispatch();
@@ -70,13 +74,13 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             Yup.object().shape({
                 productName: Yup.string().nullable(),
                 productDescription: Yup.string().nullable(),
-                productQuantity: Yup.string().nullable(),
+                productQuantity: Yup.number().nullable(),
                 videourlForproduct: Yup.string().nullable(),
-                productType: Yup.string().nullable(),
+                // productType: Yup.string().nullable(),
                 technologyused: Yup.string().nullable(),
                 targetaudience: Yup.string().nullable(),
                 problemaddressed: Yup.string().nullable(),
-                productPrice: Yup.string().nullable(),
+                productPrice: Yup.number().nullable(),
                 intellectualpropertyconsiderations: Yup.string().nullable(),
                 CompetitiveAdvantages: Yup.string().nullable(),
                 feasibilityofthesolution: Yup.string().nullable(),
@@ -95,74 +99,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         // }),
     });
 
-    const formik = useFormik<FormValues>({
-        initialValues: {
-            qualification: '',
-            organization: '',
-            sector: '',
-            workAddress: '',
-            designation: '',
-            userType: '',
-            productToMarket: '',
-            products: [{
-                productName: '',
-                productDescription: '',
-                productType: '',
-                productPrice: '',
-                currency: 'INR',
-                productQuantity: '',
-                videourlForproduct: '',
-                targetaudience: '',
-                problemaddressed: '',
-                technologyused: '',
-                stageofdevelopmentdropdown: '',
-                intellectualpropertyconsiderations: '',
-                CompetitiveAdvantages: '',
-                feasibilityofthesolution: '',
-                howdoesthesolutionwork: '',
-                potentialbenefits: '',
-                challengesorrisks: ''
-            }],
-            hasPatent: 'No',
-            patentDetails: '',
-            username: userDetails.username,
-            userId: userDetails._id,
-        },
-        validationSchema,
-        onSubmit: async (values) => {
-            setLoading(true);
-            try {
-                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
-                console.log('Form submitted successfully:', response.data);
 
-                setLoading(false);
-                const user1 = {
-                    token: userDetails.token,
-                    username: userDetails.username,
-                    firstName: userDetails.firstName,
-                    lastName: userDetails.lastName,
-                    mobileNumber: userDetails.mobileNumber,
-                    _id: userDetails._id,
-                    userType: values.userType as userType
-                };
-
-                dispatch(addUser(user1));
-
-                pubsub.publish('toast', {
-                    message: 'Profile updated successfully!',
-                    severity: 'success',
-                });
-                onNext();
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                setLoading(false);
-                pubsub.publish('toast', {
-                    message: 'Failed to update profile. Please try again later.',
-                    severity: 'error',
-                });
-            }
-        },
-    });
 
 
     const handleFocus = () => {
@@ -201,55 +138,94 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const handleAddProduct = () => {
         setShowAddProductModal(true); // Open the modal
+        setOpenModal(true)
     };
 
-    const handleSaveProduct = (
-        productName: string,
-        productDescription: string,
-        productQuantity: string,
-        videourlForproduct: string,
-        targetaudience: string,
-        problemaddressed: string,
-        technologyused: string,
-        intellectualpropertyconsiderations: string,
-        stageofdevelopmentdropdown: string,
-        CompetitiveAdvantages: string,
-        feasibilityofthesolution: string,
-        howdoesthesolutionwork: string,
-        potentialbenefits: string,
-        challengesorrisks: string,
-        productPrice: string,
-        currency: string,
 
-    ) => {
-        const newProduct = {
-            productName,
-            productDescription,
-            videourlForproduct,
-            productQuantity,
-            targetaudience,
-            problemaddressed,
-            technologyused,
-            intellectualpropertyconsiderations,
-            stageofdevelopmentdropdown,
-            CompetitiveAdvantages,
-            feasibilityofthesolution,
-            howdoesthesolutionwork,
-            potentialbenefits,
-            challengesorrisks,
 
-            productType: '',
-            productPrice: '',
-            currency: 'INR'
-        };
+    // // Handle saving the new product
+    // const handleSaveProduct = (newProduct: Product) => {
+    //     console.log('New Product:', newProduct);
+    //     setProducts([...products, newProduct]);
+    // };
+    const handleSaveProduct = (newProduct: Product) => {
+        console.log('New Product:', newProduct);
+        setProducts((prevProducts) => [...prevProducts, newProduct]);
         formik.setFieldValue('products', [...formik.values.products, newProduct]);
     };
+
+    const handleViewProduct = (id: string) => {
+        // Implement view product logic here
+    };
+
+    const handleEditProduct = (id: string) => {
+        // Implement edit product logic here
+    };
+
+    const handleDeleteProduct = (id: string) => {
+        const updatedProducts = products.filter(product => product.id !== id);
+        setProducts(updatedProducts);
+        formik.setFieldValue('products', updatedProducts);
+    };
+
 
     const handleProductChange = (index: number, updatedProduct: Product) => {
         const updatedProducts = [...formik.values.products];
         updatedProducts[index] = updatedProduct;
         formik.setFieldValue('products', updatedProducts);
     };
+
+    const formik = useFormik<FormValues>({
+        initialValues: {
+            qualification: '',
+            organization: '',
+            sector: '',
+            workAddress: '',
+            designation: '',
+            userType: '',
+            productToMarket: '',
+            products: [],
+            hasPatent: 'No',
+            patentDetails: '',
+            username: userDetails.username,
+            userId: userDetails._id,
+        },
+        validationSchema,
+        onSubmit: async (values) => {
+            setLoading(true);
+            console.log("Submitting products:", values.products);
+            try {
+                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
+                console.log('Form submitted successfully:', response.data);
+
+                setLoading(false);
+                const user1 = {
+                    token: userDetails.token,
+                    username: userDetails.username,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    mobileNumber: userDetails.mobileNumber,
+                    _id: userDetails._id,
+                    userType: values.userType as userType
+                };
+
+                dispatch(addUser(user1));
+
+                pubsub.publish('toast', {
+                    message: 'Profile updated successfully!',
+                    severity: 'success',
+                });
+                onNext();
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                setLoading(false);
+                pubsub.publish('toast', {
+                    message: 'Failed to update profile. Please try again later.',
+                    severity: 'error',
+                });
+            }
+        },
+    });
 
     return (
         <Container component="main" maxWidth="md">
@@ -466,6 +442,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     </Button>
                                     {/* ProductTable and other relevant UI components */}
                                 </Grid>
+
+
                             )}
 
 
@@ -475,7 +453,22 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 onSave={handleSaveProduct}
                             />
 
+
+                            {isInnovator && showProductDetails && (
+
+                                <NewProductTable
+                                    products={formik.values.products}
+                                    onView={handleViewProduct}
+                                    onEdit={handleEditProduct}
+                                    onDelete={handleDeleteProduct}
+                                />
+
+                            )}
+
+
+
                             {/* *********** back and back *************** */}
+
 
                             <Grid item xs={12}>
                                 <Button
