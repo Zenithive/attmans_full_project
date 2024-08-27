@@ -97,11 +97,12 @@ export class UsersService {
     username: string;
   }): Promise<any[]> {
     const skip = (pageNumber - 1) * limitNumber;
-    const filterQuery: any = { userType };
+    const filterQuery: any = {};
 
     const allNativeFiltersArray = {
       firstName,
       lastName,
+      userType,
       mobileNumber,
       username,
     };
