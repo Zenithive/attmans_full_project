@@ -11,8 +11,9 @@ interface CategoryFilterProps {
 
 const CategoryComponent: React.FC<CategoryFilterProps> = ({ formikObj, keyToMap }) => {
 
-    const handleCategoryCheckboxChange = (value: string, isChecked: boolean) => {debugger;
-        let updatedCategories = [...formikObj.values[keyToMap]];
+    const handleCategoryCheckboxChange = (value: string, isChecked: boolean) => {
+        const tmpFormValues: Array<string> = Array.isArray(formikObj.values[keyToMap]) ? formikObj.values[keyToMap] as Array<string> : [];
+        let updatedCategories = [...tmpFormValues];
         if (isChecked) {
             updatedCategories.push(value);
         } else {
@@ -28,7 +29,7 @@ const CategoryComponent: React.FC<CategoryFilterProps> = ({ formikObj, keyToMap 
             options={categories}
             disableCloseOnSelect
             getOptionLabel={(option) => option}
-            value={formikObj.values[keyToMap] || []}
+            value={(formikObj.values[keyToMap] || []) as Array<string>}
             onChange={(event, newValue) => formikObj.setFieldValue(keyToMap, newValue)}
             renderInput={(params) => (
                 <TextField

@@ -77,7 +77,7 @@ const Filters = ({ column, onFilter }: FiltersProps) => {
         <>
           <Box sx={{display: 'inline-flex', mr: 2}} id="subjectMatterExpBox">
             <SubjectMatterExpertise
-              selectedValues={formikObj.values[item.key] || []}
+              selectedValues={(formikObj.values[item.key] || []) as Array<string> }
               setSelectedValues={(values) => {
                 formikObj.setFieldValue(item.key, values);
               }}
