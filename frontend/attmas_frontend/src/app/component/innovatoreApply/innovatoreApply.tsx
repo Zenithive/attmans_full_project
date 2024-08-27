@@ -13,8 +13,28 @@ import { Formik, Form, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-import ProductTable, { Product } from '../ProductTable';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import AddProductModal2 from '../all_Profile_component/AddProductModal2';
+
+
+interface Product {
+    productName: string;
+    productDescription: string;
+    productQuantity: string;
+    videourlForproduct: string;
+    targetaudience: string;
+    problemaddressed: string;
+    technologyused: string;
+    intellectualpropertyconsiderations: string;
+    stageofdevelopmentdropdown: string;
+    CompetitiveAdvantages: string;
+    feasibilityofthesolution: string;
+    howdoesthesolutionwork: string;
+    potentialbenefits: string;
+    challengesorrisks: string;
+    productPrice: string;
+    currency: string;
+}
 
 interface WorkExprience {
     gender: string
@@ -73,7 +93,10 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
     const [loading, setLoading] = React.useState<boolean>(true);
     const [subcategories, setSelectedValues] = React.useState<string[]>([]);
     const [categories, setCategories] = React.useState([]);
-    const [products, setProducts] = React.useState<Product[]>([]);
+    const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+    const [viewProductModalOpen, setViewProductModalOpen] = React.useState<boolean>(false);
+
+
 
 
     const initialValues = {
@@ -172,17 +195,13 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
         setOpen(false);
     };
 
-    const handleRemoveProduct = (index: number) => {
-        const updatedProducts = products.filter((_, i) => i !== index);
-        setProducts(updatedProducts);
+
+    const handleViewProduct = (product: Product) => {
+        console.log('Selected Product:', product);
+        setSelectedProduct(product);
+        setViewProductModalOpen(true);
     };
 
-    const handleProductChange = (index: number, updatedProduct: Product) => {
-        const updatedProducts = products.map((product, i) =>
-            i === index ? updatedProduct : product
-        );
-        setProducts(updatedProducts);
-    };
 
     return (
         <Drawer
@@ -277,7 +296,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         }}
                                     />
                                 </Box>
-                                <Box sx={{ flex: '1 1 45%',marginBottom:'30px' }}>
+                                <Box sx={{ flex: '1 1 45%', marginBottom: '30px' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DateTimePicker
                                             label="Time Frame"
@@ -360,23 +379,74 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         </Grid>
 
                                         <>
-                                            <Box sx={{position:'relative',left:'1.5%',width:'98%',marginBottom:'20px'}}>
-                                                <Paper elevation={3} sx={{ p: 4, maxWidth: 1800, margin: '0 auto' }}>
-                                                    <Typography component="h1" variant="h5" align="center" sx={{ marginBottom: '40px' }}>
-                                                        Products
+                                            <Box sx={{ position: 'relative', left: '1.5%', width: '97%', marginBottom: '20px' }}>
+                                                <Typography
+                                                    component="h1"
+                                                    variant="h5"
+                                                    align="center"
+                                                    sx={{ marginBottom: '40px', fontWeight: 'bold' }}
+                                                >
+                                                    Products
+                                                </Typography>
+
+                                                {workExperience?.products.length > 0 ? (
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexWrap: 'wrap',
+                                                            gap: '16px'
+                                                        }}
+                                                    >
+                                                        {workExperience.products.map((product, index) => (
+                                                            <Box
+                                                                key={index}
+                                                                sx={{
+                                                                    display: 'flex',
+                                                                    flexDirection: 'row',
+                                                                    alignItems: 'center',
+                                                                    width: '100%',
+                                                                    maxWidth: '600px', // Set a max-width for the product card
+                                                                    padding: '10px',
+                                                                    borderRadius: '8px',
+                                                                    border: '1px solid #ddd',
+                                                                    backgroundColor: '#f9f9f9',
+                                                                    textAlign: 'left'
+                                                                }}
+                                                            >
+                                                                <Typography
+                                                                    variant="subtitle1"
+                                                                    sx={{ flexGrow: 1, marginRight: '16px' }}
+                                                                >
+                                                                    {product.productName}
+                                                                </Typography>
+                                                                <Button
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    onClick={() => handleViewProduct(product)}
+                                                                >
+                                                                    View Product
+                                                                </Button>
+                                                            </Box>
+                                                        ))}
+                                                    </Box>
+                                                ) : (
+                                                    <Typography variant="body1" align="center">
+                                                        No products available.
                                                     </Typography>
-                                                    <ProductTable
-                                                        products={workExperience.products}
-                                                        onRemove={handleRemoveProduct}
-                                                        onChange={handleProductChange}
-                                                        readOnly={true} 
-                                                    />
-                                                </Paper>
+                                                )}
+
+                                                <AddProductModal2
+                                                    open={viewProductModalOpen}
+                                                    onClose={() => setViewProductModalOpen(false)}
+                                                    onSave={() => { }}
+                                                    readOnly={true}
+                                                    selectedProduct={selectedProduct}
+                                                />
                                             </Box>
 
                                         </>
 
-                                        <Grid item xs={12} sm={6} sx={{marginBottom:'20px'}}>
+                                        <Grid item xs={12} sm={6} sx={{ marginBottom: '20px' }}>
                                             <TextField
                                                 fullWidth
                                                 label="Do you have a patent?"
@@ -386,7 +456,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                             />
                                         </Grid>
                                         {workExperience.hasPatent === 'Yes' && (
-                                            <Grid item xs={12} > 
+                                            <Grid item xs={12} >
                                                 <TextField
                                                     fullWidth
                                                     multiline
@@ -400,38 +470,38 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         )}
                                     </Grid>
                                     <Grid container spacing={3}>
-                                <Grid item xs={12} sm={12}>
-                                    <Typography variant="h6" sx={{ marginBottom: 1 }}>
-                                        Categories
-                                    </Typography>
-                                    <TextField
-                                        fullWidth
-                                        sx={{ width: '100%' }}
-                                        value={categories.join(', ')}
-                                        variant="outlined"
-                                        multiline
-                                        disabled
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={12}>
-                                    <Typography variant="h6" sx={{ marginBottom: 1 }}>
-                                        Subcategories
-                                    </Typography>
-                                    <TextField
-                                        fullWidth
-                                        sx={{ width: '100%' }}
-                                        value={subcategories.join(', ')}
-                                        variant="outlined"
-                                        multiline
-                                        disabled
-                                    />
-                                </Grid>
-                            </Grid>
+                                        <Grid item xs={12} sm={12}>
+                                            <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                                Categories
+                                            </Typography>
+                                            <TextField
+                                                fullWidth
+                                                sx={{ width: '100%' }}
+                                                value={categories.join(', ')}
+                                                variant="outlined"
+                                                multiline
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={12}>
+                                            <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                                Subcategories
+                                            </Typography>
+                                            <TextField
+                                                fullWidth
+                                                sx={{ width: '100%' }}
+                                                value={subcategories.join(', ')}
+                                                variant="outlined"
+                                                multiline
+                                                disabled
+                                            />
+                                        </Grid>
+                                    </Grid>
                                 </Paper>
                             )}
                         </Box>
 
-                        
+
 
 
 
