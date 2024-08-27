@@ -144,7 +144,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       onClose={() => handleCancel}
     >
       <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
-        <h2>Create Apply</h2>
+        <h2>Apply</h2>
         <IconButton aria-label="close" onClick={handleCancel} sx={{ p: 0, right: 0 }}>
           <CloseIcon />
         </IconButton>
