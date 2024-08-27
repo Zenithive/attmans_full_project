@@ -75,8 +75,6 @@ export class UsersService {
     return user.save();
   }
 
- 
-
   async findUsersByUserType(
     userType: string,
     page: number,
@@ -87,14 +85,14 @@ export class UsersService {
   ): Promise<any[]> {
     const skip = (page - 1) * limit;
     const filterQuery: any = { userType };
-  
+
     if (filter) {
       filterQuery.$or = [
         { firstName: new RegExp(filter, 'i') },
         { lastName: new RegExp(filter, 'i') },
       ];
     }
-  
+
     // Aggregate users with their personal profile data
     const users = await this.userModel
       .aggregate([
@@ -109,7 +107,12 @@ export class UsersService {
             as: 'personalProfileData',
           },
         },
-        { $unwind: { path: '$personalProfileData', preserveNullAndEmptyArrays: true } },
+        {
+          $unwind: {
+            path: '$personalProfileData',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
         {
           $lookup: {
             from: 'categories', // Assuming the collection is named 'categories'
@@ -118,7 +121,9 @@ export class UsersService {
             as: 'categoryData',
           },
         },
-        { $unwind: { path: '$categoryData', preserveNullAndEmptyArrays: true } },
+        {
+          $unwind: { path: '$categoryData', preserveNullAndEmptyArrays: true },
+        },
         {
           $lookup: {
             from: 'workexpriences', // Assuming the collection is named 'categories'
@@ -126,9 +131,13 @@ export class UsersService {
             foreignField: 'username',
             as: 'workexpriencesData',
           },
-
         },
-        { $unwind: { path: '$workexpriencesData', preserveNullAndEmptyArrays: true }},
+        {
+          $unwind: {
+            path: '$workexpriencesData',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
         {
           $project: {
             _id: 1,
@@ -140,16 +149,16 @@ export class UsersService {
             personalProfilePhoto: '$personalProfileData.profilePhoto',
             categories: '$categoryData.categories', // Include categories field
             subcategories: '$categoryData.subcategories', // Include subcategories field
-            sector:'$workexpriencesData.sector',
-            organization:'$workexpriencesData.organization',
+            sector: '$workexpriencesData.sector',
+            organization: '$workexpriencesData.organization',
           },
         },
       ])
       .exec();
-  
+
     if (category || subCategory) {
       const usernames = users.map((user) => user.username);
-  
+
       const categoryFilter: any = { username: { $in: usernames } };
       if (category) {
         categoryFilter['categories'] = category;
@@ -157,7 +166,7 @@ export class UsersService {
       if (subCategory) {
         categoryFilter['subcategories'] = subCategory;
       }
-  
+
       // Apply additional filtering based on category and subcategory
       const categoryData = await this.categoriesModel
         .find(categoryFilter)
@@ -165,13 +174,12 @@ export class UsersService {
       const filteredUsernames = new Set(
         categoryData.map((cat) => cat.username),
       );
-  
+
       return users.filter((user) => filteredUsernames.has(user.username));
     }
-  
+
     return users;
   }
-  
 
   async findUsersByUserType1(
     userType: string,

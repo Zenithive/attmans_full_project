@@ -14,10 +14,12 @@ interface InterestedModalProps {
     open: boolean;
     onClose: () => void;
     exhibitionId?: string | null;
+    boothId?: string | null;
+    interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth'; 
 }
 
 
-const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibitionId }) => {
+const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibitionId, boothId, interestType }) => {
     const [showSignIn, setShowSignIn] = useState(true); // Default to Sign-In form
     const [message, setMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -71,9 +73,12 @@ const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibi
                     </Alert>
                 )}
                 {showSignIn ? (
-                    <SignIn exhibitionId={exhibitionId} showLinks={false} onSignInSuccess={handleSignInSuccess} />
+                    <SignIn exhibitionId={exhibitionId}
+                    boothId={boothId} 
+                    interestType={interestType} showLinks={false} onSignInSuccess={handleSignInSuccess} />
                 ) : (
-                    <SignUp showLinks={false} onSignUpSuccess={handleSignUpSuccess} userType="Visitors" isAllProfileCompleted={true} />
+                    <SignUp showLinks={false} onSignUpSuccess={handleSignUpSuccess} userType="Visitors" isAllProfileCompleted={true}
+                    interestType={interestType} />
                 )}
                 <Box
                     sx={{

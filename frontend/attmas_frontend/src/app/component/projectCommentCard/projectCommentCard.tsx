@@ -62,6 +62,12 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
         borderRadius: '20px',
         marginTop: { xs: 1, sm: 2 },
         backgroundColor: '#f5f5f5',
+        '@media (max-width: 767px)': {
+          width: '112%',
+          position: 'relative',
+          right: '6%',
+
+        },
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -80,6 +86,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
             overflowY: 'auto',
             marginTop: 2,
             paddingRight: 1,
+            '@media (max-width: 767px)': {
+              maxHeight: { xs: 250 }
+            }
           }}
         >
           {job.comments.length > 0 ? (
@@ -94,7 +103,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
               >
                 <Typography
                   variant="body2"
-                  sx={{ whiteSpace: 'pre', fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  sx={{ whiteSpace: 'pre-wrap', fontSize: { xs: '0.875rem', sm: '1rem' } ,width:'76%','@media (max-width: 767px)': {
+                    width:'100%'
+                  }}}
                 >
                   <strong>{comment.firstName} {comment.lastName}:</strong> {comment.commentText}
                 </Typography>
@@ -112,7 +123,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
                     top: { xs: 4, sm: 8 },
                     right: { xs: 4, sm: 8 },
                     textAlign: 'right',
-                    fontSize: { xs: '0.75rem', sm: '1rem' },
+                    '@media (max-width: 767px)': {
+                      textAlign: 'right', width: 'fit-content', float: 'right', position: 'relative', top:'-14px'
+                    }
                   }}
                 >
                   <Typography variant="body2">

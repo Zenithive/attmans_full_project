@@ -7,7 +7,6 @@ export class CreateJobsDto {
   @IsString()
   title: string;
 
-
   @IsString()
   commentWhenProjectClose: string;
   @IsString()
@@ -95,17 +94,17 @@ export class UpdateJobsDto {
   title?: string;
 
   @IsString()
-  commentWhenProjectClose: string;
-  
+  commentWhenProjectClose?: string;
+
   @IsString()
-  commentWhenProjectCloseByAdmin: string;
+  commentWhenProjectCloseByAdmin?: string;
 
   @IsNotEmpty()
   @IsString()
   description?: string;
 
   @IsString()
-  currency: string;
+  currency?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -119,7 +118,7 @@ export class UpdateJobsDto {
   @IsString()
   IPR_ownership?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   SelectService?: string;
 
@@ -159,9 +158,9 @@ export class UpdateJobsDto {
   @IsString()
   Budget?: number;
 
-  @IsNotEmpty()
-  @IsString()
-  username?: string;
+  // @IsNotEmpty()
+  // @IsString()
+  // username?: string;
 }
 
 export class AddCommentDto {

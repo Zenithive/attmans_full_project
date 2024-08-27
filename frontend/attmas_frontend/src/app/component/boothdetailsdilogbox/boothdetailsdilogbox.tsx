@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -25,6 +25,12 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
+import { APIS } from '@/app/constants/api.constant';
+import { useSearchParams } from 'next/navigation';
+import axios from 'axios';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import InterestedModal from '../booth/intrestedUsers';
 
 interface Product {
   productName: string;
@@ -51,6 +57,18 @@ interface Booth {
   rejectComment?: string;
 }
 
+interface Visitor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  mobileNumber: string;
+  timestamps: string;
+  exhibitionId: string;
+  userId:string;
+}
+
+
 interface BoothDetailsDialogProps {
   open: boolean;
   onClose: () => void;
@@ -61,6 +79,54 @@ interface BoothDetailsDialogProps {
 const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, booth, renderVideo }) => {
   const [videoOpen, setVideoOpen] = useState(false);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+  const [showInterestedModals, setShowInterestedModals] = useState(false);
+  const [view, setView] = useState('boothDetails');
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const searchParams = useSearchParams();
+  const [isInterestedBtnShows, setIsInterestedBtnShows] = useState<Boolean>(true);
+
+
+
+  
+  useEffect(() => {
+    const fetchVisitors = async () => {
+      try {
+        const boothId = booth?._id;
+        const exhibitionId = searchParams.get('exhibitionId');
+        if (!boothId || !exhibitionId) {
+          console.error('Booth ID or Exhibition ID not found');
+          return;
+        }
+
+        const response = await axios.get(`${APIS.GET_BOOTH_VISITORS_BY_EXHIBITION}`, {
+          params: {
+            boothId,
+            exhibitionId,
+          },
+        });
+
+        console.log('Fetched visitors:', response.data);
+
+        if (response.data.some((visitor: Visitor) => visitor.userId === userDetails._id)) {
+          setIsInterestedBtnShows(false);
+        }
+
+        setVisitors(response.data);
+      } catch (error) {
+        console.error('Error fetching visitors:', error);
+      }
+    };
+
+    if (view === 'boothDetails') {
+      fetchVisitors();
+    }
+  }, [userDetails._id, searchParams, view, booth?._id]);
+
+const openInterestedModals = () => setShowInterestedModals(true);
+const closeInterestedModals = () => setShowInterestedModals(false);
+
+  const exhibitionId = searchParams.get('exhibitionId');
   
 
   const theme = useTheme();
@@ -106,6 +172,18 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                 <Typography variant="body1" sx={{'@media (max-width: 767px)': {fontSize:'1.25rem'}}} color="text.secondary">
                   Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
                 </Typography>
+                <Box sx={{position:'relative',right:'45%',top:'15px'}}>
+                {(!userDetails.userType || userDetails.userType === 'Visitors') && isInterestedBtnShows && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={openInterestedModals}
+                sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+              >
+                Interested
+              </Button>
+            )}
+                </Box>
               </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
@@ -216,6 +294,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                   )}
                 </Grid>
               </Grid>
+              <InterestedModal open={showInterestedModals} onClose={closeInterestedModals} exhibitionId={exhibitionId} boothId={booth._id} interestType={'InterestedUserForBooth'} />
             </Box>
           )}
         </DialogContent>

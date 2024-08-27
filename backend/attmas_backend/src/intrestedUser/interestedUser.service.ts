@@ -12,7 +12,7 @@ export class InterestedUserService {
     private readonly interestedUserModel: Model<InterestedUser>,
     @InjectModel('User') private readonly userModel: Model<User>,
     private mailerService: MailerService, // Inject MailerService
-  ) { }
+  ) {}
 
   async create(createInterestedUserDto: any): Promise<InterestedUser> {
     const {
@@ -22,7 +22,9 @@ export class InterestedUserService {
       mobileNumber,
       userId,
       exhibitionId,
+      boothId,
       userType,
+      interestType,
     } = createInterestedUserDto;
 
     console.log('Create InterestedUser DTO:', createInterestedUserDto);
@@ -55,8 +57,10 @@ export class InterestedUserService {
           lastName,
           mobileNumber,
           exhibitionId,
+          boothId,
           userId,
           userType,
+          interestType,
         });
         console.log('Created InterestedUser with null values:', createdUser);
 
@@ -90,6 +94,7 @@ export class InterestedUserService {
           lastName,
           mobileNumber,
           exhibitionId,
+          boothId,
           userId,
           userType,
         });
@@ -97,11 +102,9 @@ export class InterestedUserService {
 
         return createdUser.save();
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error sending email:', error);
       throw error;
-
     }
   }
 
@@ -109,10 +112,36 @@ export class InterestedUserService {
     return this.interestedUserModel.find({ userId }).exec();
   }
 
-
   async findVisitorsByExhibition(
     exhibitionId: string,
   ): Promise<InterestedUser[]> {
     return this.interestedUserModel.find({ exhibitionId }).exec();
+  }
+
+  async findVisitorsByBooth(boothId: string): Promise<InterestedUser[]> {
+    return this.interestedUserModel.find({ boothId }).exec();
+  }
+
+  async findVisitorsByBoothAndExhibition(
+    boothId: string,
+    exhibitionId: string,
+  ): Promise<InterestedUser[]> {
+    return this.interestedUserModel
+      .find({
+        boothId,
+        exhibitionId,
+        interestType: 'InterestedUserForBooth',
+      })
+      .exec();
+  }
+
+  async findVisitorsByInterestType(
+    interestType: string,
+  ): Promise<InterestedUser[]> {
+    return this.interestedUserModel
+      .find({
+        interestType,
+      })
+      .exec();
   }
 }

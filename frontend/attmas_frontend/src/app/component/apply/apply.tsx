@@ -41,6 +41,7 @@ interface FormValues {
   availableSolution: string;
   SolutionUSP: string;
   milestones: Milestone[];
+  applyType: string;
 }
 
 
@@ -75,6 +76,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     milestones: [{ scopeOfWork: '', milestones: [''] ,comments: ['']}],
     availableSolution: '',
     SolutionUSP: '',
+    applyType: 'freelancerApply',
   };
 
   const handleSubmit = async (
@@ -95,6 +97,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
         jobId: values.jobId,
         availableSolution: values.availableSolution,
         SolutionUSP: values.SolutionUSP,
+        applyType: 'FreelancerApply',
       };
     
       const applyResponse = await axios.post(APIS.APPLY, applyData);

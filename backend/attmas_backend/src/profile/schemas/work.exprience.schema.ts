@@ -81,7 +81,7 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   userType: string;
-  
+
   @Prop({ required: false })
   patentDetails: string;
 

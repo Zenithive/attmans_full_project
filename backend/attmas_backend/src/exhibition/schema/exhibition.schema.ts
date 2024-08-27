@@ -15,12 +15,11 @@ export class Exhibition {
   @Prop({ required: false })
   description: string;
 
-  @Prop()
+  @Prop({ required: false })
   status: string;
-  
+
   @Prop()
   meetingUrl: string;
-
 
   @Prop({ type: [String], required: false })
   industries: string[];

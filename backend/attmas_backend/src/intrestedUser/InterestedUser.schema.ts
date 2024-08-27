@@ -7,7 +7,9 @@ export interface InterestedUser extends Document {
   mobileNumber: string;
   userId: string;
   exhibitionId: string;
+  boothId?: string;
   userType: string;
+  interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth';
 }
 
 export const InterestedUserSchema = new Schema(
@@ -18,7 +20,13 @@ export const InterestedUserSchema = new Schema(
     userId: { type: String, required: false },
     username: { type: String, required: false },
     exhibitionId: { type: String, required: false },
+    boothId: { type: String, required: false },
     userType: { type: String, required: false },
+    interestType: {
+      type: String,
+      enum: ['InterestedUserForExhibition', 'InterestedUserForBooth'],
+      required: true,
+    },
   },
   {
     timestamps: true,
