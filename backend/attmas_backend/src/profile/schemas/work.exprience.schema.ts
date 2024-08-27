@@ -11,7 +11,7 @@ export class ProductInfo {
   productDescription: string;
 
   @Prop({ required: false })
-  productQuantity: string;
+  productQuantity: number;
 
   @Prop({ required: false })
   productType: string;
@@ -93,6 +93,9 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   username: string;
+  
+  @Prop({ required: false })
+  id: string;
 
   @Prop({ required: false, type: String }) // Ensure the type is String
   hasPatent: string;
