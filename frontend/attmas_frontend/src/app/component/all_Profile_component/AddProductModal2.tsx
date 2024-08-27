@@ -61,18 +61,20 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
     return (
         <Modal open={open} onClose={onClose}>
             <Box
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 900, // Adjust width if needed
-                    bgcolor: 'background.paper',
-                    borderRadius: 2,
-                    border: '1px solid #000',
-                    boxShadow: 24,
-                    p: 4,
-                }}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 900, // Adjust width if needed
+                maxHeight: '95vh', // Set max height relative to viewport height
+                overflowY: 'auto', // Enable scrolling if content exceeds max height
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                border: '1px solid #000',
+                boxShadow: 24,
+                p: 4, // Reduce padding if needed
+            }}
             >
                 <Typography variant="h6" component="h2" mb={2}>
                     Add Product Details
