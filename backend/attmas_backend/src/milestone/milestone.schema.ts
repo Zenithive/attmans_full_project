@@ -11,17 +11,25 @@ export class Milestone {
   @Prop({
     type: [
       {
-        name: { type: String, required: true },
+        name: {
+          text: { type: String, required: true },
+          timeFrame: { type: Date, required: true },
+        },
         isCommentSubmitted: { type: Boolean, default: false },
         status: { type: String, default: 'Pending' },
+        submittedAt: { type: Date },
       },
     ],
     required: true,
   })
   milestones: {
-    name: string;
+    name: {
+      text: string;
+      timeFrame: Date;
+    };
     isCommentSubmitted: boolean;
     status: string;
+    submittedAt?: Date;
   }[];
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { InterestedUser } from './InterestedUser.schema';
 import { User } from 'src/users/user.schema'; // Assuming User schema is in src/users directory
 import { MailerService } from 'src/common/service/UserEmailSend'; // Assuming MailerService is in src/common/service
+import { Exhibition } from 'src/exhibition/schema/exhibition.schema';
 
 @Injectable()
 export class InterestedUserService {
@@ -12,6 +13,8 @@ export class InterestedUserService {
     private readonly interestedUserModel: Model<InterestedUser>,
     @InjectModel('User') private readonly userModel: Model<User>,
     private mailerService: MailerService, // Inject MailerService
+    @InjectModel('Exhibition')
+    private readonly exhibitionModel: Model<Exhibition>,
   ) {}
 
   async create(createInterestedUserDto: any): Promise<InterestedUser> {
@@ -27,22 +30,36 @@ export class InterestedUserService {
       interestType,
     } = createInterestedUserDto;
 
-    console.log('Create InterestedUser DTO:', createInterestedUserDto);
-
-    // Check if the user exists by username
-    const existingUser = await this.userModel
-      .findOne({ username: username })
+    const existingInterest = await this.interestedUserModel
+      .findOne({ userId, boothId, interestType: 'InterestedUserForBooth' })
       .exec();
-    console.log('Existing User:', existingUser);
+
+    if (existingInterest) {
+      throw new Error('User has already shown interest in this booth');
+    }
 
     try {
+      const exhibition = await this.exhibitionModel
+        .findById(exhibitionId)
+        .exec();
+
+      if (!exhibition) {
+        throw new Error('Exhibition not found');
+      }
+
+      const adminEmail = exhibition.username;
+      console.log('Exhibition Admin Email:', adminEmail);
+
+      // Check if the user exists by username
+      const existingUser = await this.userModel
+        .findOne({ username: username })
+        .exec();
+
       if (existingUser) {
         // Send "abc" message
         const backendBaseUrl = process.env.BACKEND_BASE_URL;
 
-        console.log('BACKEND_BASE_URL:', backendBaseUrl);
         const exhibitionUrl = `${backendBaseUrl}/view-exhibition?exhibitionId=${exhibitionId}`;
-        console.log('Sending "abc" email to:', username);
         await this.mailerService.sendEmail(
           username,
           'Existing User of Attmas',
@@ -61,16 +78,27 @@ export class InterestedUserService {
           userId,
           userType,
           interestType,
+          adminEmail,
         });
-        console.log('Created InterestedUser with null values:', createdUser);
 
-        // Save and then delete the null entry
         await createdUser.save();
 
         return createdUser;
       } else {
+        console.log('Attempting to send email to admin:', adminEmail);
+        try {
+          await this.mailerService.sendEmail(
+            adminEmail,
+            'New Booth Interest',
+            `Hello,\n\nA new user has shown interest in your booth "${boothId}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`,
+          );
+          console.log('Email sent to exhibition admin successfully.');
+        } catch (error) {
+          console.error('Failed to send email to exhibition admin:', error);
+          throw error;
+        }
+
         // Send "xyz" message
-        console.log('Sending "xyz" email to:', username);
         await this.mailerService.sendEmail(
           username,
           'New User Interest in Attmas',
@@ -97,8 +125,8 @@ export class InterestedUserService {
           boothId,
           userId,
           userType,
+          adminEmail,
         });
-        console.log('Created InterestedUser:', createdUser);
 
         return createdUser.save();
       }

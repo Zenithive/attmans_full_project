@@ -27,7 +27,7 @@ export class Jobs {
   @Prop({ required: true })
   IPRownership: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   Expertiselevel: string;
 
   @Prop({ required: false })

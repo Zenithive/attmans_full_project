@@ -32,6 +32,8 @@ export class InterestedUserController {
     @Query('boothId') boothId: string,
     @Query('exhibitionId') exhibitionId: string,
   ): Promise<any> {
+    console.log('Booth ID:', boothId);
+    console.log('Exhibition ID:', exhibitionId);
     return this.interestedUserService.findVisitorsByBoothAndExhibition(
       boothId,
       exhibitionId,

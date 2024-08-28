@@ -8,6 +8,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
+import dayjs from 'dayjs';
 
 export interface Job {
     _id?: string;
@@ -37,8 +38,14 @@ export interface Job {
 interface Milestone {
     scopeOfWork: string;
     milestones: {
-        name: string;
+        _id: string;
         isCommentSubmitted: boolean;
+        name: {
+            text: string;
+            timeFrame: string | null;
+        };
+        status: string;
+        submittedAt: string;
     }[];
     isCommentSubmitted?: boolean;
     status?: string;
@@ -271,10 +278,10 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         p: 2,
                         backgroundColor: '#f9f9f9',
                         '@media (max-width: 767px)': {
-                                maxWidth:'100%'
-                            }
+                            maxWidth: '100%'
+                        }
                     }
-    
+
                 }}
             >
                 <DialogTitle>
@@ -321,15 +328,15 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                     />
                                 </Grid>
                                 {!(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        label="Owner Name"
-                                        value={`${viewingJob.firstName} ${viewingJob.lastName}`}
-                                        fullWidth
-                                        disabled
-                                        sx={{ mb: 2 }}
-                                    />
-                                </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Owner Name"
+                                            value={`${viewingJob.firstName} ${viewingJob.lastName}`}
+                                            fullWidth
+                                            disabled
+                                            sx={{ mb: 2 }}
+                                        />
+                                    </Grid>
                                 )}
                                 {userDetails && (
                                     userType === 'Project Owner' ||
@@ -404,8 +411,15 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                                                                     <Grid item xs={12} key={milestoneIndex}>
                                                                                         <Card variant="outlined" sx={{ mb: 1 }}>
                                                                                             <CardContent>
-                                                                                                <Typography variant="h6" sx={{ mb: 4 }}>
-                                                                                                    Milestone {milestoneIndex + 1}
+                                                                                                <Typography variant="h6" sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                                    <span>
+                                                                                                        Milestone {milestoneIndex + 1}
+                                                                                                        {milestone.submittedAt && (
+                                                                                                            <Typography component="span" sx={{ ml: 2 , color: 'green',}}>
+                                                                                                               Submitted Date: ({dayjs(milestone.submittedAt).format('MMMM D, YYYY h:mm A')})
+                                                                                                            </Typography>
+                                                                                                        )}
+                                                                                                    </span>
 
                                                                                                     {milestone.isCommentSubmitted && (
                                                                                                         <Chip
@@ -415,8 +429,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                                                                                                 borderColor: 'green',
                                                                                                                 color: 'green',
                                                                                                                 borderRadius: '16px',
-                                                                                                                position: 'relative',
-                                                                                                                float: 'right'
+                                                                                                                ml: 2,
                                                                                                             }}
                                                                                                         />
                                                                                                     )}
@@ -424,7 +437,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
                                                                                                 <TextField
                                                                                                     label={`Milestone ${milestoneIndex + 1}`}
-                                                                                                    value={milestone.name}
+                                                                                                    value={milestone.name.text}
                                                                                                     multiline
                                                                                                     fullWidth
                                                                                                     disabled
@@ -485,18 +498,18 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                                                 )}
                                                             </Grid>
                                                         </Grid>
-                                                        <Box sx={{position:'relative'}}>
-                                                        <JobDetail key={jobDetailKey} jobId={viewingJob._id || ''} applyId={app._id} onCommentSubmitted={onCommentSubmitted} />
-                                                        {viewingJob && (
-                                                            <AddComment
-                                                                jobId={viewingJob._id || ''}
-                                                                applyId={app._id}
-                                                                onCommentSubmitted={() => {
-                                                                    onCommentSubmitted();
-                                                                    setJobDetailKey((prev) => prev + 1);
-                                                                }}
-                                                            />
-                                                        )}
+                                                        <Box sx={{ position: 'relative' }}>
+                                                            <JobDetail key={jobDetailKey} jobId={viewingJob._id || ''} applyId={app._id} onCommentSubmitted={onCommentSubmitted} />
+                                                            {viewingJob && (
+                                                                <AddComment
+                                                                    jobId={viewingJob._id || ''}
+                                                                    applyId={app._id}
+                                                                    onCommentSubmitted={() => {
+                                                                        onCommentSubmitted();
+                                                                        setJobDetailKey((prev) => prev + 1);
+                                                                    }}
+                                                                />
+                                                            )}
                                                         </Box>
                                                     </Box>
                                                 </Box>
