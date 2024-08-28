@@ -136,6 +136,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="User Name"
               value={`${user.firstName} ${user.lastName}`}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               fullWidth
@@ -147,6 +148,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="Email"
               value={user.username}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               fullWidth
@@ -160,6 +162,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="Mobile Number"
               value={user.mobileNumber}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
 
@@ -171,6 +174,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="User Type"
               value={user.userType}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               fullWidth
@@ -184,6 +188,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="Sector"
               value={user.sector}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
 
@@ -195,6 +200,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="Organization"
               value={user.organization}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               fullWidth
@@ -208,6 +214,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="Categories"
               value={user?.categories?.join(', ')}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               multiline
@@ -219,6 +226,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               label="Subcategories"
               value={user?.subcategories?.join(', ')}
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               fullWidth
@@ -226,17 +234,19 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
           
           </Box>
+          <Box sx={{marginBottom:'20px'}}>
           <TextField
               label="Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile."
               value={user.Headline}
               multiline
               InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
               variant="outlined"
               color="secondary"
               fullWidth
               rows={5}
             />
-
+          </Box>
           {user.userType === 'Innovators' && (
             <ProductTable
               products={productArray}
