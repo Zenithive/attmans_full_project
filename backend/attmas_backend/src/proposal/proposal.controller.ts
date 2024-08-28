@@ -12,22 +12,22 @@ export class ProposalController {
 
   @Get()
   async findAll() {
-    return this.proposalService.findAll();
+    return this.proposalService.findAllProposal();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.proposalService.findOne(id);
+    return this.proposalService.findOneProposal(id);
   }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateProposalDto: any) {
-    return this.proposalService.update(id, updateProposalDto);
+    return this.proposalService.updateProposal(id, updateProposalDto);
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.proposalService.delete(id);
+    return this.proposalService.deleteProposal(id);
   }
 
   @Put(':id/status')
@@ -35,6 +35,6 @@ export class ProposalController {
     @Param('id') id: string,
     @Body() { status, comment }: { status: 'Approved' | 'Rejected'; comment: string }
   ) {
-    return this.proposalService.updateStatus(id, status, comment);
+    return this.proposalService.updateStatusProposal(id, status, comment);
   }
 }

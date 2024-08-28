@@ -25,7 +25,16 @@ interface Proposal {
     // Add other fields as needed
     firstname: string;
     lastname: string;
+    jobDetails: JobDetails;
+
 }
+
+interface JobDetails {
+
+    firstName: string;
+    lastName: string;
+    
+  }
 
 
 
@@ -229,7 +238,7 @@ const proposal = () => {
             console.error('Error updating proposal status:', error);
         }
     };
-    
+
 
     return (
         <Box
@@ -349,7 +358,12 @@ const proposal = () => {
                                     <CardContent>
                                         <Typography variant="h6">{proposal.projectTitle}</Typography>
                                         <Typography variant="body1">
-                                            {proposal.firstname} {proposal.lastname}
+                                            <span style={{ fontWeight: 'bold' }}>Project Owner Name:</span>
+                                            {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            <span style={{ fontWeight: 'bold' }}>Freelancer Name:</span>
+                                            {` ${proposal.firstname} ${proposal.lastname}`}
                                         </Typography>
                                         <Box
                                             sx={{
@@ -391,6 +405,7 @@ const proposal = () => {
                     </Box>
                 )}
             </Box>
+
 
             {/* Confirmation Dialog */}
             <ProposalConfirmationDialog
