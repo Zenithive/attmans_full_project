@@ -57,6 +57,7 @@ const proposal = () => {
             const response = await axios.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
                 params: {
                     userId: userDetails._id, // Include userId in the request
+                    
                 },
             });
             console.log('Fetched Projects:', response.data); // Log the response data
@@ -134,7 +135,8 @@ const proposal = () => {
     };
 
     const handleSubmit = async (values: any) => {
-        const finalValues = { ...formValues, ...values };
+        const finalValues = { ...formValues, ...values,userID: userDetails._id, 
+            userName: userDetails.username };
         // Submit finalValues to the backend
         try {
             await axios.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
@@ -298,7 +300,7 @@ const proposal = () => {
                                                         Proposal
                                                     </Button>
 
-                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
                                                         <DialogTitle>Submit Proposal</DialogTitle>
                                                         <DialogContent>
                                                             {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
