@@ -23,6 +23,7 @@ import { APIS } from '@/app/constants/api.constant';
 import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import UserDrawer from '../UserNameSeperate/UserDrawer';
 
 
 
@@ -49,6 +50,7 @@ interface Apply {
   lastName: string;
   availableSolution: string;
   SolutionUSP: string;
+  userId?: UserSchema;
 }
 
 interface ProjectDetailsDialogProps {
@@ -68,6 +70,9 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
   const [applications, setApplications] = useState<Apply[]>([]);
   const [isAwardButtonVisible, setIsAwardButtonVisible] = useState(true);
+
+  const [selectedUser, setSelectedUser] = React.useState<string>('');
+  const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
 
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
 
@@ -167,6 +172,16 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     }
   };
 
+  const handleUserClick = (username: string) => {
+    setSelectedUser(username);
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedUser('');
+  };
+
   return (
     <>
 
@@ -215,8 +230,11 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   },
                 }}
               >
-                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status) }}>
-                  Status: {apply.status}, Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                  Status: {apply.status}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                  Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
                 </Typography>
               </Box>
               <Grid container spacing={2} flexDirection={'column'}>
@@ -225,7 +243,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     label="Title"
                     value={apply.title}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -235,16 +254,19 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     value={apply.description}
                     multiline
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
+                    onClick={() => handleUserClick(apply?.userId?.username || "")}
                     label="Applied User"
                     value={`${apply.firstName} ${apply.lastName}`}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -253,7 +275,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     label="Budget"
                     value={`${apply.currency === 'USD' ? '$' : '₹'}${apply.Budget}`}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -271,7 +294,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                               value={milestone.scopeOfWork}
                               multiline
                               fullWidth
-                              disabled
+                              color='secondary'
+                              aria-readonly
                               sx={{ mb: 2 }}
                             />
                           </Grid>
@@ -285,7 +309,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                       value={m.name.text || 'No text available'}
                                       multiline
                                       fullWidth
-                                      disabled
+                                      color='secondary'
+                                      aria-readonly
                                       sx={{ mb: 2 }}
                                     />
                                   </Grid>
@@ -294,7 +319,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                       label={`Milestone Deadline Date `}
                                       value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
                                       fullWidth
-                                      disabled
+                                      color='secondary'
+                                      aria-readonly
                                       sx={{ mb: 2 }}
                                     />
                                   </Grid>
@@ -317,7 +343,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     value={apply.availableSolution}
                     fullWidth
                     multiline
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -327,7 +354,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     value={apply.SolutionUSP}
                     fullWidth
                     multiline
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -405,6 +433,14 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         onConfirm={handleConfirm}
         message="Are you sure you want to award this application?"
       />
+
+      {selectedUser ? (
+        <UserDrawer
+          open={drawerOpen}
+          onClose={handleDrawerClose}
+          username={selectedUser}
+        />
+      ) : ""}
 
     </>
   );

@@ -643,7 +643,19 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           {app.title}
                         </Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Applied User:</b> {app.firstName} {app.lastName}
+                          <b>Applied User:</b> 
+                          <a
+                                href="javascript:void(0);"
+                                onClick={(e) => {
+                                  handleUserClick(app?.username || "")
+                                }}
+                                style={{
+                                  textDecoration: 'underline',
+                                  color: '#1976d2',
+                                  fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                                }}
+                              >{app.firstName} {app.lastName}
+                              </a>
                         </Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                           <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
