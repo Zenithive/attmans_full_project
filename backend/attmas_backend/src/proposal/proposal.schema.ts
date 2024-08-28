@@ -2,37 +2,37 @@ import { Schema, Document } from 'mongoose';
 
 // Define the schema for the proposal data
 export const ProposalSchema = new Schema({
-    industryProblem: { type: String, required: true },
-    impactProductOutput: { type: String, required: true },
-    natureOfProject: { type: String, required: true },
-    haveTechnology: { type: String, required: true },
-    patentPreference: { type: String, required: true },
-    projectObjective: { type: String, required: true },
-    projectOutline: { type: String, required: true },
-    marketNiche: { type: String, required: true },
+    industryProblem: { type: String, required: false },
+    impactProductOutput: { type: String, required: false },
+    natureOfProject: { type: String, required: false },
+    haveTechnology: { type: String, required: false },
+    patentPreference: { type: String, required: false },
+    projectObjective: { type: String, required: false },
+    projectOutline: { type: String, required: false },
+    marketNiche: { type: String, required: false },
 
-    isPeerReviewed: { type: String, required: true },
-    expectedOutcome: { type: String, required: true },
-    detailedMethodology: { type: String, required: true },
-    physicalAchievements: { type: String, required: true },
+    isPeerReviewed: { type: String, required: false },
+    expectedOutcome: { type: String, required: false },
+    detailedMethodology: { type: String, required: false },
+    physicalAchievements: { type: String, required: false },
 
     budgetOutlay: [
         {
-            head: { type: String, required: true },
-            firstYear: { type: String, required: true },
-            secondYear: { type: String, required: true },
-            thirdYear: { type: String, required: true },
-            total: { type: String, required: true },
+            head: { type: String, required: false },
+            firstYear: { type: String, required: false },
+            secondYear: { type: String, required: false },
+            thirdYear: { type: String, required: false },
+            total: { type: String, required: false },
         },
     ],
 
     manpowerDetails: [
         {
-            designation: { type: String, required: true },
-            monthlySalary: { type: String, required: true },
-            firstYear: { type: String, required: true },
-            secondYear: { type: String, required: true },
-            totalExpenditure: { type: String, required: true },
+            designation: { type: String, required: false },
+            monthlySalary: { type: String, required: false },
+            firstYear: { type: String, required: false },
+            secondYear: { type: String, required: false },
+            totalExpenditure: { type: String, required: false },
         },
     ],
 
@@ -48,6 +48,14 @@ export const ProposalSchema = new Schema({
     externalEquipment: { type: String, required: true },
     pilotProductionTesting: { type: String, required: true },
     mentoringRequired: { type: String, required: true },
+
+    // New fields added
+    userID: { type: String, required: false },
+    userName: { type: String, required: false },
+    projectId:{ type: String, required: false },
+    projectTitle:{ type: String, required: false },
+    projectCurrency:{ type: String, required: false },
+    Status: { type: String, required: false },
 });
 
 export interface Proposal extends Document {
@@ -93,4 +101,12 @@ export interface Proposal extends Document {
     externalEquipment: string;
     pilotProductionTesting: string;
     mentoringRequired: string;
+
+    // New fields added to the interface
+    userID?: string;
+    userName?: string;
+    projectId:string;
+    projectTitle:string;
+    projectCurrency:string;
+    Status:string;
 }

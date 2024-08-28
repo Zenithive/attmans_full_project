@@ -26,6 +26,15 @@ export class BoothService {
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
     console.log('Booth Products:', createBoothDto.products);
 
+    const existingBooth = await this.boothModel.findOne({
+      exhibitionId: createBoothDto.exhibitionId,
+      userId: createBoothDto.userId, // Ensure that this comes from the user details in your DTO
+    });
+
+    if (existingBooth) {
+      throw new Error('You have already participated in this exhibition');
+    }
+
     const createdBooth = new this.boothModel(createBoothDto);
     const booth = await createdBooth.save();
 

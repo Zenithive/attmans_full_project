@@ -43,22 +43,24 @@ const ProposalStep2 = ({ onNext, onPrevious }: { onNext: (values: any) => void, 
       {({ values, handleSubmit }) => (
         <Form onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Field name="isPeerReviewed" as={TextField} label="Is this proposal peer reviewed?" fullWidth />
-            <Field name="expectedOutcome" as={TextField} label="Expected Outcome in Physical Terms" fullWidth multiline />
-            <Field name="detailedMethodology" as={TextField} label="Detailed Methodology and Duration of Project" fullWidth multiline />
-            <Field name="physicalAchievements" as={TextField} label="Year-wise Break-up of Physical Achievements" fullWidth multiline />
+            <Field  rows={4} color = 'secondary'  name="isPeerReviewed" as={TextField} label="Is this proposal peer reviewed?" fullWidth multiline />
+            <Field  rows={4} color = 'secondary' name="expectedOutcome" as={TextField} label="Expected Outcome in Physical Terms" fullWidth multiline />
+            <Field  rows={4} color = 'secondary' name="detailedMethodology" as={TextField} label="Detailed Methodology and Duration of Project" fullWidth multiline />
+            <Field  rows={4} color = 'secondary' name="physicalAchievements" as={TextField} label="Year-wise Break-up of Physical Achievements" fullWidth multiline />
 
             {/* Budget Outlay Table */}
-            <Typography variant="h6">5. Budget Outlay</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Budget Outlay
+            </Typography>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Head</TableCell>
-                    <TableCell>1st Year (Rs.)</TableCell>
-                    <TableCell>2nd Year (Rs.)</TableCell>
-                    <TableCell>3rd Year (Rs.)</TableCell>
-                    <TableCell>Total (Rs.)</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Head</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>1st Year </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>2nd Year </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>3rd Year </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Total </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -89,16 +91,19 @@ const ProposalStep2 = ({ onNext, onPrevious }: { onNext: (values: any) => void, 
             </TableContainer>
 
             {/* Manpower Details Table */}
-            <Typography variant="h6">6. Manpower Details</Typography>
+
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            Manpower Details
+            </Typography>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Designation</TableCell>
-                    <TableCell>Monthly Salary (Rs.)</TableCell>
-                    <TableCell>1st Year (Rs.)</TableCell>
-                    <TableCell>2nd Year (Rs.)</TableCell>
-                    <TableCell>Total Expenditure (Rs.)</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Designation</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Monthly Salary </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>1st Year </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>2nd Year </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Total Expenditure </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -145,9 +150,9 @@ const ProposalStep2 = ({ onNext, onPrevious }: { onNext: (values: any) => void, 
               </Table>
             </TableContainer>
 
-            <Field name="pastCredentials" as={TextField} label="Past Credentials in Similar Projects" fullWidth multiline />
-            <Field name="briefProfile" as={TextField} label="Brief Profile/CV with Roles of Project Team" fullWidth multiline />
-            <Field name="proposalOwnerCredentials" as={TextField} label="Credentials of Proposal Owner (e.g., patents, tech transfers)" fullWidth multiline />
+            <Field color='secondary' rows={4} name="pastCredentials" as={TextField} label="Past Credentials in Similar Projects" fullWidth multiline />
+            <Field color='secondary' rows={4} name="briefProfile" as={TextField} label="Brief Profile/CV with Roles of Project Team" fullWidth multiline />
+            <Field color='secondary' rows={4} name="proposalOwnerCredentials" as={TextField} label="Credentials of Proposal Owner (e.g., patents, tech transfers)" fullWidth multiline />
 
             {/* Navigation Buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

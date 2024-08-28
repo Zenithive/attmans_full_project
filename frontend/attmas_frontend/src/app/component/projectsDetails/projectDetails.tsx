@@ -28,12 +28,13 @@ import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 
 interface Milestone {
   scopeOfWork: string;
-  milestones: {
-      name: string;
-      isCommentSubmitted: boolean;
-  }[];
+  milestones: Array<{
+    name: {
+      text: string;
+      timeFrame: string | null;
+    };
+  }>;
   isCommentSubmitted?: boolean;
-  status?: string;
 }
 interface Apply {
   _id?: string;
@@ -78,7 +79,10 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   useEffect(() => {
     if (apply?._id) {
       axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
-        .then(response => setMilestones(response.data))
+        .then(response => {
+          console.log("Fetched milestones:", response.data);
+          setMilestones(response.data);
+        })
         .catch(error => console.error('Error fetching milestones:', error));
     }
   }, [apply]);
@@ -95,7 +99,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     }
   };
 
-  const handleReward = async (applicationId: string,Comment:string) => {
+  const handleReward = async (applicationId: string, Comment: string) => {
     try {
       if (!applicationId) return;
       console.log("applicationId", applicationId);
@@ -153,11 +157,11 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     setCurrentApplicationId(null);
   };
 
-  const handleConfirm = (comment:string) => {
+  const handleConfirm = (comment: string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
       console.log(`Awarding application with ID: ${currentApplicationId}`);
-      handleReward(currentApplicationId,comment)
+      handleReward(currentApplicationId, comment)
       // Close the dialog after confirming
       handleCloseConfirmationDialog();
     }
@@ -272,22 +276,35 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                             />
                           </Grid>
                           <Grid item xs={12}>
-                            {milestone.milestones.length > 0 ? (
+                            {milestone.milestones && milestone.milestones.length > 0 ? (
                               milestone.milestones.map((m, index) => (
-                                <TextField
-                                  key={index}
-                                  label={`Milestone ${index + 1}`}
-                                  value={m.name}
-                                  multiline
-                                  fullWidth
-                                  disabled
-                                  sx={{ mb: 2 }}
-                                />
+                                <Grid container spacing={2} key={index}>
+                                  <Grid item xs={12} sm={6}>
+                                    <TextField
+                                      label={`Milestone ${index + 1}`}
+                                      value={m.name.text || 'No text available'}
+                                      multiline
+                                      fullWidth
+                                      disabled
+                                      sx={{ mb: 2 }}
+                                    />
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <TextField
+                                      label={`Milestone Deadline Date `}
+                                      value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
+                                      fullWidth
+                                      disabled
+                                      sx={{ mb: 2 }}
+                                    />
+                                  </Grid>
+                                </Grid>
                               ))
                             ) : (
                               <Typography>No milestones available</Typography>
                             )}
                           </Grid>
+
 
                         </Grid>
                       </CardContent>

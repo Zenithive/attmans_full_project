@@ -29,6 +29,11 @@ export class JobsService {
   ) {}
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
+    if (createJobsDto.SelectService.includes('Innovative product')) {
+      // Ensure Expertiselevel is not set for 'Innovative product'
+      createJobsDto.Expertiselevel = undefined;
+    }
+
     const createdJobs = new this.jobsModel(createJobsDto);
     const savedJob = await createdJobs.save();
 
@@ -128,6 +133,14 @@ export class JobsService {
 
     if (!existingJob) {
       throw new NotFoundException(`Job with id ${id} not found`);
+    }
+
+    if (
+      updateJobsDto.SelectService &&
+      updateJobsDto.SelectService.includes('Innovative product')
+    ) {
+      // Ensure Expertiselevel is not set for 'Innovative product'
+      updateJobsDto.Expertiselevel = undefined;
     }
 
     Object.assign(existingJob, updateJobsDto);
