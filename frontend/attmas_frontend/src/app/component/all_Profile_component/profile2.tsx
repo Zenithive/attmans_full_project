@@ -450,8 +450,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             <AddProductModal2
                                 open={showAddProductModal}
                                 onClose={() => setShowAddProductModal(false)}
-                                onSave={handleSaveProduct}
-                            />
+                                onSave={handleSaveProduct}                            />
 
 
                             {isInnovator && showProductDetails && (
