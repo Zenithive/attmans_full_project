@@ -61,6 +61,9 @@ export const ProductInfoSchema = SchemaFactory.createForClass(ProductInfo);
 // Define the WorkExperience schema
 @Schema()
 export class WorkExprience extends Document {
+  @Prop({ required: true })
+  Headline: string;
+
   @Prop({ required: false })
   workAddress: string;
 
@@ -93,7 +96,7 @@ export class WorkExprience extends Document {
 
   @Prop({ required: false })
   username: string;
-  
+
   @Prop({ required: false })
   id: string;
 
