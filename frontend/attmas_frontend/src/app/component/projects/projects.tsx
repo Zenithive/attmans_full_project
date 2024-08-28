@@ -321,7 +321,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     )}
                                 </FormControl>
 
-
+                                {values.SelectService !== 'Innovative product' && (
                                 <FormControl fullWidth>
                                     <InputLabel color='secondary' id="Expertiselevel-label">Expertise Level</InputLabel>
                                     <Select
@@ -340,7 +340,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         <MenuItem value="Phd">Phd</MenuItem>
                                     </Select>
                                 </FormControl>
-
+                                )}
 
                                 <Box display="flex" alignItems="center" gap={2}>
                                     <TextField

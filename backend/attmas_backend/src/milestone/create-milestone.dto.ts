@@ -9,10 +9,21 @@ import {
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
-class MilestoneItemDto {
+class MilestoneNameDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  text: string;
+
+  @IsNotEmpty()
+  @IsString()
+  timeFrame: string;
+}
+
+class MilestoneItemDto {
+  @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => MilestoneNameDto)
+  name: MilestoneNameDto;
 
   @IsOptional()
   isCommentSubmitted?: boolean;
@@ -20,6 +31,10 @@ class MilestoneItemDto {
   @IsNotEmpty()
   @IsString()
   status: string;
+
+  @IsNotEmpty()
+  @IsString()
+  submittedAt: Date;
 }
 
 export class CreateMilestoneDto {

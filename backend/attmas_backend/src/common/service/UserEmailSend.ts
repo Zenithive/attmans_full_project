@@ -30,6 +30,12 @@ export class MailerService {
       html,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', info);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error;
+    }
   }
 }

@@ -115,9 +115,11 @@ const ExhibitionsPage: React.FC = () => {
           },
         });
 
-        setBooths(response.data);
+        const booths = response.data;
 
-        const userHasBooth = response.data.some((booth: Booth) => booth.exhibitionId === exhibitionId);
+        setBooths(booths);
+
+        const userHasBooth = booths.some((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
         setHasUserBooth(userHasBooth);
         setParticipateButtonVisible(!userHasBooth);
       } catch (error) {
@@ -126,7 +128,7 @@ const ExhibitionsPage: React.FC = () => {
     };
 
 
-    const fetchVisitors = async () => {
+    const fetchVisitorsforExhibition = async () => {
       try {
         const exhibitionId = searchParams.get('exhibitionId');
         const boothId = searchParams.get('boothId');
@@ -151,7 +153,7 @@ const ExhibitionsPage: React.FC = () => {
 
 
 
-          if (element.userId === userDetails._id) {
+          if (element.userId === userDetails._id && element.interestType === 'InterestedUserForExhibition') {
             setIsInterestedBtnShow(false);
           }
         }
@@ -166,7 +168,7 @@ const ExhibitionsPage: React.FC = () => {
     fetchBooths();
     console.log("view", view);
     if (view === 'boothDetails') {
-      fetchVisitors();
+      fetchVisitorsforExhibition();
 
     } 
 
@@ -209,11 +211,11 @@ const ExhibitionsPage: React.FC = () => {
       const response = await axios.post(APIS.CREATE_BOOTH, boothData);
       if (response.data.exhibitionId === exhibitionId) {
         setBooths(prevBooths => [...prevBooths, response.data]);
+        setParticipateButtonVisible(false);
       } else {
         console.error('Booth created does not belong to the current exhibition');
       }
       closeModal();
-      setParticipateButtonVisible(false);
     } catch (error) {
       console.error('Error creating booth:', error);
     }

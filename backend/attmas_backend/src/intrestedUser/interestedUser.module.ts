@@ -5,6 +5,7 @@ import { InterestedUserService } from './interestedUser.service';
 import { InterestedUserController } from './interestedUser.controller';
 import { MailerService } from 'src/common/service/UserEmailSend';
 import { UsersModule } from 'src/users/users.module';
+import { ExhibitionModule } from 'src/exhibition/exhibition.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UsersModule } from 'src/users/users.module';
       { name: 'InterestedUser', schema: InterestedUserSchema },
     ]),
     UsersModule, // Import UsersModule
+    ExhibitionModule,
   ],
   providers: [InterestedUserService, MailerService],
   controllers: [InterestedUserController],
