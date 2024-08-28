@@ -2,10 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
 import axios from 'axios';
-import { APIS } from '@/app/constants/api.constant';
+import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
@@ -14,9 +13,20 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Job, Apply } from '../projects/projectinterface';
 import { Expertiselevel } from '../projects/projectinterface';
 import { getSubcategorys } from '../projects/projectinterface';
-import ProposalStep1 from '../component/proposal/ProposalStep1' 
+import ProposalStep1 from '../component/proposal/ProposalStep1'
 import ProposalStep2 from '../component/proposal/ProposalStep2'
 import ProposalStep3 from '../component/proposal/ProposalStep3'
+import ProposalConfirmationDialog from '../component/All_ConfirmationBox/ProposalConfirmationDialog';
+
+interface Proposal {
+    _id: string;
+    projectTitle: string;
+    Status: string;
+    // Add other fields as needed
+    firstname: string;
+    lastname: string;
+}
+
 
 
 const proposal = () => {
@@ -39,6 +49,13 @@ const proposal = () => {
 
     const [selectedProject, setSelectedProject] = useState<Job | null>(null);
 
+    const [proposals, setProposals] = useState<Proposal[]>([]);
+
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
+    const [currentAction, setCurrentAction] = useState<'Approve' | 'Reject'>('Approve');
+    const [selectedProposalId, setSelectedProposalId] = useState<string>('');
+
+
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { _id: userId } = userDetails;
@@ -60,7 +77,7 @@ const proposal = () => {
             const response = await axios.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
                 params: {
                     userId: userDetails._id, // Include userId in the request
-                    
+
                 },
             });
             console.log('Fetched Projects:', response.data); // Log the response data
@@ -70,11 +87,28 @@ const proposal = () => {
         }
     }, [userDetails._id]);
 
+    const fetchAllProposals = useCallback(async () => {
+        if (userDetails.userType === 'Admin') {
+            try {
+                const response = await axios.get(APIS.GET_ALL_PROPOSALS);
+                console.log('Fetched Proposals:', response.data);
+                setProposals(response.data);
+            } catch (error) {
+                console.error('Error fetching proposals:', error);
+            }
+        }
+    }, [userDetails.userType]);
+
 
     useEffect(() => {
         fetchAllProjects();
         // Fetch all projects on component mount
     }, [fetchAllProjects]);
+
+    useEffect(() => {
+        fetchAllProposals();
+        // Fetch proposals if user is Admin
+    }, [fetchAllProposals]);
 
 
     const refetch = useCallback(async () => {
@@ -128,7 +162,7 @@ const proposal = () => {
 
 
 
-    ////////////// Proposal 
+    ////////////// Proposal ///////////////
 
     const handleNextStep = (values: any) => {
         setFormValues((prevValues) => ({ ...prevValues, ...values }));
@@ -140,16 +174,20 @@ const proposal = () => {
     };
 
     const handleSubmit = async (values: any) => {
-        
-        const finalValues = { ...formValues, ...values,
-            userID: userDetails._id, 
+
+        const finalValues = {
+            ...formValues, ...values,
+            userID: userDetails._id,
             userName: userDetails.username,
             projectId: selectedProject?._id,               // Correct
             projectTitle: selectedProject?.title,          // Correct
             // projectCurrency: selectedProject?.jobDetails?.currency,
-            Status:'Pending'
+            Status: 'Pending',
+            comment: '',
+            firstname: userDetails.firstName,
+            lastname: userDetails.lastName,
 
-         };
+        };
         console.log("finalValues.projectId", finalValues.projectId);
         console.log("finalValues.projectTitle", finalValues.projectTitle);
 
@@ -163,6 +201,35 @@ const proposal = () => {
             console.error('Error submitting proposal:', error);
         }
     };
+
+
+
+
+    const handleApprove = (proposalId: string) => {
+        setCurrentAction('Approve');
+        setSelectedProposalId(proposalId);
+        setConfirmationOpen(true);
+    };
+
+    const handleReject = (proposalId: string) => {
+        setCurrentAction('Reject');
+        setSelectedProposalId(proposalId);
+        setConfirmationOpen(true);
+    };
+
+    const handleConfirmation = async (status: 'Approved' | 'Rejected', comment: string) => {
+        try {
+            await axios.put(`${SERVER_URL}/proposals/${selectedProposalId}/status`, {
+                status,
+                comment
+            });
+            // Refresh the proposals list after update
+            fetchAllProposals();
+        } catch (error) {
+            console.error('Error updating proposal status:', error);
+        }
+    };
+    
 
     return (
         <Box
@@ -188,7 +255,15 @@ const proposal = () => {
                     },
                 }}
             >
-                <Typography component="h2" sx={{ marginY: 0 }}>My Projects</Typography>
+                {userDetails.userType === 'Freelancer' && (
+                    <Typography component="h2" sx={{ marginY: 0 }}>
+                        My Projects
+                    </Typography>
+                )}
+                {userDetails.userType === 'Admin' && (
+                    <Typography variant="h4">All Proposals</Typography>
+                )}
+
 
 
 
@@ -266,6 +341,67 @@ const proposal = () => {
             )}
 
             <Box sx={{ mt: 2, position: 'relative' }}>
+                {userDetails.userType === 'Admin' && (
+                    <Box>
+                        {proposals.length > 0 ? (
+                            proposals.map((proposal) => (
+                                <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
+                                    <CardContent>
+                                        <Typography variant="h6">{proposal.projectTitle}</Typography>
+                                        <Typography variant="body1">
+                                            {proposal.firstname} {proposal.lastname}
+                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 8,
+                                                right: 8,
+                                                display: 'flex',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <Chip
+                                                label={proposal.Status}
+                                                variant="outlined"
+                                                color={proposal.Status === 'Approved' ? 'success' : 'error'}
+                                            />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                onClick={() => handleApprove(proposal._id)}
+                                            >
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="error"
+                                                onClick={() => handleReject(proposal._id)}
+                                            >
+                                                Reject
+                                            </Button>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        ) : (
+                            <Typography>No proposals available</Typography>
+                        )}
+                    </Box>
+                )}
+            </Box>
+
+            {/* Confirmation Dialog */}
+            <ProposalConfirmationDialog
+                open={confirmationOpen}
+                onClose={() => setConfirmationOpen(false)}
+                onConfirm={handleConfirmation}
+                action={currentAction}
+            />
+
+
+            <Box sx={{ mt: 2, position: 'relative' }}>
                 {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
                     <>
                         {projects.length > 0 ? (
@@ -301,18 +437,15 @@ const proposal = () => {
                                                 <Box sx={{
                                                     fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
                                                 }}>
-                                                    <Chip
-                                                        label={project.jobDetails.status}
-                                                        color={
-                                                            project.jobDetails.status === 'Approved'
-                                                                ? 'success'
-                                                                : project.jobDetails.status === 'Rejected'
-                                                                    ? 'error'
-                                                                    : 'default'
-                                                        }
-                                                    />
 
-                                                    <Button variant="contained" onClick={() => setOpen(true)}>
+
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => {
+                                                            handleViewJob(project.jobDetails); // Call handleViewJob with the relevant job details
+                                                            setOpen(true); // Open the proposal dialog
+                                                        }}
+                                                    >
                                                         Proposal
                                                     </Button>
 

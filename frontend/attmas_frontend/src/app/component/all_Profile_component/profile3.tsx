@@ -11,6 +11,7 @@ import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import { categories, options } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise'; // Import the new component
+import TermsAndConditions from './TermsAndConditions';
 
 interface ProfileForm3Props {
   onPrevious: () => void;
@@ -200,8 +201,12 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             >
               Save
             </LoadingButton>
+
+
           </Box>
+
         </Box>
+    <TermsAndConditions/>
       </Box>
     </Container>
   );

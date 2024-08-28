@@ -39,6 +39,10 @@ export const APIS = {
 
     PROPOSAL: `${SERVER_URL}/proposals`,
 
+    GET_ALL_PROPOSALS : `${SERVER_URL}/proposals`,
+
+    UPDATE_PROPOSAL_STATUS: `${SERVER_URL}/status`,
+
 
 
 

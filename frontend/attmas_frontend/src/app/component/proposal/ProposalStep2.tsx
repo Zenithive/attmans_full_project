@@ -42,8 +42,8 @@ const ProposalStep2 = ({ onNext, onPrevious }: { onNext: (values: any) => void, 
     >
       {({ values, handleSubmit }) => (
         <Form onSubmit={handleSubmit}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Field  rows={4} color = 'secondary'  name="isPeerReviewed" as={TextField} label="Is this proposal peer reviewed?" fullWidth multiline />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, padding: 2 }}> {/* Added padding */}
+            <Field  rows={4} color = 'secondary'  name="isPeerReviewed" as={TextField} label="Is this proposal peer reviewed?" fullWidth multiline sx={{ paddingBottom: 2 }} /> {/* Specific padding */}
             <Field  rows={4} color = 'secondary' name="expectedOutcome" as={TextField} label="Expected Outcome in Physical Terms" fullWidth multiline />
             <Field  rows={4} color = 'secondary' name="detailedMethodology" as={TextField} label="Detailed Methodology and Duration of Project" fullWidth multiline />
             <Field  rows={4} color = 'secondary' name="physicalAchievements" as={TextField} label="Year-wise Break-up of Physical Achievements" fullWidth multiline />
