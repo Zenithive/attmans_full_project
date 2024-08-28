@@ -95,7 +95,7 @@ export default function MainSideBar() {
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
       Name: "My Project",
-      isVisible: (isFreelancer || isProjectOwner || isInnovator)
+      isVisible: (isAdmin ||isFreelancer || isProjectOwner || isInnovator)
     },
     {
       path: '/proposal',

@@ -12,6 +12,7 @@ interface User {
   _id: string;
   firstName: string;
   lastName: string;
+  Headline: string;
   mobileNumber: string;
   username: string;
   userType: string;
@@ -21,6 +22,8 @@ interface User {
   sector: string;
   organization: string;
 }
+
+
 
 interface UserDrawerProps {
   open: boolean;
@@ -62,7 +65,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
   }, [user.username])
 
   useEffect(() => {
-    if(username){
+    if (username) {
       fetchUserDetailsUsingUsername();
     }
   }, [username])
@@ -83,7 +86,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
       const response = await axios.get<User[]>(
         `${SERVER_URL}/users/filters?&page=1&limit=20&username=${username}`
       );
-
+      console.log('profile for',response.data)
       setUser(response.data[0] || []);
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -97,7 +100,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
       anchor="right"
       open={open}
       onClose={onClose}
-      sx={{zIndex: 1300}}
+      sx={{ zIndex: 1300 }}
       PaperProps={{
         sx: {
           borderRadius: "20px 0px 0px 20px",
@@ -127,6 +130,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             Detailed Information
           </Typography>
 
+
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               label="User Name"
@@ -135,7 +139,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               variant="outlined"
               color="secondary"
               fullWidth
-              aria-readonly
+
               sx={{ width: "50%" }}
             />
 
@@ -146,7 +150,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               variant="outlined"
               color="secondary"
               fullWidth
-              aria-readonly
+
               sx={{ width: "50%" }}
             />
           </Box>
@@ -158,7 +162,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               InputProps={{ readOnly: true }}
               variant="outlined"
               color="secondary"
-              aria-readonly
+
               fullWidth
               sx={{ width: "50%" }}
             />
@@ -170,7 +174,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               variant="outlined"
               color="secondary"
               fullWidth
-              aria-readonly
+
               sx={{ width: "50%" }}
             />
           </Box>
@@ -182,7 +186,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               InputProps={{ readOnly: true }}
               variant="outlined"
               color="secondary"
-              aria-readonly
+
               fullWidth
               sx={{ width: "50%" }}
             />
@@ -194,7 +198,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               variant="outlined"
               color="secondary"
               fullWidth
-              aria-readonly
+
               sx={{ width: "50%" }}
             />
           </Box>
@@ -208,7 +212,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               color="secondary"
               multiline
               fullWidth
-              aria-readonly
+
             />
 
             <TextField
@@ -219,9 +223,19 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               color="secondary"
               fullWidth
               multiline
-              aria-readonly
             />
+          
           </Box>
+          <TextField
+              label="Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile."
+              value={user.Headline}
+              multiline
+              InputProps={{ readOnly: true }}
+              variant="outlined"
+              color="secondary"
+              fullWidth
+              rows={5}
+            />
 
           {user.userType === 'Innovators' && (
             <ProductTable
@@ -229,7 +243,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               onRemove={(index) => {
                 const updatedProducts = productArray.filter((_, i) => i !== index);
                 setProductDetails(
-                    updatedProducts.map(product => convertToProductForBooth(product))
+                  updatedProducts.map(product => convertToProductForBooth(product))
                 );
               }}
               onChange={(index, updatedProduct) => {
@@ -237,7 +251,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
                   i === index ? updatedProduct : product
                 );
                 setProductDetails(
-                    updatedProducts.map(product => convertToProductForBooth(product))
+                  updatedProducts.map(product => convertToProductForBooth(product))
                 );
               }}
               showActions={false}
