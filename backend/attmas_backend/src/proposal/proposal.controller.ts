@@ -29,4 +29,12 @@ export class ProposalController {
   async delete(@Param('id') id: string) {
     return this.proposalService.delete(id);
   }
+
+  @Put(':id/status')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() { status, comment }: { status: 'Approved' | 'Rejected'; comment: string }
+  ) {
+    return this.proposalService.updateStatus(id, status, comment);
+  }
 }

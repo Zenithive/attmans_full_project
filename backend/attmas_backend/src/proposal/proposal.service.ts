@@ -29,4 +29,8 @@ export class ProposalService {
   async delete(id: string): Promise<any> {
     return this.proposalModel.findByIdAndDelete(id).exec();
   }
+
+  async updateStatus(id: string, status: 'Approved' | 'Rejected', comment: string): Promise<Proposal> {
+    return this.proposalModel.findByIdAndUpdate(id, { Status: status, comment: comment }, { new: true }).exec();
+  }
 }
