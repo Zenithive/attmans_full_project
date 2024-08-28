@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip } from '@mui/material';
+import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants, Grid } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
@@ -27,8 +27,12 @@ interface AddApplyProps {
 
 interface Milestone {
   scopeOfWork: string;
-  milestones: string[];
-  comments: string[];
+  milestones: {
+    name: {
+      text: string;
+      timeFrame: string | null;
+    };
+  }[];
 }
 
 interface FormValues {
@@ -52,15 +56,23 @@ const validationSchema = Yup.object().shape({
   Budget: Yup.number().required('Budget is required'),
   currency: Yup.string().required('Currency is required'),
   TimeFrame: Yup.date().nullable('Date & Time is required'),
+  availableSolution: Yup.string().required('You have to give solution'),
+  SolutionUSP: Yup.string().required('Solution USP is required'),
   milestones: Yup.array().of(
     Yup.object().shape({
       scopeOfWork: Yup.string().required('Scope of work is required'),
-      milestones: Yup.array().of(Yup.string().required('Milestone is required')).required(),
+      milestones: Yup.array().of(
+        Yup.object().shape({
+          name: Yup.object().shape({
+            text: Yup.string().required('Milestone text is required'),
+            timeFrame: Yup.date().nullable().required('Milestone time frame is required'),
+          }),
+        })
+      ).min(1, 'At least one milestone is required')
     })
-  ),
-  availableSolution: Yup.string().required('you have to give solution'),
-  SolutionUSP: Yup.string().required('Solution USP is required'),
+  ).min(1, 'At least one milestone group is required'),
 });
+
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -73,7 +85,11 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
     jobId: jobId,
-    milestones: [{ scopeOfWork: '', milestones: [''] ,comments: ['']}],
+    milestones: [{
+      scopeOfWork: '',
+      milestones: [{ name: { text: '', timeFrame: null } }],
+
+    }],
     availableSolution: '',
     SolutionUSP: '',
     applyType: 'freelancerApply',
@@ -99,28 +115,29 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
         SolutionUSP: values.SolutionUSP,
         applyType: 'FreelancerApply',
       };
-    
+
       const applyResponse = await axios.post(APIS.APPLY, applyData);
-      const applyId = applyResponse.data._id; 
-    
+      const applyId = applyResponse.data._id;
+
       const milestonePromises = values.milestones.map(milestone => {
         const formattedMilestone = {
           scopeOfWork: milestone.scopeOfWork,
-          milestones: milestone.milestones.map(milestoneItem => ({ name: milestoneItem })),
+          milestones: milestone.milestones.map(milestoneItem => ({
+            name: milestoneItem.name,
+          })),
           userId: userDetails._id,
           jobId: values.jobId,
-          applyId: applyId, 
-          comments: milestone.comments,
+          applyId: applyId,
         };
-  
+
         return axios.post(APIS.MILESTONES, formattedMilestone);
       });
-      
+
       await Promise.all(milestonePromises);
-    
+
       pubsub.publish('ApplyCreated', { message: 'A new Apply Created' });
       pubsub.publish('toast', { message: 'Applied successfully!', severity: 'success' });
-    
+
       resetForm();
       setOpen(false);
     } catch (error) {
@@ -130,7 +147,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       setSubmitting(false);
     }
   };
-  
+
   const handleCancel = () => {
     if (onCancel) onCancel();
     setOpen(false);
@@ -144,7 +161,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
       onClose={() => handleCancel}
     >
       <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
-        <h2>Create Apply</h2>
+        <h2>Apply</h2>
         <IconButton aria-label="close" onClick={handleCancel} sx={{ p: 0, right: 0 }}>
           <CloseIcon />
         </IconButton>
@@ -235,7 +252,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
 
                         <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
                           Add Specific activities, deliverables, timelines, and/or quality guidelines to ensure successful execution of the project.
-                        </Typography >
+                        </Typography>
                         <TextField
                           label="Scope of Work"
                           name={`milestones[${index}].scopeOfWork`}
@@ -248,43 +265,71 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                           rows={4}
                           fullWidth
                           error={!!(errors.milestones && touched.milestones)}
-                          helperText={<ErrorMessage name="Scope of Work" />}
+                          helperText={<ErrorMessage name={`milestones[${index}].scopeOfWork`} />}
                         />
 
                         <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
                           Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client.
-                        </Typography >
+                        </Typography>
                         <FieldArray
                           name={`milestones[${index}].milestones`}
-                          render={(milestoneHelpers) => (
+                          render={(milestoneArrayHelpers) => (
                             <Box>
                               {milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                <Box key={milestoneIndex} sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                                  <TextField
-                                    placeholder="Milestone..."
-                                    name={`milestones[${index}].milestones[${milestoneIndex}]`}
-                                    value={milestone}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    fullWidth
-                                    multiline
-                                    error={!!(errors.milestones && touched.milestones)}
-                                    helperText={<ErrorMessage name={`milestones[${index}].milestones[${milestoneIndex}]`} />}
-                                  />
+                                <Grid
+                                  container
+                                  spacing={2}
+                                  key={milestoneIndex}
+                                  sx={{ marginBottom: '20px', alignItems: 'center' }}
+                                >
+                                  <Grid item xs={12} sm={6}>
+                                    <TextField
+                                      placeholder="Milestone..."
+                                      name={`milestones[${index}].milestones[${milestoneIndex}].name.text`}
+                                      value={milestone.name.text}
+                                      onChange={handleChange}
+                                      onBlur={handleBlur}
+                                      fullWidth
+                                      multiline
+                                      error={!!(errors.milestones && touched.milestones)}
+                                      helperText={<ErrorMessage name={`milestones[${index}].milestones[${milestoneIndex}].name.text`} />}
+                                    />
+                                  </Grid>
+
+                                  <Grid item xs={12} sm={5}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <DateTimePicker
+                                        label="Milestone Deadline Date"
+                                        value={milestone.name.timeFrame ? dayjs(milestone.name.timeFrame) : null}
+                                        onChange={(newValue) =>
+                                          setFieldValue(`milestones[${index}].milestones[${milestoneIndex}].name.timeFrame`, newValue)
+                                        }
+                                        slotProps={{
+                                          textField: {
+                                            color: 'secondary',
+                                          },
+                                        }}
+                                      />
+                                    </LocalizationProvider>
+                                  </Grid>
+
                                   {milestoneIndex > 0 && (
-                                    <IconButton
-                                      onClick={() => milestoneHelpers.remove(milestoneIndex)}
-                                      color='secondary'
-                                    >
-                                      <DeleteIcon />
-                                    </IconButton>
+                                    <Grid item xs={12} sm={1} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                      <IconButton
+                                        onClick={() => milestoneArrayHelpers.remove(milestoneIndex)}
+                                        color="secondary"
+                                      >
+                                        <DeleteIcon />
+                                      </IconButton>
+                                    </Grid>
                                   )}
-                                </Box>
+                                </Grid>
                               ))}
+
                               <Button
-                                onClick={() => milestoneHelpers.push('')}
+                                onClick={() => milestoneArrayHelpers.push({  name: { text: '', timeFrame: null }, })}
                                 variant="outlined"
-                                sx={{ mt: 1, textTransform: 'none', marginBottom: '20px' }}
+                                sx={{ mt: 1, textTransform: 'none' }}
                                 startIcon={<AddIcon />}
                               >
                                 Add Milestone
@@ -292,12 +337,12 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                             </Box>
                           )}
                         />
-
                       </Paper>
                     ))}
                   </Box>
                 )}
               />
+
 
 
               <Typography variant="h6" sx={{ fontSize: 'small' }}>
@@ -334,24 +379,24 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 helperText={<ErrorMessage name="SolutionUSP" />}
               />
 
-                <Typography
-                    variant="body2"
-                    align="center"
-                    mt={4}
-                    mb={3}
-                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
-                >
-                    Please Note: <br />
-                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
-                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
-                </Typography>
+              <Typography
+                variant="body2"
+                align="center"
+                mt={4}
+                mb={3}
+                sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
+              >
+                Please Note: <br />
+                If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
+              </Typography>
 
-                
-                {fetchError && (
-                    <Typography color="error" align="center" mt={2}>
-                        {fetchError}
-                    </Typography>
-                )}
+
+              {fetchError && (
+                <Typography color="error" align="center" mt={2}>
+                  {fetchError}
+                </Typography>
+              )}
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                 <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>

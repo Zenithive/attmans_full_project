@@ -196,6 +196,7 @@ export class UsersService {
             subcategories: '$categoryData.subcategories', // Include subcategories field
             sector: '$workexpriencesData.sector',
             organization: '$workexpriencesData.organization',
+            Headline: '$workexpriencesData.Headline',
           },
         },
       ])

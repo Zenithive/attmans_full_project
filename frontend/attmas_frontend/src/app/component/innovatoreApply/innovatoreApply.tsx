@@ -15,26 +15,10 @@ import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import AddProductModal2 from '../all_Profile_component/AddProductModal2';
+import { Product } from '../ProductTable';
+import NewProductTable from '../all_Profile_component/NewProductTable';
 
 
-interface Product {
-    productName: string;
-    productDescription: string;
-    productQuantity: string;
-    videourlForproduct: string;
-    targetaudience: string;
-    problemaddressed: string;
-    technologyused: string;
-    intellectualpropertyconsiderations: string;
-    stageofdevelopmentdropdown: string;
-    CompetitiveAdvantages: string;
-    feasibilityofthesolution: string;
-    howdoesthesolutionwork: string;
-    potentialbenefits: string;
-    challengesorrisks: string;
-    productPrice: string;
-    currency: string;
-}
 
 interface WorkExprience {
     gender: string
@@ -93,9 +77,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
     const [loading, setLoading] = React.useState<boolean>(true);
     const [subcategories, setSelectedValues] = React.useState<string[]>([]);
     const [categories, setCategories] = React.useState([]);
-    const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
-    const [viewProductModalOpen, setViewProductModalOpen] = React.useState<boolean>(false);
-
+    const [products, setProducts] = React.useState<Product[]>([]);
 
 
 
@@ -196,11 +178,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
     };
 
 
-    const handleViewProduct = (product: Product) => {
-        console.log('Selected Product:', product);
-        setSelectedProduct(product);
-        setViewProductModalOpen(true);
-    };
+
 
 
     return (
@@ -389,59 +367,20 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                                     Products
                                                 </Typography>
 
-                                                {workExperience?.products.length > 0 ? (
-                                                    <Box
-                                                        sx={{
-                                                            display: 'flex',
-                                                            flexWrap: 'wrap',
-                                                            gap: '16px'
-                                                        }}
-                                                    >
-                                                        {workExperience.products.map((product, index) => (
-                                                            <Box
-                                                                key={index}
-                                                                sx={{
-                                                                    display: 'flex',
-                                                                    flexDirection: 'row',
-                                                                    alignItems: 'center',
-                                                                    width: '100%',
-                                                                    maxWidth: '600px', // Set a max-width for the product card
-                                                                    padding: '10px',
-                                                                    borderRadius: '8px',
-                                                                    border: '1px solid #ddd',
-                                                                    backgroundColor: '#f9f9f9',
-                                                                    textAlign: 'left'
-                                                                }}
-                                                            >
-                                                                <Typography
-                                                                    variant="subtitle1"
-                                                                    sx={{ flexGrow: 1, marginRight: '16px' }}
-                                                                >
-                                                                    {product.productName}
-                                                                </Typography>
-                                                                <Button
-                                                                    variant="contained"
-                                                                    color="secondary"
-                                                                    onClick={() => handleViewProduct(product)}
-                                                                >
-                                                                    View Product
-                                                                </Button>
-                                                            </Box>
-                                                        ))}
-                                                    </Box>
+
+
+                                                {workExperience?.products && workExperience?.products.length > 0 ? (
+                                                    <NewProductTable
+                                                        products={workExperience.products}
+                                                        onView={(productId) => console.log('View', productId)} 
+                                                        onEdit={(productId) => console.log('Edit', productId)}
+                                                        onDelete={(productId) => console.log('Delete', productId)}
+                                                    />
                                                 ) : (
-                                                    <Typography variant="body1" align="center">
-                                                        No products available.
-                                                    </Typography>
+                                                    <Typography>No products available</Typography>
                                                 )}
 
-                                                <AddProductModal2
-                                                    open={viewProductModalOpen}
-                                                    onClose={() => setViewProductModalOpen(false)}
-                                                    onSave={() => { }}
-                                                    // readOnly={true}
-                                                    // selectedProduct={selectedProduct}
-                                                />
+
                                             </Box>
 
                                         </>

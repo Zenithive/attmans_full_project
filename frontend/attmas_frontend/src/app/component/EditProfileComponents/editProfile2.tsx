@@ -25,6 +25,7 @@ interface FormValues {
     qualification: string;
     organization: string;
     sector: string;
+    Headline: string;
     workAddress: string;
     designation: string;
     userType: string;
@@ -42,10 +43,12 @@ const EditProfile2: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
+    const [labels, setLabels] = useState("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const validationSchema = Yup.object({
+        Headline: Yup.string().required("Headline is required"),
         qualification: Yup.string().required('Qualification is required'),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
@@ -67,6 +70,7 @@ const EditProfile2: React.FC = () => {
 
     const formik = useFormik<FormValues>({
         initialValues: {
+            Headline: '',
             qualification: '',
             organization: '',
             sector: '',
@@ -126,6 +130,7 @@ const EditProfile2: React.FC = () => {
 
                 formik.setValues({
                     ...formik.values,
+                    Headline:userData.Headline || '',
                     qualification: userData.qualification || '',
                     organization: userData.organization || '',
                     sector: userData.sector || '',
@@ -160,6 +165,8 @@ const EditProfile2: React.FC = () => {
         if (value !== 'Innovators') {
             setShowProductDetails(false);
             formik.setFieldValue('productToMarket', 'No');
+            formik.setFieldValue('hasPatent', 'No');
+            formik.setFieldValue('patentDetails', '');
         } else {
             if (formik.values.productToMarket === 'Yes') {
                 setShowProductDetails(true);
@@ -180,16 +187,23 @@ const EditProfile2: React.FC = () => {
     };
 
     const handleFocus = () => {
+
         setLabel("Share Solution");
-      };
-    
+        setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
    
-      const handleBlur = () => {
+    };
+
+
+    const handleBlur = () => {
         if (!formik.values.patentDetails) {
-          setLabel("Provide details about the research product or solution that you intend to commercialize");
+            setLabel("Provide details about the research product or solution that you intend to commercialize");
         }
-      };
-    
+        if (!formik.values.Headline) {
+            setLabels("Headline");
+        }
+    };
+
+
 
     return (
         <Container component="main" maxWidth="md">
@@ -226,7 +240,28 @@ const EditProfile2: React.FC = () => {
                                 width: '126%', position: 'relative', right: '26px'
                             }
                         }}>
-                            <Grid color= 'secondary' item xs={12} sm={6}>
+
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={5}
+                                    id="Headline"
+                                    label={labels}
+                                    color='secondary'
+                                    name="Headline"
+                                    onChange={formik.handleChange}
+                                    onBlur={(e) => {
+                                        formik.handleBlur(e);
+                                        handleBlur();
+                                    }}
+                                    onFocus={handleFocus}
+                                    value={formik.values.Headline}
+                                    error={formik.touched.Headline && Boolean(formik.errors.Headline)}
+                                    helperText={formik.touched.Headline && formik.errors.Headline}
+                                />
+                            </Grid>
+                            <Grid color='secondary' item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     select
@@ -248,12 +283,12 @@ const EditProfile2: React.FC = () => {
                                     <MenuItem value="Ph.D.">Ph.D.</MenuItem>
                                 </TextField>
                             </Grid>
-                            <Grid color= 'secondary' item xs={12} sm={6}>
+                            <Grid color='secondary' item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     id="organization"
                                     label="Organization"
-                                    color= 'secondary'
+                                    color='secondary'
                                     name="organization"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -267,7 +302,7 @@ const EditProfile2: React.FC = () => {
                                     fullWidth
                                     id="sector"
                                     label="Sector"
-                                    color= 'secondary'
+                                    color='secondary'
                                     name="sector"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -280,7 +315,7 @@ const EditProfile2: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     id="workAddress"
-                                    color= 'secondary'
+                                    color='secondary'
                                     label="Work Address"
                                     name="workAddress"
                                     onChange={formik.handleChange}
@@ -294,7 +329,7 @@ const EditProfile2: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     id="designation"
-                                    color= 'secondary'
+                                    color='secondary'
                                     label="Designation"
                                     name="designation"
                                     onChange={formik.handleChange}
@@ -336,7 +371,7 @@ const EditProfile2: React.FC = () => {
                                         select
                                         style={{ background: "white", borderRadius: "25px" }}
                                         id="productToMarket"
-                                        color= 'secondary'
+                                        color='secondary'
                                         label="Product to Market"
                                         name="productToMarket"
                                         onChange={(e) => {
@@ -356,13 +391,13 @@ const EditProfile2: React.FC = () => {
 
                             )}
 
-                            <Grid item xs={12} sm={6}>
+                            {formik.values.productToMarket == "Yes" ? <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
                                     select
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="hasPatent"
-                                    color= 'secondary'
+                                    color='secondary'
                                     label="Do you have a patent?"
                                     name="hasPatent"
                                     onChange={formik.handleChange}
@@ -374,31 +409,31 @@ const EditProfile2: React.FC = () => {
                                     <MenuItem value="Yes">Yes</MenuItem>
                                     <MenuItem value="No">No</MenuItem>
                                 </TextField>
-                            </Grid>
+                            </Grid> : ""}
 
                             {formik.values.hasPatent === "Yes" && (
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                fullWidth
-                                                multiline
-                                                rows={4}
-                                                id="patentDetails"
-                                                color='secondary'
-                                                // label="Provide details about the research product or solution that you intend to commercialize"
-                                                label={label}
-                                                name="patentDetails"
-                                                onChange={formik.handleChange}
-                                                onBlur={(e) => {
-                                                    formik.handleBlur(e);
-                                                    handleBlur(); 
-                                                  }}
-                                                onFocus={handleFocus}
-                                                value={formik.values.patentDetails}
-                                                error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
-                                                helperText={formik.touched.patentDetails && formik.errors.patentDetails}
-                                            />
-                                        </Grid>
-                                    )}
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        rows={4}
+                                        id="patentDetails"
+                                        color='secondary'
+                                        // label="Provide details about the research product or solution that you intend to commercialize"
+                                        label={label}
+                                        name="patentDetails"
+                                        onChange={formik.handleChange}
+                                        onBlur={(e) => {
+                                            formik.handleBlur(e);
+                                            handleBlur();
+                                        }}
+                                        onFocus={handleFocus}
+                                        value={formik.values.patentDetails}
+                                        error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
+                                        helperText={formik.touched.patentDetails && formik.errors.patentDetails}
+                                    />
+                                </Grid>
+                            )}
                             {isFreelancer && showProductDetails && (
                                 <Grid item xs={12}>
                                     <ProductTable

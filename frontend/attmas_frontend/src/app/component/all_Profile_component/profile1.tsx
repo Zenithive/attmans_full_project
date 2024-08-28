@@ -161,10 +161,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                   </IconButton>
 
                 </label>
-                <Box>
-                  <Box component="h3">Headline</Box>
-                  <Box component="span">Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.</Box>
-                </Box>
+              
               </Box>
 
               <ProfileFormFields />

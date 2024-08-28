@@ -22,6 +22,6 @@ import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
   ],
   controllers: [ExhibitionController],
   providers: [ExhibitionService, EmailServices],
-  exports: [ExhibitionService],
+  exports: [ExhibitionService, MongooseModule],
 })
 export class ExhibitionModule {}

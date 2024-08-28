@@ -257,6 +257,7 @@ const myproject = () => {
         }
     };
 
+    const isProjectOwnerOrAdmin = userDetails.userType === 'Project Owner' || userDetails.userType === 'Admin';
 
 
     return (
@@ -361,7 +362,7 @@ const myproject = () => {
             )}
 
 
-            {(userType === 'Project Owner') && (
+            {(userType === 'Project Owner' || userType === 'Admin') && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -390,7 +391,7 @@ const myproject = () => {
                 </Box>
             )}
 
-            {(userType === 'Project Owner') && (
+            {(userType === 'Project Owner' || userType === 'Admin') && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -430,8 +431,8 @@ const myproject = () => {
 
 
 
+            {isProjectOwnerOrAdmin && (
             <Box sx={{ mt: 2 }}>
-                {userDetails.userType === 'Project Owner' && (
                     <>
                         {isShowingApplies ? (
                             <Box>
@@ -465,6 +466,7 @@ const myproject = () => {
                                 loader={<Typography>Loading...</Typography>}
                                 endMessage={<Typography>No more Projects</Typography>}
                             >
+                           
                                 <Box sx={{ mt: 2 }}>
                                     {filteredJobs.map((job) => (
                                         <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
@@ -535,6 +537,7 @@ const myproject = () => {
                                         </Card>
                                     ))}
                                 </Box>
+                     
                             </InfiniteScroll>
                         )}
                         <MyProjectDrawer
@@ -548,8 +551,9 @@ const myproject = () => {
                         />
 
                     </>
-                )}
             </Box>
+                )}
+            
 
             <Box sx={{ mt: 2, position: 'relative' }}>
                 {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (

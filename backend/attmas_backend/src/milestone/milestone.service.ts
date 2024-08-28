@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Milestone, MilestoneDocument } from './milestone.schema';
-import { User, UserDocument } from '../users/user.schema';
+import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 import { Jobs, JobsDocument } from 'src/projects/projects.schema';
-import { Apply, ApplyDocument } from '../apply/apply.schema';
+import { User, UserDocument } from 'src/users/user.schema';
 import { CreateMilestoneDto } from './create-milestone.dto';
+import { Milestone, MilestoneDocument } from './milestone.schema';
 
 @Injectable()
 export class MilestonesService {
@@ -19,7 +19,6 @@ export class MilestonesService {
   ) {}
 
   async create(createMilestoneDto: CreateMilestoneDto): Promise<Milestone> {
-    console.log('Received DTO:', createMilestoneDto);
     const {
       scopeOfWork,
       milestones,
@@ -30,19 +29,14 @@ export class MilestonesService {
     } = createMilestoneDto;
 
     const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new NotFoundException(`User with id ${userId} not found`);
-    }
+    if (!user) throw new NotFoundException(`User with id ${userId} not found`);
 
     const job = await this.jobsModel.findById(jobId);
-    if (!job) {
-      throw new NotFoundException(`Job with id ${jobId} not found`);
-    }
+    if (!job) throw new NotFoundException(`Job with id ${jobId} not found`);
 
     const apply = await this.appliesModel.findById(applyId);
-    if (!apply) {
+    if (!apply)
       throw new NotFoundException(`Application with id ${applyId} not found`);
-    }
 
     const milestone = new this.milestoneModel({
       scopeOfWork,
@@ -54,10 +48,6 @@ export class MilestonesService {
     });
 
     return milestone.save();
-  }
-
-  async getMilestonesByApplyId(applyId: string): Promise<Milestone[]> {
-    return this.milestoneModel.find({ applyId }).exec();
   }
 
   async submitComment(
@@ -72,9 +62,9 @@ export class MilestonesService {
 
     // Ensure the milestone exists before updating
     if (milestone.milestones[milestoneIndex]) {
-      // Update the specific milestone's status and comment
       milestone.milestones[milestoneIndex].isCommentSubmitted = true;
       milestone.milestones[milestoneIndex].status = 'Submitted';
+      milestone.milestones[milestoneIndex].submittedAt = new Date(); // Set the submission date
     }
 
     // Update comments array if needed
@@ -90,5 +80,13 @@ export class MilestonesService {
     }
 
     return milestone.milstonSubmitcomments;
+  }
+
+  async getMilestonesByApplyId(applyId: string): Promise<Milestone[]> {
+    const milestones = await this.milestoneModel.find({ applyId }).exec();
+    if (!milestones || milestones.length === 0) {
+      throw new NotFoundException(`No milestones found for applyId ${applyId}`);
+    }
+    return milestones;
   }
 }

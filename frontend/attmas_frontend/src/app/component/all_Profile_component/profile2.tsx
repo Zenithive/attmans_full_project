@@ -28,6 +28,7 @@ interface FormValues {
     qualification: string;
     organization: string;
     sector: string;
+    Headline: string;
     workAddress: string;
     designation: string;
     userType: string;
@@ -52,6 +53,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
+    const [labels, setLabels] = useState("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+
 
     const [showAddProductModal, setShowAddProductModal] = useState(false);
 
@@ -63,6 +66,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const dispatch = useAppDispatch();
 
     const validationSchema = Yup.object({
+        Headline: Yup.string().required('Headline is required'),
         qualification: Yup.string().required('Qualification is required'),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
@@ -104,12 +108,16 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const handleFocus = () => {
         setLabel("Share Solution");
+        setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
     };
 
 
     const handleBlur = () => {
         if (!formik.values.patentDetails) {
             setLabel("Provide details about the research product or solution that you intend to commercialize");
+        }
+        if (!formik.values.Headline) {
+            setLabels("Headline");
         }
     };
 
@@ -123,6 +131,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         if (value !== 'Innovators') {
             setShowProductDetails(false);
             formik.setFieldValue('productToMarket', 'No');
+            formik.setFieldValue('hasPatent', 'No');
+            formik.setFieldValue('patentDetails', '');
         } else {
             if (formik.values.productToMarket === 'Yes') {
                 setShowProductDetails(true);
@@ -177,6 +187,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const formik = useFormik<FormValues>({
         initialValues: {
+            Headline: '',
             qualification: '',
             organization: '',
             sector: '',
@@ -262,6 +273,28 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 width: '126%', position: 'relative', right: '26px'
                             }
                         }}>
+
+
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={5}
+                                    id="Headline"
+                                    label={labels}
+                                    color='secondary'
+                                    name="Headline"
+                                    onChange={formik.handleChange}
+                                    onBlur={(e) => {
+                                        formik.handleBlur(e);
+                                        handleBlur();
+                                    }}
+                                    onFocus={handleFocus}
+                                    value={formik.values.Headline}
+                                    error={formik.touched.Headline && Boolean(formik.errors.Headline)}
+                                    helperText={formik.touched.Headline && formik.errors.Headline}
+                                />
+                            </Grid>
                             <Grid color='secondary' item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -450,8 +483,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             <AddProductModal2
                                 open={showAddProductModal}
                                 onClose={() => setShowAddProductModal(false)}
-                                onSave={handleSaveProduct}
-                            />
+                                onSave={handleSaveProduct} />
 
 
                             {isInnovator && showProductDetails && (

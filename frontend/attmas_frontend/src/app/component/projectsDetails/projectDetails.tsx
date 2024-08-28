@@ -23,17 +23,25 @@ import { APIS } from '@/app/constants/api.constant';
 import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import UserDrawer from '../UserNameSeperate/UserDrawer';
 
 
 
 interface Milestone {
   scopeOfWork: string;
   milestones: {
-      name: string;
-      isCommentSubmitted: boolean;
+    _id: string;
+    isCommentSubmitted: boolean;
+    name: {
+      text: string;
+      timeFrame: string | null;
+    };
+    status: string;
+    submittedAt: string;
   }[];
   isCommentSubmitted?: boolean;
   status?: string;
+  milstonSubmitcomments: string[];
 }
 interface Apply {
   _id?: string;
@@ -48,6 +56,7 @@ interface Apply {
   lastName: string;
   availableSolution: string;
   SolutionUSP: string;
+  userId?: UserSchema;
 }
 
 interface ProjectDetailsDialogProps {
@@ -68,6 +77,9 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [applications, setApplications] = useState<Apply[]>([]);
   const [isAwardButtonVisible, setIsAwardButtonVisible] = useState(true);
 
+  const [selectedUser, setSelectedUser] = React.useState<string>('');
+  const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
+
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -78,7 +90,10 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   useEffect(() => {
     if (apply?._id) {
       axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
-        .then(response => setMilestones(response.data))
+        .then(response => {
+          console.log("Fetched milestones:", response.data);
+          setMilestones(response.data);
+        })
         .catch(error => console.error('Error fetching milestones:', error));
     }
   }, [apply]);
@@ -95,7 +110,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     }
   };
 
-  const handleReward = async (applicationId: string,Comment:string) => {
+  const handleReward = async (applicationId: string, Comment: string) => {
     try {
       if (!applicationId) return;
       console.log("applicationId", applicationId);
@@ -153,14 +168,24 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     setCurrentApplicationId(null);
   };
 
-  const handleConfirm = (comment:string) => {
+  const handleConfirm = (comment: string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
       console.log(`Awarding application with ID: ${currentApplicationId}`);
-      handleReward(currentApplicationId,comment)
+      handleReward(currentApplicationId, comment)
       // Close the dialog after confirming
       handleCloseConfirmationDialog();
     }
+  };
+
+  const handleUserClick = (username: string) => {
+    setSelectedUser(username);
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedUser('');
   };
 
   return (
@@ -211,8 +236,11 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   },
                 }}
               >
-                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status) }}>
-                  Status: {apply.status}, Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                  Status: {apply.status}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                  Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
                 </Typography>
               </Box>
               <Grid container spacing={2} flexDirection={'column'}>
@@ -221,7 +249,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     label="Title"
                     value={apply.title}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -231,16 +260,19 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     value={apply.description}
                     multiline
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
+                    onClick={() => handleUserClick(apply?.userId?.username || "")}
                     label="Applied User"
                     value={`${apply.firstName} ${apply.lastName}`}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -249,7 +281,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     label="Budget"
                     value={`${apply.currency === 'USD' ? '$' : '₹'}${apply.Budget}`}
                     fullWidth
-                    disabled
+                    color='secondary'
+                    aria-readonly
                     sx={{ mb: 2 }}
                   />
                 </Grid>
@@ -267,53 +300,126 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                               value={milestone.scopeOfWork}
                               multiline
                               fullWidth
-                              disabled
+                              color='secondary'
+                              aria-readonly
                               sx={{ mb: 2 }}
                             />
                           </Grid>
                           <Grid item xs={12}>
-                            {milestone.milestones.length > 0 ? (
+                            {milestone.milestones && milestone.milestones.length > 0 ? (
                               milestone.milestones.map((m, index) => (
-                                <TextField
-                                  key={index}
-                                  label={`Milestone ${index + 1}`}
-                                  value={m.name}
-                                  multiline
-                                  fullWidth
-                                  disabled
-                                  sx={{ mb: 2 }}
-                                />
+                                <Grid item xs={12} key={index}>
+                                  <Card sx={{ marginBottom: '20px' }}>
+                                    <CardContent>
+                                      <Typography variant="h6" gutterBottom>
+                                        Milestone {index + 1}
+                                      </Typography>
+                                      <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                          <TextField
+                                            label="Milestone"
+                                            value={m.name.text || 'No text available'}
+                                            multiline
+                                            fullWidth
+                                            color='secondary'
+                                            aria-readonly
+                                            sx={{ mb: 2 }}
+                                          />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                          <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={4}>
+                                              <TextField
+                                                label="Milestone Deadline Date"
+                                                value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
+                                                fullWidth
+                                                color='secondary'
+                                                aria-readonly
+                                                sx={{ mb: 2 }}
+                                              />
+                                            </Grid>
+                                            {userDetails.userType === 'Admin' && (
+                                              <>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    label="Status"
+                                                    value={m.status || 'No status available'}
+                                                    fullWidth
+                                                    color='secondary'
+                                                    aria-readonly
+                                                    sx={{ mb: 2 }}
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    label="Submitted Date"
+                                                    value={m.submittedAt ? dayjs(m.submittedAt).format('MM/DD/YYYY') : 'No Submitted Date available'}
+                                                    fullWidth
+                                                    color='secondary'
+                                                    aria-readonly
+                                                    sx={{ mb: 2 }}
+                                                  />
+                                                </Grid>
+                                              </>
+                                            )}
+                                          </Grid>
+                                        </Grid>
+
+                                        {userDetails.userType === 'Admin' && (
+                                          <Grid item xs={12}>
+                                            <TextField
+                                              label="Comment"
+                                              value={milestone.milstonSubmitcomments[index] || 'No comment submitted'}
+                                              multiline
+                                              fullWidth
+                                              color='secondary'
+                                              aria-readonly
+                                              sx={{ mb: 2 }}
+                                            />
+                                          </Grid>
+                                        )}
+                                      </Grid>
+                                    </CardContent>
+                                  </Card>
+                                </Grid>
+
                               ))
                             ) : (
                               <Typography>No milestones available</Typography>
                             )}
                           </Grid>
 
+
                         </Grid>
                       </CardContent>
                     </Card>
                   ))}
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Other available solutions"
-                    value={apply.availableSolution}
-                    fullWidth
-                    multiline
-                    disabled
-                    sx={{ mb: 2 }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Solution USP"
-                    value={apply.SolutionUSP}
-                    fullWidth
-                    multiline
-                    disabled
-                    sx={{ mb: 2 }}
-                  />
-                </Grid>
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Other available solutions"
+                      value={apply.availableSolution}
+                      fullWidth
+                      multiline
+                      color='secondary'
+                      aria-readonly
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Solution USP"
+                      value={apply.SolutionUSP}
+                      fullWidth
+                      multiline
+                      color='secondary'
+                      aria-readonly
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                </>
                 {apply.rejectComment && (
                   <Grid item xs={12}>
                     <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
@@ -388,6 +494,14 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         onConfirm={handleConfirm}
         message="Are you sure you want to award this application?"
       />
+
+      {selectedUser ? (
+        <UserDrawer
+          open={drawerOpen}
+          onClose={handleDrawerClose}
+          username={selectedUser}
+        />
+      ) : ""}
 
     </>
   );

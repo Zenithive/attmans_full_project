@@ -66,6 +66,7 @@ interface Visitor {
   timestamps: string;
   exhibitionId: string;
   userId:string;
+  interestType:string;
 }
 
 
@@ -84,7 +85,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const searchParams = useSearchParams();
-  const [isInterestedBtnShows, setIsInterestedBtnShows] = useState<Boolean>(true);
+  const [isBoothInterestedBtnVisible, setIsBoothInterestedBtnVisible] = useState(true); 
 
 
 
@@ -92,36 +93,48 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   useEffect(() => {
     const fetchVisitors = async () => {
       try {
+        setIsBoothInterestedBtnVisible(true);
         const boothId = booth?._id;
         const exhibitionId = searchParams.get('exhibitionId');
         if (!boothId || !exhibitionId) {
           console.error('Booth ID or Exhibition ID not found');
           return;
         }
-
-        const response = await axios.get(`${APIS.GET_BOOTH_VISITORS_BY_EXHIBITION}`, {
+  
+        const response = await axios.get('http://localhost:3000/interested-users/booth-visitors-by-exhibition', {
           params: {
             boothId,
             exhibitionId,
           },
         });
-
+  
         console.log('Fetched visitors:', response.data);
 
-        if (response.data.some((visitor: Visitor) => visitor.userId === userDetails._id)) {
-          setIsInterestedBtnShows(false);
+  
+ 
+        const hasUserShownInterest = response.data.some(
+          (visitor:Visitor) => visitor.userId === userDetails._id && visitor.interestType === 'InterestedUserForBooth'
+        );
+        
+  
+        if (hasUserShownInterest) {
+          console.log('Condition met: user has shown interest in booth');
+          setIsBoothInterestedBtnVisible(false);
         }
 
         setVisitors(response.data);
+  
       } catch (error) {
-        console.error('Error fetching visitors:', error);
+        console.error('Error fetching booth visitors:', error);
       }
+      
     };
-
+  
     if (view === 'boothDetails') {
       fetchVisitors();
     }
   }, [userDetails._id, searchParams, view, booth?._id]);
+  
 
 const openInterestedModals = () => setShowInterestedModals(true);
 const closeInterestedModals = () => setShowInterestedModals(false);
@@ -173,7 +186,7 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                   Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
                 </Typography>
                 <Box sx={{position:'relative',right:'45%',top:'15px'}}>
-                {(!userDetails.userType || userDetails.userType === 'Visitors') && isInterestedBtnShows && (
+                {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
               <Button
                 variant="contained"
                 color="primary"
