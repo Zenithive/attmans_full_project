@@ -161,7 +161,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         if (filter === 'All') return true;
         return app.status === filter;
     }).filter(app => {
-        if (userType === 'Project Owner') {
+        if (userType === 'Project Owner' || userType === 'Admin' ) {
             return (app.status === 'Awarded') && currentUser === viewingJob?.username;
         }
         if (userType === 'Innovators' || userType === 'Freelancer') {
@@ -340,7 +340,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 )}
                                 {userDetails && (
                                     userType === 'Project Owner' ||
-                                    (userType === 'Innovators' || userType === 'Freelancer')
+                                    (userType === 'Innovators' || userType === 'Freelancer'|| userType === 'Admin')
                                 ) && (
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, position: 'relative', left: '20%' }}>
                                             <a
@@ -446,7 +446,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
                                                                                                 {milestone.isCommentSubmitted ? (
                                                                                                     <>
-                                                                                                        {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer') && (
+                                                                                                        {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer'|| userType === 'Admin' ) && (
                                                                                                             <TextField
                                                                                                                 label="Submitted Milestone"
                                                                                                                 value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}

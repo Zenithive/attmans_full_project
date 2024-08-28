@@ -29,13 +29,19 @@ import UserDrawer from '../UserNameSeperate/UserDrawer';
 
 interface Milestone {
   scopeOfWork: string;
-  milestones: Array<{
+  milestones: {
+    _id: string;
+    isCommentSubmitted: boolean;
     name: {
       text: string;
       timeFrame: string | null;
     };
-  }>;
+    status: string;
+    submittedAt: string;
+  }[];
   isCommentSubmitted?: boolean;
+  status?: string;
+  milstonSubmitcomments: string[];
 }
 interface Apply {
   _id?: string;
@@ -302,29 +308,77 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                           <Grid item xs={12}>
                             {milestone.milestones && milestone.milestones.length > 0 ? (
                               milestone.milestones.map((m, index) => (
-                                <Grid container spacing={2} key={index}>
-                                  <Grid item xs={12} sm={6}>
-                                    <TextField
-                                      label={`Milestone ${index + 1}`}
-                                      value={m.name.text || 'No text available'}
-                                      multiline
-                                      fullWidth
-                                      color='secondary'
-                                      aria-readonly
-                                      sx={{ mb: 2 }}
-                                    />
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <TextField
-                                      label={`Milestone Deadline Date `}
-                                      value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
-                                      fullWidth
-                                      color='secondary'
-                                      aria-readonly
-                                      sx={{ mb: 2 }}
-                                    />
-                                  </Grid>
+                                <Grid item xs={12} key={index}>
+                                  <Card sx={{ marginBottom: '20px' }}>
+                                    <CardContent>
+                                      <Typography variant="h6" gutterBottom>
+                                        Milestone {index + 1}
+                                      </Typography>
+                                      <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                          <TextField
+                                            label="Milestone"
+                                            value={m.name.text || 'No text available'}
+                                            multiline
+                                            fullWidth
+                                            disabled
+                                            sx={{ mb: 2 }}
+                                          />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                          <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={4}>
+                                              <TextField
+                                                label="Milestone Deadline Date"
+                                                value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
+                                                fullWidth
+                                                disabled
+                                                sx={{ mb: 2 }}
+                                              />
+                                            </Grid>
+                                            {userDetails.userType === 'Admin' && (
+                                              <>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    label="Status"
+                                                    value={m.status || 'No status available'}
+                                                    fullWidth
+                                                    disabled
+                                                    sx={{ mb: 2 }}
+                                                  />
+                                                </Grid>
+                                                <Grid item xs={12} sm={4}>
+                                                  <TextField
+                                                    label="Submitted Date"
+                                                    value={m.submittedAt ? dayjs(m.submittedAt).format('MM/DD/YYYY') : 'No Submitted Date available'}
+                                                    fullWidth
+                                                    disabled
+                                                    sx={{ mb: 2 }}
+                                                  />
+                                                </Grid>
+                                              </>
+                                            )}
+                                          </Grid>
+                                        </Grid>
+
+                                        {userDetails.userType === 'Admin' && (
+                                          <Grid item xs={12}>
+                                            <TextField
+                                              label="Comment"
+                                              value={milestone.milstonSubmitcomments[index] || 'No comment submitted'}
+                                              multiline
+                                              fullWidth
+                                              disabled
+                                              sx={{ mb: 2 }}
+                                            />
+                                          </Grid>
+                                        )}
+                                      </Grid>
+                                    </CardContent>
+                                  </Card>
                                 </Grid>
+
                               ))
                             ) : (
                               <Typography>No milestones available</Typography>
@@ -337,28 +391,28 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Other available solutions"
-                    value={apply.availableSolution}
-                    fullWidth
-                    multiline
-                    color='secondary'
-                    aria-readonly
-                    sx={{ mb: 2 }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Solution USP"
-                    value={apply.SolutionUSP}
-                    fullWidth
-                    multiline
-                    color='secondary'
-                    aria-readonly
-                    sx={{ mb: 2 }}
-                  />
-                </Grid>
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Other available solutions"
+                      value={apply.availableSolution}
+                      fullWidth
+                      multiline
+                      disabled
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Solution USP"
+                      value={apply.SolutionUSP}
+                      fullWidth
+                      multiline
+                      disabled
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
+                </>
                 {apply.rejectComment && (
                   <Grid item xs={12}>
                     <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
