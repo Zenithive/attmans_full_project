@@ -52,6 +52,10 @@ export const ProposalSchema = new Schema({
     // New fields added
     userID: { type: String, required: false },
     userName: { type: String, required: false },
+    projectId:{ type: String, required: false },
+    projectTitle:{ type: String, required: false },
+    projectCurrency:{ type: String, required: false },
+    Status: { type: String, required: false },
 });
 
 export interface Proposal extends Document {
@@ -101,4 +105,8 @@ export interface Proposal extends Document {
     // New fields added to the interface
     userID?: string;
     userName?: string;
+    projectId:string;
+    projectTitle:string;
+    projectCurrency:string;
+    Status:string;
 }
