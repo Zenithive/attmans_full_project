@@ -321,7 +321,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                             value={m.name.text || 'No text available'}
                                             multiline
                                             fullWidth
-                                            disabled
+                                            color='secondary'
+                                            aria-readonly
                                             sx={{ mb: 2 }}
                                           />
                                         </Grid>
@@ -333,7 +334,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 label="Milestone Deadline Date"
                                                 value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
                                                 fullWidth
-                                                disabled
+                                                color='secondary'
+                                                aria-readonly
                                                 sx={{ mb: 2 }}
                                               />
                                             </Grid>
@@ -344,7 +346,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                     label="Status"
                                                     value={m.status || 'No status available'}
                                                     fullWidth
-                                                    disabled
+                                                    color='secondary'
+                                                    aria-readonly
                                                     sx={{ mb: 2 }}
                                                   />
                                                 </Grid>
@@ -353,7 +356,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                     label="Submitted Date"
                                                     value={m.submittedAt ? dayjs(m.submittedAt).format('MM/DD/YYYY') : 'No Submitted Date available'}
                                                     fullWidth
-                                                    disabled
+                                                    color='secondary'
+                                                    aria-readonly
                                                     sx={{ mb: 2 }}
                                                   />
                                                 </Grid>
@@ -369,7 +373,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                               value={milestone.milstonSubmitcomments[index] || 'No comment submitted'}
                                               multiline
                                               fullWidth
-                                              disabled
+                                              color='secondary'
+                                              aria-readonly
                                               sx={{ mb: 2 }}
                                             />
                                           </Grid>
@@ -398,7 +403,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                       value={apply.availableSolution}
                       fullWidth
                       multiline
-                      disabled
+                      color='secondary'
+                      aria-readonly
                       sx={{ mb: 2 }}
                     />
                   </Grid>
@@ -408,7 +414,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                       value={apply.SolutionUSP}
                       fullWidth
                       multiline
-                      disabled
+                      color='secondary'
+                      aria-readonly
                       sx={{ mb: 2 }}
                     />
                   </Grid>
