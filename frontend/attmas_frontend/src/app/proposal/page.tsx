@@ -37,6 +37,9 @@ const proposal = () => {
     const [projects, setProjects] = useState<Apply[]>([]);
 
 
+    const [selectedProject, setSelectedProject] = useState<Job | null>(null);
+
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { _id: userId } = userDetails;
 
@@ -111,7 +114,9 @@ const proposal = () => {
 
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
+        console.log("Viewing Job:", job);
         setViewingJob(job);
+        setSelectedProject(job);
         setApplyOpen(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
@@ -135,8 +140,19 @@ const proposal = () => {
     };
 
     const handleSubmit = async (values: any) => {
-        const finalValues = { ...formValues, ...values,userID: userDetails._id, 
-            userName: userDetails.username };
+        
+        const finalValues = { ...formValues, ...values,
+            userID: userDetails._id, 
+            userName: userDetails.username,
+            projectId: selectedProject?._id,               // Correct
+            projectTitle: selectedProject?.title,          // Correct
+            // projectCurrency: selectedProject?.jobDetails?.currency,
+            Status:'Pending'
+
+         };
+        console.log("finalValues.projectId", finalValues.projectId);
+        console.log("finalValues.projectTitle", finalValues.projectTitle);
+
         // Submit finalValues to the backend
         try {
             await axios.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
