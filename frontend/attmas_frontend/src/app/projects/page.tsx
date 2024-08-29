@@ -15,21 +15,70 @@ import { useCallback, useMemo } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
-import { Category, Subcategorys } from '@/app/constants/categories';
 import ApproveDialogForProject from '../component/approveforproject/approveforproject';
 import RejectDialogForProject from '../component/rejectforproject/rejectforproject';
-import { styled } from '@mui/material/styles';
+
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ProjectDrawer from '../component/projectDrwer/projectDrwer';
 import { Job, Apply } from './projectinterface';
-import { Expertiselevel } from './projectinterface';
-import { getSubcategorys } from './projectinterface';
 import { CustomChip } from './projectinterface';
 import { AddApplyForInnovatores } from '../component/innovatoreApply/innovatoreApply';
-
+import Filters, { FilterColumn } from '../component/filter/filter.component';
 
 
 const Jobs = () => {
+
+    const column:Array<FilterColumn> = [
+        {
+          name: "Project Name",
+          value: '',
+          type: "Texbox",
+          key: 'title'
+        },
+        {
+          name: "Project Owner",
+          value: '',
+          type: "Texbox",
+          key: 'ProjectOwner'
+        },
+        {
+          name: "Created Date",
+          value: '',
+          type: "Date",
+          key: 'createdAt'
+        },
+        {
+            name: "Deadline",
+            value: '',
+            type: "Date",
+            key: 'TimeFrame'
+        },
+        {
+            name: "Status",
+            value: '',
+            type: "Texbox",
+            key: 'status'
+        },
+        {
+          name: "Service",
+          value: '',
+          type: "Service",
+          key: 'SelectService'
+        },
+        {
+          name: "Category",
+          value: '',
+          type: "Category",
+          key: 'Category'
+        },
+        {
+          name: "Subject Matter Expertise",
+          value: '',
+          type: "SubCategory",
+          key: 'Subcategorys'
+        }
+      ];
+      
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
@@ -42,7 +91,6 @@ const Jobs = () => {
     const [filterOpen, setFilterOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
-    // const [filterType, setFilterType] = useState("all");
 
     const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; jobs: Job | null }>({ open: false, jobs: null });
     const [approveDialogOpen, setApproveDialogOpen] = useState<{
@@ -64,6 +112,7 @@ const Jobs = () => {
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [filter, setFilter] = useState('');
 
     const [filterType, setFilterType] = useState(() => {
         return userDetails.userType === 'Freelancer' ? 'Innovative Products' : 'all';
@@ -94,18 +143,18 @@ const Jobs = () => {
     };
 
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
+    const fetchJobs = useCallback(async (page: number) => {
         try {
-            console.log('Fetch Jobs Params:', { page, CategoryesFilter, SubcategorysFilter, ExpertiselevelFilter, statusFilter, filterType, selectedServices });
+            console.log('Fetch Jobs Params:', filter);
+            const paramString = `?page=${page}&${filter}`
+            const response = await axios.get(`${APIS.JOBS}${paramString}`, {
+                // params: {
+                //     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
+                //     status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
+                //     userId: filterType === 'mine' ? userId : undefined,
+                //     SelectService: selectedServices.join(','),
 
-            const response = await axios.get(APIS.JOBS, {
-                params: {
-                    page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
-                    status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
-                    userId: filterType === 'mine' ? userId : undefined,
-                    SelectService: selectedServices.join(','),
-
-                }
+                // }
             })
 
             if (response.data.length === 0) {
@@ -122,10 +171,7 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, filterType, userType, selectedServices]);
-
-
-    ///////////   All Applies fetch   ////////////
+    }, [userId, filterType, userType, filter]);
 
     const fetchApplies = useCallback(async () => {
         try {
@@ -180,21 +226,21 @@ const Jobs = () => {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
+            await fetchJobs(1);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus, filterType, selectedServices]);
+    }, [fetchJobs, filter]);
 
     useEffect(() => {
         refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices, userId]);
+    }, [filter, userId]);
 
     useEffect(() => {
         if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
+            fetchJobs(page);
         }
-    }, [page]);
+    }, [page, filter]);
 
     useEffect(() => {
         pubsub.subscribe('JobUpdated', refetch);
@@ -202,14 +248,6 @@ const Jobs = () => {
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
 
-        };
-    }, [refetch]);
-
-    useEffect(() => {
-        pubsub.subscribe('JobCreated', refetch);
-
-        return () => {
-            pubsub.unsubscribe('JobCreated', refetch);
         };
     }, [refetch]);
 
@@ -393,6 +431,15 @@ const Jobs = () => {
         setAppliedJobs(prev => prev.filter(id => id !== jobId));
     }, []);
 
+    const changeFilterOrPage = (paramStr: string) => {
+        if(paramStr && paramStr.length){
+          setFilter(paramStr);
+        }else{
+          setFilter('');
+        }
+        setPage(1);
+      }
+
 
     return (
 
@@ -421,37 +468,18 @@ const Jobs = () => {
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
 
+                <Box sx={{
+                    mr: 2, display: "flex"
+                }}>
+                    <Filters column={column} onFilter={changeFilterOrPage}></Filters>
+                    <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                </Box>
             </Box>
 
 
-            <Box sx={{
-                mt: {
-                    xs: 2, md: 0, float: 'right', position: 'relative', bottom: '20px', '@media (max-width: 767px)': {
-                        position: 'relative',
-                        float: 'right',
-                        top: '0px'
-                    }
-                }
-            }}>
-                <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
-            </Box>
 
-            <Box sx={{
-                position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
-                    position: 'relative',
-                    top: '8px',
-                    left: '-5px',
-                    marginBottom: '15px'
-                }
-            }}>
-                <Tooltip title="Filter" arrow>
-                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                        <FilterAltIcon />
-                    </IconButton>
-                </Tooltip>
-            </Box>
 
-            {filterOpen && (
+            {/* {filterOpen && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -503,8 +531,8 @@ const Jobs = () => {
                     />
 
                 </Box>
-            )}
-            {userType === 'Admin' && (
+            )} */}
+            {/* {userType === 'Admin' && (
                 <Box
                     sx={{
                         display: 'flex',
@@ -534,75 +562,25 @@ const Jobs = () => {
                     </ToggleButtonGroup>
                 </Box>
 
-            )}
+            )} */}
 
-            {/* {(userType === 'Project Owner') && ( */}
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    marginTop: '-15px',
-                    '@media (max-width: 767px)': {
-                        width: '100%',
-                        justifyContent: 'space-between',
-                        mt: 4,
-                        position: 'relative',
-                        left: '28px',
-                        marginBottom: '20%'
-                    },
-                }}
-            >
+
+            {/* <Box sx={{ display: 'flex', gap: 2 }}>
                 <ToggleButtonGroup
-                    value={filterType}
+                    value={selectedFilter}
                     exclusive
-                    onChange={handleFilterTypeChange}
-                    aria-label="filter exhibitions"
-                    sx={{ height: "30px" }}
+                    onChange={handleFilterChanges}
+                    aria-label="Apply Filter"
+                    sx={{ height: "30px", ml: 2 }}
                 >
-
-
-
-                    <ToggleButton value="all" aria-label="all exhibitions">
-                        All Projects
+                    <ToggleButton value="all">
+                        All
                     </ToggleButton>
-                    <ToggleButton value="Innovative Products" aria-label="Innovative Products">
-                        Innovative Products
-                    </ToggleButton>
-                    <ToggleButton value="Outsource Research and Development" aria-label="Outsource Research and Development">
-                        Outsource Research and Development
-                    </ToggleButton>
-                    <ToggleButton value="mine" aria-label="my exhibitions">
+                    <ToggleButton value="my">
                         My Projects
                     </ToggleButton>
-
-
                 </ToggleButtonGroup>
-            </Box>
-            {/* )} */}
-
-
-
-
-            {(userType === 'Innovators' || userType === 'Freelancer') && (
-
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <ToggleButtonGroup
-                        value={selectedFilter}
-                        exclusive
-                        onChange={handleFilterChanges}
-                        aria-label="Apply Filter"
-                        sx={{ height: "30px", ml: 2 }}
-                    >
-                        <ToggleButton value="all">
-                            All
-                        </ToggleButton>
-                        <ToggleButton value="my">
-                            My Projects
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-            )}
+            </Box> */}
 
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (

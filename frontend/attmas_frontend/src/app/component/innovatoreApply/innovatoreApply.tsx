@@ -13,10 +13,11 @@ import { Formik, Form, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
-import YouTubeIcon from '@mui/icons-material/YouTube';
 import AddProductModal2 from '../all_Profile_component/AddProductModal2';
 import { Product } from '../ProductTable';
 import NewProductTable from '../all_Profile_component/NewProductTable';
+import { DatePicker } from '@mui/x-date-pickers';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 
 
@@ -276,7 +277,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                 </Box>
                                 <Box sx={{ flex: '1 1 45%', marginBottom: '30px' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DateTimePicker
+                                        <DatePicker
+                                            format={DATE_FORMAT}
                                             label="Time Frame"
                                             value={values.TimeFrame}
                                             slotProps={{

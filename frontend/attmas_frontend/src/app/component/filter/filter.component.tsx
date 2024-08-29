@@ -1,7 +1,7 @@
 "use client";
 import * as React from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { Box, Button, ButtonGroup, IconButton, Menu, MenuItem, TextField } from '@mui/material';
+import { Box, Button, ButtonGroup, FormControl, IconButton, InputLabel, Menu, MenuItem, Select, TextField } from '@mui/material';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Form, Formik, FormikProps, useFormik } from 'formik';
@@ -9,6 +9,10 @@ import { getParamFromFilterArray } from '@/app/services/common.service';
 import CategoryComponent from '../EditProfileComponents/category.component';
 import SubjectMatterExpertise from '../SubjectMatterExpertise';
 import { options } from '@/app/constants/categories';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 export interface FilterColumn {
   name: string;
@@ -72,12 +76,28 @@ const Filters = ({ column, onFilter }: FiltersProps) => {
       return TextFieldFilter(item, formikObj);
     } else if (item.type === 'Category') {
       return <CategoryComponent key={item.key} keyToMap={item.key} formikObj={formikObj}></CategoryComponent>;
+    } else if (item.type === 'Date') {
+      return <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker
+          label={item.name}
+          format={DATE_FORMAT}
+          value={formikObj.values[item.key]}
+          onChange={(newValue: any) => formikObj.setFieldValue(item.key, newValue)}
+          sx={{ mr: 2, height: 37 }}
+          slotProps={{
+            textField: {
+              color: 'secondary',
+              size: 'small'
+            },
+          }}
+        />
+      </LocalizationProvider>
     } else if (item.type === 'SubCategory') {
       return (
         <>
-          <Box sx={{display: 'inline-flex', mr: 2}} id="subjectMatterExpBox">
+          <Box sx={{ display: 'inline-flex', mr: 2 }} id="subjectMatterExpBox">
             <SubjectMatterExpertise
-              selectedValues={(formikObj.values[item.key] || []) as Array<string> }
+              selectedValues={(formikObj.values[item.key] || []) as Array<string>}
               setSelectedValues={(values) => {
                 formikObj.setFieldValue(item.key, values);
               }}
@@ -87,7 +107,36 @@ const Filters = ({ column, onFilter }: FiltersProps) => {
           </Box>
         </>
       )
+    } else if (item.type === 'Service') {
+      return ServiceComponent(item, formikObj);
     }
+  }
+
+  const ServiceComponent = (item: NewFilterColumn,
+    formikObj: FormikProps<FormValues>) => {
+    return (
+      <Box sx={{mr:2, display: 'inline-flex'}}>
+        <FormControl fullWidth>
+
+          <InputLabel color='secondary' id="SelectService-label">{item.name}</InputLabel>
+          <Select
+            labelId="SelectService-label"
+            color='secondary'
+            sx={{minWidth: 200}}
+            id="SelectService"
+            name={item.key}
+            value={formikObj.values[item.key]}
+            onChange={formikObj.handleChange}
+            onBlur={formikObj.handleBlur}
+            label={item.name}
+            size="small"
+          >
+            <MenuItem value="Outsource Research and Development ">Outsource Research and Development  </MenuItem>
+            <MenuItem value="Innovative product">Innovative product</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+    );
   }
 
   const TextFieldFilter = (item: NewFilterColumn,
@@ -107,8 +156,14 @@ const Filters = ({ column, onFilter }: FiltersProps) => {
   }
 
   const onFilterSubmit = (values: FormValues) => {
-    console.log(values)
-    const paramString = getParamFromFilterArray(values);
+    const newValues: FormValues = { ...values };
+    for (let index = 0; index < column.length; index++) {
+      const element = column[index];
+      if (element.type === "Date" && newValues[element.key]) {
+        newValues[element.key] = dayjs(newValues[element.key] as string).format(DATE_FORMAT)
+      }
+    }
+    const paramString = getParamFromFilterArray(newValues);
     console.log(paramString)
     onFilter(paramString);
   }

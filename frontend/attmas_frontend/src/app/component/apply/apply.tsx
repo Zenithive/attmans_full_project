@@ -16,6 +16,8 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { DatePicker } from '@mui/x-date-pickers';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 interface AddApplyProps {
   open: boolean;
@@ -228,7 +230,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 }}
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateTimePicker
+              <DatePicker
+                  format={DATE_FORMAT}
                   label="Time Frame"
                   value={values.TimeFrame}
                   slotProps={{
@@ -298,7 +301,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
 
                                   <Grid item xs={12} sm={5}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                      <DateTimePicker
+                                    <DatePicker
+                                        format={DATE_FORMAT}
                                         label="Milestone Deadline Date"
                                         value={milestone.name.timeFrame ? dayjs(milestone.name.timeFrame) : null}
                                         onChange={(newValue) =>

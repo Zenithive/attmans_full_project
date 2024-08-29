@@ -113,11 +113,6 @@ export class UsersService {
         if (element) {
           filterQuery[key] = new RegExp(element, 'i');
         }
-        // if (!filterQuery.$or) {
-        //   filterQuery.$or = [{ [key]: new RegExp(element, 'i') }];
-        // } else {
-        //   filterQuery.$or.push({ [key]: new RegExp(element, 'i') });
-        // }
       }
     }
 
