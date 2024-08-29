@@ -100,6 +100,14 @@ export const APIS = {
     GET_CURRENT_DATE: `${SERVER_URL}/exhibitions/current-date`,
 
     APPLIED_JOBS: `${SERVER_URL}/apply/appliedJobs`,
+
+
+
+    APPLIED_JOBSFORADMIN: `${SERVER_URL}/Apply/appliedJobsForAdmin`,
+
+
+
+
     APPLIED_APPLICATION: `${SERVER_URL}/Apply`,
     JOB_DETAILS: `${SERVER_URL}/apply/jobDetails`,
 
@@ -124,5 +132,9 @@ export const APIS = {
 
     GET_BOOTH_VISITORS_BY_EXHIBITION: `${SERVER_URL}/booth-visitors-by-exhibition`,
 
-    GET_VISITORS_BY_INTEREST_TYPE:`${SERVER_URL}/interested-users/visitors-by-interest-type`
+    GET_VISITORS_BY_INTEREST_TYPE:`${SERVER_URL}/interested-users/visitors-by-interest-type`,
+
+
+    BILLING: `${SERVER_URL}/billing`,
+    GET_BILLING: (id: string) => `${SERVER_URL}/billing/${id}`,
 }

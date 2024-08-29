@@ -9,6 +9,7 @@ import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
 import dayjs from 'dayjs';
+import ApplicationsForProject from '../applicationforproject/applicationforproject';
 
 export interface Job {
     _id?: string;
@@ -35,7 +36,7 @@ export interface Job {
     rejectComment?: string;
 }
 
-interface Milestone {
+export interface Milestone {
     scopeOfWork: string;
     milestones: {
         _id: string;
@@ -46,13 +47,15 @@ interface Milestone {
         };
         status: string;
         submittedAt: string;
+        adminStatus: 'Pending' | 'Approved' | 'Rejected';
+        adminComments: string[];
     }[];
     isCommentSubmitted?: boolean;
     status?: string;
     milstonSubmitcomments: string[];
 }
 
-interface Apply {
+export interface Apply {
     _id?: string;
     title: string;
     jobDetails: any;
@@ -91,6 +94,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
     const isRejected = viewingJob?.status === 'Rejected';
     const [filter, setFilter] = useState<string>('All');
     const [applications, setApplications] = useState<Apply[]>([]);
+    const [filteredApplications, setFilteredApplications] = useState<Apply[]>([]);
     const [milestones, setMilestones] = useState<Record<string, Milestone[]>>({});
     const [viewingJobs, setViewingJobs] = useState<Job | null>(null);
     const [milestoneComments, setMilestoneComments] = useState<Record<string, string>>({});
@@ -98,6 +102,8 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [commentErrors, setCommentErrors] = useState<Record<string, boolean>>({});
     const [jobDetailKey, setJobDetailKey] = useState<number>(0);
+
+    
 
 
 
@@ -152,23 +158,27 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     fetchMilestonesForApply(app._id);
                 }
             });
+
+            const tmpfilteredApplications = applications.filter(app => {
+                if (filter === 'All') return true;
+                return app.status === filter;
+            }).filter(app => {
+                if (userType === 'Project Owner') {
+                    return (app.status === 'Awarded') && currentUser === viewingJob?.username;
+                }
+                if (userType === 'Admin') {
+                    return  (app.status === 'Awarded');
+                }
+                if (userType === 'Innovators' || userType === 'Freelancer') {
+                    return app.username === currentUser;
+                }
+                return true;
+            });
+
+            setFilteredApplications(tmpfilteredApplications);
         }
     }, [applications]);
 
-
-
-    const filteredApplications = applications.filter(app => {
-        if (filter === 'All') return true;
-        return app.status === filter;
-    }).filter(app => {
-        if (userType === 'Project Owner' || userType === 'Admin' ) {
-            return (app.status === 'Awarded') && currentUser === viewingJob?.username;
-        }
-        if (userType === 'Innovators' || userType === 'Freelancer') {
-            return app.username === currentUser;
-        }
-        return true;
-    });
 
     const forceUpdate = () => setUpdateState(prev => !prev);
 
@@ -340,7 +350,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 )}
                                 {userDetails && (
                                     userType === 'Project Owner' ||
-                                    (userType === 'Innovators' || userType === 'Freelancer'|| userType === 'Admin')
+                                    (userType === 'Innovators' || userType === 'Freelancer' || userType === 'Admin')
                                 ) && (
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, position: 'relative', left: '20%' }}>
                                             <a
@@ -361,164 +371,40 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
                             <Divider orientation="horizontal" flexItem />
 
-                            <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
-                                <DialogTitle sx={{ fontSize: '25px' }}>
-                                    Applications for Project
-                                </DialogTitle>
-                            </Box>
-                            <Box p={2}>
-                                {filteredApplications.length > 0 ? (
-                                    <Grid container spacing={2}>
-                                        {filteredApplications.map((app) => (
-                                            <Grid item xs={12} key={app._id}>
-                                                <Box sx={{
-                                                    border: '1px solid #ddd', borderRadius: '4px', p: 2, '@media (max-width: 767px)': {
-                                                        position: 'relative',
-                                                        width: '135%',
-                                                        right: '18%'
-                                                    }
-                                                }}>
-                                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                                                            <Box sx={{ flex: 1 }}>
-                                                                <TextField
-                                                                    label="Title"
-                                                                    value={app.title}
-                                                                    fullWidth
-                                                                    multiline
-                                                                    disabled
-                                                                    sx={{ mb: 1 }}
-                                                                />
-                                                            </Box>
-                                                            <Box sx={{ flex: 1 }}>
-                                                                <TextField
-                                                                    label="Applied User"
-                                                                    value={`${app.firstName} ${app.lastName}`}
-                                                                    fullWidth
-                                                                    multiline
-                                                                    disabled
-                                                                    sx={{ mb: 1 }}
-                                                                />
-                                                            </Box>
-                                                        </Box>
-                                                        <Grid container spacing={2}>
-                                                            <Grid item xs={12}>
-                                                                {milestones[app._id!]?.length > 0 ? (
-                                                                    milestones[app._id!].map((milestoneGroup, groupIndex) => (
-                                                                        <Grid container spacing={2} key={groupIndex}>
-                                                                            {milestoneGroup.milestones.length > 0 ? (
-                                                                                milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                                                                    <Grid item xs={12} key={milestoneIndex}>
-                                                                                        <Card variant="outlined" sx={{ mb: 1 }}>
-                                                                                            <CardContent>
-                                                                                                <Typography variant="h6" sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                                                    <span>
-                                                                                                        Milestone {milestoneIndex + 1}
-                                                                                                        {milestone.submittedAt && (
-                                                                                                            <Typography component="span" sx={{ ml: 2 , color: 'green',}}>
-                                                                                                               Submitted Date: ({dayjs(milestone.submittedAt).format('MMMM D, YYYY h:mm A')})
-                                                                                                            </Typography>
-                                                                                                        )}
-                                                                                                    </span>
+                            <ApplicationsForProject
+                                filteredApplications={filteredApplications}
+                                milestones={milestones}
+                                userType={userType}
+                                milestoneComments={milestoneComments}
+                                setMilestoneComments={setMilestoneComments}
+                                commentErrors={commentErrors}
+                                handleMilestoneSubmit={handleMilestoneSubmit}
+                                handleCommentChange={handleCommentChange}
+                                isSubmitting={isSubmitting}
 
-                                                                                                    {milestone.isCommentSubmitted && (
-                                                                                                        <Chip
-                                                                                                            label="Milestone submitted"
-                                                                                                            variant="outlined"
-                                                                                                            sx={{
-                                                                                                                borderColor: 'green',
-                                                                                                                color: 'green',
-                                                                                                                borderRadius: '16px',
-                                                                                                                ml: 2,
-                                                                                                            }}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                </Typography>
+                            />
 
-                                                                                                <TextField
-                                                                                                    label={`Milestone ${milestoneIndex + 1}`}
-                                                                                                    value={milestone.name.text}
-                                                                                                    multiline
-                                                                                                    fullWidth
-                                                                                                    disabled
-                                                                                                    sx={{ mb: 2 }}
-                                                                                                />
-
-                                                                                                {milestone.isCommentSubmitted ? (
-                                                                                                    <>
-                                                                                                        {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer'|| userType === 'Admin' ) && (
-                                                                                                            <TextField
-                                                                                                                label="Submitted Milestone"
-                                                                                                                value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
-                                                                                                                multiline
-                                                                                                                rows={4}
-                                                                                                                fullWidth
-                                                                                                                disabled
-                                                                                                                sx={{ mb: 2, color: 'blue' }}
-                                                                                                            />
-                                                                                                        )}
-                                                                                                    </>
-                                                                                                ) : (
-                                                                                                    (userType === 'Innovators' || userType === 'Freelancer') && (
-                                                                                                        <>
-                                                                                                            <TextField
-                                                                                                                label="Submit Milestone"
-                                                                                                                color="secondary"
-                                                                                                                multiline
-                                                                                                                rows={4}
-                                                                                                                value={milestoneComments[`${app._id}-${milestoneIndex}`] || ''}
-                                                                                                                onChange={(e) => handleCommentChange(app._id!, milestoneIndex, e.target.value)}
-                                                                                                                error={commentErrors[`${app._id}-${milestoneIndex}`]}
-                                                                                                                helperText={commentErrors[`${app._id}-${milestoneIndex}`] ? "Comment is required" : ""}
-                                                                                                                fullWidth
-                                                                                                                sx={{ mb: 2 }}
-                                                                                                            />
-                                                                                                            <Button
-                                                                                                                onClick={() => handleMilestoneSubmit(app._id!, milestoneIndex)}
-                                                                                                                disabled={milestone.isCommentSubmitted || isSubmitting}
-                                                                                                                sx={{ marginBottom: '40px' }}
-                                                                                                            >
-                                                                                                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Milestone'}
-                                                                                                            </Button>
-                                                                                                        </>
-                                                                                                    )
-                                                                                                )}
-
-                                                                                            </CardContent>
-                                                                                        </Card>
-                                                                                    </Grid>
-                                                                                ))
-                                                                            ) : (
-                                                                                <Typography>No milestones available</Typography>
-                                                                            )}
-                                                                        </Grid>
-                                                                    ))
-                                                                ) : (
-                                                                    <Typography>No milestones available</Typography>
-                                                                )}
-                                                            </Grid>
-                                                        </Grid>
-                                                        <Box sx={{ position: 'relative' }}>
-                                                            <JobDetail key={jobDetailKey} jobId={viewingJob._id || ''} applyId={app._id} onCommentSubmitted={onCommentSubmitted} />
-                                                            {viewingJob && (
-                                                                <AddComment
-                                                                    jobId={viewingJob._id || ''}
-                                                                    applyId={app._id}
-                                                                    onCommentSubmitted={() => {
-                                                                        onCommentSubmitted();
-                                                                        setJobDetailKey((prev) => prev + 1);
-                                                                    }}
-                                                                />
-                                                            )}
-                                                        </Box>
-                                                    </Box>
-                                                </Box>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
-                                ) : (
-                                    <Typography>No applications available</Typography>
-                                )}
+                            <Box sx={{ position: 'relative' }}>
+                                {filteredApplications.map((app) => (
+                                    <React.Fragment key={app._id}>
+                                        <JobDetail
+                                            key={jobDetailKey}
+                                            jobId={viewingJob._id || ''}
+                                            applyId={app._id || ''}
+                                            onCommentSubmitted={onCommentSubmitted}
+                                        />
+                                        {viewingJob && (
+                                            <AddComment
+                                                jobId={viewingJob._id || ''}
+                                                applyId={app._id || ''}
+                                                onCommentSubmitted={() => {
+                                                    onCommentSubmitted();
+                                                    setJobDetailKey((prev) => prev + 1);
+                                                }}
+                                            />
+                                        )}
+                                    </React.Fragment>
+                                ))}
                             </Box>
 
                         </Box>

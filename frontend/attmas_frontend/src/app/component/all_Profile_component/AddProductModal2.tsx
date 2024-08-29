@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     Modal,
     Box,
@@ -14,7 +14,7 @@ interface Product {
     productName: string;
     productDescription: string;
     productQuantity: number;
-    videourlForproduct: string;
+    videourlForproduct?: string;
     targetaudience: string;
     problemaddressed: string;
     technologyused: string;
@@ -33,9 +33,11 @@ interface AddProductModalProps2 {
     open: boolean;
     onClose: () => void;
     onSave: (productDetails: Product) => void;
+    product: Product | null;
+    viewOnly: boolean;
 }
 
-const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSave}) => {
+const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSave, product, viewOnly }) => {
     const [productName, setProductName] = React.useState('');
     const [productDescription, setProductDescription] = React.useState('');
     const [productQuantity, setProductQuantity] = React.useState(0);
@@ -53,75 +55,83 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
     const [productPrice, setProductPrice] = React.useState(0);
     const [currency, setCurrency] = React.useState('INR');
 
-    const reset = () => {
-        setProductName('');
-        setProductDescription('');
-        setProductQuantity(0);
-        setVideourlForproduct('');
-        setTargetaudience('');
-        setProblemaddressed('');
-        setTechnologyused('');
-        setStageofdevelopmentdropdown('');
-        setIntellectualpropertyconsiderations('');
-        setCompetitiveAdvantages('');
-        setFeasibilityofthesolution('');
-        setHowdoesthesolutionwork('');
-        setPotentialbenefits('');
-        setChallengesorrisks('');
-        setProductPrice(0);
-        setCurrency('INR');
-    };
+    useEffect(() => {
+        if (product) {
+            setProductName(product.productName);
+            setProductDescription(product.productDescription);
+            setProductQuantity(product.productQuantity);
+            setVideourlForproduct(product.videourlForproduct || '');
+            setTargetaudience(product.targetaudience);
+            setProblemaddressed(product.problemaddressed);
+            setTechnologyused(product.technologyused);
+            setStageofdevelopmentdropdown(product.stageofdevelopmentdropdown);
+            setIntellectualpropertyconsiderations(product.intellectualpropertyconsiderations);
+            setCompetitiveAdvantages(product.CompetitiveAdvantages);
+            setFeasibilityofthesolution(product.feasibilityofthesolution);
+            setHowdoesthesolutionwork(product.howdoesthesolutionwork);
+            setPotentialbenefits(product.potentialbenefits);
+            setChallengesorrisks(product.challengesorrisks);
+            setProductPrice(product.productPrice);
+            setCurrency(product.currency);
+        }
+    }, [product]);
 
-    // React.useEffect(() => {
-    //     if (selectedProduct) {
-    //         setProductName(selectedProduct.productName || '');
-    //         setProductDescription(selectedProduct.productDescription || '');
-    //         setProductQuantity(selectedProduct.productQuantity || '');
-    //         setVideourlForproduct(selectedProduct.videourlForproduct || '');
-    //         setTargetaudience(selectedProduct.targetaudience || '');
-    //         setProblemaddressed(selectedProduct.problemaddressed || '');
-    //         setTechnologyused(selectedProduct.technologyused || '');
-    //         setStageofdevelopmentdropdown(selectedProduct.stageofdevelopmentdropdown || '');
-    //         setIntellectualpropertyconsiderations(selectedProduct.intellectualpropertyconsiderations || '');
-    //         setCompetitiveAdvantages(selectedProduct.CompetitiveAdvantages || '');
-    //         setFeasibilityofthesolution(selectedProduct.feasibilityofthesolution || '');
-    //         setHowdoesthesolutionwork(selectedProduct.howdoesthesolutionwork || '');
-    //         setPotentialbenefits(selectedProduct.potentialbenefits || '');
-    //         setChallengesorrisks(selectedProduct.challengesorrisks || '');
-    //         setProductPrice(selectedProduct.productPrice || '');
-    //         setCurrency(selectedProduct.currency || '');
-    //     }
-    // }, [selectedProduct]);
     
 
     const handleSave = () => {
         const newProduct = {
             id: Date.now().toString(),
-            productName, 
-            productDescription, 
-            productQuantity, 
-            videourlForproduct, 
-            targetaudience, 
-            problemaddressed, 
-            technologyused, 
-            stageofdevelopmentdropdown, 
-            intellectualpropertyconsiderations, 
-            CompetitiveAdvantages, 
-            feasibilityofthesolution, 
-            howdoesthesolutionwork, 
-            potentialbenefits, 
-            challengesorrisks, 
-            productPrice, 
+            productName,
+            productDescription,
+            productQuantity,
+            videourlForproduct,
+            targetaudience,
+            problemaddressed,
+            technologyused,
+            stageofdevelopmentdropdown,
+            intellectualpropertyconsiderations,
+            CompetitiveAdvantages,
+            feasibilityofthesolution,
+            howdoesthesolutionwork,
+            potentialbenefits,
+            challengesorrisks,
+            productPrice,
             currency
         };
+    
         onSave(newProduct);
-        reset(); 
         onClose();
+
+        
+    
     };
+    
 
     const handleClose = () => {
-        reset(); // Reset the form fields when the modal closes
         onClose();
+
+        setTimeout(()=>{
+
+            // Reset all form fields
+            setProductName('');
+            setProductDescription('');
+            setProductQuantity(0);
+            setVideourlForproduct('');
+            setTargetaudience('');
+            setProblemaddressed('');
+            setTechnologyused('');
+            setStageofdevelopmentdropdown('');
+            setIntellectualpropertyconsiderations('');
+            setCompetitiveAdvantages('');
+            setFeasibilityofthesolution('');
+            setHowdoesthesolutionwork('');
+            setPotentialbenefits('');
+            setChallengesorrisks('');
+            setProductPrice(0);
+            setCurrency('INR');
+        }, 200)
+
+        
     };
 
     return (
@@ -143,18 +153,19 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                 }}
             >
                 <Typography variant="h6" component="h2" mb={2}>
-                    {/* {readOnly ? 'View Product Details' : 'Add Product Details'} */}
+                    {viewOnly ? 'View Product Details' : (product ? 'Edit Product Details' : 'Add Product Details')}
                 </Typography>
 
                 <Grid container spacing={2}>
+
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
                             label="Product Name"
                             color="secondary"
                             value={productName}
-                            onChange={(e) => setProductName(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setProductName(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -166,8 +177,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             multiline
                             color="secondary"
                             value={productDescription}
-                            onChange={(e) => setProductDescription(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setProductDescription(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -179,8 +190,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             multiline
                             color="secondary"
                             value={howdoesthesolutionwork}
-                            onChange={(e) => setHowdoesthesolutionwork(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setHowdoesthesolutionwork(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -191,7 +202,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             type="number"
                             value={productQuantity}
-                            onChange={(e) => setProductQuantity(parseInt(e.target.value))}
+                            onChange={(e) => !viewOnly && setProductQuantity(parseInt(e.target.value))}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -201,8 +213,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Video URL"
                             color="secondary"
                             value={videourlForproduct}
-                            onChange={(e) => setVideourlForproduct(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setVideourlForproduct(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -213,7 +225,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             color="secondary"
                             type="number"
                             value={productPrice}
-                            onChange={(e) => setProductPrice(parseFloat(e.target.value))}
+                            onChange={(e) => !viewOnly && setProductPrice(parseFloat(e.target.value))}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -224,7 +237,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Currency"
                             color="secondary"
                             value={currency}
-                            onChange={(e) => setCurrency(e.target.value)}
+                            onChange={(e) => !viewOnly && setCurrency(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         >
                             <MenuItem value="INR">INR</MenuItem>
                             <MenuItem value="USD">USD</MenuItem>
@@ -238,8 +252,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Stage of Development"
                             color="secondary"
                             value={stageofdevelopmentdropdown}
-                            onChange={(e) => setStageofdevelopmentdropdown(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setStageofdevelopmentdropdown(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         >
                             <MenuItem value="prototype">Prototype</MenuItem>
                             <MenuItem value="market-ready">Market-Ready</MenuItem>
@@ -254,8 +268,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Intellectual Property Considerations"
                             color="secondary"
                             value={intellectualpropertyconsiderations}
-                            onChange={(e) => setIntellectualpropertyconsiderations(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setIntellectualpropertyconsiderations(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         >
                             <MenuItem value="yes">Yes</MenuItem>
                             <MenuItem value="no">No</MenuItem>
@@ -268,8 +282,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Target Audience"
                             color="secondary"
                             value={targetaudience}
-                            onChange={(e) => setTargetaudience(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setTargetaudience(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -279,8 +293,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Technology Used"
                             color="secondary"
                             value={technologyused}
-                            onChange={(e) => setTechnologyused(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setTechnologyused(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -292,10 +306,11 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Problem Addressed"
                             color="secondary"
                             value={problemaddressed}
-                            onChange={(e) => setProblemaddressed(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setProblemaddressed(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
+
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
@@ -304,8 +319,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Competitive Advantages"
                             color="secondary"
                             value={CompetitiveAdvantages}
-                            onChange={(e) => setCompetitiveAdvantages(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setCompetitiveAdvantages(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -317,8 +332,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Feasibility of the Solution"
                             color="secondary"
                             value={feasibilityofthesolution}
-                            onChange={(e) => setFeasibilityofthesolution(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setFeasibilityofthesolution(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -330,8 +345,8 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Potential Benefits"
                             color="secondary"
                             value={potentialbenefits}
-                            onChange={(e) => setPotentialbenefits(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setPotentialbenefits(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
@@ -343,25 +358,26 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             label="Challenges or Risks"
                             color="secondary"
                             value={challengesorrisks}
-                            onChange={(e) => setChallengesorrisks(e.target.value)}
-                            // InputProps={{ readOnly }}
+                            onChange={(e) => !viewOnly && setChallengesorrisks(e.target.value)}
+                            InputProps={{ readOnly: viewOnly }}
                         />
                     </Grid>
 
-                    <Grid item xs={12} display="flex" justifyContent="space-between" mt={2}>
-                        <Button variant="outlined" onClick={handleClose}>
-                            Cancel
-                        </Button>
-                        {/* {!readOnly && ( */}
-                            <Button variant="contained" onClick={handleSave}>
-                                Save
-                            </Button>
-                        {/* // )} */}
-                    </Grid>
                 </Grid>
+
+                <Box mt={2} display="flex" justifyContent="flex-end">
+                    {!viewOnly && (
+                        <Button onClick={handleSave} variant="contained" color="primary">
+                            Save
+                        </Button>
+                    )}
+                    <Button onClick={handleClose} variant="outlined" color="secondary" sx={{ ml: 2 }}>
+                        Close
+                    </Button>
+                </Box>
             </Box>
         </Modal>
     );
 };
 
-export default AddProductModal2
+export default AddProductModal2;

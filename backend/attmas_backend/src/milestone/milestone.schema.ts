@@ -18,6 +18,12 @@ export class Milestone {
         isCommentSubmitted: { type: Boolean, default: false },
         status: { type: String, default: 'Pending' },
         submittedAt: { type: Date },
+        adminStatus: {
+          type: String,
+          enum: ['Pending', 'Approved', 'Rejected'],
+          default: 'Pending',
+        },
+        adminComments: { type: [String], default: [] },
       },
     ],
     required: true,
@@ -30,6 +36,8 @@ export class Milestone {
     isCommentSubmitted: boolean;
     status: string;
     submittedAt?: Date;
+    adminStatus: 'Pending' | 'Approved' | 'Rejected';
+    adminComments: string[];
   }[];
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })
@@ -43,6 +51,9 @@ export class Milestone {
 
   @Prop({ type: [String], default: [] })
   milstonSubmitcomments: string[];
+
+  @Prop({ type: [String], default: [] })
+  adminComments: string[];
 
   @Prop({ default: false })
   isCommentSubmitted: boolean;

@@ -466,7 +466,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Category"
+                    label="Preferred Category"
                     value={viewingJob.Category.join(', ')}
                     fullWidth
                     multiline
@@ -477,7 +477,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Subcategories"
+                    label="Subject Matter Expertise "
                     value={viewingJob.Subcategorys.join(', ')}
                     fullWidth
                     multiline
