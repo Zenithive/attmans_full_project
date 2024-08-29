@@ -57,9 +57,11 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
 
     const [showAddProductModal, setShowAddProductModal] = useState(false);
+    const [viewOnly, setViewOnly] = useState(false);
 
     const [openModal, setOpenModal] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -80,7 +82,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 productDescription: Yup.string().nullable(),
                 productQuantity: Yup.number().nullable(),
                 videourlForproduct: Yup.string().nullable(),
-                // productType: Yup.string().nullable(),
                 technologyused: Yup.string().nullable(),
                 targetaudience: Yup.string().nullable(),
                 problemaddressed: Yup.string().nullable(),
@@ -96,11 +97,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             })
         ),
         hasPatent: Yup.string().nullable(),
-        // patentDetails: Yup.string().when('hasPatent', {
-        //     is: 'Yes',
-        //     then: Yup.string().required('Patent details are required'),
-        //     otherwise: Yup.string().nullable()
-        // }),
+
     });
 
 
@@ -146,30 +143,78 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
         setShowProductDetails(value === 'Yes');
     };
 
+    // const handleAddProduct = () => {
+    //     setShowAddProductModal(true); // Open the modal
+    //     setOpenModal(true)
+    // };
+
     const handleAddProduct = () => {
-        setShowAddProductModal(true); // Open the modal
-        setOpenModal(true)
+        setEditingProduct(null); // Clear any existing product being edited
+        setViewOnly(false); // Ensure it's in edit mode
+        setShowAddProductModal(true);
     };
 
-
-
-    // // Handle saving the new product
     // const handleSaveProduct = (newProduct: Product) => {
     //     console.log('New Product:', newProduct);
-    //     setProducts([...products, newProduct]);
+    //     setProducts((prevProducts) => [...prevProducts, newProduct]);
+    //     formik.setFieldValue('products', [...formik.values.products, newProduct]);
     // };
+
     const handleSaveProduct = (newProduct: Product) => {
-        console.log('New Product:', newProduct);
-        setProducts((prevProducts) => [...prevProducts, newProduct]);
-        formik.setFieldValue('products', [...formik.values.products, newProduct]);
+        console.log('Product to Save:', newProduct);
+
+        // Check if a product is provided for editing
+        if (editingProduct) {
+            // Update existing product
+            setProducts((prevProducts) =>
+                prevProducts.map((p) =>
+                    p.id === editingProduct.id ? { ...p, ...newProduct } : p
+                )
+            );
+            formik.setFieldValue(
+                'products',
+                formik.values.products.map((p: Product) =>
+                    p.id === editingProduct.id ? { ...p, ...newProduct } : p
+                )
+            );
+        } else {
+            // Add new product
+            setProducts((prevProducts) => [...prevProducts, newProduct]);
+            formik.setFieldValue('products', [...formik.values.products, newProduct]);
+        }
+
+        // Close modal and reset form
+        setShowAddProductModal(false);
     };
 
-    const handleViewProduct = (id: string) => {
-        // Implement view product logic here
+
+    // const handleViewProduct = (product: Product) => {
+    //     // Set the product to be viewed
+    //     setEditingProduct(product);
+    //     // Open the modal
+    //     setShowAddProductModal(true);
+    //     console.log("Viewing Product", product);
+    // };
+
+    const handleViewProduct = (product: Product) => {
+        setEditingProduct(product);
+        setViewOnly(true);
+        setShowAddProductModal(true);
     };
 
-    const handleEditProduct = (id: string) => {
-        // Implement edit product logic here
+
+    // const handleEditProduct = (product: Product) => {
+
+    //     setEditingProduct(product);
+    //     // Implement edit product logic here
+    //     setShowAddProductModal(true);
+    //     console.log("Product", product);
+    // };
+
+    const handleEditProduct = (product: Product) => {
+        setEditingProduct(product);
+        setViewOnly(false);
+        setShowAddProductModal(true);
     };
 
     const handleDeleteProduct = (id: string) => {
@@ -473,17 +518,21 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     <Button variant="contained" onClick={handleAddProduct}>
                                         Add Product
                                     </Button>
-                                    {/* ProductTable and other relevant UI components */}
+
                                 </Grid>
 
 
                             )}
 
-
                             <AddProductModal2
+
                                 open={showAddProductModal}
-                                onClose={() => setShowAddProductModal(false)}
-                                onSave={handleSaveProduct} />
+                                onClose={() => {setShowAddProductModal(false); setEditingProduct(null)}}
+                                onSave={handleSaveProduct}
+                                product={editingProduct}
+                                viewOnly={viewOnly} // Pass the viewOnly flag
+
+                            />
 
 
                             {isInnovator && showProductDetails && (

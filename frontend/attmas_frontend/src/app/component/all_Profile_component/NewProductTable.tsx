@@ -8,8 +8,8 @@ import { Product } from '../ProductTable'; // Assuming Product interface include
 
 interface NewProductTableProps {
     products: Product[];
-    onView: (id: string) => void;
-    onEdit: (id: string) => void;
+    onView: (product: Product) => void;
+    onEdit: (product: Product) => void;
     onDelete: (id: string) => void;
 }
 
@@ -32,9 +32,10 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onView, onE
                 <TableHead>
                     <TableRow>
                         <TableCell>Product Name</TableCell>
-                        <TableCell>Price</TableCell> {/* Updated header */}
+                        <TableCell>Price</TableCell>
                         <TableCell>Quantity</TableCell>
-                        <TableCell>Video</TableCell> {/* Updated header */}
+                        <TableCell>Stage of Development</TableCell> {/* New column */}
+                        <TableCell>Video</TableCell>
                         <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
@@ -42,8 +43,9 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onView, onE
                     {products.map((product) => (
                         <TableRow key={product.id}>
                             <TableCell>{product.productName}</TableCell>
-                            <TableCell>{`${getCurrencySymbol(product.currency)} ${product.productPrice}`}</TableCell> {/* Combined price and currency */}
+                            <TableCell>{`${getCurrencySymbol(product.currency)} ${product.productPrice}`}</TableCell>
                             <TableCell>{product.productQuantity}</TableCell>
+                            <TableCell>{product.stageofdevelopmentdropdown}</TableCell> {/* Displaying stage of development */}
                             <TableCell>
                                 {product.videourlForproduct && (
                                     <IconButton
@@ -55,10 +57,10 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onView, onE
                                 )}
                             </TableCell>
                             <TableCell>
-                                <IconButton onClick={() => onView(product.id)} aria-label="view">
+                                <IconButton onClick={() => onView(product)} aria-label="view">
                                     <VisibilityIcon />
                                 </IconButton>
-                                <IconButton onClick={() => onEdit(product.id)} aria-label="edit">
+                                <IconButton onClick={() => onEdit(product)} aria-label="edit">
                                     <EditIcon />
                                 </IconButton>
                                 <IconButton onClick={() => onDelete(product.id)} aria-label="delete">
