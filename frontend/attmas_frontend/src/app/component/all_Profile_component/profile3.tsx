@@ -1,4 +1,3 @@
-"use client"
 import React, { useState, useEffect } from 'react';
 import { Box, Container, CssBaseline, Typography, CircularProgress, Autocomplete, TextField, Button, Checkbox } from '@mui/material';
 import { useFormik } from 'formik';
@@ -10,8 +9,8 @@ import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import { categories, options } from '@/app/constants/categories';
-import SubjectMatterExpertise from '../SubjectMatterExpertise'; // Import the new component
-import TermsAndConditions from './TermsAndConditions';
+import SubjectMatterExpertise from '../SubjectMatterExpertise';
+import TermsAndConditionsModal from './TermsAndConditionsModal'; // Import the new modal component
 
 interface ProfileForm3Props {
   onPrevious: () => void;
@@ -21,6 +20,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control the modal
   const router = useRouter();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -87,6 +87,19 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     formik.setFieldValue('categories', updatedCategories);
   };
 
+  const handleSaveClick = () => {
+    setIsModalOpen(true); // Open the modal when "Save" is clicked
+  };
+
+  const handleModalConfirm = () => {
+    setIsModalOpen(false);
+    formik.handleSubmit(); // Submit the form when "OK" is clicked in the modal
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false); // Close the modal when "Cancel" is clicked
+  };
+
   return (
     <Container component="main" maxWidth="md">
       <CssBaseline />
@@ -127,7 +140,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
               justifyContent: 'space-between',
-              gap: 2, 
+              gap: 2,
             }}
           >
             <Autocomplete
@@ -145,7 +158,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                   label="Preferred Category"
                   placeholder="Select categories"
                   color="secondary"
-                  sx={{ width: '100%' }} 
+                  sx={{ width: '100%' }}
                 />
               )}
               renderOption={(props, option, { selected }) => (
@@ -164,49 +177,50 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
 
             <Box sx={{ width: '100%', maxWidth: { xs: '100%', md: '45%' } }}>
               <SubjectMatterExpertise
-                            selectedValues={selectedValues}
-                            setSelectedValues={(values) => {
-                              setSelectedValues(values);
-                              formik.setFieldValue('subcategories', values);
-                            } }
-                            options={options} Option={[]} value={[]} onChange={function (selectedSubjects: string[]): void {
-                              throw new Error('Function not implemented.');
-                            } }  />
+                selectedValues={selectedValues}
+                setSelectedValues={(values) => {
+                  setSelectedValues(values);
+                  formik.setFieldValue('subcategories', values);
+                }}
+                options={options}
+                Option={[]}
+                value={[]}
+                onChange={(selectedSubjects: string[]): void => {}}
+              />
             </Box>
           </Box>
 
-          <Button
-            type="button"
-            variant="contained"
-            size="small"
-            sx={{ mt: 2, mb: 2, px: 3, py: 1, marginLeft: "0.1%", top: '65px' }}
-            onClick={onPrevious}
-          >
-            Back
-          </Button>
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-            <LoadingButton
-              type="submit"
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+            <Button
+              type="button"
               variant="contained"
               size="small"
+              sx={{ px: 3, py: 1 }}
+              onClick={onPrevious}
+            >
+              Back
+            </Button>
+
+            <LoadingButton
               loading={loading}
-              loadingIndicator={<CircularProgress size={24} />}
-              sx={{ mt: 2, mb: 2, ml: '84.5%', width: '10%', height: '40px' ,
-                '@media (max-width: 767px)': {
-                  position:'relative',
-                  bottom:'22px'
-                }
-              }}
+              onClick={handleSaveClick} // Open modal instead of direct submission
+              type="button" // Change to button to avoid default form submission
+              variant="contained"
+              size="small"
+              sx={{ px: 3, py: 1 }}
+              color="primary"
             >
               Save
             </LoadingButton>
-
-
           </Box>
-
         </Box>
-    <TermsAndConditions/>
+
+        {/* Include the Terms and Conditions Modal */}
+        <TermsAndConditionsModal
+          open={isModalOpen}
+          onClose={handleModalClose}
+          onConfirm={handleModalConfirm}
+        />
       </Box>
     </Container>
   );
