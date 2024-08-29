@@ -14,12 +14,15 @@ import {
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import ProductTable, { Product } from '../ProductTable';
+import { userType } from '@/app/services/user.access.service';
+import AddProductModal2 from '../all_Profile_component/AddProductModal2';
+import NewProductTable from '../all_Profile_component/NewProductTable';
 
 interface FormValues {
     qualification: string;
@@ -32,23 +35,38 @@ interface FormValues {
     productToMarket: string;
     products: Product[];
     hasPatent: string;
-    patentDetails: string;
+    patentDetails: string; // New field
     username: string;
     userId: string;
 }
 
+
+
 const EditProfile2: React.FC = () => {
+
     const [isFreelancer, setIsFreelancer] = useState(false);
+
+    const [isInnovator, setIsInnovator] = useState(false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
     const [labels, setLabels] = useState("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
 
+
+    const [showAddProductModal, setShowAddProductModal] = useState(false);
+    const [viewOnly, setViewOnly] = useState(false);
+
+    const [openModal, setOpenModal] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+    const dispatch = useAppDispatch();
+
     const validationSchema = Yup.object({
-        Headline: Yup.string().required("Headline is required"),
+        Headline: Yup.string().required('Headline is required'),
         qualification: Yup.string().required('Qualification is required'),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
@@ -60,66 +78,26 @@ const EditProfile2: React.FC = () => {
             Yup.object().shape({
                 productName: Yup.string().nullable(),
                 productDescription: Yup.string().nullable(),
-                productType: Yup.string().nullable(),
-                productPrice: Yup.string().nullable(),
+                productQuantity: Yup.number().nullable(),
+                videourlForproduct: Yup.string().nullable(),
+                technologyused: Yup.string().nullable(),
+                targetaudience: Yup.string().nullable(),
+                problemaddressed: Yup.string().nullable(),
+                productPrice: Yup.number().nullable(),
+                intellectualpropertyconsiderations: Yup.string().nullable(),
+                CompetitiveAdvantages: Yup.string().nullable(),
+                feasibilityofthesolution: Yup.string().nullable(),
+                stageofdevelopmentdropdown: Yup.string().nullable(),
+                howdoesthesolutionwork: Yup.string().nullable(),
+                challengesorrisks: Yup.string().nullable(),
+                potentialbenefits: Yup.string().nullable(),
                 currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
             })
         ),
         hasPatent: Yup.string().nullable(),
+
     });
 
-    const formik = useFormik<FormValues>({
-        initialValues: {
-            Headline: '',
-            qualification: '',
-            organization: '',
-            sector: '',
-            workAddress: '',
-            designation: '',
-            userType: '',
-            productToMarket: '',
-            products: [{
-                productName: '', productDescription: '', productPrice: 0, currency: 'INR',
-                productQuantity: 0,
-                targetaudience: '',
-                problemaddressed: '',
-                technologyused: '',
-                stageofdevelopmentdropdown: '',
-                intellectualpropertyconsiderations: '',
-                CompetitiveAdvantages: '',
-                feasibilityofthesolution: '',
-                howdoesthesolutionwork: '',
-                potentialbenefits: '',
-                challengesorrisks: '',
-                id: ''
-            }],
-            hasPatent: 'No',
-            patentDetails: '',
-            username: userDetails.username,
-            userId: userDetails._id,
-        },
-        validationSchema,
-        onSubmit: async (values) => {
-            setLoading(true);
-            try {
-                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
-                console.log('Form submitted successfully:', response.data);
-
-                setLoading(false);
-                pubsub.publish('toast', {
-                    message: 'Profile updated successfully!',
-                    severity: 'success',
-                });
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                setLoading(false);
-                pubsub.publish('toast', {
-                    message: 'Failed to update profile. Please try again later.',
-                    severity: 'error',
-                });
-            }
-        },
-    });
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -130,7 +108,7 @@ const EditProfile2: React.FC = () => {
 
                 formik.setValues({
                     ...formik.values,
-                    Headline:userData.Headline || '',
+                    Headline: userData.Headline || '',
                     qualification: userData.qualification || '',
                     organization: userData.organization || '',
                     sector: userData.sector || '',
@@ -157,10 +135,29 @@ const EditProfile2: React.FC = () => {
         fetchUserProfile();
     }, [userDetails.username]);
 
+
+
+    const handleFocus = () => {
+        setLabel("Share Solution");
+        setLabels("HeadLine");
+    };
+
+
+    const handleBlur = () => {
+        if (!formik.values.patentDetails) {
+            setLabel("Provide details about the research product or solution that you intend to commercialize");
+        }
+        if (!formik.values.Headline) {
+            setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+        }
+    };
+
+
+
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        setIsFreelancer(value === 'Innovators');
+        setIsInnovator(value === 'Innovators');
 
         if (value !== 'Innovators') {
             setShowProductDetails(false);
@@ -180,30 +177,145 @@ const EditProfile2: React.FC = () => {
         setShowProductDetails(value === 'Yes');
     };
 
+    // const handleAddProduct = () => {
+    //     setShowAddProductModal(true); // Open the modal
+    //     setOpenModal(true)
+    // };
+
+    const handleAddProduct = () => {
+        setEditingProduct(null); // Clear any existing product being edited
+        setViewOnly(false); // Ensure it's in edit mode
+        setShowAddProductModal(true);
+    };
+
+    // const handleSaveProduct = (newProduct: Product) => {
+    //     console.log('New Product:', newProduct);
+    //     setProducts((prevProducts) => [...prevProducts, newProduct]);
+    //     formik.setFieldValue('products', [...formik.values.products, newProduct]);
+    // };
+
+    const handleSaveProduct = (newProduct: Product) => {
+        console.log('Product to Save:', newProduct);
+
+        // Check if a product is provided for editing
+        if (editingProduct) {
+            // Update existing product
+            setProducts((prevProducts) =>
+                prevProducts.map((p) =>
+                    p.id === editingProduct.id ? { ...p, ...newProduct } : p
+                )
+            );
+            formik.setFieldValue(
+                'products',
+                formik.values.products.map((p: Product) =>
+                    p.id === editingProduct.id ? { ...p, ...newProduct } : p
+                )
+            );
+        } else {
+            // Add new product
+            setProducts((prevProducts) => [...prevProducts, newProduct]);
+            formik.setFieldValue('products', [...formik.values.products, newProduct]);
+        }
+
+        // Close modal and reset form
+        setShowAddProductModal(false);
+    };
+
+
+    // const handleViewProduct = (product: Product) => {
+    //     // Set the product to be viewed
+    //     setEditingProduct(product);
+    //     // Open the modal
+    //     setShowAddProductModal(true);
+    //     console.log("Viewing Product", product);
+    // };
+
+    const handleViewProduct = (product: Product) => {
+        setEditingProduct(product);
+        setViewOnly(true);
+        setShowAddProductModal(true);
+    };
+
+
+    // const handleEditProduct = (product: Product) => {
+
+    //     setEditingProduct(product);
+    //     // Implement edit product logic here
+    //     setShowAddProductModal(true);
+    //     console.log("Product", product);
+    // };
+
+    const handleEditProduct = (product: Product) => {
+        setEditingProduct(product);
+        setViewOnly(false);
+        setShowAddProductModal(true);
+    };
+
+    const handleDeleteProduct = (id: string) => {
+        const updatedProducts = products.filter(product => product.id !== id);
+        setProducts(updatedProducts);
+        formik.setFieldValue('products', updatedProducts);
+    };
+
+
     const handleProductChange = (index: number, updatedProduct: Product) => {
         const updatedProducts = [...formik.values.products];
         updatedProducts[index] = updatedProduct;
         formik.setFieldValue('products', updatedProducts);
     };
 
-    const handleFocus = () => {
+    const formik = useFormik<FormValues>({
+        initialValues: {
+            Headline: '',
+            qualification: '',
+            organization: '',
+            sector: '',
+            workAddress: '',
+            designation: '',
+            userType: '',
+            productToMarket: '',
+            products: [],
+            hasPatent: 'No',
+            patentDetails: '',
+            username: userDetails.username,
+            userId: userDetails._id,
+        },
+        validationSchema,
+        onSubmit: async (values) => {
+            setLoading(true);
+            console.log("Submitting products:", values.products);
+            try {
+                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
+                console.log('Form submitted successfully:', response.data);
 
-        setLabel("Share Solution");
-        setLabels("HeadLine");
-   
-    };
+                setLoading(false);
+                const user1 = {
+                    token: userDetails.token,
+                    username: userDetails.username,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    mobileNumber: userDetails.mobileNumber,
+                    _id: userDetails._id,
+                    userType: values.userType as userType
+                };
 
+                dispatch(addUser(user1));
 
-    const handleBlur = () => {
-        if (!formik.values.patentDetails) {
-            setLabel("Provide details about the research product or solution that you intend to commercialize");
-        }
-        if (!formik.values.Headline) {
-            setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
-        }
-    };
-
-
+                pubsub.publish('toast', {
+                    message: 'Profile updated successfully!',
+                    severity: 'success',
+                });
+                // onNext();
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                setLoading(false);
+                pubsub.publish('toast', {
+                    message: 'Failed to update profile. Please try again later.',
+                    severity: 'error',
+                });
+            }
+        },
+    });
 
     return (
         <Container component="main" maxWidth="md">
@@ -240,6 +352,7 @@ const EditProfile2: React.FC = () => {
                                 width: '126%', position: 'relative', right: '26px'
                             }
                         }}>
+
 
                             <Grid item xs={12}>
                                 <TextField
@@ -311,6 +424,8 @@ const EditProfile2: React.FC = () => {
                                     helperText={formik.touched.sector && formik.errors.sector}
                                 />
                             </Grid>
+
+
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -364,99 +479,115 @@ const EditProfile2: React.FC = () => {
                             </Grid>
 
 
-                            {isFreelancer && (
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        fullWidth
-                                        select
-                                        style={{ background: "white", borderRadius: "25px" }}
-                                        id="productToMarket"
-                                        color='secondary'
-                                        label="Product to Market"
-                                        name="productToMarket"
-                                        onChange={(e) => {
-                                            handleProductToMarketChange(e);
-                                            formik.handleChange(e);
-                                        }}
-                                        onBlur={formik.handleBlur}
-                                        value={formik.values.productToMarket}
-                                        error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
-                                        helperText={formik.touched.productToMarket && formik.errors.productToMarket}
-                                    >
-                                        <MenuItem value="Yes">Yes</MenuItem>
-                                        <MenuItem value="No">No</MenuItem>
-                                    </TextField>
-                                </Grid>
+                            {isFreelancer ? (
+                                <>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            select
+                                            style={{ background: "white", borderRadius: "25px" }}
+                                            id="productToMarket"
+                                            color='secondary'
+                                            label="Product to Market"
+                                            name="productToMarket"
+                                            onChange={(e) => {
+                                                handleProductToMarketChange(e);
+                                                formik.handleChange(e);
+                                            }}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.productToMarket}
+                                            error={formik.touched.productToMarket && Boolean(formik.errors.productToMarket)}
+                                            helperText={formik.touched.productToMarket && formik.errors.productToMarket}
+                                        >
+                                            <MenuItem value="Yes">Yes</MenuItem>
+                                            <MenuItem value="No">No</MenuItem>
+                                        </TextField>
+                                    </Grid>
 
+                                    {formik.values.productToMarket == "Yes" ? <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            select
+                                            style={{ background: "white", borderRadius: "25px" }}
+                                            id="hasPatent"
+                                            color='secondary'
+                                            label="Do you have a patent?"
+                                            name="hasPatent"
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            value={formik.values.hasPatent}
+                                            error={formik.touched.hasPatent && Boolean(formik.errors.hasPatent)}
+                                            helperText={formik.touched.hasPatent && formik.errors.hasPatent}
+                                        >
+                                            <MenuItem value="Yes">Yes</MenuItem>
+                                            <MenuItem value="No">No</MenuItem>
+                                        </TextField>
+                                    </Grid> : ""}
 
-                            )}
+                                    {formik.values.hasPatent === "Yes" && (
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                rows={4}
+                                                id="patentDetails"
+                                                color='secondary'
+                                                label={label}
+                                                name="patentDetails"
+                                                onChange={formik.handleChange}
+                                                onBlur={(e) => {
+                                                    formik.handleBlur(e);
+                                                    handleBlur();
+                                                }}
+                                                onFocus={handleFocus}
+                                                value={formik.values.patentDetails}
+                                                error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
+                                                helperText={formik.touched.patentDetails && formik.errors.patentDetails}
+                                            />
+                                        </Grid>
+                                    )}
+                                </>
+                            ) : ""}
 
-                            {formik.values.productToMarket == "Yes" ? <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    style={{ background: "white", borderRadius: "25px" }}
-                                    id="hasPatent"
-                                    color='secondary'
-                                    label="Do you have a patent?"
-                                    name="hasPatent"
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.hasPatent}
-                                    error={formik.touched.hasPatent && Boolean(formik.errors.hasPatent)}
-                                    helperText={formik.touched.hasPatent && formik.errors.hasPatent}
-                                >
-                                    <MenuItem value="Yes">Yes</MenuItem>
-                                    <MenuItem value="No">No</MenuItem>
-                                </TextField>
-                            </Grid> : ""}
-
-                            {formik.values.hasPatent === "Yes" && (
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        rows={4}
-                                        id="patentDetails"
-                                        color='secondary'
-                                        // label="Provide details about the research product or solution that you intend to commercialize"
-                                        label={label}
-                                        name="patentDetails"
-                                        onChange={formik.handleChange}
-                                        onBlur={(e) => {
-                                            formik.handleBlur(e);
-                                            handleBlur();
-                                        }}
-                                        onFocus={handleFocus}
-                                        value={formik.values.patentDetails}
-                                        error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
-                                        helperText={formik.touched.patentDetails && formik.errors.patentDetails}
-                                    />
-                                </Grid>
-                            )}
                             {isFreelancer && showProductDetails && (
                                 <Grid item xs={12}>
-                                    <ProductTable
-                                        products={formik.values.products}
-                                        onRemove={(index: number) => {
-                                            const updatedProducts = [...formik.values.products];
-                                            updatedProducts.splice(index, 1);
-                                            formik.setFieldValue('products', updatedProducts);
-                                        }}
-                                        onChange={(index: number, updatedProduct: Product) => handleProductChange(index, updatedProduct)}
-                                    />
-                                    <Button
-                                        onClick={() => {
-                                            const updatedProducts = [...formik.values.products, { productName: '', productDescription: '', productType: '', productPrice: '', currency: 'INR' }];
-                                            formik.setFieldValue('products', updatedProducts);
-                                        }}
-                                    >
+                                    <Button variant="contained" onClick={handleAddProduct}>
                                         Add Product
                                     </Button>
+
                                 </Grid>
+
+
                             )}
+
+                            <AddProductModal2
+
+                                open={showAddProductModal}
+                                onClose={() => { setShowAddProductModal(false); setEditingProduct(null) }}
+                                onSave={handleSaveProduct}
+                                product={editingProduct}
+                                viewOnly={viewOnly} // Pass the viewOnly flag
+
+                            />
+
+
+                            {isFreelancer && showProductDetails && (
+
+                                <NewProductTable
+                                    products={formik.values.products}
+                                    onView={handleViewProduct}
+                                    onEdit={handleEditProduct}
+                                    onDelete={handleDeleteProduct}
+                                />
+
+                            )}
+
+
+
+                            {/* *********** back and back *************** */}
+
                             <Grid item xs={12}>
-                                <Box mt={3} display="flex" justifyContent="center">
+                                    <Box mt={3} display="flex" justifyContent="center">
                                     <LoadingButton
                                         type="submit"
                                         variant="contained"
@@ -468,9 +599,15 @@ const EditProfile2: React.FC = () => {
                                     </LoadingButton>
                                 </Box>
                             </Grid>
+
+
+
+
                         </Grid>
                     </Box>
                 </FormikProvider>
+
+
 
                 {/* Added sentences at the end of the form */}
                 <Typography
@@ -483,6 +620,10 @@ const EditProfile2: React.FC = () => {
                     If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
                     Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
                 </Typography>
+
+
+
+
                 {fetchError && (
                     <Typography color="error" align="center" mt={2}>
                         {fetchError}
@@ -494,3 +635,4 @@ const EditProfile2: React.FC = () => {
 };
 
 export default EditProfile2;
+

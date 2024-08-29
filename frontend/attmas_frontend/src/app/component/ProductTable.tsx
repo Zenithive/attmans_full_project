@@ -71,7 +71,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onRemove, onChang
                     <TableRow>
                         <TableCell>Product Name</TableCell>
                         <TableCell>Product Description</TableCell>
-                        <TableCell>Product Price & Currency</TableCell>
+                        <TableCell>Product Price</TableCell>
                         <TableCell>Video URL</TableCell>
                         {showActions && !readOnly && <TableCell>Actions</TableCell>}
                     </TableRow>
