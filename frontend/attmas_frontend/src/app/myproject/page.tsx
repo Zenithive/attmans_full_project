@@ -34,6 +34,7 @@ const myproject = () => {
     const [filterType, setFilterType] = useState("all");
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
+    const [appliedJobsForAdmin, setAppliedJobsForAdmin] = useState<string[]>([]);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
     const [isShowingApplies, setIsShowingApplies] = useState(false);
@@ -52,6 +53,7 @@ const myproject = () => {
 
 
     const [projects, setProjects] = useState<Apply[]>([]);
+    const [projectsForAdmin, setProjectsForAdmin] = useState<Apply[]>([]);
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -177,6 +179,34 @@ const myproject = () => {
     }, [userId]);
 
 
+    
+    useEffect(() => {
+        // Function to fetch applied jobs for admin
+        const fetchAppliedJobsForAdmin = async () => {
+          try {
+            const response = await axios.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
+            console.log("ggg", response.data)
+            setProjectsForAdmin(response.data)
+    
+            console.log('response page', response.data);
+            // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
+            const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
+
+            console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
+            setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
+          } catch (error) {
+            console.error('Error fetching applied jobs:', error);
+          }
+        };
+    
+        // Check if the user type is 'Admin' before fetching
+        if (userDetails.userType === 'Admin') {
+          fetchAppliedJobsForAdmin();
+        }
+      }, [userDetails]);
+      
+
+
     const handleFilterTypeChange = (event: any, newFilterType: string) => {
         if (newFilterType !== null) {
             setFilterType(newFilterType);
@@ -233,8 +263,6 @@ const myproject = () => {
         }
     };
 
-
-
     const handleCancel = async (projectId: string, comment?: string) => {
         try {
             if (!projectId) return;
@@ -257,7 +285,7 @@ const myproject = () => {
         }
     };
 
-    const isProjectOwnerOrAdmin = userDetails.userType === 'Project Owner' || userDetails.userType === 'Admin';
+    const isProjectOwnerOrAdmin = userDetails.userType === 'Project Owner';
 
 
     return (
@@ -426,9 +454,6 @@ const myproject = () => {
                     </ToggleButtonGroup>
                 </Box>
             )}
-
-
-
 
 
             {isProjectOwnerOrAdmin && (
@@ -671,8 +696,101 @@ const myproject = () => {
                 />
             </Box>
 
+            <Box sx={{ mt: 2, position: 'relative' }}>
+                {(userDetails.userType === 'Admin') && (
+                    <>
+                        {projectsForAdmin.length > 0 ? (
+                            <Box>
+                                {projectsForAdmin.map((project) => (
+                                    <Card key={project._id} sx={{ mb: 2 }}>
+                                        <CardContent>
+                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box
+                                                    onClick={() => handleViewJob(project.jobDetails)}
+                                                    sx={{ cursor: 'pointer' }}
+                                                >
+                                                    {project.jobDetails.title}
+                                                </Box>
+                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                </Box>
+                                            </Typography>
 
 
+
+                                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                                {project.jobDetails.currency} {project.jobDetails.Budget}
+                                            </Typography>
+
+
+
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
+                                            </Typography>
+
+                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box sx={{
+                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
+                                                }}>
+                                                    <Chip
+                                                        label={project.jobDetails.status}
+                                                        color={
+                                                            project.jobDetails.status === 'Approved'
+                                                                ? 'success'
+                                                                : project.jobDetails.status === 'Rejected'
+                                                                    ? 'error'
+                                                                    : 'default'
+                                                        }
+                                                    />
+
+
+                                                    
+                                                </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <Button
+                                                        aria-controls="simple-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={handleClick}
+                                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        endIcon={<MoreVertIcon />}
+                                                    >
+                                                        More
+                                                    </Button>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                border: '1px solid',
+                                                                boxShadow: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                    </Menu>
+                                                </Box>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </Box>
+                        ) : (
+                            <Typography>No projects available</Typography>
+                        )}
+                    </>
+                )}
+                {/* Close Button */}
+
+                {/* Confirmation Dialog */}
+                <ConfirmationCancelDialog
+                    open={confirmationDialogOpen}
+                    onClose={handleCloseConfirmationDialog}
+                    onConfirm={handleConfirm}
+                    message="Are you sure you want to close this application?"
+                />
+            </Box>
 
             <AddApply
                 open={applyOpen}

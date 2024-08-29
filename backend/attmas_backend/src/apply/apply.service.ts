@@ -308,6 +308,31 @@ export class ApplyService {
     return this.ApplyModel.find({ userId }).exec();
   }
 
+  // async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {
+  //   return this.ApplyModel.find({ status }).exec();
+  // }
+
+  async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {
+    return this.ApplyModel.aggregate([
+      // Match documents with the specified status
+      { $match: { status } },
+      
+      // Use $lookup to join with the Jobs collection
+      {
+        $lookup: {
+          from: 'jobs', // Name of the Jobs collection
+          localField: 'title', // Field from the Apply collection
+          foreignField: 'title', // Field from the Jobs collection to match
+          as: 'jobDetails' // Name of the output array field
+        }
+      },
+      
+      // Optionally, unwind the jobDetails array to get a single document per match
+      { $unwind: { path: '$jobDetails', preserveNullAndEmptyArrays: true } }
+    ]).exec();
+  }
+  
+
   async findJobDetails(jobId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ jobId })
       .populate('userId', 'firstName lastName username')
