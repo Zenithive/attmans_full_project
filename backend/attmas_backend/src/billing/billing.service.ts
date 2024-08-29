@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Billing, BillingDocument } from './billing.schema';
 import { CreateBillingDto } from './create-billing.dto';
 import { Milestone, MilestoneDocument } from 'src/milestone/milestone.schema';
@@ -16,27 +20,42 @@ export class BillingService {
   ) {}
 
   async create(createBillingDto: CreateBillingDto): Promise<Billing> {
-    const milestone = await this.milestoneModel.findById(
-      createBillingDto.milestoneId,
-    );
-    const apply = await this.applyModel.findById(createBillingDto.applyId);
+    const { applyId, milestoneText } = createBillingDto;
+
+    // Validate applyId
+    if (!mongoose.Types.ObjectId.isValid(applyId)) {
+      throw new BadRequestException('Invalid applyId');
+    }
+
+    // Check if applyId exists
+    const apply = await this.applyModel.findById(applyId);
+    if (!apply) {
+      throw new NotFoundException('Application not found');
+    }
+
+    // Check if milestone exists
+    const milestone = await this.milestoneModel.findOne({
+      'milestones.name.text': milestoneText,
+    });
 
     if (!milestone) {
       throw new NotFoundException('Milestone not found');
     }
 
-    if (!apply) {
-      throw new NotFoundException('Application not found');
-    }
-
-    const milestoneData = milestone.milestones.find((m) =>
-      m._id.equals(createBillingDto.milestoneId),
+    // Find milestoneData with the provided milestoneText
+    const milestoneData = milestone.milestones.find(
+      (m) => m.name.text === milestoneText && m.status === 'Submitted',
     );
-    if (!milestoneData || milestoneData.status !== 'Submitted') {
-      throw new Error('Milestone is not submitted');
+
+    if (!milestoneData) {
+      throw new Error('Milestone is not submitted or text does not match');
     }
 
-    const createdBilling = new this.billingModel(createBillingDto);
+    // Create and save the billing record
+    const createdBilling = new this.billingModel({
+      ...createBillingDto,
+      milestoneText: milestoneData.name.text,
+    });
     return createdBilling.save();
   }
 
@@ -50,5 +69,19 @@ export class BillingService {
       throw new NotFoundException(`Billing with ID ${id} not found`);
     }
     return billing;
+  }
+
+  async findByApplyId(applyId: string): Promise<Billing[]> {
+    const result = await this.billingModel.find({ applyId }).exec();
+
+    console.log('Billing Records Found:', result);
+
+    if (result.length === 0) {
+      console.warn(
+        'No records found. Verify if any billing records exist with this applyId.',
+      );
+    }
+
+    return result;
   }
 }

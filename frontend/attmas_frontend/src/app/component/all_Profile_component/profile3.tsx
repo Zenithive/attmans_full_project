@@ -142,7 +142,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                 <TextField
                   {...params}
                   variant="outlined"
-                  label="Categories"
+                  label="Preferred Category"
                   placeholder="Select categories"
                   color="secondary"
                   sx={{ width: '100%' }} 

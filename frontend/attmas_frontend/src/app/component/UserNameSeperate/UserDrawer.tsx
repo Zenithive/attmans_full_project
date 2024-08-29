@@ -211,7 +211,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
-              label="Categories"
+              label="Preferred Category"
               value={user?.categories?.join(', ')}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -223,7 +223,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
 
             <TextField
-              label="Subcategories"
+              label="Subject Matter Expertise "
               value={user?.subcategories?.join(', ')}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}

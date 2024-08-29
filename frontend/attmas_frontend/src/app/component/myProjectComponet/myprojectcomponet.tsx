@@ -47,6 +47,8 @@ export interface Milestone {
         };
         status: string;
         submittedAt: string;
+        adminStatus: 'Pending' | 'Approved' | 'Rejected';
+        adminComments: string[];
     }[];
     isCommentSubmitted?: boolean;
     status?: string;
@@ -92,6 +94,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
     const isRejected = viewingJob?.status === 'Rejected';
     const [filter, setFilter] = useState<string>('All');
     const [applications, setApplications] = useState<Apply[]>([]);
+    const [filteredApplications, setFilteredApplications] = useState<Apply[]>([]);
     const [milestones, setMilestones] = useState<Record<string, Milestone[]>>({});
     const [viewingJobs, setViewingJobs] = useState<Job | null>(null);
     const [milestoneComments, setMilestoneComments] = useState<Record<string, string>>({});
@@ -99,6 +102,8 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [commentErrors, setCommentErrors] = useState<Record<string, boolean>>({});
     const [jobDetailKey, setJobDetailKey] = useState<number>(0);
+
+    
 
 
 
@@ -153,23 +158,27 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     fetchMilestonesForApply(app._id);
                 }
             });
+
+            const tmpfilteredApplications = applications.filter(app => {
+                if (filter === 'All') return true;
+                return app.status === filter;
+            }).filter(app => {
+                if (userType === 'Project Owner') {
+                    return (app.status === 'Awarded') && currentUser === viewingJob?.username;
+                }
+                if (userType === 'Admin') {
+                    return  (app.status === 'Awarded');
+                }
+                if (userType === 'Innovators' || userType === 'Freelancer') {
+                    return app.username === currentUser;
+                }
+                return true;
+            });
+
+            setFilteredApplications(tmpfilteredApplications);
         }
     }, [applications]);
 
-
-
-    const filteredApplications = applications.filter(app => {
-        if (filter === 'All') return true;
-        return app.status === filter;
-    }).filter(app => {
-        if (userType === 'Project Owner' || userType === 'Admin') {
-            return (app.status === 'Awarded') && currentUser === viewingJob?.username;
-        }
-        if (userType === 'Innovators' || userType === 'Freelancer') {
-            return app.username === currentUser;
-        }
-        return true;
-    });
 
     const forceUpdate = () => setUpdateState(prev => !prev);
 

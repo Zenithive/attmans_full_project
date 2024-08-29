@@ -3,7 +3,8 @@ import { IsNotEmpty, IsNumber, IsString, IsDateString } from 'class-validator';
 export class CreateBillingDto {
   @IsNotEmpty()
   @IsString()
-  milestoneId: string;
+  @IsString()
+  milestoneText: string;
 
   @IsNotEmpty()
   @IsString()
@@ -20,4 +21,8 @@ export class CreateBillingDto {
   @IsNotEmpty()
   @IsString()
   category: string;
+
+  @IsString()
+  @IsNotEmpty()
+  currency: string;
 }

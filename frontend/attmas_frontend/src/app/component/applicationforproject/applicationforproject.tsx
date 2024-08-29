@@ -1,12 +1,62 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Box, TextField, Card, CardContent, Typography, Button, CircularProgress, Chip, Divider, InputLabel, MenuItem, ToggleButton, ToggleButtonGroup, FormControl, Modal, Select, SelectChangeEvent } from '@mui/material';
-import { Apply, Milestone } from '../myProjectComponet/myprojectcomponet';
+import { Grid, Box, TextField, Card, CardContent, Typography, Button, CircularProgress, Chip, Divider, InputLabel, MenuItem, ToggleButton, ToggleButtonGroup, FormControl, Modal, Select, SelectChangeEvent, IconButton } from '@mui/material';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
+import ApproveMilestoneDialog from '../approveformilston/approveformilston';
+import RejectMilestoneDialog from '../rejectformilston/rejectformilston';
+import BillingData from '../addpaymentshow/addpaymentshow';
+import CloseIcon from '@mui/icons-material/Close';
+
+export interface Milestone {
+    scopeOfWork: string;
+    milestones: {
+        isCommentSubmitted: boolean;
+        name: {
+            text: string;
+            timeFrame: string | null;
+        };
+        status: string;
+        submittedAt: string;
+        adminStatus: 'Pending' | 'Approved' | 'Rejected';
+        adminComments: string[];
+    }[];
+    isCommentSubmitted?: boolean;
+    status?: string;
+    milstonSubmitcomments: string[];
+}
+
+interface Billing {
+    _id?: string;
+    milestoneText: string;
+    applyId: string;
+    amount: number;
+    paymentDate: string;
+    category: string;
+    currency: string;
+    createdAt?: string;
+}
+
+export interface Apply {
+    _id?: string;
+    title: string;
+    jobDetails: any;
+    description: string;
+    Budget: number;
+    currency: string;
+    TimeFrame: string | null;
+    rejectComment: string;
+    status: string;
+    firstName: string;
+    lastName: string;
+    username: string;
+    jobId: string;
+    availableSolution: string;
+    SolutionUSP: string;
+}
 
 interface ApplicationsForProjectProps {
     filteredApplications: Apply[];
@@ -30,59 +80,73 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     handleCommentChange,
     isSubmitting,
 }) => {
+
+    console.log("filteredApplications", filteredApplications)
     const [view, setView] = useState<'applications' | 'billing'>('applications');
-    const [submittedMilestones, setSubmittedMilestones] = useState<
-        {
-            _id: string;
-            isCommentSubmitted: boolean;
-            name: {
-                text: string;
-                timeFrame: string | null;
-            };
-            status: string;
-            submittedAt: string;
-        }[]
-    >([]);
+    const [submittedMilestones, setSubmittedMilestones] = useState<Milestone[]>([]);
     const [openModal, setOpenModal] = useState(false);
     const [paymentDetails, setPaymentDetails] = useState({
-        milestoneId: '',
+        milestoneText: '',
         applyId: '',
         amount: '',
         paymentDate: null as dayjs.Dayjs | null,
-        category: ''
+        category: '',
+        currency: 'USD'
     });
+    const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
+    const [selectedApplyId, setSelectedApplyId] = useState<string | null>(null);
+    const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState<number | null>(null);
+
+    const initialPaymentDetails = {
+        milestoneText: '',
+        applyId: '',
+        amount: '',
+        paymentDate: null as dayjs.Dayjs | null,
+        category: '',
+        currency: 'USD'
+    };
+
+
+    const fetchSubmittedMilestones = async () => {
+        try {
+
+            const submittedMilestonesData = await Promise.all(
+                filteredApplications.map(async (app) => {
+                    const response = await axios.get(`${SERVER_URL}/milestones/submitted/${app._id}`);
+                    console.log("Mistlon Fetch With ApplyId", response.data)
+                    return response.data;
+                })
+            );
+
+            const allSubmittedMilestones = submittedMilestonesData.flat();
+            console.log('All Submitted Milestones:', allSubmittedMilestones);
+            setSubmittedMilestones(allSubmittedMilestones);
+        } catch (error) {
+            console.error('Error fetching submitted milestones:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchSubmittedMilestones = async () => {
-            try {
-
-                const submittedMilestonesData = await Promise.all(
-                    filteredApplications.map(async (app) => {
-                        const response = await axios.get(`${SERVER_URL}/milestones/submitted/${app._id}`);
-                        console.log("Mistlon Fetch With ApplyId", response.data)
-                        return response.data;
-                    })
-                );
-
-                const allSubmittedMilestones = submittedMilestonesData.flat();
-                console.log('All Submitted Milestones:', allSubmittedMilestones);
-                setSubmittedMilestones(allSubmittedMilestones);
-            } catch (error) {
-                console.error('Error fetching submitted milestones:', error);
-            }
-        };
-
         fetchSubmittedMilestones();
     }, [filteredApplications]);
+
 
     const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newView: 'applications' | 'billing') => {
         if (newView !== null) {
             setView(newView);
         }
     };
+    const handleOpenModal = (applyId: string) => () => {
+        setPaymentDetails(prevDetails => ({ ...prevDetails, applyId }));
+        setOpenModal(true);
+    };
 
-    const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
+    const handleCloseModal = () => {
+        setPaymentDetails(initialPaymentDetails); 
+        setOpenModal(false);
+    };
 
     const handlePaymentDetailsChange = (
         e: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>
@@ -109,31 +173,110 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     };
 
     const handleAddPayment = async () => {
+        if (!paymentDetails.applyId) {
+            console.error('applyId is required');
+            return;
+        }
+
+
         try {
             const response = await axios.post(APIS.BILLING, {
-                milestoneId: paymentDetails.milestoneId,
+                milestoneText: paymentDetails.milestoneText,
                 applyId: paymentDetails.applyId,
                 amount: paymentDetails.amount,
+                currency: paymentDetails.currency,
                 paymentDate: paymentDetails.paymentDate?.toISOString(),
                 category: paymentDetails.category
             });
 
             console.log('Payment added successfully:', response.data);
-            // Optionally, you can reset the form or perform other actions after successful submission
             handleCloseModal();
         } catch (error) {
             console.error('Error adding payment:', error);
         }
     };
+
+    const handleOpenApproveDialog = (milestoneGroup: Milestone, applyId: string, milestoneIndex: number) => {
+        const milestone = milestoneGroup.milestones[milestoneIndex];
+        setSelectedMilestone(milestoneGroup);
+        setSelectedApplyId(applyId);
+        setSelectedMilestoneIndex(milestoneIndex);
+        setApproveDialogOpen(true);
+    };
+
+    const handleOpenRejectDialog = (milestoneGroup: Milestone, applyId: string, milestoneIndex: number) => {
+        const milestone = milestoneGroup.milestones[milestoneIndex];
+        setSelectedMilestone(milestoneGroup);
+        setSelectedApplyId(applyId);
+        setSelectedMilestoneIndex(milestoneIndex);
+        setRejectDialogOpen(true);
+    };
+
+
+    const milestoneLabel = "Approved Milestone";
+    const handleApproveMilestone = async (comment: string) => {
+        if (selectedApplyId && selectedMilestoneIndex !== null) {
+            try {
+                await axios.post(`${SERVER_URL}/milestones/approve`, {
+                    applyId: selectedApplyId,
+                    milestoneIndex: selectedMilestoneIndex,
+                    comment
+                });
+
+                await fetchSubmittedMilestones();
+
+                handleCloseApproveDialog();
+            } catch (error) {
+                console.error('Error approving milestone:', error);
+            }
+        }
+    };
+
+    const handleRejectMilestone = async (comment: string) => {
+        if (selectedApplyId && selectedMilestoneIndex !== null) {
+            try {
+                await axios.post(`${SERVER_URL}/milestones/reject`, {
+                    applyId: selectedApplyId,
+                    milestoneIndex: selectedMilestoneIndex,
+                    comment
+                });
+
+
+                await fetchSubmittedMilestones();
+                handleCloseRejectDialog();
+            } catch (error) {
+                console.error('Error rejecting milestone:', error);
+            }
+        }
+    };
+
+    const handleCloseApproveDialog = () => {
+        setApproveDialogOpen(false);
+        setSelectedMilestone(null);
+        setSelectedApplyId(null);
+        setSelectedMilestoneIndex(null);
+    };
+
+    const handleCloseRejectDialog = () => {
+        setRejectDialogOpen(false);
+        setSelectedMilestone(null);
+        setSelectedApplyId(null);
+        setSelectedMilestoneIndex(null);
+    };
+
+    const isFormValid = () => {
+        return paymentDetails.milestoneText && paymentDetails.amount && paymentDetails.currency && paymentDetails.paymentDate && paymentDetails.category;
+    };
+
     return (
         <Box>
             <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
-                <Typography variant="h5">Applications for Project</Typography>
+                <Typography variant="h5" sx={{ marginBottom: '15px' }}>Applications for Project</Typography>
                 <ToggleButtonGroup
                     value={view}
                     exclusive
                     onChange={handleToggleChange}
-                    sx={{ marginTop: 2 }}
+                    sx={{ marginTop: 2, marginBottom: '15px', position: 'relative', left: '10px' }}
                 >
                     <ToggleButton value="applications">Applications</ToggleButton>
                     <ToggleButton value="billing">Billing</ToggleButton>
@@ -182,87 +325,127 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                             <Grid container spacing={2} key={groupIndex}>
                                                                 {milestoneGroup.milestones.length > 0 ? (
                                                                     milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                                                        <Grid item xs={12} key={milestoneIndex}>
-                                                                            <Card variant="outlined" sx={{ mb: 1 }}>
-                                                                                <CardContent>
-                                                                                    <Typography variant="h6" sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                                        <span>
-                                                                                            Milestone {milestoneIndex + 1}
-                                                                                            {milestone.submittedAt && (
-                                                                                                <Typography component="span" sx={{ ml: 2, color: 'green', }}>
-                                                                                                    Submitted Date: ({dayjs(milestone.submittedAt).format('MMMM D, YYYY h:mm A')})
-                                                                                                </Typography>
-                                                                                            )}
-                                                                                        </span>
+                                                                        (userType === 'Project Owner' ? milestone.adminStatus === 'Approved' : true) && (
+                                                                            <Grid item xs={12} key={milestoneIndex}>
+                                                                                <Card variant="outlined" sx={{ mb: 1 }}>
+                                                                                    <CardContent>
+                                                                                        <Typography variant="h6" sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                            <span>
+                                                                                                Milestone {milestoneIndex + 1}
+                                                                                                {milestone.submittedAt && (
+                                                                                                    <Typography component="span" sx={{ ml: 2, color: 'green', }}>
+                                                                                                        Submitted Date: ({dayjs(milestone.submittedAt).format('MMMM D, YYYY h:mm A')})
+                                                                                                    </Typography>
+                                                                                                )}
+                                                                                                <Box sx={{ position: 'relative', top: '5px' }}>
+                                                                                                    {milestone.name.timeFrame && (
+                                                                                                        <Typography variant="body2" sx={{ color: 'green', }}>
+                                                                                                            Deadline Date: ({dayjs(milestone.name.timeFrame).format('MMMM D, YYYY h:mm A')})
+                                                                                                        </Typography>
+                                                                                                    )}
+                                                                                                </Box>
+                                                                                            </span>
 
-                                                                                        {milestone.isCommentSubmitted && (
+                                                                                            {milestone.isCommentSubmitted && (
+                                                                                                <Chip
+                                                                                                    label="Milestone submitted"
+                                                                                                    variant="outlined"
+                                                                                                    sx={{
+                                                                                                        borderColor: 'green',
+                                                                                                        color: 'green',
+                                                                                                        borderRadius: '16px',
+                                                                                                        ml: 40,
+                                                                                                    }}
+                                                                                                />
+                                                                                            )}
                                                                                             <Chip
-                                                                                                label="Milestone submitted"
+                                                                                                label={milestone.adminStatus}
                                                                                                 variant="outlined"
-                                                                                                sx={{
-                                                                                                    borderColor: 'green',
-                                                                                                    color: 'green',
-                                                                                                    borderRadius: '16px',
-                                                                                                    ml: 2,
-                                                                                                }}
+                                                                                                color={milestone.adminStatus === 'Approved' ? 'success' : milestone.adminStatus === 'Rejected' ? 'error' : 'default'}
+                                                                                                sx={{ ml: 2 }}
                                                                                             />
-                                                                                        )}
-                                                                                    </Typography>
 
-                                                                                    <TextField
-                                                                                        label={`Milestone ${milestoneIndex + 1}`}
-                                                                                        value={milestone.name ? milestone.name.text : 'No Name'}
-                                                                                        multiline
-                                                                                        fullWidth
-                                                                                        disabled
-                                                                                        sx={{ mb: 2 }}
-                                                                                    />
+                                                                                        </Typography>
 
-                                                                                    {milestone.isCommentSubmitted ? (
-                                                                                        <>
-                                                                                            {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer' || userType === 'Admin') && (
-                                                                                                <TextField
-                                                                                                    label="Submitted Milestone"
-                                                                                                    value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
-                                                                                                    multiline
-                                                                                                    rows={4}
-                                                                                                    fullWidth
-                                                                                                    disabled
-                                                                                                    sx={{ mb: 2, color: 'blue' }}
-                                                                                                />
-                                                                                            )}
-                                                                                        </>
-                                                                                    ) : (
-                                                                                        (userType === 'Freelancer') && (
+
+
+                                                                                        <TextField
+                                                                                            label={`Milestone ${milestoneIndex + 1}`}
+                                                                                            value={milestone.name ? milestone.name.text : 'No Name'}
+                                                                                            multiline
+                                                                                            fullWidth
+                                                                                            disabled
+                                                                                            sx={{ mb: 2 }}
+                                                                                        />
+
+                                                                                        {milestone.isCommentSubmitted ? (
                                                                                             <>
-                                                                                                <TextField
-                                                                                                    label="Submit Milestone"
-                                                                                                    color="secondary"
-                                                                                                    multiline
-                                                                                                    rows={4}
-                                                                                                    value={milestoneComments[`${app._id}-${milestoneIndex}`] || ''}
-                                                                                                    onChange={(e) => handleCommentChange(app._id!, milestoneIndex, e.target.value)}
-                                                                                                    error={commentErrors[`${app._id}-${milestoneIndex}`]}
-                                                                                                    helperText={commentErrors[`${app._id}-${milestoneIndex}`] ? "Comment is required" : ""}
-                                                                                                    fullWidth
-                                                                                                    sx={{ mb: 2 }}
-                                                                                                />
-                                                                                                <Button
-                                                                                                    onClick={() => handleMilestoneSubmit(app._id!, milestoneIndex)}
-                                                                                                    disabled={milestone.isCommentSubmitted || isSubmitting}
-                                                                                                    sx={{ marginBottom: '40px' }}
-                                                                                                >
-                                                                                                    {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Milestone'}
-                                                                                                </Button>
+                                                                                                {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer' || userType === 'Admin') && (
+                                                                                                    <TextField
+                                                                                                        label="Submitted Milestone"
+                                                                                                        value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
+                                                                                                        multiline
+                                                                                                        rows={4}
+                                                                                                        fullWidth
+                                                                                                        disabled
+                                                                                                        sx={{ mb: 2, color: 'blue' }}
+                                                                                                    />
+                                                                                                )}
                                                                                             </>
-                                                                                        )
-                                                                                    )}
+                                                                                        ) : (
+                                                                                            (userType === 'Freelancer') && (
+                                                                                                <>
+                                                                                                    <TextField
+                                                                                                        label="Submit Milestone"
+                                                                                                        color="secondary"
+                                                                                                        multiline
+                                                                                                        rows={4}
+                                                                                                        value={milestoneComments[`${app._id}-${milestoneIndex}`] || ''}
+                                                                                                        onChange={(e) => handleCommentChange(app._id!, milestoneIndex, e.target.value)}
+                                                                                                        error={commentErrors[`${app._id}-${milestoneIndex}`]}
+                                                                                                        helperText={commentErrors[`${app._id}-${milestoneIndex}`] ? "Comment is required" : ""}
+                                                                                                        fullWidth
+                                                                                                        sx={{ mb: 2 }}
+                                                                                                    />
+                                                                                                    <Button
+                                                                                                        onClick={() => handleMilestoneSubmit(app._id!, milestoneIndex)}
+                                                                                                        disabled={milestone.isCommentSubmitted || isSubmitting}
+                                                                                                        sx={{ marginBottom: '40px' }}
+                                                                                                    >
+                                                                                                        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Milestone'}
+                                                                                                    </Button>
+                                                                                                </>
+                                                                                            )
+                                                                                        )}
+                                                                                        {userType === 'Admin' && milestone.adminStatus === 'Pending' && (
+                                                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                                                {milestone.status === 'Submitted' && (
+                                                                                                    <>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            color="success"
+                                                                                                            onClick={() => handleOpenApproveDialog(milestoneGroup, app._id!, milestoneIndex)}
+                                                                                                            sx={{ marginRight: '10px' }}
+                                                                                                        >
+                                                                                                            Approve
+                                                                                                        </Button>
+                                                                                                        <Button
+                                                                                                            variant="contained"
+                                                                                                            color="error"
+                                                                                                            onClick={() => handleOpenRejectDialog(milestoneGroup, app._id!, milestoneIndex)}
+                                                                                                        >
+                                                                                                            Reject
+                                                                                                        </Button>
+                                                                                                    </>
+                                                                                                )}
+                                                                                            </Box>
+                                                                                        )}
 
-                                                                                </CardContent>
-                                                                            </Card>
-                                                                        </Grid>
-                                                                    ))
-                                                                ) : (
+                                                                                    </CardContent>
+                                                                                </Card>
+                                                                            </Grid>
+                                                                        ))
+                                                                    )) : (
                                                                     <Typography>No milestones available</Typography>
                                                                 )}
                                                             </Grid>
@@ -283,68 +466,142 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 </Box>
             ) : (
                 <Box p={2}>
+                    {filteredApplications.length > 0 ? (
+                        filteredApplications.map((app) => (
+                            userType === 'Admin' && (
 
-                    <Button onClick={handleOpenModal} variant="contained">Add Payment</Button>
+                                <Button key={app._id} onClick={handleOpenModal(app._id!)} variant="contained">Add Payment</Button>
+                            )
+                        ))
+                    ) : (
+                        <Typography>No applications available for billing</Typography>
+                    )}
                 </Box>
             )}
+            <Box p={2}>
+                {filteredApplications.length > 0 ? (
+                    filteredApplications.map((app) => (
+                        <BillingData apply={app} />
+                    ))
+                ) : (
+                    <Typography>No applications available for billing</Typography>
+                )}
+            </Box>
             <Modal
                 open={openModal}
                 onClose={handleCloseModal}
                 aria-labelledby="payment-modal-title"
                 aria-describedby="payment-modal-description"
             >
-                <Box sx={{ width: 400, margin: 'auto', padding: 4, backgroundColor: 'white', marginTop: '20%', borderRadius: 2 }}>
+                <Box sx={{ width: 400, margin: 'auto', padding: 4, backgroundColor: 'white', marginTop: '10%', borderRadius: 2 }}>
+                    
                     <Typography id="payment-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
                         Add Payment
+                        <IconButton
+                        onClick={handleCloseModal}
+                        sx={{
+                            position: 'relative',
+                            float:'right',
+                            
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
                     </Typography>
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel>Submitted Milestone</InputLabel>
+                        <InputLabel color="secondary">
+                            {milestoneLabel}
+                        </InputLabel>
                         <Select
-                            name="milestoneId"
-                            value={paymentDetails.milestoneId}
+                            label={milestoneLabel}
+                            name="milestoneText"
+                            color="secondary"
+                            value={paymentDetails.milestoneText}
                             onChange={handlePaymentDetailsChange}
-                            label="Submitted Milestone"
+                            required
+
                         >
-                            {submittedMilestones.map((milestone) => (
-                                <MenuItem key={milestone._id} value={milestone._id}>
-                                    {milestone.name?.text || 'No Title'} ({milestone.name?.timeFrame ? dayjs(milestone.name.timeFrame).format('MMMM D, YYYY') : 'No Timeframe'})
+                            {submittedMilestones.map((milestone, index) => (
+                                <MenuItem key={index} value={(milestone as any).name.text}>
+                                    {(milestone as any).name.text}
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
 
-
-
                     <TextField
                         label="Amount"
                         name="amount"
+                        color="secondary"
                         value={paymentDetails.amount}
                         onChange={handleTextFieldChange}
                         fullWidth
+                        required
                         sx={{ mb: 2 }}
+                        inputProps={{ type: 'number' }}
                     />
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel color="secondary">Currency</InputLabel>
+                        <Select
+                            name="currency"
+                            value={paymentDetails.currency}
+                            onChange={handlePaymentDetailsChange}
+                            color="secondary"
+                            label="Currency"
+                        >
+                            <MenuItem value="USD">USD</MenuItem>
+                            <MenuItem value="INR">INR</MenuItem>
+                        </Select>
+                    </FormControl>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateTimePicker
                             label="Payment Date"
+                            sx={{ marginBottom: '15px' }}
                             value={paymentDetails.paymentDate}
                             onChange={handleDateChange}
+                            slotProps={{
+                                textField: {
+                                    color: 'secondary',
+                                   
+                                },
+                            }}
                         />
                     </LocalizationProvider>
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel>Category</InputLabel>
+                        <InputLabel color="secondary">Category</InputLabel>
                         <Select
                             name="category"
                             value={paymentDetails.category}
                             onChange={handlePaymentDetailsChange}
+                            color="secondary"
                             label="Category"
+                            required
                         >
-                            <MenuItem value="receivedByOwner">Received by Project Owner</MenuItem>
-                            <MenuItem value="receivedByInnovator">Received by Innovator/Freelancer</MenuItem>
+                            <MenuItem value="received from Project Owner">Received from Project Owner</MenuItem>
+                            <MenuItem value="Paid to Innovator/Freelancer">Paid to Innovator/Freelancer</MenuItem>
                         </Select>
                     </FormControl>
-                    <Button onClick={handleAddPayment} variant="contained">Submit</Button>
+                    <Button
+                        onClick={handleAddPayment}
+                        variant="contained"
+                        disabled={isSubmitting || !isFormValid()}
+                    >
+                        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
+                    </Button>
                 </Box>
             </Modal>
+            <ApproveMilestoneDialog
+                open={approveDialogOpen}
+                onClose={handleCloseApproveDialog}
+                onApprove={handleApproveMilestone}
+                milestone={selectedMilestone}
+            />
+            <RejectMilestoneDialog
+                open={rejectDialogOpen}
+                onClose={handleCloseRejectDialog}
+                onReject={handleRejectMilestone}
+                milestone={selectedMilestone}
+            />
         </Box>
     );
 };
