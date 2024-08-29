@@ -108,7 +108,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const handleFocus = () => {
         setLabel("Share Solution");
-        setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+        setLabels("HeadLine");
     };
 
 
@@ -117,7 +117,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             setLabel("Provide details about the research product or solution that you intend to commercialize");
         }
         if (!formik.values.Headline) {
-            setLabels("Headline");
+            setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
         }
     };
 

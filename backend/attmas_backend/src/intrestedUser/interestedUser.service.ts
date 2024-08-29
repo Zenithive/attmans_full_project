@@ -5,6 +5,7 @@ import { InterestedUser } from './InterestedUser.schema';
 import { User } from 'src/users/user.schema'; // Assuming User schema is in src/users directory
 import { MailerService } from 'src/common/service/UserEmailSend'; // Assuming MailerService is in src/common/service
 import { Exhibition } from 'src/exhibition/schema/exhibition.schema';
+import { Booth } from 'src/booth/booth.schema';
 
 @Injectable()
 export class InterestedUserService {
@@ -15,6 +16,8 @@ export class InterestedUserService {
     private mailerService: MailerService, // Inject MailerService
     @InjectModel('Exhibition')
     private readonly exhibitionModel: Model<Exhibition>,
+    @InjectModel('Booth')
+    private readonly boothModel: Model<Booth>,
   ) {}
 
   async create(createInterestedUserDto: any): Promise<InterestedUser> {
@@ -50,6 +53,15 @@ export class InterestedUserService {
       const adminEmail = exhibition.username;
       console.log('Exhibition Admin Email:', adminEmail);
 
+      let boothTitle: string | undefined;
+      if (boothId) {
+        const booth = await this.boothModel
+          .findById(boothId)
+          .select('title')
+          .exec();
+        boothTitle = booth?.title;
+      }
+
       // Check if the user exists by username
       const existingUser = await this.userModel
         .findOne({ username: username })
@@ -77,27 +89,23 @@ export class InterestedUserService {
           boothId,
           userId,
           userType,
+          boothTitle,
           interestType,
           adminEmail,
         });
 
         await createdUser.save();
 
+        console.log('Attempting to send email to admin:', adminEmail);
+        await this.mailerService.sendEmail(
+          adminEmail,
+          'New Booth Interest',
+          `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`,
+        );
+        console.log('Email sent to exhibition admin successfully.');
+
         return createdUser;
       } else {
-        console.log('Attempting to send email to admin:', adminEmail);
-        try {
-          await this.mailerService.sendEmail(
-            adminEmail,
-            'New Booth Interest',
-            `Hello,\n\nA new user has shown interest in your booth "${boothId}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`,
-          );
-          console.log('Email sent to exhibition admin successfully.');
-        } catch (error) {
-          console.error('Failed to send email to exhibition admin:', error);
-          throw error;
-        }
-
         // Send "xyz" message
         await this.mailerService.sendEmail(
           username,

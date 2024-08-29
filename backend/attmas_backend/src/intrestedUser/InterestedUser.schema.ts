@@ -8,6 +8,7 @@ export interface InterestedUser extends Document {
   userId: string;
   exhibitionId: string;
   boothId?: string;
+  boothTitle?: string;
   userType: string;
   interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth';
   adminEmail: string;
@@ -21,6 +22,7 @@ export const InterestedUserSchema = new Schema(
     userId: { type: String, required: false },
     username: { type: String, required: false },
     exhibitionId: { type: String, required: false },
+    boothTitle: { type: String, required: false },
     boothId: { type: String, required: false },
     userType: { type: String, required: false },
     interestType: {

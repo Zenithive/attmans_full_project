@@ -22,7 +22,7 @@ export class Product {
 
   @Prop({ required: true })
   videourlForproduct: string;
-  
+
   @Prop({ required: false })
   _id: string;
 }

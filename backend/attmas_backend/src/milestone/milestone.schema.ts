@@ -11,6 +11,7 @@ export class Milestone {
   @Prop({
     type: [
       {
+        _id: { type: Types.ObjectId },
         name: {
           text: { type: String, required: true },
           timeFrame: { type: Date, required: true },
@@ -23,6 +24,7 @@ export class Milestone {
     required: true,
   })
   milestones: {
+    _id: Types.ObjectId;
     name: {
       text: string;
       timeFrame: Date;

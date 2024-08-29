@@ -124,5 +124,9 @@ export const APIS = {
 
     GET_BOOTH_VISITORS_BY_EXHIBITION: `${SERVER_URL}/booth-visitors-by-exhibition`,
 
-    GET_VISITORS_BY_INTEREST_TYPE:`${SERVER_URL}/interested-users/visitors-by-interest-type`
+    GET_VISITORS_BY_INTEREST_TYPE:`${SERVER_URL}/interested-users/visitors-by-interest-type`,
+
+
+    BILLING: `${SERVER_URL}/billing`,
+    GET_BILLING: (id: string) => `${SERVER_URL}/billing/${id}`,
 }
