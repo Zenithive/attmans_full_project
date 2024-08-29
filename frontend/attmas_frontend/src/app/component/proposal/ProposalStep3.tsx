@@ -1,8 +1,16 @@
 import React from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, Typography } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 
 const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => void, onPrevious: () => void }) => {
+
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    // Get current date
+    const currentDate = new Date().toLocaleDateString();
+
     return (
         <Formik
             initialValues={{
@@ -30,8 +38,8 @@ const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => vo
                             fullWidth
                         />
                         <Field
-                         color='secondary'
-                         rows={4}
+                            color='secondary'
+                            rows={4}
                             name="progressReportTemplate"
                             as={TextField}
                             label="Progress Report Template and Periodicity"
@@ -92,7 +100,30 @@ const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => vo
                             multiline
                             fullWidth
                         />
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                        {/* Statement of Agreement */}
+                        <Box sx={{ mt: 4, borderTop: '1px solid #ccc', pt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Typography variant="h6" gutterBottom align="center">
+                                STATEMENT OF AGREEMENT
+                            </Typography>
+                            <Typography variant="body1" paragraph align="center">
+                                By typing my name below, I declare that, to the best of my knowledge, the information
+                                provided in this form is correct. I understand that if any false information is given, or any
+                                material fact suppressed, my profile may be terminated.
+                            </Typography>
+                            {/* <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', mt: 2 }}> */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                <Typography variant="body2" color="textSecondary" fontWeight="bold">
+                                    Full Name: {userDetails.firstName} {userDetails.lastName}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary" fontWeight="bold" mt={1}>
+                                    Current Date: {currentDate}
+                                </Typography>
+                            </Box>
+
+                        </Box>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
                             <Button variant="outlined" onClick={onPrevious}>Back</Button>
                             <Button type="submit" variant="contained">Submit</Button>
                         </Box>
