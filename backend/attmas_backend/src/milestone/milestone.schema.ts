@@ -23,7 +23,9 @@ export class Milestone {
           enum: ['Pending', 'Approved', 'Rejected'],
           default: 'Pending',
         },
-        adminComments: { type: [String], default: [] },
+        approvalComments: { type: [String], default: [] },
+        rejectionComments: { type: [String], default: [] },
+        resubmissionComments: { type: [String], default: [] },
       },
     ],
     required: true,
@@ -37,7 +39,9 @@ export class Milestone {
     status: string;
     submittedAt?: Date;
     adminStatus: 'Pending' | 'Approved' | 'Rejected';
-    adminComments: string[];
+    approvalComments: string[];
+    rejectionComments: string[];
+    resubmissionComments: string[];
   }[];
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })

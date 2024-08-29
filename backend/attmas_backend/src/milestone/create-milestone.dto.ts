@@ -43,7 +43,17 @@ class MilestoneItemDto {
 
   @IsArray()
   @IsString({ each: true })
-  adminComments: string[];
+  @IsOptional()
+  approvalComments?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  rejectionComments?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  resubmissionComments: string[];
 }
 
 export class CreateMilestoneDto {

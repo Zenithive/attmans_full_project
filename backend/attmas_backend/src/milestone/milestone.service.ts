@@ -140,7 +140,7 @@ export class MilestonesService {
 
     if (milestone.milestones[milestoneIndex]) {
       milestone.milestones[milestoneIndex].adminStatus = 'Approved';
-      milestone.milestones[milestoneIndex].adminComments.push(comment);
+      milestone.milestones[milestoneIndex].approvalComments.push(comment);
     } else {
       throw new BadRequestException(
         `Milestone index ${milestoneIndex} is out of bounds`,
@@ -162,7 +162,31 @@ export class MilestonesService {
 
     if (milestone.milestones[milestoneIndex]) {
       milestone.milestones[milestoneIndex].adminStatus = 'Rejected';
-      milestone.milestones[milestoneIndex].adminComments.push(comment);
+      milestone.milestones[milestoneIndex].rejectionComments.push(comment);
+    } else {
+      throw new BadRequestException(
+        `Milestone index ${milestoneIndex} is out of bounds`,
+      );
+    }
+
+    await milestone.save();
+  }
+
+  async resubmitMilestone(
+    applyId: string,
+    milestoneIndex: number,
+    resubmitComment: string,
+  ): Promise<void> {
+    const milestone = await this.milestoneModel.findOne({ applyId });
+    if (!milestone) {
+      throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
+    }
+
+    if (milestone.milestones[milestoneIndex]) {
+      milestone.milestones[milestoneIndex].adminStatus = 'Pending';
+      milestone.milestones[milestoneIndex].resubmissionComments.push(
+        resubmitComment,
+      );
     } else {
       throw new BadRequestException(
         `Milestone index ${milestoneIndex} is out of bounds`,

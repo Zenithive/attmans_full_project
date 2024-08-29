@@ -22,7 +22,9 @@ export interface Milestone {
         status: string;
         submittedAt: string;
         adminStatus: 'Pending' | 'Approved' | 'Rejected';
-        adminComments: string[];
+        approvalComments: string[];
+        rejectionComments: string[];
+        resubmissionComments: string[];
     }[];
     isCommentSubmitted?: boolean;
     status?: string;
@@ -144,7 +146,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     };
 
     const handleCloseModal = () => {
-        setPaymentDetails(initialPaymentDetails); 
+        setPaymentDetails(initialPaymentDetails);
         setOpenModal(false);
     };
 
@@ -226,6 +228,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 await fetchSubmittedMilestones();
 
                 handleCloseApproveDialog();
+                window.location.reload();
             } catch (error) {
                 console.error('Error approving milestone:', error);
             }
@@ -244,6 +247,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
 
                 await fetchSubmittedMilestones();
                 handleCloseRejectDialog();
+                window.location.reload();
             } catch (error) {
                 console.error('Error rejecting milestone:', error);
             }
@@ -381,16 +385,57 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                                                         {milestone.isCommentSubmitted ? (
                                                                                             <>
                                                                                                 {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer' || userType === 'Admin') && (
-                                                                                                    <TextField
-                                                                                                        label="Submitted Milestone"
-                                                                                                        value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
-                                                                                                        multiline
-                                                                                                        rows={4}
-                                                                                                        fullWidth
-                                                                                                        disabled
-                                                                                                        sx={{ mb: 2, color: 'blue' }}
-                                                                                                    />
+                                                                                                    <>
+                                                                                                        <TextField
+                                                                                                            label="Submitted Milestone"
+                                                                                                            value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
+                                                                                                            multiline
+                                                                                                            rows={4}
+                                                                                                            fullWidth
+                                                                                                            disabled
+                                                                                                            sx={{ mb: 2, color: 'blue' }}
+                                                                                                        />
+                                                                                                        {milestone.resubmissionComments.length > 0 && (
+                                                                                                            <TextField
+                                                                                                                label="Resubmission Comments"
+                                                                                                                value={milestone.resubmissionComments.join('\n')}
+                                                                                                                multiline
+                                                                                                                rows={4}
+                                                                                                                fullWidth
+                                                                                                                disabled
+                                                                                                                sx={{ mb: 2 }}
+                                                                                                            />
+                                                                                                        )}
+                                    
+
+                                                                                                    </>
+                                                                                                
                                                                                                 )}
+                                                                                                 <>
+                                                                                                       { milestone.approvalComments.length > 0 && (
+                                                                                                            <TextField
+                                                                                                                label="Approval Comments"
+                                                                                                                value={milestone.approvalComments.join('\n')}
+                                                                                                                multiline
+                                                                                                                rows={4}
+                                                                                                                fullWidth
+                                                                                                                disabled
+                                                                                                                sx={{ mb: 2, color: 'success.main' }}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                       
+                                                                                                        {milestone.rejectionComments.length > 0 && (
+                                                                                                            <TextField
+                                                                                                                label="Rejection Comments"
+                                                                                                                value={milestone.rejectionComments.join('\n')}
+                                                                                                                multiline
+                                                                                                                rows={4}
+                                                                                                                fullWidth
+                                                                                                                disabled
+                                                                                                                sx={{ mb: 2, color: 'error.main' }}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </>
                                                                                             </>
                                                                                         ) : (
                                                                                             (userType === 'Freelancer') && (
@@ -467,26 +512,28 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
             ) : (
                 <Box p={2}>
                     {filteredApplications.length > 0 ? (
-                        filteredApplications.map((app) => (
-                            userType === 'Admin' && (
+                        <>
+                            <Box sx={{ marginBottom: '40px' }}>
+                                {filteredApplications.map((app) => (
+                                    <BillingData key={app._id} apply={app} />
+                                ))}
+                            </Box>
 
-                                <Button key={app._id} onClick={handleOpenModal(app._id!)} variant="contained">Add Payment</Button>
-                            )
-                        ))
+                            <Box sx={{ mb: 2 }}>
+                                {filteredApplications.map((app) => (
+                                    userType === 'Admin' && (
+                                        <Button key={app._id} onClick={handleOpenModal(app._id!)} variant="contained">Add Payment</Button>
+                                    )
+                                ))}
+                            </Box>
+
+                        </>
                     ) : (
                         <Typography>No applications available for billing</Typography>
                     )}
                 </Box>
             )}
-            <Box p={2}>
-                {filteredApplications.length > 0 ? (
-                    filteredApplications.map((app) => (
-                        <BillingData apply={app} />
-                    ))
-                ) : (
-                    <Typography>No applications available for billing</Typography>
-                )}
-            </Box>
+
             <Modal
                 open={openModal}
                 onClose={handleCloseModal}
@@ -494,19 +541,19 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 aria-describedby="payment-modal-description"
             >
                 <Box sx={{ width: 400, margin: 'auto', padding: 4, backgroundColor: 'white', marginTop: '10%', borderRadius: 2 }}>
-                    
+
                     <Typography id="payment-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
                         Add Payment
                         <IconButton
-                        onClick={handleCloseModal}
-                        sx={{
-                            position: 'relative',
-                            float:'right',
-                            
-                        }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
+                            onClick={handleCloseModal}
+                            sx={{
+                                position: 'relative',
+                                float: 'right',
+
+                            }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
                     </Typography>
                     <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel color="secondary">
@@ -562,7 +609,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                             slotProps={{
                                 textField: {
                                     color: 'secondary',
-                                   
+
                                 },
                             }}
                         />
