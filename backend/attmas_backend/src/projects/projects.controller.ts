@@ -35,9 +35,13 @@ export class JobsController {
     @Query('Subcategorys') Subcategorys: string[] = [],
     @Query('Expertiselevel') Expertiselevel: string[] = [],
     @Query('status') status?: string,
+    @Query('title') title?: string,
+    @Query('createdAt') createdAt?: string,
     @Query('SelectService') SelectService: string[] = [],
+    @Query('TimeFrame') TimeFrame?: string,
+    @Query('ProjectOwner') ProjectOwner?: string,
   ): Promise<Jobs[]> {
-    return this.jobsService.findAll(
+    return this.jobsService.filterJobs(
       page,
       limit,
       Category,
@@ -46,6 +50,10 @@ export class JobsController {
       Expertiselevel,
       status,
       SelectService,
+      title,
+      createdAt,
+      TimeFrame,
+      ProjectOwner,
     );
   }
 

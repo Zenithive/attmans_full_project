@@ -109,7 +109,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const fetchApplications = useCallback(async () => {
-    console.log(userDetails, "viewingJob", viewingJob)
     if (viewingJob?._id) {
       try {
         const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
@@ -361,7 +360,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   <TextField
                     onClick={() => handleUserClick(viewingJob?.userId?.username || "")}
                     label="Project Owner"
-                    value={`${viewingJob?.userId?.firstName} ${viewingJob?.userId?.firstName}`}
+                    value={`${viewingJob?.userId?.firstName} ${viewingJob?.userId?.lastName}`}
                     fullWidth
                     color='secondary'
                     aria-readonly
