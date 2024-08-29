@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, PipelineStage, Types } from 'mongoose';
 
 import { User, UserDocument } from 'src/users/user.schema';
 import { Jobs, JobsDocument } from './projects.schema';
@@ -124,7 +124,6 @@ export class JobsService {
     if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
-    console.log('Subcategorys', Subcategorys);
 
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
@@ -137,11 +136,8 @@ export class JobsService {
     if (SelectService && SelectService.length > 0) {
       filter.SelectService = { $in: SelectService };
     }
-    console.log('filterQuery', filterQuery);
 
-    // console.log('Applied Filters:', filter);
-
-    const pipeline = [
+    const pipeline: PipelineStage[] = [
       {
         $lookup: {
           from: 'users',
@@ -159,6 +155,9 @@ export class JobsService {
       {
         $match: {
           ...filterQuery,
+          ...(userId && {
+            'userId._id': new Types.ObjectId(userId),
+          }),
           ...(filter.ProjectOwner && {
             $or: [
               { 'userId.firstName': filter.ProjectOwner },
@@ -167,6 +166,7 @@ export class JobsService {
           }),
         },
       },
+      { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
       {
@@ -188,6 +188,8 @@ export class JobsService {
           title: 1,
           currency: 1,
           description: 1,
+          createdAt: 1,
+          status: 1,
           userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
         },
       },
