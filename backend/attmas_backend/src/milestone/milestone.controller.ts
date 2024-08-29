@@ -77,4 +77,17 @@ export class MilestonesController {
       comment,
     );
   }
+
+  @Post('/resubmit')
+  async resubmitMilestone(
+    @Body('applyId') applyId: string,
+    @Body('milestoneIndex') milestoneIndex: number,
+    @Body('resubmitComment') resubmitComment: string,
+  ): Promise<void> {
+    return this.milestonesService.resubmitMilestone(
+      applyId,
+      milestoneIndex,
+      resubmitComment,
+    );
+  }
 }

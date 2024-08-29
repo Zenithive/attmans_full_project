@@ -48,7 +48,9 @@ export interface Milestone {
         status: string;
         submittedAt: string;
         adminStatus: 'Pending' | 'Approved' | 'Rejected';
-        adminComments: string[];
+        approvalComments: string[];
+        rejectionComments: string[];
+        resubmissionComments:string[];
     }[];
     isCommentSubmitted?: boolean;
     status?: string;

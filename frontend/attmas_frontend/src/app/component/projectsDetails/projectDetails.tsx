@@ -13,6 +13,7 @@ import {
   Divider,
   CardContent,
   Card,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
@@ -27,10 +28,9 @@ import UserDrawer from '../UserNameSeperate/UserDrawer';
 
 
 
-interface Milestone {
+export interface Milestone {
   scopeOfWork: string;
   milestones: {
-    _id: string;
     isCommentSubmitted: boolean;
     name: {
       text: string;
@@ -38,6 +38,9 @@ interface Milestone {
     };
     status: string;
     submittedAt: string;
+    adminStatus: 'Pending' | 'Approved' | 'Rejected';
+    adminComments: string[];
+    resubmissionComments: string[];
   }[];
   isCommentSubmitted?: boolean;
   status?: string;
@@ -86,6 +89,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [commentsFetched, setCommentsFetched] = useState<boolean>(false);
+  const [resubmitComment, setResubmitComment] = useState<string>('');
+  const [isResubmitting, setIsResubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (apply?._id) {
@@ -186,6 +191,24 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const handleDrawerClose = () => {
     setDrawerOpen(false);
     setSelectedUser('');
+  };
+
+
+  const handleResubmitMilestone = async (applyId: string, milestoneIndex: number, comment: string) => {
+    try {
+      setIsResubmitting(true);
+      console.log(`Resubmitting milestone ${milestoneIndex} for applyId ${applyId} with comment: ${comment}`);
+      await axios.post(`${APIS.MILESTONES}/resubmit`, {
+        applyId,
+        milestoneIndex,
+        resubmitComment: comment
+      });
+      window.location.reload();
+    } catch (error) {
+      console.error('Error resubmitting milestone:', error);
+    } finally {
+      setIsResubmitting(false); 
+    }
   };
 
   return (
@@ -328,8 +351,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                         </Grid>
 
                                         <Grid item xs={12}>
-                                          <Grid container spacing={2}>
-                                            <Grid item xs={12} sm={4}>
+                                          <Grid container spacing={3}>
+                                            <Grid item xs={12} sm={5}>
                                               <TextField
                                                 label="Milestone Deadline Date"
                                                 value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
@@ -339,9 +362,19 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 sx={{ mb: 2 }}
                                               />
                                             </Grid>
+                                            <Grid item xs={12} sm={5}>
+                                              <TextField
+                                                label="Admin Status"
+                                                value={m.adminStatus || 'No admin status available'}
+                                                fullWidth
+                                                color='secondary'
+                                                aria-readonly
+                                                sx={{ mb: 2 }}
+                                              />
+                                            </Grid>
                                             {userDetails.userType === 'Admin' && (
                                               <>
-                                                <Grid item xs={12} sm={4}>
+                                                <Grid item xs={12} sm={5}>
                                                   <TextField
                                                     label="Status"
                                                     value={m.status || 'No status available'}
@@ -351,7 +384,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                     sx={{ mb: 2 }}
                                                   />
                                                 </Grid>
-                                                <Grid item xs={12} sm={4}>
+                                                <Grid item xs={12} sm={5}>
                                                   <TextField
                                                     label="Submitted Date"
                                                     value={m.submittedAt ? dayjs(m.submittedAt).format('MM/DD/YYYY') : 'No Submitted Date available'}
@@ -378,6 +411,34 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                               sx={{ mb: 2 }}
                                             />
                                           </Grid>
+                                        )}
+                                        {userDetails.userType === 'Freelancer' && m.adminStatus === 'Rejected' && (
+                                          <>
+                                            <Grid item xs={12}>
+                                              <TextField
+                                                label="Resubmission Comment"
+                                                value={resubmitComment}
+                                                onChange={(e) => setResubmitComment(e.target.value)}
+                                                multiline
+                                                 color='secondary'
+                                                fullWidth
+                                                sx={{ mb: 2 }}
+                                              />
+                                              <Button
+                                                onClick={() => handleResubmitMilestone(apply._id || "", index, resubmitComment)}
+                                                variant="contained"
+                                                color="primary"
+                                                sx={{ mr: 1 }}
+                                                disabled={isResubmitting}
+                                              >
+                                                {isResubmitting ? (
+                                                  <CircularProgress size={24} color="inherit" />
+                                                ) : (
+                                                  'Resubmit'
+                                                )}
+                                              </Button>
+                                            </Grid>
+                                          </>
                                         )}
                                       </Grid>
                                     </CardContent>
