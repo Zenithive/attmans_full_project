@@ -208,7 +208,7 @@ const EditProfile3: React.FC = () => {
                 <TextField
                   {...params}
                   variant="outlined"
-                  label="Categories"
+                  label="Preferred Category"
                   placeholder="Select categories"
                   color="secondary"
                 />

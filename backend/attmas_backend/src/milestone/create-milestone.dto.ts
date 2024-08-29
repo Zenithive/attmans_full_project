@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
@@ -35,6 +36,14 @@ class MilestoneItemDto {
   @IsNotEmpty()
   @IsString()
   submittedAt: Date;
+
+  @IsNotEmpty()
+  @IsEnum(['Pending', 'Approved', 'Rejected'])
+  adminStatus: 'Pending' | 'Approved' | 'Rejected';
+
+  @IsArray()
+  @IsString({ each: true })
+  adminComments: string[];
 }
 
 export class CreateMilestoneDto {

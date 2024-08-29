@@ -94,7 +94,6 @@ export class ApplyController {
   async getAppliedJobsForAdmin(@Param('status') status: string) {
     return this.applyService.findAppliedJobsForAdmin(status);
   }
-  
 
   @Get('jobDetails/:jobId')
   async getJobDetails(@Param('jobId') jobId: string) {

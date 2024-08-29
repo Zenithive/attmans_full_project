@@ -15,6 +15,7 @@ import {
   Exhibition,
   ExhibitionDocument,
 } from 'src/exhibition/schema/exhibition.schema';
+import { getSameDateISOs } from 'src/services/util.services';
 
 @Injectable()
 export class JobsService {
@@ -32,6 +33,10 @@ export class JobsService {
     if (createJobsDto.SelectService.includes('Innovative product')) {
       // Ensure Expertiselevel is not set for 'Innovative product'
       createJobsDto.Expertiselevel = undefined;
+    }
+
+    if (createJobsDto.userId) {
+      createJobsDto.userId = new Types.ObjectId(createJobsDto.userId);
     }
 
     const createdJobs = new this.jobsModel(createJobsDto);
@@ -65,7 +70,7 @@ export class JobsService {
     return savedJob;
   }
 
-  async findAll(
+  async filterJobs(
     page: number,
     limit: number,
     Category: string[],
@@ -74,12 +79,42 @@ export class JobsService {
     Expertiselevel?: string[],
     status?: string,
     SelectService?: string[],
+    title?: string,
+    createdAt?: string,
+    TimeFrame?: string,
+    ProjectOwner?: string,
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
+    const filterQuery: any = {};
 
-    if (userId) {
-      filter.userId = userId;
+    const allNativeFiltersArray = {
+      title,
+      status,
+      SelectService,
+      Subcategorys,
+      Category,
+      createdAt,
+      TimeFrame,
+    };
+
+    for (const key in allNativeFiltersArray) {
+      if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+        const element = allNativeFiltersArray[key];
+        if ((key === 'createdAt' || key === 'TimeFrame') && element) {
+          const sameDateISOs = getSameDateISOs(element);
+          filterQuery[key] = {
+            $gte: sameDateISOs.startOfDay,
+            $lte: sameDateISOs.endOfDay,
+          };
+        } else if (element) {
+          filterQuery[key] = new RegExp(element, 'i');
+        }
+      }
+    }
+
+    if (ProjectOwner) {
+      filter.ProjectOwner = new RegExp(ProjectOwner, 'i');
     }
 
     if (Category && Category.length > 0) {
@@ -102,20 +137,63 @@ export class JobsService {
     if (SelectService && SelectService.length > 0) {
       filter.SelectService = { $in: SelectService };
     }
-    console.log('SelectService', SelectService);
+    console.log('filterQuery', filterQuery);
 
     // console.log('Applied Filters:', filter);
 
-    return this.jobsModel
-      .find(filter)
-      .skip(skip)
-      .limit(limit)
-      .populate(
-        'userId',
-        'firstName lastName username userType',
-        this.userModel,
-      )
-      .exec();
+    const pipeline = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userId',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userId',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: {
+          ...filterQuery,
+          ...(filter.ProjectOwner && {
+            $or: [
+              { 'userId.firstName': filter.ProjectOwner },
+              { 'userId.lastName': filter.ProjectOwner },
+            ],
+          }),
+        },
+      },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 1,
+          AreaOfProduct: 1,
+          Budget: 1,
+          Category: 1,
+          DetailsOfInnovationChallenge: 1,
+          Expectedoutcomes: 1,
+          Expertiselevel: 1,
+          IPRownership: 1,
+          Objective: 1,
+          ProductDescription: 1,
+          Sector: 1,
+          SelectService: 1,
+          Subcategorys: 1,
+          TimeFrame: 1,
+          title: 1,
+          currency: 1,
+          description: 1,
+          userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
+        },
+      },
+    ];
+
+    return await this.jobsModel.aggregate(pipeline);
   }
 
   async findJobWithUser(id: string): Promise<Jobs> {

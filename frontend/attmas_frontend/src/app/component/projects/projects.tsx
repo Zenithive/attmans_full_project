@@ -19,6 +19,8 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { useCallback, useMemo } from 'react';
 import { Category, options, Subcategorys } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise';
+import { DatePicker } from '@mui/x-date-pickers';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 
 
@@ -169,7 +171,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     return (
         <>
             {userDetails.userType === 'Project Owner' && (
-            <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'>{editingJobs ? 'Edit Project' : 'Create Project'}</Button>
+            <Button sx={{ml: 3, width: 180, pt: 0}} onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'>{editingJobs ? 'Edit Project' : 'Create Project'}</Button>
         )}
             <Drawer sx={{ '& .MuiDrawer-paper': { width: "50%", borderRadius: 3, pr: 10, mr: -8 ,'@media (max-width: 767px)':{
                 width:'116%'
@@ -469,7 +471,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
 
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DateTimePicker
+                                <DatePicker
+                                    format={DATE_FORMAT}
                                     label="Time Frame"
                                     // color='secondary'
                                     value={values.TimeFrame}

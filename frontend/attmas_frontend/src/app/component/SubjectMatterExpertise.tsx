@@ -176,6 +176,7 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
           margin-right: 10px;
           width: 100%;
           min-width: 200px;
+          max-width: 450px;
           border-radius: 20px;
           background-color: white;
           min-height: 57px;
