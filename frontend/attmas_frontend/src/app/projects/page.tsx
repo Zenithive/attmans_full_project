@@ -28,57 +28,68 @@ import Filters, { FilterColumn } from '../component/filter/filter.component';
 
 const Jobs = () => {
 
-    const column:Array<FilterColumn> = [
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+    const { userType, _id: userId } = userDetails;
+
+    const column: Array<FilterColumn> = [
         {
-          name: "Project Name",
-          value: '',
-          type: "Texbox",
-          key: 'title'
+            name: "Project Name",
+            value: '',
+            type: "Texbox",
+            key: 'title',
+            isVisible: true,
         },
         {
-          name: "Project Owner",
-          value: '',
-          type: "Texbox",
-          key: 'ProjectOwner'
+            name: "Project Owner",
+            value: '',
+            type: "Texbox",
+            key: 'ProjectOwner',
+            isVisible: userType === "Admin",
         },
         {
-          name: "Created Date",
-          value: '',
-          type: "Date",
-          key: 'createdAt'
+            name: "Created Date",
+            value: '',
+            type: "Date",
+            key: 'createdAt',
+            isVisible: true,
         },
         {
             name: "Deadline",
             value: '',
             type: "Date",
-            key: 'TimeFrame'
+            key: 'TimeFrame',
+            isVisible: true,
         },
         {
             name: "Status",
             value: '',
             type: "Texbox",
-            key: 'status'
+            key: 'status',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
         },
         {
-          name: "Service",
-          value: '',
-          type: "Service",
-          key: 'SelectService'
+            name: "Service",
+            value: '',
+            type: "Service",
+            key: 'SelectService',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
         },
         {
-          name: "Category",
-          value: '',
-          type: "Category",
-          key: 'Category'
+            name: "Category",
+            value: '',
+            type: "Category",
+            key: 'Category',
+            isVisible: true,
         },
         {
-          name: "Subject Matter Expertise",
-          value: '',
-          type: "SubCategory",
-          key: 'Subcategorys'
+            name: "Subject Matter Expertise",
+            value: '',
+            type: "SubCategory",
+            key: 'Subcategorys',
+            isVisible: true,
         }
-      ];
-      
+    ];
+
     const [jobs, setJobs] = useState<Job[]>([]);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [applyOpen, setApplyOpen] = useState(false);
@@ -104,8 +115,7 @@ const Jobs = () => {
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
-    const userDetails: UserSchema = useAppSelector(selectUserSession);
-    const { userType, _id: userId } = userDetails;
+
     const [isShowingApplies, setIsShowingApplies] = useState(false);
     const [showingMyApplies, setShowingMyApplies] = useState(false);
     const [applies, setApplies] = useState<Apply[]>([]);
@@ -142,20 +152,24 @@ const Jobs = () => {
         setAnchorEl(null);
     };
 
+    const getParamForJobs = (page: number) => {
+        if(userType === 'Project Owner'){
+            return `?page=${page}&userId=${userDetails._id}&${filter}`;
+        }else if(userType === 'Freelancer'){
+            return `?page=${page}&status=Approved&SelectService=Outsource Research and Development&${filter}`;
+        }else if(userType === 'Innovators'){
+            return `?page=${page}&status=Approved&SelectService=Innovative product&${filter}`;
+        }else {
+            return `?page=${page}&${filter}`;
+        }
+    }
+
 
     const fetchJobs = useCallback(async (page: number) => {
         try {
             console.log('Fetch Jobs Params:', filter);
-            const paramString = `?page=${page}&${filter}`
-            const response = await axios.get(`${APIS.JOBS}${paramString}`, {
-                // params: {
-                //     page, limit: 10, Category: CategoryesFilter.join(','), Subcategorys: SubcategorysFilter.join(','), Expertiselevel: ExpertiselevelFilter.join(','),
-                //     status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
-                //     userId: filterType === 'mine' ? userId : undefined,
-                //     SelectService: selectedServices.join(','),
-
-                // }
-            })
+            const paramString = getParamForJobs(page);
+            const response = await axios.get(`${APIS.JOBS}${paramString}`)
 
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -330,14 +344,6 @@ const Jobs = () => {
     }, [userId]);
 
 
-
-    const handleFilterTypeChange = (event: any, newFilter: string) => {
-        if (newFilter !== null) {
-            setFilterType(newFilter);
-        }
-    }
-
-
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
@@ -402,43 +408,19 @@ const Jobs = () => {
         }
     }, [refetch, viewingJob]);
 
-    // const filteredJobs = useMemo(() => {
-    //     return jobs.filter(job => {
-    //         if (userType === 'Admin' && selectedStatus) {
-    //             return job.status === selectedStatus;
-    //         }
-    //         return userType === 'Admin' || job.status === 'Approved';
-    //     });
-
-    // }, [jobs, userType, selectedStatus]);
-
-    // Filter jobs based on the selected filter type
-    const filteredJobs = jobs.filter((job) => {
-        if (filterType === 'Innovative Products') {
-            return job.SelectService.includes('Innovative product');
-        }
-        if (filterType === 'Outsource Research and Development') {
-            return job.SelectService.includes('Outsource Research and Development ');
-        }
-        if (filterType === 'mine') {
-            return job.username === userDetails.username;
-        }
-        return true; // Return all jobs if no specific filter is selected
-    });
-
 
     const handleCancelApply = useCallback((jobId: string) => {
         setAppliedJobs(prev => prev.filter(id => id !== jobId));
     }, []);
 
     const changeFilterOrPage = (paramStr: string) => {
-        if(paramStr && paramStr.length){
-          setFilter(paramStr);
-        }else{
-          setFilter('');
+        if (paramStr && paramStr.length) {
+            setFilter(paramStr);
+        } else {
+            setFilter('');
         }
         setPage(1);
-      }
+    }
 
 
     return (
@@ -620,7 +602,7 @@ const Jobs = () => {
                     >
 
                         <Box sx={{ mt: 2 }}>
-                            {filteredJobs.map((job) => (
+                            {jobs.map((job) => (
                                 <Card key={job._id} sx={{ mb: 2 }}>
                                     <CardContent>
                                         <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>

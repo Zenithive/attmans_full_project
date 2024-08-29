@@ -50,37 +50,43 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
       name: "First Name",
       value: '',
       type: "Texbox",
-      key: 'firstName'
+      key: 'firstName',
+      isVisible: true
     },
     {
       name: "Last Name",
       value: '',
       type: "Texbox",
-      key: 'lastName'
+      key: 'lastName',
+      isVisible: true
     },
     {
       name: "Username",
       value: '',
       type: "Texbox",
-      key: 'username'
+      key: 'username',
+      isVisible: true
     },
     {
       name: "Mobile Number",
       value: '',
       type: "Texbox",
-      key: 'mobileNumber'
+      key: 'mobileNumber',
+      isVisible: true
     },
     {
       name: "Category",
       value: '',
       type: "Category",
-      key: 'categories'
+      key: 'categories',
+      isVisible: true
     },
     {
       name: "Subject Matter Expertise",
       value: '',
       type: "SubCategory",
-      key: 'subCategory'
+      key: 'subCategory',
+      isVisible: true
     }
   ];
   const [rowData, setRowData] = React.useState<User[]>([]);

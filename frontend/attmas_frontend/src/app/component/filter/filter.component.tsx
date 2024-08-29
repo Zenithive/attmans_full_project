@@ -19,6 +19,7 @@ export interface FilterColumn {
   value: string;
   key: string;
   type: string;
+  isVisible: boolean;
 }
 
 interface NewFilterColumn extends FilterColumn {
@@ -239,13 +240,13 @@ const Filters = ({ column, onFilter }: FiltersProps) => {
           onClose={handleClose}
         >
           {newColumn.map((col, index) => (
-            <MenuItem onClick={(event) => handleMenuClick(event, col)} key={index} sx={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
-              {col.name}
-              {col.active ? <CheckBoxIcon fontSize="small" color="secondary" /> : ''}
-            </MenuItem>
+            <>
+              {col.isVisible ? <MenuItem onClick={(event) => handleMenuClick(event, col)} key={index} sx={{ display: 'flex', justifyContent: 'space-between', width: 250 }}>
+                {col.name}
+                {col.active ? <CheckBoxIcon fontSize="small" color="secondary" /> : ''}
+              </MenuItem> : ''}
+            </>
           ))}
-          {/* <MenuItem onClick={handleClose}>Option 2</MenuItem>
-          <MenuItem onClick={handleClose}>Option 3</MenuItem> */}
         </Menu>
       </Box>
     </Box>
