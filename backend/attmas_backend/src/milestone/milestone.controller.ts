@@ -40,4 +40,11 @@ export class MilestonesController {
   ): Promise<string[]> {
     return this.milestonesService.getSubmittedComments(applyId);
   }
+
+  @Get('submitted/:applyId')
+  async findSubmittedMilestones(
+    @Param('applyId') applyId: string,
+  ): Promise<Milestone[]> {
+    return this.milestonesService.findSubmittedMilestones(applyId);
+  }
 }
