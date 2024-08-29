@@ -89,4 +89,24 @@ export class MilestonesService {
     }
     return milestones;
   }
+
+  async findSubmittedMilestones(applyId: string): Promise<any[]> {
+    const submittedMilestones = await this.milestoneModel
+      .find(
+        { applyId, 'milestones.status': 'Submitted' },
+        { 'milestones.$': 1 },
+      )
+      .exec();
+
+    const allSubmittedMilestones = submittedMilestones.flatMap(
+      (doc) => doc.milestones,
+    );
+
+    console.log(
+      `Submitted Milestones for applyId ${applyId}:`,
+      allSubmittedMilestones,
+    );
+
+    return allSubmittedMilestones;
+  }
 }
