@@ -5,8 +5,8 @@ export type BillingDocument = Billing & Document;
 
 @Schema()
 export class Billing {
-  @Prop({ type: Types.ObjectId, ref: 'Milestone', required: true })
-  milestoneId: Types.ObjectId;
+  @Prop({ type: String, required: true })
+  milestoneText: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })
   applyId: Types.ObjectId;
@@ -19,6 +19,9 @@ export class Billing {
 
   @Prop({ required: true })
   category: string;
+
+  @Prop({ required: true })
+  currency: string;
 
   @Prop({ default: Date.now })
   createdAt: Date;

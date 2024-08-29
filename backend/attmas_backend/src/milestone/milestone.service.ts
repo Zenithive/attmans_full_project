@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Apply, ApplyDocument } from 'src/apply/apply.schema';
@@ -92,13 +96,27 @@ export class MilestonesService {
 
   async findSubmittedMilestones(applyId: string): Promise<any[]> {
     const submittedMilestones = await this.milestoneModel
-      .find(
-        { applyId, 'milestones.status': 'Submitted' },
-        { 'milestones.$': 1 },
-      )
+      .aggregate([
+        { $match: { applyId } },
+        { $unwind: '$milestones' },
+        { $match: { 'milestones.adminStatus': 'Approved' } },
+        {
+          $project: {
+            _id: 0,
+            'milestones._id': 1,
+            'milestones.name': 1,
+            'milestones.status': 1,
+            'milestones.submittedAt': 1,
+            'milestones.adminStatus': 1,
+            'milestones.adminComments': 1,
+          },
+        },
+      ])
       .exec();
 
-    const allSubmittedMilestones = submittedMilestones.flatMap(
+    console.log('Raw Aggregation Result:', submittedMilestones);
+
+    const allSubmittedMilestones = submittedMilestones.map(
       (doc) => doc.milestones,
     );
 
@@ -108,5 +126,49 @@ export class MilestonesService {
     );
 
     return allSubmittedMilestones;
+  }
+
+  async approveMilestone(
+    applyId: string,
+    milestoneIndex: number,
+    comment: string,
+  ): Promise<void> {
+    const milestone = await this.milestoneModel.findOne({ applyId });
+    if (!milestone) {
+      throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
+    }
+
+    if (milestone.milestones[milestoneIndex]) {
+      milestone.milestones[milestoneIndex].adminStatus = 'Approved';
+      milestone.milestones[milestoneIndex].adminComments.push(comment);
+    } else {
+      throw new BadRequestException(
+        `Milestone index ${milestoneIndex} is out of bounds`,
+      );
+    }
+
+    await milestone.save();
+  }
+
+  async rejectMilestone(
+    applyId: string,
+    milestoneIndex: number,
+    comment: string,
+  ): Promise<void> {
+    const milestone = await this.milestoneModel.findOne({ applyId });
+    if (!milestone) {
+      throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
+    }
+
+    if (milestone.milestones[milestoneIndex]) {
+      milestone.milestones[milestoneIndex].adminStatus = 'Rejected';
+      milestone.milestones[milestoneIndex].adminComments.push(comment);
+    } else {
+      throw new BadRequestException(
+        `Milestone index ${milestoneIndex} is out of bounds`,
+      );
+    }
+
+    await milestone.save();
   }
 }

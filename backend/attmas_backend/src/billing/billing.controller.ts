@@ -21,4 +21,9 @@ export class BillingController {
   async findOne(@Param('id') id: string): Promise<Billing> {
     return this.billingService.findOne(id);
   }
+
+  @Get('by-apply/:applyId')
+  async findByApplyId(@Param('applyId') applyId: string): Promise<Billing[]> {
+    return this.billingService.findByApplyId(applyId);
+  }
 }
