@@ -13,7 +13,7 @@ export interface Job {
     // ******** op ******** //
     DetailsOfInnovationChallenge: string;
     Sector: string;
-    AreaOfProduct: string;
+    Quantity: number;
     ProductDescription: string;
     firstName:string,
     lastName:string,

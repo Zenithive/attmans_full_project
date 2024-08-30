@@ -24,7 +24,7 @@ export interface Job {
     firstName: string;
     lastName: string;
     Sector: string;
-    AreaOfProduct: string;
+    Quantity: number;
     ProductDescription: string;
     username: string;
     SelectService: string;

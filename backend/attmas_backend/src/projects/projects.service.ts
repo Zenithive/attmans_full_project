@@ -172,7 +172,7 @@ export class JobsService {
       {
         $project: {
           _id: 1,
-          AreaOfProduct: 1,
+          Quantity: 1,
           Budget: 1,
           Category: 1,
           DetailsOfInnovationChallenge: 1,

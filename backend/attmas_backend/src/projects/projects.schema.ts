@@ -43,7 +43,7 @@ export class Jobs {
   lastName: string;
 
   @Prop({ required: false })
-  AreaOfProduct: string;
+  Quantity: number;
 
   @Prop({ required: false })
   ProductDescription: string;
