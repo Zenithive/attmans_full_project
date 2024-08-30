@@ -45,7 +45,7 @@ export class CreateJobsDto {
 
   @IsNotEmpty()
   @IsString()
-  AreaOfProduct: string;
+  Quantity: number;
 
   @IsNotEmpty()
   @IsString()
@@ -132,7 +132,7 @@ export class UpdateJobsDto {
 
   @IsNotEmpty()
   @IsString()
-  AreaOfProduct?: string;
+  Quantity?: number;
 
   @IsNotEmpty()
   @IsString()

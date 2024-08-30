@@ -33,7 +33,7 @@ export interface Job {
   firstName: string,
   lastName: string,
   Sector: string;
-  AreaOfProduct: string;
+  Quantity: number;
   ProductDescription: string;
   username: string;
   SelectService: string;
@@ -434,7 +434,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     <Grid item xs={12} sm={6}>
                       <TextField
                         label="Area Of Product"
-                        value={viewingJob.AreaOfProduct}
+                        value={viewingJob.Quantity}
                         fullWidth
                         color='secondary'
                         aria-readonly

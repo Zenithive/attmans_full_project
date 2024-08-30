@@ -9,7 +9,7 @@ export interface Job {
     Subcategorys: string[];
     DetailsOfInnovationChallenge: string;
     Sector: string;
-    AreaOfProduct: string;
+    Quantity: number;
     ProductDescription: string;
     username: string;
     SelectService: string;
