@@ -10,6 +10,7 @@ import ApproveMilestoneDialog from '../approveformilston/approveformilston';
 import RejectMilestoneDialog from '../rejectformilston/rejectformilston';
 import BillingData from '../addpaymentshow/addpaymentshow';
 import CloseIcon from '@mui/icons-material/Close';
+import BillingModal from '../billingmodel/billingmodel';
 
 export interface Milestone {
     scopeOfWork: string;
@@ -193,6 +194,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
 
             console.log('Payment added successfully:', response.data);
             handleCloseModal();
+            window.location.reload();
         } catch (error) {
             console.error('Error adding payment:', error);
         }
@@ -406,36 +408,36 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                                                                                 sx={{ mb: 2 }}
                                                                                                             />
                                                                                                         )}
-                                    
+
 
                                                                                                     </>
-                                                                                                
+
                                                                                                 )}
-                                                                                                 <>
-                                                                                                       { milestone.approvalComments.length > 0 && (
-                                                                                                            <TextField
-                                                                                                                label="Approval Comments"
-                                                                                                                value={milestone.approvalComments.join('\n')}
-                                                                                                                multiline
-                                                                                                                rows={4}
-                                                                                                                fullWidth
-                                                                                                                disabled
-                                                                                                                sx={{ mb: 2, color: 'success.main' }}
-                                                                                                            />
-                                                                                                        )}
-                                                                                                       
-                                                                                                        {milestone.rejectionComments.length > 0 && (
-                                                                                                            <TextField
-                                                                                                                label="Rejection Comments"
-                                                                                                                value={milestone.rejectionComments.join('\n')}
-                                                                                                                multiline
-                                                                                                                rows={4}
-                                                                                                                fullWidth
-                                                                                                                disabled
-                                                                                                                sx={{ mb: 2, color: 'error.main' }}
-                                                                                                            />
-                                                                                                        )}
-                                                                                                    </>
+                                                                                                <>
+                                                                                                    {milestone.approvalComments.length > 0 && (
+                                                                                                        <TextField
+                                                                                                            label="Approval Comments"
+                                                                                                            value={milestone.approvalComments.join('\n')}
+                                                                                                            multiline
+                                                                                                            rows={4}
+                                                                                                            fullWidth
+                                                                                                            disabled
+                                                                                                            sx={{ mb: 2, color: 'success.main' }}
+                                                                                                        />
+                                                                                                    )}
+
+                                                                                                    {milestone.rejectionComments.length > 0 && (
+                                                                                                        <TextField
+                                                                                                            label="Rejection Comments"
+                                                                                                            value={milestone.rejectionComments.join('\n')}
+                                                                                                            multiline
+                                                                                                            rows={4}
+                                                                                                            fullWidth
+                                                                                                            disabled
+                                                                                                            sx={{ mb: 2, color: 'error.main' }}
+                                                                                                        />
+                                                                                                    )}
+                                                                                                </>
                                                                                             </>
                                                                                         ) : (
                                                                                             (userType === 'Freelancer') && (
@@ -534,109 +536,17 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 </Box>
             )}
 
-            <Modal
+            <BillingModal
                 open={openModal}
                 onClose={handleCloseModal}
-                aria-labelledby="payment-modal-title"
-                aria-describedby="payment-modal-description"
-            >
-                <Box sx={{ width: 400, margin: 'auto', padding: 4, backgroundColor: 'white', marginTop: '10%', borderRadius: 2 }}>
-
-                    <Typography id="payment-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-                        Add Payment
-                        <IconButton
-                            onClick={handleCloseModal}
-                            sx={{
-                                position: 'relative',
-                                float: 'right',
-
-                            }}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                    </Typography>
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel color="secondary">
-                            {milestoneLabel}
-                        </InputLabel>
-                        <Select
-                            label={milestoneLabel}
-                            name="milestoneText"
-                            color="secondary"
-                            value={paymentDetails.milestoneText}
-                            onChange={handlePaymentDetailsChange}
-                            required
-
-                        >
-                            {submittedMilestones.map((milestone, index) => (
-                                <MenuItem key={index} value={(milestone as any).name.text}>
-                                    {(milestone as any).name.text}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <TextField
-                        label="Amount"
-                        name="amount"
-                        color="secondary"
-                        value={paymentDetails.amount}
-                        onChange={handleTextFieldChange}
-                        fullWidth
-                        required
-                        sx={{ mb: 2 }}
-                        inputProps={{ type: 'number' }}
-                    />
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel color="secondary">Currency</InputLabel>
-                        <Select
-                            name="currency"
-                            value={paymentDetails.currency}
-                            onChange={handlePaymentDetailsChange}
-                            color="secondary"
-                            label="Currency"
-                        >
-                            <MenuItem value="USD">USD</MenuItem>
-                            <MenuItem value="INR">INR</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateTimePicker
-                            label="Payment Date"
-                            sx={{ marginBottom: '15px' }}
-                            value={paymentDetails.paymentDate}
-                            onChange={handleDateChange}
-                            slotProps={{
-                                textField: {
-                                    color: 'secondary',
-
-                                },
-                            }}
-                        />
-                    </LocalizationProvider>
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel color="secondary">Category</InputLabel>
-                        <Select
-                            name="category"
-                            value={paymentDetails.category}
-                            onChange={handlePaymentDetailsChange}
-                            color="secondary"
-                            label="Category"
-                            required
-                        >
-                            <MenuItem value="received from Project Owner">Received from Project Owner</MenuItem>
-                            <MenuItem value="Paid to Innovator/Freelancer">Paid to Innovator/Freelancer</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Button
-                        onClick={handleAddPayment}
-                        variant="contained"
-                        disabled={isSubmitting || !isFormValid()}
-                    >
-                        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
-                    </Button>
-                </Box>
-            </Modal>
+                paymentDetails={paymentDetails}
+                submittedMilestones={submittedMilestones}
+                onPaymentDetailsChange={handlePaymentDetailsChange}
+                onTextFieldChange={handleTextFieldChange}
+                onDateChange={handleDateChange}
+                onAddPayment={handleAddPayment}
+                isSubmitting={isSubmitting}
+            />
             <ApproveMilestoneDialog
                 open={approveDialogOpen}
                 onClose={handleCloseApproveDialog}
