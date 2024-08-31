@@ -5,7 +5,9 @@ import { ProposalService } from './proposal.service';
 import { ProposalController } from './proposal.controller';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Proposal', schema: ProposalSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: 'Proposal', schema: ProposalSchema }]),
+  ],
   providers: [ProposalService],
   controllers: [ProposalController],
   exports: [ProposalService],

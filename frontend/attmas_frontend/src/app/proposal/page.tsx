@@ -17,6 +17,7 @@ import ProposalStep1 from '../component/proposal/ProposalStep1'
 import ProposalStep2 from '../component/proposal/ProposalStep2'
 import ProposalStep3 from '../component/proposal/ProposalStep3'
 import ProposalConfirmationDialog from '../component/All_ConfirmationBox/ProposalConfirmationDialog';
+import UserDrawer from '../component/UserNameSeperate/UserDrawer';
 
 interface Proposal {
     _id: string;
@@ -26,15 +27,17 @@ interface Proposal {
     firstname: string;
     lastname: string;
     jobDetails: JobDetails;
-
+    userId?: UserSchema;
+    userName:string;
 }
 
 interface JobDetails {
 
     firstName: string;
     lastName: string;
-    
-  }
+    username: string;
+
+}
 
 
 
@@ -54,6 +57,8 @@ const proposal = () => {
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
     const [projects, setProjects] = useState<Apply[]>([]);
+    const [selectedUser, setSelectedUser] = React.useState<string>('');
+    const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
 
 
     const [selectedProject, setSelectedProject] = useState<Job | null>(null);
@@ -79,6 +84,17 @@ const proposal = () => {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+
+    const handleUserClick = (username: string) => {
+        setSelectedUser(username);
+        setDrawerOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setDrawerOpen(false);
+        setSelectedUser('');
     };
 
     const fetchAllProjects = useCallback(async () => {
@@ -358,11 +374,19 @@ const proposal = () => {
                                     <CardContent>
                                         <Typography variant="h6">{proposal.projectTitle}</Typography>
                                         <Typography variant="body1">
-                                            <span style={{ fontWeight: 'bold' }}>Project Owner Name:</span>
+                                        <span style={{ fontWeight: 'bold' }} onClick={() => {
+                                               
+                                                handleUserClick(proposal?.jobDetails?.username);
+                                            }}>
+                                                Project Owner Name:
+                                            </span>
                                             {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
                                         </Typography>
                                         <Typography variant="body1">
-                                            <span style={{ fontWeight: 'bold' }}>Freelancer Name:</span>
+                                            <span style={{ fontWeight: 'bold' }} onClick={() => {
+                                                console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
+                                                handleUserClick(proposal?.userName);
+                                            }}>Freelancer Name:</span>
                                             {` ${proposal.firstname} ${proposal.lastname}`}
                                         </Typography>
                                         <Box
@@ -417,7 +441,7 @@ const proposal = () => {
 
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                {(userDetails.userType === 'Innovators' || userDetails.userType === 'Freelancer') && (
                     <>
                         {projects.length > 0 ? (
                             <Box>
@@ -517,6 +541,111 @@ const proposal = () => {
 
 
             </Box>
+
+
+            {/* <Box sx={{ mt: 2, position: 'relative' }}>
+                {(userDetails.userType === 'Freelancer') && (
+                    <>
+                        {projects.length > 0 ? (
+                            <Box>
+                                {projects.map((project) => (
+                                    <Card key={project._id} sx={{ mb: 2 }}>
+                                        <CardContent>
+                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box
+                                                    onClick={() => handleViewJob(project.jobDetails)}
+                                                    sx={{ cursor: 'pointer' }}
+                                                >
+                                                    {project.title}
+                                                </Box>
+                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                    {dayjs(project.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                </Box>
+                                            </Typography>
+
+
+
+                                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                                {project.jobDetails.currency} {project.jobDetails.Budget}
+                                            </Typography>
+
+
+                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box sx={{
+                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
+                                                }}>
+
+
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => {
+                                                            handleViewJob(project.jobDetails); // Call handleViewJob with the relevant job details
+                                                            setOpen(true); // Open the proposal dialog
+                                                        }}
+                                                    >
+                                                        Proposal
+                                                    </Button>
+
+                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
+                                                        <DialogTitle>Submit Proposal</DialogTitle>
+                                                        <DialogContent>
+                                                            {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
+                                                            {step === 2 && <ProposalStep2 onNext={handleNextStep} onPrevious={handlePreviousStep} />}
+                                                            {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={handlePreviousStep} />}
+                                                        </DialogContent>
+                                                        <DialogActions>
+                                                            <Button onClick={() => setOpen(false)}>Cancel</Button>
+                                                        </DialogActions>
+                                                    </Dialog>
+
+
+
+                                                </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <Button
+                                                        aria-controls="simple-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={handleClick}
+                                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        endIcon={<MoreVertIcon />}
+                                                    >
+                                                        More
+                                                    </Button>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                border: '1px solid',
+                                                                boxShadow: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                    </Menu>
+                                                </Box>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </Box>
+                        ) : (
+                            <Typography>No projects available</Typography>
+                        )}
+                    </>
+                )}
+
+            </Box> */}
+            
+            {selectedUser ? (
+                    <UserDrawer
+                        open={drawerOpen}
+                        onClose={handleDrawerClose}
+                        username={selectedUser}
+                    />
+                ) : ""}
         </Box>
     );
 };
