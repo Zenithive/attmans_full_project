@@ -103,6 +103,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const currentUser = userDetails.username;
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  // const [filteredApplications, setFilteredApplications] = useState<Apply[]>([]);
+  
 
 
 
@@ -113,6 +115,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       try {
         const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
         setApplications(response.data);
+        // getFilteredApplications(response.data);
       } catch (error) {
         console.error('Error fetching applications:', error);
       }
@@ -154,19 +157,40 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     }
   };
 
+  // const getFilteredApplications = (receivedApplication: any[]) => {
+  //   const tmpFilteredApps = receivedApplication.filter(app => {
+  //     if (filter === 'All') return true;
+  //     return app.status === filter;
+  //   }).filter(app => {
+  //     if (userType === 'Project Owner') {
+  //       return (app.status === 'Approved' || app.status === 'Awarded') && currentUser === viewingJob?.username;
+  //     }
+  //     if (userType === 'Innovators' || userType === 'Freelancer') {
+  //       return app.username === currentUser;
+  //     }
+  //     return true;
+  
+  //   setFilteredApplications(tmpFilteredApps);
+  //   });
+  // }
+  // useEffect(() => {
+  //   getFilteredApplications(applications);
+  // }, [filter, applications, userType, currentUser, viewingJob]);
 
-  const filteredApplications = applications.filter(app => {
+  const filteredApplicationse = applications.filter(app => {
     if (filter === 'All') return true;
     return app.status === filter;
   }).filter(app => {
     if (userType === 'Project Owner') {
-      return (app.status === 'Approved' || app.status === 'Awarded') && currentUser === viewingJob?.username;
+      return (app.status === 'Approved' || app.status === 'Awarded') 
+      && currentUser === viewingJob?.username;
     }
     if (userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser;
     }
     return true;
   });
+  
 
   const handleCommentSubmitted = () => {
     fetchApplications();
@@ -179,7 +203,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
-    (userType === 'Innovators' || userType === 'Freelancer') && filteredApplications.some(app => app.username === currentUser && app.status === 'Approved' || app.status === 'Awarded');
+    (userType === 'Innovators' || userType === 'Freelancer') 
+    && filteredApplicationse.some(app => app.username === currentUser && app.status === 'Approved' || app.status === 'Awarded');
 
   const handleReward = async (applicationId: string, Comment: string) => {
     try {
@@ -595,8 +620,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               )}
 
               <Box p={2} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                {filteredApplications.length > 0 ? (
-                  filteredApplications.map((app) => (
+                {applications.length > 0 ? (
+                  applications.map((app) => (
                     <Card
                       key={app._id}
                       sx={{
@@ -667,7 +692,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           (userType === 'Admin' ||
                             userType === 'Project Owner' ||
                             (userType === 'Innovators' || userType === 'Freelancer') &&
-                            filteredApplications.some((filteredApp) => filteredApp.username === currentUser && filteredApp._id === app._id))
+                            applications.some((filteredApp) => filteredApp.username === currentUser && filteredApp._id === app._id))
                         ) && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
                               <a

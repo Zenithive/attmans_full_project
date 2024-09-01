@@ -29,7 +29,7 @@ export class JobsController {
   @Get()
   async findAll(
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('limit') limit: string = '10',
     @Query('Category') Category: string[] = [],
     @Query('userId') userId?: string,
     @Query('Subcategorys') Subcategorys: string[] = [],
@@ -43,7 +43,7 @@ export class JobsController {
   ): Promise<Jobs[]> {
     return this.jobsService.filterJobs(
       page,
-      limit,
+      parseInt(limit),
       Category,
       userId,
       Subcategorys,

@@ -457,7 +457,7 @@ const Jobs = () => {
                     <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
                 </Box>
             </Box>
-
+            
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (
                     <Box>
