@@ -19,6 +19,9 @@ import { useMemo, useCallback } from 'react';
 import { PubSub, pubsub } from '@/app/services/pubsub.service';
 import { Industry, options, Subjects } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise';
+import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from '@/app/constants/common.constants';
+import { formatToLocal, formatToUTC } from '@/app/services/date.service';
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 interface Exhibition {
     _id?: string;
     title: string;
@@ -27,6 +30,7 @@ interface Exhibition {
     videoUrl: string;
     meetingUrl: string;
     dateTime: string;
+    exhbTime: string;
     industries: string[];
     subjects: string[];
     username: string;
@@ -45,7 +49,8 @@ const validationSchema = Yup.object().shape({
     status: Yup.string(),
     videoUrl: Yup.string().required('Video URL is required'),
     meetingUrl: Yup.string().required('Meeting URL is required'),
-    dateTime: Yup.date().nullable('Date & Time is required'),
+    dateTime: Yup.date().nullable('Date is required'),
+    exhbTime: Yup.date().nullable('Time is required'),
     categoryforIndustries: Yup.array().of(Yup.string()),
     subject: Yup.array().of(Yup.string())
 });
@@ -64,6 +69,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         videoUrl: '',
         meetingUrl: '',
         dateTime: null as Dayjs | null,
+        exhbTime: null as Dayjs | null,
         categoryforIndustries: [],
         subject: []
     }), []);
@@ -96,12 +102,15 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         category: subject.category,
         label: item
     }))), [subjects]);
-    const handleSubmit = React.useCallback(async (values: { title: string; description: string; status: string; dateTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; videoUrl: string; meetingUrl:string }, { setSubmitting, resetForm }: any) => {
+
+
+    const handleSubmit = React.useCallback(async (values: { title: string; description: string; status: string; dateTime: Dayjs | null; exhbTime: Dayjs | null; categoryforIndustries: string[]; subject: string[]; videoUrl: string; meetingUrl: string }, { setSubmitting, resetForm }: any) => {
         const exhibitionData = {
             title: values.title,
             description: values.description,
-            dateTime: values.dateTime ? values.dateTime.toISOString() : null,
+            dateTime: values.dateTime ? dayjs(values.dateTime).format(DATE_FORMAT) : null,
             status: values.status,
+            exhbTime: dayjs(values.exhbTime).format(TIME_FORMAT),
             videoUrl: values.videoUrl,
             meetingUrl: values.meetingUrl,
             industries: values.categoryforIndustries,
@@ -110,7 +119,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
             username: userDetails.username
         };
 
-        console.log("wee", exhibitionData);
+        console.log("exhibitionData", exhibitionData);
 
         try {
             if (editingExhibition) {
@@ -138,10 +147,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         <>
             {userType === "Admin" && (
                 <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
+                    ml: 3, minWidth: 150, py: 0,
                     borderRadius: 3, backgroundColor: '#CC4800', color: "white", '@media (max-width: 767px)': {
                         position: 'relative', width: '157%'
                     }
-                }}>    {editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+                }}>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
             )}
             <Drawer sx={{
                 '& .MuiDrawer-paper': {
@@ -165,6 +175,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                         videoUrl: editingExhibition.videoUrl || '',
                         meetingUrl: editingExhibition.meetingUrl || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
+                        exhbTime: editingExhibition.exhbTime ? dayjs(editingExhibition.exhbTime, TIME_FORMAT) : null,
                         categoryforIndustries: editingExhibition.industries || [],
                         subject: editingExhibition.subjects || []
                     } : initialValues}
@@ -228,24 +239,24 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     error={!!(errors.meetingUrl && touched.meetingUrl)}
                                     helperText={<ErrorMessage name="meetingUrl" />}
                                 />
-                              
-                                    <FormControl fullWidth>
-                                        <InputLabel id="status-label" color='secondary'>Status</InputLabel>
-                                        <Select
-                                            labelId="status-label"
-                                            id="status"
-                                            name="status"
-                                            color='secondary'
-                                            value={values.status}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            label="Status"
-                                        >
-                                            <MenuItem value="open">open</MenuItem>
-                                            <MenuItem value="close">close</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                               
+
+                                <FormControl fullWidth>
+                                    <InputLabel id="status-label" color='secondary'>Status</InputLabel>
+                                    <Select
+                                        labelId="status-label"
+                                        id="status"
+                                        name="status"
+                                        color='secondary'
+                                        value={values.status}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        label="Status"
+                                    >
+                                        <MenuItem value="open">open</MenuItem>
+                                        <MenuItem value="close">close</MenuItem>
+                                    </Select>
+                                </FormControl>
+
                                 <Autocomplete
                                     multiple
                                     options={industries}
@@ -295,11 +306,20 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
 
 
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DateTimePicker
-                                        label="Date & Time"
-                                        value={values.dateTime}
-                                        onChange={(newValue) => setFieldValue('dateTime', newValue)}
-                                    />
+                                    <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                                        <DatePicker
+                                            format={DATE_FORMAT}
+                                            label="Date"
+                                            value={values.dateTime}
+                                            onChange={(newValue) => setFieldValue('dateTime', newValue)}
+                                        />
+
+                                        <TimePicker
+                                            label="Select Time"
+                                            value={values.exhbTime}
+                                            onChange={(newValue) => setFieldValue('exhbTime', newValue)}    
+                                        />
+                                    </Box>
                                 </LocalizationProvider>
 
 

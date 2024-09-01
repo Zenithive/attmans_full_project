@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Exhibition, ExhibitionDocument } from './schema/exhibition.schema';
 import {
   SendToInnovators,
@@ -13,6 +13,7 @@ import {
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { UsersService } from 'src/users/users.service';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
+import { getSameDateISOs } from 'src/services/util.services';
 
 @Injectable()
 export class ExhibitionService {
@@ -86,22 +87,40 @@ export class ExhibitionService {
     page: number,
     limit: number,
     userId?: string,
+    title?: string,
     industries?: string[],
     subjects?: string[],
+    createdAt?: string,
+    dateTime?: string,
+    status?: string,
   ): Promise<Exhibition[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
 
-    if (userId) {
-      filter.userId = userId;
-    }
+    const allNativeFiltersArray = {
+      title,
+      industries,
+      subjects,
+      createdAt,
+      dateTime,
+      status,
+    };
 
-    if (industries && industries.length > 0) {
-      filter.industries = { $in: industries };
-    }
-
-    if (subjects && subjects.length > 0) {
-      filter.subjects = { $in: subjects };
+    for (const key in allNativeFiltersArray) {
+      if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+        const element = allNativeFiltersArray[key];
+        if (key === 'createdAt' && element) {
+          const sameDateISOs = getSameDateISOs(element);
+          filter[key] = {
+            $gte: sameDateISOs.startOfDay,
+            $lte: sameDateISOs.endOfDay,
+          };
+        } else if (key === 'userId' && element) {
+          filter[key] = new Types.ObjectId(userId);
+        } else if (element) {
+          filter[key] = new RegExp(element, 'i');
+        }
+      }
     }
 
     return this.exhibitionModel

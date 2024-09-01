@@ -24,7 +24,11 @@ export class CreateExhibitionDto {
 
   @IsNotEmpty()
   @IsString()
-  dateTime: Date;
+  dateTime: string;
+
+  @IsNotEmpty()
+  @IsString()
+  exhbTime: string;
 
   @IsNotEmpty()
   @IsString()

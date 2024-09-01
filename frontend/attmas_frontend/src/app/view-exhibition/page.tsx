@@ -15,6 +15,7 @@ import Head from 'next/head';
 import IntrestedModal from '../component/booth/intrestedUsers';
 import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
+import { DATE_TIME_FORMAT } from '../constants/common.constants';
 
 interface Exhibition {
   _id?: string;
@@ -24,6 +25,7 @@ interface Exhibition {
   videoUrl: string;
   meetingUrl: string;
   dateTime: string;
+  exhbTime: string;
   industries: string[];
   subjects: string[];
   userId?: string;
@@ -474,7 +476,7 @@ const ExhibitionsPage: React.FC = () => {
                         }
                       }}
                     >
-                      ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
+                      ({!exhibition.exhbTime ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT): exhibition.dateTime} {exhibition.exhbTime || ''})
                     </Box>
                   </Typography>
                   <Typography variant="h5" sx={{ fontSize: 'medium', marginBottom: '10px' }}>{exhibition.description}</Typography>
