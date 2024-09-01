@@ -5,23 +5,23 @@ export type BoothDocument = Booth & Document;
 
 @Schema()
 export class Product {
-  @Prop({ required: true })
-  productName: string;
+  // @Prop({ required: false })
+  // productName: string;
 
-  @Prop({ required: true })
-  productDescription: string;
+  // @Prop({ required: false })
+  // productDescription: string;
 
-  @Prop({ required: true })
-  productType: string;
+  // @Prop({ required: true })
+  // productType: string;
 
-  @Prop({ required: true })
-  productPrice: number;
+  // @Prop({ required: false })
+  // productPrice: number;
 
-  @Prop({ required: true })
-  currency: string;
+  // @Prop({ required: false })
+  // currency: string;
 
-  @Prop({ required: true })
-  videourlForproduct: string;
+  // @Prop({ required: false })
+  // videourlForproduct: string;
 
   @Prop({ required: false })
   _id: string;
@@ -40,7 +40,7 @@ export class Booth {
   @Prop({ required: true })
   videoUrl: string;
 
-  @Prop({ type: [ProductSchema], required: true })
+  @Prop({ required: false })
   products: Product[];
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })

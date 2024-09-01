@@ -42,13 +42,13 @@ export class BoothService {
       (product) => !product._id,
     );
 
-    if (newProducts.length > 0) {
-      // Update WorkExprience by matching the username and pushing new products
-      await this.workExperienceModel.updateOne(
-        { username: createBoothDto.username }, // Match by username
-        { $push: { products: { $each: newProducts } } }, // Push new products into products array
-      );
-    }
+    // if (newProducts.length > 0) {
+    //   // Update WorkExprience by matching the username and pushing new products
+    //   await this.workExperienceModel.updateOne(
+    //     { username: createBoothDto.username }, // Match by username
+    //     { $push: { products: { $each: newProducts } } }, // Push new products into products array
+    //   );
+    // }
 
     const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
 
