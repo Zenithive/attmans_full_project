@@ -177,7 +177,7 @@ const Exhibition = () => {
   const [editingExhibition, setEditingExhibition] = useState<Exhibition | null>(null);
   const [sendingExhibition, setSendingExhibition] = useState<Exhibition | null>(null);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [toggleFilter, setToggleFilter] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [filterType, setFilterType] = useState('all');
@@ -234,7 +234,7 @@ const Exhibition = () => {
 
   const fetchExhibitions = useCallback(async (page: number) => {
     try {
-      const response = await axios.get(`${APIS.EXHIBITION}?page=${page}&${filter}`);
+      const response = await axios.get(`${APIS.EXHIBITION}?page=${page}${toggleFilter}&${filter}`);
       if (response.data.length === 0) {
         setHasMore(false);
       } else {
@@ -251,7 +251,7 @@ const Exhibition = () => {
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
     }
-  }, [userId, filterType, filter]);
+  }, [userId, toggleFilter, filter]);
 
   const refetch = useCallback(async () => {
     try {
@@ -266,13 +266,13 @@ const Exhibition = () => {
 
   useEffect(() => {
     refetch();
-  }, [filter, filterType]);
+  }, [filter, toggleFilter]);
 
   useEffect(() => {
     if (page > 1) {
       fetchExhibitions(page);
     }
-  }, [page, filter]);
+  }, [page, filter, toggleFilter]);
 
   useEffect(() => {
     pubsub.subscribe('ExhibitionCreated', refetch);
@@ -324,8 +324,12 @@ const Exhibition = () => {
   }, [refetch]);
 
   const handleFilterTypeChange = (event: React.MouseEvent<HTMLElement>, newFilterType: string) => {
-    if (newFilterType !== null) {
-      setFilterType(newFilterType);
+    //setFilterType(`&userId=${userId}`);
+    setFilterType(newFilterType);
+    if (newFilterType == 'mine') {
+      setToggleFilter(`&userId=${userId}`);
+    }else{
+      setToggleFilter(``);
     }
   };
 
@@ -384,7 +388,7 @@ const Exhibition = () => {
         </Box>
       
       </Box>
-      <Box
+      {userType === "Admin" && <Box
           sx={{
             display: 'flex',
             justifyContent: 'flex-start',
@@ -412,7 +416,7 @@ const Exhibition = () => {
               My Exhibitions
             </ToggleButton>
           </ToggleButtonGroup>
-        </Box>
+        </Box>}
       <InfiniteScroll
         dataLength={exhibitions.length}
         next={() => setPage(prev => prev + 1)}
@@ -439,7 +443,7 @@ const Exhibition = () => {
                     {exhibition.status}
                   </span>
                 </Typography>
-                <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
+                <Typography variant="caption">{exhibition.industries.join(', ')} | {exhibition.subjects.join(', ')}</Typography>
                 <Typography sx={{ display: "flex", float: "right" }}>
                   {userType === "Admin" && (
                     <IconButton onClick={() => handleEditExhibition(exhibition)}>

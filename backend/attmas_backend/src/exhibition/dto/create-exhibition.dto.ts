@@ -79,4 +79,8 @@ export class UpdateExhibitionDto {
 
   @IsUrl()
   meetingUrl?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  userId: Types.ObjectId;
 }

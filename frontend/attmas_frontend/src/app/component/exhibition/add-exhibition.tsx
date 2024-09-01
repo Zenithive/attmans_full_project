@@ -315,6 +315,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                         />
 
                                         <TimePicker
+                                            format={TIME_FORMAT}
                                             label="Select Time"
                                             value={values.exhbTime}
                                             onChange={(newValue) => setFieldValue('exhbTime', newValue)}    
