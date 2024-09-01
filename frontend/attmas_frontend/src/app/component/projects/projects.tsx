@@ -9,7 +9,6 @@ import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { pubsub } from '@/app/services/pubsub.service';
 import { Formik, Form, ErrorMessage } from 'formik';
@@ -106,18 +105,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             toggleDrawer(true);
         }
     }, [editingJobs]);
-
-
-
-
-
-    const allSubcategoryItems = React.useMemo(() =>
-        Subcategorys().flatMap((subcategory) =>
-            subcategory.items.map((item) => ({
-                category: subcategory.category,
-                label: item,
-            }))
-        ), []);
 
     const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; Quantity: number; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; currency: string; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {

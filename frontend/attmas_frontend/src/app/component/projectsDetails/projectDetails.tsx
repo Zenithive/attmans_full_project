@@ -25,6 +25,7 @@ import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 
 
@@ -263,7 +264,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   Status: {apply.status}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
-                  Date: {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                  Date: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
                 </Typography>
               </Box>
               <Grid container spacing={2} flexDirection={'column'}>
@@ -355,7 +356,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                             <Grid item xs={12} sm={5}>
                                               <TextField
                                                 label="Milestone Deadline Date"
-                                                value={m.name.timeFrame ? dayjs(m.name.timeFrame).format('MM/DD/YYYY') : 'No time frame available'}
+                                                value={m.name.timeFrame ? dayjs(m.name.timeFrame).format(DATE_FORMAT) : 'No time frame available'}
                                                 fullWidth
                                                 color='secondary'
                                                 aria-readonly
@@ -387,7 +388,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 <Grid item xs={12} sm={5}>
                                                   <TextField
                                                     label="Submitted Date"
-                                                    value={m.submittedAt ? dayjs(m.submittedAt).format('MM/DD/YYYY') : 'No Submitted Date available'}
+                                                    value={m.submittedAt ? dayjs(m.submittedAt).format(DATE_FORMAT) : 'No Submitted Date available'}
                                                     fullWidth
                                                     color='secondary'
                                                     aria-readonly

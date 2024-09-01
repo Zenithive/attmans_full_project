@@ -24,6 +24,7 @@ import { Job, Apply } from './projectinterface';
 import { CustomChip } from './projectinterface';
 import { AddApplyForInnovatores } from '../component/innovatoreApply/innovatoreApply';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
+import { DATE_FORMAT } from '../constants/common.constants';
 
 
 const Jobs = () => {
@@ -258,9 +259,16 @@ const Jobs = () => {
 
     useEffect(() => {
         pubsub.subscribe('JobUpdated', refetch);
-
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
+
+        };
+    }, [refetch]);
+
+    useEffect(() => {
+        pubsub.subscribe('JobCreated', refetch);
+        return () => {
+            pubsub.unsubscribe('JobCreated', refetch);
 
         };
     }, [refetch]);
@@ -458,8 +466,6 @@ const Jobs = () => {
                 </Box>
             </Box>
 
-
-
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (
                     <Box>
@@ -505,10 +511,10 @@ const Jobs = () => {
 
                                             <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
                                                 <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
-                                                    {job.title},
+                                                    {job.title} 
                                                 </a>
-                                                <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                    ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                <span style={{ fontSize: 'small', color: "#616161", marginLeft: 10 }}>
+                                                    ({dayjs(job.TimeFrame).format(DATE_FORMAT)})
                                                 </span>
                                             </Box>
 

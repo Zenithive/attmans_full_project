@@ -53,13 +53,21 @@ export class ExhibitionController {
     @Query('industries') industries: string[] = [],
     @Query('subjects') subjects: string[] = [],
     @Query('userId') userId?: string,
+    @Query('title') title?: string,
+    @Query('createdAt') createdAt?: string,
+    @Query('dateTime') dateTime?: string,
+    @Query('status') status?: string,
   ): Promise<Exhibition[]> {
     return this.exhibitionService.findAll(
       page,
       limit,
       userId,
+      title,
       industries,
       subjects,
+      createdAt,
+      dateTime,
+      status,
     );
   }
 

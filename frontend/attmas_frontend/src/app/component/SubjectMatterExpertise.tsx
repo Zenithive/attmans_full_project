@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Chip, Checkbox, TextField } from '@mui/material';
+import { Box, Chip, Checkbox, TextField, Button } from '@mui/material';
 import { options } from '@/app/constants/categories';
 
 interface options {
@@ -117,15 +117,17 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
           )
         )}
       </button>
-
       {isOpen && (
         <div className="dropdown-content">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+          <Box sx={{display: 'flex'}}>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            <Button onClick={()=> handleToggleDropdown()} type='button' sx={{ml: 2, mb: 1}} size='small' variant='text'>Close</Button>
+          </Box>
           <div className="options-container">
             {renderOptions(filteredOptions)}
           </div>
