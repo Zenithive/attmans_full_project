@@ -18,6 +18,7 @@ import ProposalStep2 from '../component/proposal/ProposalStep2'
 import ProposalStep3 from '../component/proposal/ProposalStep3'
 import ProposalConfirmationDialog from '../component/All_ConfirmationBox/ProposalConfirmationDialog';
 import UserDrawer from '../component/UserNameSeperate/UserDrawer';
+import { DATE_FORMAT } from '../constants/common.constants';
 
 interface Proposal {
     _id: string;
@@ -28,7 +29,7 @@ interface Proposal {
     lastname: string;
     jobDetails: JobDetails;
     userId?: UserSchema;
-    userName:string;
+    userName: string;
 }
 
 interface JobDetails {
@@ -289,10 +290,6 @@ const proposal = () => {
                     <Typography variant="h4">All Proposals</Typography>
                 )}
 
-
-
-
-
             </Box>
 
 
@@ -374,8 +371,8 @@ const proposal = () => {
                                     <CardContent>
                                         <Typography variant="h6">{proposal.projectTitle}</Typography>
                                         <Typography variant="body1">
-                                        <span style={{ fontWeight: 'bold' }} onClick={() => {
-                                               
+                                            <span style={{ fontWeight: 'bold' }} onClick={() => {
+
                                                 handleUserClick(proposal?.jobDetails?.username);
                                             }}>
                                                 Project Owner Name:
@@ -456,36 +453,31 @@ const proposal = () => {
                                                     {project.jobDetails.title}
                                                 </Box>
                                                 <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                    {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
                                                 </Box>
                                             </Typography>
-
 
 
                                             <Typography variant="body1" sx={{ mt: 1 }}>
                                                 {project.jobDetails.currency} {project.jobDetails.Budget}
                                             </Typography>
 
-
-
-                                            <Typography variant="body2" sx={{ mt: 1 }}>
-                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
-                                            </Typography>
-
-                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                <Typography variant="body2" sx={{ mt: 1 }}>
+                                                    {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? ` | ${project.jobDetails.Subcategorys.join(', ')}` : ''}
+                                                </Typography>
                                                 <Box sx={{
                                                     fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
                                                 }}>
-
-
                                                     <Button
                                                         variant="contained"
+                                                        size='small'
                                                         onClick={() => {
                                                             handleViewJob(project.jobDetails); // Call handleViewJob with the relevant job details
                                                             setOpen(true); // Open the proposal dialog
                                                         }}
                                                     >
-                                                        Proposal
+                                                        Submit Proposal
                                                     </Button>
 
                                                     <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
@@ -503,6 +495,7 @@ const proposal = () => {
 
 
                                                 </Box>
+                                            </Box>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Button
                                                         aria-controls="simple-menu"
@@ -528,7 +521,6 @@ const proposal = () => {
                                                     >
                                                     </Menu>
                                                 </Box>
-                                            </Box>
                                         </CardContent>
                                     </Card>
                                 ))}
@@ -638,14 +630,14 @@ const proposal = () => {
                 )}
 
             </Box> */}
-            
+
             {selectedUser ? (
-                    <UserDrawer
-                        open={drawerOpen}
-                        onClose={handleDrawerClose}
-                        username={selectedUser}
-                    />
-                ) : ""}
+                <UserDrawer
+                    open={drawerOpen}
+                    onClose={handleDrawerClose}
+                    username={selectedUser}
+                />
+            ) : ""}
         </Box>
     );
 };

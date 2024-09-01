@@ -106,18 +106,6 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         }
     }, [editingJobs]);
 
-
-
-
-
-    const allSubcategoryItems = React.useMemo(() =>
-        Subcategorys().flatMap((subcategory) =>
-            subcategory.items.map((item) => ({
-                category: subcategory.category,
-                label: item,
-            }))
-        ), []);
-
     const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; Quantity: number; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; currency: string; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {
             title: values.title,

@@ -17,6 +17,7 @@ import ConfirmCloseBox from '../All_ConfirmationBox/ConfirmCloseBox';
 import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import ConfirmationDialogWithCommentForCancel from '../All_ConfirmationBox/ConfirmationDialogWithCommentForCancel';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 
 
@@ -405,7 +406,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 <Grid item xs={12} sm={6}>
                   <TextField
                     label="Created Date"
-                    value={dayjs(viewingJob.createdAt).format('MMMM D, YYYY h:mm A')}
+                    value={dayjs(viewingJob.createdAt).format(DATE_FORMAT)}
                     fullWidth
                     color='secondary'
                     aria-readonly
@@ -667,7 +668,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           {app.title}
                         </Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Applied User:</b> 
+                          <b>Applied User: </b> 
                           <a
                                 href="javascript:void(0);"
                                 onClick={(e) => {
@@ -685,7 +686,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
                         </Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format('MMMM D, YYYY h:mm A') : 'N/A'}
+                          <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format(DATE_FORMAT) : 'N/A'}
                         </Typography>
 
                         {userDetails && (
