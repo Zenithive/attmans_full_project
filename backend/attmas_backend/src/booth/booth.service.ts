@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Booth, BoothDocument, Product } from './booth.schema';
 import { CreateBoothDto } from './create-booth.dto';
 import { User, UserDocument } from 'src/users/user.schema';
@@ -26,32 +26,45 @@ export class BoothService {
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
     console.log('Booth Products:', createBoothDto.products);
 
+    // for (let index = 0; index < createBoothDto.products.length; index++) {
+    //   //let element: string = createBoothDto.products[index];
+    //   createBoothDto.products[index] = new Types.ObjectId(createBoothDto.products[index]);
+    // }
+  
+    // Convert `_id` to `ObjectId` if it is a valid string
+    // createBoothDto.products = createBoothDto.products.forEach((product) => {
+    //   if (typeof product === 'string' && Types.ObjectId.isValid(product)) {
+    //     return { ...product, _id: new Types.ObjectId(product) }; // Convert string to ObjectId
+    //   }
+    //   return product; // Return as is if not a string or already an ObjectId
+    // });
+  
     const existingBooth = await this.boothModel.findOne({
       exhibitionId: createBoothDto.exhibitionId,
-      userId: createBoothDto.userId, // Ensure that this comes from the user details in your DTO
+      userId: createBoothDto.userId,
     });
-
+  
     if (existingBooth) {
       throw new Error('You have already participated in this exhibition');
     }
-
+  
     const createdBooth = new this.boothModel(createBoothDto);
     const booth = await createdBooth.save();
-
+  
     const newProducts = createBoothDto.products.filter(
       (product) => !product._id,
     );
-
-    if (newProducts.length > 0) {
-      // Update WorkExprience by matching the username and pushing new products
-      await this.workExperienceModel.updateOne(
-        { username: createBoothDto.username }, // Match by username
-        { $push: { products: { $each: newProducts } } }, // Push new products into products array
-      );
-    }
-
+  
+    // if (newProducts.length > 0) {
+    //   // Update WorkExperience by matching the username and pushing new products
+    //   await this.workExperienceModel.updateOne(
+    //     { username: createBoothDto.username },
+    //     { $push: { products: { $each: newProducts } } },
+    //   );
+    // }
+  
     const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
-
+  
     const exhibition = await this.exhibitionModel
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
@@ -69,6 +82,7 @@ export class BoothService {
     console.log('exhibition', exhibition);
     return booth;
   }
+  
 
   async findAll(status?: string): Promise<Booth[]> {
     const filter = status ? { status } : {};
@@ -78,6 +92,53 @@ export class BoothService {
       .exec();
   }
 
+  // async findWorkExpriencesWithProductDetails(productId: string): Promise<any[]> {
+  //   return this.workExperienceModel.aggregate([
+  //     {
+  //       $unwind: '$products', // Deconstruct the products array to process each ObjectId individually
+  //     },
+  //     {
+  //       $match: {
+  //         products: new mongoose.Types.ObjectId(productId), // Match documents with the given productId in the products array
+  //       },
+  //     },
+  //     {
+  //       $lookup: {
+  //         from: 'workexpriences', // The collection to join with
+  //         localField: 'products', // Field from the workexpriences collection (ObjectId)
+  //         foreignField: '_id', // Field from the products collection (ObjectId)
+  //         as: 'productDetails', // Output field that will contain the joined documents
+  //       },
+  //     },
+  //     {
+  //       $unwind: '$productDetails', // Deconstruct the productDetails array to process each product individually
+  //     },
+  //     {
+  //       $project: {
+  //         _id: 1,
+  //         workAddress: 1,
+  //         productToMarket: 1,
+  //         qualification: 1,
+  //         organization: 1,
+  //         sector: 1,
+  //         designation: 1,
+  //         userType: 1,
+  //         hasPatent: 1,
+  //         products: {
+  //           productName: '$productDetails.productName',
+  //           productDescription: '$productDetails.productDescription',
+  //           // productType: '$productDetails.productType',
+  //           productPrice: '$productDetails.productPrice',
+  //           currency: '$productDetails.currency',
+  //           videourlForproduct: '$productDetails.videourlForproduct',
+  //         },
+  //       },
+  //     },
+  //   ]).exec();
+  // }
+
+
+
   async findOne(id: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id).exec();
     if (!booth) {
@@ -86,17 +147,17 @@ export class BoothService {
     return booth;
   }
 
-  async findBoothProduct(username: string): Promise<Product[]> {
-    const booth = await this.boothModel
-      .findOne({ username })
-      .select('products')
-      .exec();
-    if (!booth) {
-      throw new NotFoundException(`Booth with username  ${username} not found`);
-    }
-    console.log('booth.products', booth.products);
-    return booth.products;
-  }
+  // async findBoothProduct(username: string): Promise<Product[]> {
+  //   const booth = await this.boothModel
+  //     .findOne({ username })
+  //     .select('products')
+  //     .exec();
+  //   if (!booth) {
+  //     throw new NotFoundException(`Booth with username  ${username} not found`);
+  //   }
+  //   console.log('booth.products', booth.products);
+  //   return booth.products;
+  // }
 
   async delete(id: string): Promise<Booth> {
     const deletedBooth = await this.boothModel.findByIdAndDelete(id).exec();

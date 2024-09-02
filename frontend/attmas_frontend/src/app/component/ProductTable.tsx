@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CurrencyPriceInput from './CurrencyPriceInput';
-import { ProductForBooth } from './ProductTableForBooth';
+// import { ProductForBooth } from './ProductTableForBooth';
 
 export interface Product {
     id: string;
