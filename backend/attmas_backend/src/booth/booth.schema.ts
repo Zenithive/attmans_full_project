@@ -5,26 +5,56 @@ export type BoothDocument = Booth & Document;
 
 @Schema()
 export class Product {
-  // @Prop({ required: false })
-  // productName: string;
 
-  // @Prop({ required: false })
-  // productDescription: string;
 
-  // @Prop({ required: true })
-  // productType: string;
-
-  // @Prop({ required: false })
-  // productPrice: number;
-
-  // @Prop({ required: false })
-  // currency: string;
-
-  // @Prop({ required: false })
-  // videourlForproduct: string;
+  @Prop({ type: Types.ObjectId, required: false }) // Specify type as ObjectId
+  _id?: Types.ObjectId;
 
   @Prop({ required: false })
-  _id: string;
+  productName: string;
+
+
+  @Prop({ required: false })
+  CompetitiveAdvantages: string;
+
+
+  @Prop({ required: false })
+  challengesorrisks: string;
+
+  @Prop({ required: false })
+  currency: string;
+
+  @Prop({ required: false })
+  feasibilityofthesolution: string;
+
+  @Prop({ required: false })
+  howdoesthesolutionwork: string;
+
+  @Prop({ required: false })
+  intellectualpropertyconsiderations: string;
+
+  @Prop({ required: false })
+  potentialbenefits: string;
+
+  @Prop({ required: false })
+  problemaddressed: string;
+
+  @Prop({ required: false })
+  productDescription: string;
+  
+  @Prop({ required: false })
+  productPrice: number;
+  @Prop({ required: false })
+  productQuantity: number;
+  @Prop({ required: false })
+  stageofdevelopmentdropdown: string;
+  @Prop({ required: false })
+  targetaudience: string;
+  @Prop({ required: false })
+  technologyused: string;
+  @Prop({ required: false })
+  videourlForproduct: string;
+  
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

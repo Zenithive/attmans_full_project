@@ -49,7 +49,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; }[];
+  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; stageofdevelopmentdropdown: string; productQuantity: number;      }[];
   userId: {
     firstName: string;
     lastName: string;
