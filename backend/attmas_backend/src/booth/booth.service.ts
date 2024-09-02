@@ -21,7 +21,7 @@ export class BoothService {
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
     private emailService: EmailService2,
-  ) {}
+  ) { }
 
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
     console.log('Booth Products:', createBoothDto.products);
@@ -30,7 +30,7 @@ export class BoothService {
     //   //let element: string = createBoothDto.products[index];
     //   createBoothDto.products[index] = new Types.ObjectId(createBoothDto.products[index]);
     // }
-  
+
     // Convert `_id` to `ObjectId` if it is a valid string
     // createBoothDto.products = createBoothDto.products.forEach((product) => {
     //   if (typeof product === 'string' && Types.ObjectId.isValid(product)) {
@@ -38,23 +38,28 @@ export class BoothService {
     //   }
     //   return product; // Return as is if not a string or already an ObjectId
     // });
-  
+
+    // Convert `exhibitionId` to ObjectId if it is a valid string
+    if (typeof createBoothDto.exhibitionId === 'string' && Types.ObjectId.isValid(createBoothDto.exhibitionId)) {
+      createBoothDto.exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
+    }
+
     const existingBooth = await this.boothModel.findOne({
       exhibitionId: createBoothDto.exhibitionId,
       userId: createBoothDto.userId,
     });
-  
+
     if (existingBooth) {
       throw new Error('You have already participated in this exhibition');
     }
-  
+
     const createdBooth = new this.boothModel(createBoothDto);
     const booth = await createdBooth.save();
-  
+
     const newProducts = createBoothDto.products.filter(
       (product) => !product._id,
     );
-  
+
     // if (newProducts.length > 0) {
     //   // Update WorkExperience by matching the username and pushing new products
     //   await this.workExperienceModel.updateOne(
@@ -62,9 +67,9 @@ export class BoothService {
     //     { $push: { products: { $each: newProducts } } },
     //   );
     // }
-  
+
     const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
-  
+
     const exhibition = await this.exhibitionModel
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
@@ -82,7 +87,7 @@ export class BoothService {
     console.log('exhibition', exhibition);
     return booth;
   }
-  
+
 
   async findAll(status?: string): Promise<Booth[]> {
     const filter = status ? { status } : {};
@@ -167,6 +172,40 @@ export class BoothService {
     return deletedBooth;
   }
 
+  // async approveBooth(id: string): Promise<Booth> {
+  //   const booth = await this.boothModel.findById(id);
+  //   if (!booth) {
+  //     throw new NotFoundException('Booth not found');
+  //   }
+  //   booth.status = 'Approved';
+  //   booth.buttonsHidden = true;
+  //   await booth.save();
+
+  //   const exhibitionId = new Types.ObjectId(booth.exhibitionId);
+
+  //   const exhibition: any = await this.exhibitionModel
+  //     .findById(exhibitionId)
+  //     .populate('userId', 'firstName lastName username', this.userModel)
+  //     .exec();
+  //   if (exhibition) {
+  //     const innovator = await this.userModel.findById(booth.userId);
+  //     if (innovator) {
+  //       await this.emailService.sendBoothStatusEmail(
+  //         innovator.username,
+  //         'Booth Approved',
+  //         (exhibition._id as Types.ObjectId).toHexString(),
+  //         booth.title,
+  //         'approved',
+  //         booth.username,
+  //         exhibition.userId.firstName,
+  //         exhibition.userId.lastName,
+  //       );
+  //     }
+  //   }
+
+  //   return booth;
+  // }
+
   async approveBooth(id: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id);
     if (!booth) {
@@ -182,7 +221,12 @@ export class BoothService {
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
-    if (exhibition) {
+      console.log("exhibition", exhibition);
+      console.log("exhibition.userId", exhibition.userId);
+    if (exhibition && exhibition.userId) {
+      console.log("exhibition", exhibition);
+      console.log("exhibition.userId", exhibition.userId);
+      
       const innovator = await this.userModel.findById(booth.userId);
       if (innovator) {
         await this.emailService.sendBoothStatusEmail(
@@ -196,10 +240,15 @@ export class BoothService {
           exhibition.userId.lastName,
         );
       }
+    } else {
+      // Handle the case where exhibition or exhibition.userId is null
+      console.error('Exhibition or userId is null');
+      // You might want to handle this scenario gracefully
     }
 
     return booth;
   }
+
 
   async rejectBooth(id: string, comment: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id);
