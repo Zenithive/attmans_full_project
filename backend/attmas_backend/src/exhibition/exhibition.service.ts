@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PipelineStage, Types } from 'mongoose';
 import { Exhibition, ExhibitionDocument } from './schema/exhibition.schema';
 import {
   SendToInnovators,
@@ -13,6 +13,7 @@ import {
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { UsersService } from 'src/users/users.service';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
+import { getSameDateISOs } from 'src/services/util.services';
 
 @Injectable()
 export class ExhibitionService {
@@ -42,9 +43,14 @@ export class ExhibitionService {
   async createExibitionWithSendEmail(
     createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
+    createExhibitionDto.userId = new Types.ObjectId(createExhibitionDto.userId);
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
     const savedExhibition = await createdExhibition.save();
+    this.inviteAllInnovators(savedExhibition);
+    return savedExhibition;
+  }
 
+  async inviteAllInnovators(savedExhibition) {
     // Get all users with userType 'Innovators' using UsersService
     const users = await this.usersService.findUsersByUserType1('Innovators');
 
@@ -60,8 +66,6 @@ export class ExhibitionService {
         title,
       );
     }
-
-    return savedExhibition;
   }
 
   async createSendInnovators(
@@ -86,30 +90,97 @@ export class ExhibitionService {
     page: number,
     limit: number,
     userId?: string,
+    title?: string,
     industries?: string[],
     subjects?: string[],
+    createdAt?: string,
+    dateTime?: string,
+    status?: string,
   ): Promise<Exhibition[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
 
-    if (userId) {
-      filter.userId = userId;
+    const allNativeFiltersArray = {
+      title,
+      industries,
+      subjects,
+      createdAt,
+      dateTime,
+      status,
+    };
+
+    for (const key in allNativeFiltersArray) {
+      if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+        const element = allNativeFiltersArray[key];
+        if (key === 'createdAt' && element) {
+          const sameDateISOs = getSameDateISOs(element);
+          filter[key] = {
+            $gte: sameDateISOs.startOfDay,
+            $lte: sameDateISOs.endOfDay,
+          };
+        } else if (key === 'userId' && element) {
+          filter[key] = new Types.ObjectId(userId);
+        } else if (element) {
+          filter[key] = new RegExp(element, 'i');
+        }
+      }
     }
 
-    if (industries && industries.length > 0) {
-      filter.industries = { $in: industries };
-    }
+    const pipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userId',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userId',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: {
+          ...filter,
+          ...(userId && {
+            'userId._id': new Types.ObjectId(userId),
+          }),
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          status: 1,
+          meetingUrl: 1,
+          industries: 1,
+          subjects: 1,
+          dateTime: 1,
+          exhbTime: 1,
+          username: 1,
+          videoUrl: 1,
+          innovators: 1,
+          createdAt: 1,
+          userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
+        },
+      },
+    ];
 
-    if (subjects && subjects.length > 0) {
-      filter.subjects = { $in: subjects };
-    }
+    return await this.exhibitionModel.aggregate(pipeline);
 
-    return this.exhibitionModel
-      .find(filter)
-      .skip(skip)
-      .limit(limit)
-      .populate('userId', 'firstName lastName username', this.userModel)
-      .exec();
+    // return this.exhibitionModel
+    //   .find(filter)
+    //   .skip(skip)
+    //   .sort({ createdAt: -1 })
+    //   .limit(limit)
+    //   .populate('userId', 'firstName lastName username', this.userModel)
+    //   .exec();
   }
 
   async update(

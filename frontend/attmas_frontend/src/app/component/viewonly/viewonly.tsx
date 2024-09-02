@@ -31,7 +31,7 @@ const ExhibitionDetails: React.FC<ExhibitionDetailsProps> = ({ exhibition, onClo
         <Box><h3>Title :- {exhibition.title}</h3></Box>
         <p><strong>Description :-</strong> {exhibition.description}</p>
         <p><strong>Status :-</strong> {exhibition.status}</p>
-        <p><strong>Date & Time :-</strong> {dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')}</p>
+        <p><strong>Date & Time :-</strong> {exhibition.dateTime} {exhibition.exhbTime}</p>
         <p><strong>Industries :-</strong> {exhibition.industries.join(', ')}</p>
         <p><strong>Subjects :-</strong> {exhibition.subjects.join(', ')}</p>
       </Box>

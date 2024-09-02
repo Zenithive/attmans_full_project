@@ -27,8 +27,11 @@ export class Exhibition {
   @Prop({ type: [String], required: false })
   subjects: string[];
 
-  @Prop({ required: true, default: Date.now })
-  dateTime: Date;
+  @Prop({ required: true })
+  dateTime: string;
+
+  @Prop({ required: true })
+  exhbTime: string;
 
   @Prop({ default: Date.now })
   createdAt: Date;

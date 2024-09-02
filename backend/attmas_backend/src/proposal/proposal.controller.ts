@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ProposalService } from './proposal.service';
 
 @Controller('proposals')
@@ -33,7 +41,8 @@ export class ProposalController {
   @Put(':id/status')
   async updateStatus(
     @Param('id') id: string,
-    @Body() { status, comment }: { status: 'Approved' | 'Rejected'; comment: string }
+    @Body()
+    { status, comment }: { status: 'Approved' | 'Rejected'; comment: string },
   ) {
     return this.proposalService.updateStatusProposal(id, status, comment);
   }

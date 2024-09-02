@@ -24,6 +24,7 @@ import { Job, Apply } from './projectinterface';
 import { CustomChip } from './projectinterface';
 import { AddApplyForInnovatores } from '../component/innovatoreApply/innovatoreApply';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
+import { DATE_FORMAT } from '../constants/common.constants';
 
 
 const Jobs = () => {
@@ -258,9 +259,16 @@ const Jobs = () => {
 
     useEffect(() => {
         pubsub.subscribe('JobUpdated', refetch);
-
         return () => {
             pubsub.unsubscribe('JobUpdated', refetch);
+
+        };
+    }, [refetch]);
+
+    useEffect(() => {
+        pubsub.subscribe('JobCreated', refetch);
+        return () => {
+            pubsub.unsubscribe('JobCreated', refetch);
 
         };
     }, [refetch]);
@@ -458,112 +466,6 @@ const Jobs = () => {
                 </Box>
             </Box>
 
-
-
-
-            {/* {filterOpen && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        marginBottom: '20px',
-                        gap: 3,
-                        alignItems: 'center',
-                        '@media (max-width: 767px)': {
-                            flexDirection: 'column',
-                            alignItems: 'stretch',
-                            gap: 2,
-                            width: '100%'
-                        },
-                    }}
-                >
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Expertiselevel}
-                        value={selectedExpertis}
-                        onChange={(event, value) => setSelectedExpertis(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Category()}
-                        value={selectedCategory}
-                        onChange={(event, value) => setSelectedCategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Category" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={getSubcategorys(Subcategorys())}
-                        value={selectedSubcategory}
-                        onChange={(event, value) => setSelectedSubcategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Subcategory" color="secondary" />
-                        )}
-                    />
-
-                </Box>
-            )} */}
-            {/* {userType === 'Admin' && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                    }}
-                >
-                    <ToggleButtonGroup
-                        value={selectedStatus}
-                        exclusive
-                        onChange={(event, newStatus) => setSelectedStatus(newStatus)}
-                        aria-label="filter jobs by status"
-                        sx={{ height: '40px' }}
-                    >
-                        <ToggleButton value="" aria-label="all jobs">
-                            All Projects
-                        </ToggleButton>
-                        <ToggleButton value="Pending" aria-label="pending jobs">
-                            Pending
-                        </ToggleButton>
-                        <ToggleButton value="Approved" aria-label="approved jobs">
-                            Approved
-                        </ToggleButton>
-                        <ToggleButton value="Rejected" aria-label="rejected jobs">
-                            Rejected
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-
-            )} */}
-
-
-            {/* <Box sx={{ display: 'flex', gap: 2 }}>
-                <ToggleButtonGroup
-                    value={selectedFilter}
-                    exclusive
-                    onChange={handleFilterChanges}
-                    aria-label="Apply Filter"
-                    sx={{ height: "30px", ml: 2 }}
-                >
-                    <ToggleButton value="all">
-                        All
-                    </ToggleButton>
-                    <ToggleButton value="my">
-                        My Projects
-                    </ToggleButton>
-                </ToggleButtonGroup>
-            </Box> */}
-
             <Box sx={{ mt: 2 }}>
                 {isShowingApplies ? (
                     <Box>
@@ -609,10 +511,10 @@ const Jobs = () => {
 
                                             <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
                                                 <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
-                                                    {job.title},
+                                                    {job.title} 
                                                 </a>
-                                                <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                    ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                <span style={{ fontSize: 'small', color: "#616161", marginLeft: 10 }}>
+                                                    ({dayjs(job.TimeFrame).format(DATE_FORMAT)})
                                                 </span>
                                             </Box>
 

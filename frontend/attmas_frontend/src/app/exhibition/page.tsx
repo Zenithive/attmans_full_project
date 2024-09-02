@@ -1,23 +1,25 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField, Tooltip, ToggleButton, ToggleButtonGroup, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField, Tooltip, ToggleButton, ToggleButtonGroup, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
 import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
-import { PubSub,pubsub } from '../services/pubsub.service';
+import { PubSub, pubsub } from '../services/pubsub.service';
 import SendIcon from '@mui/icons-material/Send';
 import { SendInnovators } from '../component/exhibition/send-innovators';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useMemo,useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
 import DeleteConfirmationDialog from '../component/deletdilog/deletdilog';
 import EditProfile from '../component/EditProfileComponents/editUserProfile';
 import { categories } from '../constants/categories';
+import Filters, { FilterColumn } from '../component/filter/filter.component';
+import { DATE_TIME_FORMAT } from '../constants/common.constants';
 
 interface Exhibition {
   _id?: string;
@@ -27,6 +29,7 @@ interface Exhibition {
   videoUrl: string;
   meetingUrl: string;
   dateTime: string;
+  exhbTime: string;
   industries: string[];
   subjects: string[];
   userId?: string;
@@ -168,36 +171,70 @@ const subjects = [
   },
 ];
 
-const getSubjectItems =(subjects: any[]) => {
-  return subjects.flatMap((subject: { items: any; }) => subject.items);
-};
 
 const Exhibition = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [editingExhibition, setEditingExhibition] = useState<Exhibition | null>(null);
   const [sendingExhibition, setSendingExhibition] = useState<Exhibition | null>(null);
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [hasMore,setHasMore]=useState(true);
+  const [toggleFilter, setToggleFilter] = useState('');
+  const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [filterType, setFilterType] = useState('all');
+  const [filter, setFilter] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; exhibition: Exhibition | null }>({ open: false, exhibition: null });
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const { userType, _id: userId, username } = userDetails;
 
-  const fetchExhibitions =useCallback(async (page: number, industriesFilter: string[], subjectsFilter: string[]) => {
+  const column: Array<FilterColumn> = [
+    {
+      name: "Title",
+      value: '',
+      type: "Texbox",
+      key: 'title',
+      isVisible: true,
+    },
+    {
+      name: "Created Date",
+      value: '',
+      type: "Date",
+      key: 'createdAt',
+      isVisible: true,
+    },
+    {
+      name: "Exhibition Date",
+      value: '',
+      type: "Date",
+      key: 'dateTime',
+      isVisible: true,
+    },
+    {
+      name: "Status",
+      value: '',
+      type: "Texbox",
+      key: 'status',
+      isVisible: (userType === "Admin" || userType === "Project Owner"),
+    },
+    {
+      name: "Preferred Industries",
+      value: '',
+      type: "Category",
+      key: 'industries',
+      isVisible: true,
+    },
+    {
+      name: "Subject Matter Expertise",
+      value: '',
+      type: "SubCategory",
+      key: 'subjects',
+      isVisible: true,
+    }
+  ];
+
+  const fetchExhibitions = useCallback(async (page: number) => {
     try {
-      const response = await axios.get(APIS.EXHIBITION, {
-        params: {
-          page,
-          limit: 10,
-          industries: industriesFilter.join(','),
-          subjects: subjectsFilter.join(','),
-          userId: filterType === 'mine' ? userId : undefined
-        }
-      });
+      const response = await axios.get(`${APIS.EXHIBITION}?page=${page}${toggleFilter}&${filter}`);
       if (response.data.length === 0) {
         setHasMore(false);
       } else {
@@ -205,7 +242,6 @@ const Exhibition = () => {
           const newExhibitions = response.data.filter((newExhibition: Exhibition) => {
             return !prev.some((existingExhibition) => existingExhibition._id === newExhibition._id);
           });
-          console.log("...prev, ...newExhibitions",[...prev, ...newExhibitions])
           return [...prev, ...newExhibitions];
         });
         if (response.data.length < 10) {
@@ -215,28 +251,28 @@ const Exhibition = () => {
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
     }
-  },[userId,filterType]);
+  }, [userId, toggleFilter, filter]);
 
-  const refetch =useCallback(async () => {
+  const refetch = useCallback(async () => {
     try {
       setPage(1);
       setExhibitions([]);
-      setHasMore(true); 
-      await fetchExhibitions(1, selectedIndustries, selectedSubjects); 
+      setHasMore(true);
+      await fetchExhibitions(1);
     } catch (error) {
       console.error('Error refetching exhibitions:', error);
     }
-  },[fetchExhibitions,selectedIndustries,selectedSubjects]);
+  }, [fetchExhibitions]);
 
   useEffect(() => {
-    refetch(); 
-  }, [selectedIndustries, selectedSubjects,filterType]);
+    refetch();
+  }, [filter, toggleFilter]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchExhibitions(page, selectedIndustries, selectedSubjects); 
+      fetchExhibitions(page);
     }
-  }, [page]);
+  }, [page, filter, toggleFilter]);
 
   useEffect(() => {
     pubsub.subscribe('ExhibitionCreated', refetch);
@@ -253,13 +289,13 @@ const Exhibition = () => {
     };
   }, []);
 
-  const handleEditExhibition =useCallback((exhibition: Exhibition) => {
+  const handleEditExhibition = useCallback((exhibition: Exhibition) => {
     setEditingExhibition(exhibition);
-  },[]);
+  }, []);
 
-  const handleCancelEdit =useCallback(() => {
+  const handleCancelEdit = useCallback(() => {
     setEditingExhibition(null);
-  },[]);
+  }, []);
 
   const handleDeleteExhibition = useCallback(async () => {
     if (confirmDelete.exhibition) {
@@ -275,21 +311,25 @@ const Exhibition = () => {
     }
   }, [confirmDelete, exhibitions]);
 
-  const handleSendInnovators =useCallback((exhibition: Exhibition) => {
+  const handleSendInnovators = useCallback((exhibition: Exhibition) => {
     setSendingExhibition(exhibition);
-  },[]);
+  }, []);
 
-  const handleCancelSend =useCallback(() => {
+  const handleCancelSend = useCallback(() => {
     setSendingExhibition(null);
-  },[]);
+  }, []);
 
-  const handleFilterChange =useCallback(() => {
+  const handleFilterChange = useCallback(() => {
     refetch();
-  },[refetch]);
+  }, [refetch]);
 
   const handleFilterTypeChange = (event: React.MouseEvent<HTMLElement>, newFilterType: string) => {
-    if (newFilterType !== null) {
-      setFilterType(newFilterType);
+    //setFilterType(`&userId=${userId}`);
+    setFilterType(newFilterType);
+    if (newFilterType == 'mine') {
+      setToggleFilter(`&userId=${userId}`);
+    }else{
+      setToggleFilter(``);
     }
   };
 
@@ -302,148 +342,81 @@ const Exhibition = () => {
     setConfirmDelete({ open: false, exhibition: null });
   };
 
+  const changeFilterOrPage = (paramStr: string) => {
+    if (paramStr && paramStr.length) {
+      setFilter(paramStr);
+    } else {
+      setFilter('');
+    }
+    setPage(1);
+  }
+
 
   return (
     <Box
-  sx={{
-    background: colors.grey[100],
-    p: 2,
-    borderRadius: "30px !important",
-    overflowX: "hidden",
-    '@media (max-width: 767px)': {
-      position: 'relative',
-      left: '25px',
-    },
-  }}
->
-  <Box
-    sx={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      '@media (max-width: 767px)': {
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-      },
-    }}
-  >
-    <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
-      Exhibitions
-    </Typography>
-    <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        mb: 2,
-        height: "30px",
-        position: "relative",
-        top: "8px",
+        background: colors.grey[100],
+        p: 2,
+        borderRadius: "30px !important",
+        overflowX: "hidden",
         '@media (max-width: 767px)': {
           position: 'relative',
-          right: '-106px',
-          top: '-27px',
+          left: '25px',
         },
       }}
     >
-      <ToggleButtonGroup
-        value={filterType}
-        exclusive
-        onChange={handleFilterTypeChange}
-        aria-label="filter exhibitions"
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          '@media (max-width: 767px)': {
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          },
+        }}
       >
-        <ToggleButton value="all" aria-label="all exhibitions" sx={{ fontSize: "10px" }}>
-          All Exhibitions
-        </ToggleButton>
-        <ToggleButton value="mine" aria-label="my exhibitions" sx={{ fontSize: "10px" }}>
-          My Exhibitions
-        </ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
-    <Box
-  sx={{
-    position: "relative",
-    left: "57%",
-    width: "60%",
-    display: "flex",
-    alignItems: "center",
-    '@media (max-width: 767px)': {
-      position: 'relative',
-      left: '4px',
-      width: '100%',
-      justifyContent: 'flex-start',
-      bottom: '22px',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-    },
-  }}
->
-  <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-    <Tooltip title="Filter">
-      <FilterAltIcon />
-    </Tooltip>
-  </IconButton>
-  {filterOpen && (
-    <Box
-      sx={{
-        display: "flex",
-        gap: 3,
-        width: "75%",
-        '@media (max-width: 767px)': {
-          flexDirection: 'column',
-          width: '100%',
-          gap: 1,
-          mt: 2, 
-        },
-      }}
-    >
-      <Autocomplete
-        multiple
-        size='small'
-        sx={{
-          width: "35%",
-          position: "relative",
-          right: "43.5%",
-          '@media (max-width: 767px)': { width: '100%', right: '0' }
-        }}
-        options={getSubjectItems(subjects)}
-        value={selectedSubjects}
-        onChange={(event, value) => setSelectedSubjects(value)}
-        renderInput={(params) => (
-          <TextField {...params} variant="outlined" label="Filter by Subjects" color='secondary' sx={{ borderRadius: "20px" }} />
-        )}
-      />
-      <Autocomplete
-        multiple
-        sx={{
-          width: "35%",
-          position: "relative",
-          right: "122%",
-          '@media (max-width: 767px)': { width: '100%', right: '0' }
-        }}
-        size='small'
-        options={categories}
-        value={selectedIndustries}
-        onChange={(event, value) => setSelectedIndustries(value)}
-        renderInput={(params) => (
-          <TextField {...params} variant="outlined" label="Filter by Industries" color='secondary' sx={{ borderRadius: "20px" }} />
-        )}
-      />
-    </Box>
-  )}
-</Box>
+        <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
+          Exhibitions
+        </Typography>
 
-    <Box
-      sx={{
-        '@media (max-width: 767px)': {
-          position: 'absolute',
-          top:'80px',
-          right:'25%'
-        },
-      }}
-    >
-      <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
-    </Box>
-  </Box>
+        <Box sx={{
+          mr: 2, display: "flex"
+        }}>
+          <Filters column={column} onFilter={changeFilterOrPage}></Filters>
+          <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+        </Box>
+      
+      </Box>
+      {userType === "Admin" && <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            mb: 2,
+            height: "30px",
+            position: "relative",
+            top: "8px",
+            '@media (max-width: 767px)': {
+              position: 'relative',
+              right: '-106px',
+              top: '-27px',
+            },
+          }}
+        >
+          <ToggleButtonGroup
+            value={filterType}
+            exclusive
+            onChange={handleFilterTypeChange}
+            aria-label="filter exhibitions"
+          >
+            <ToggleButton value="all" aria-label="all exhibitions" sx={{ fontSize: "10px" }}>
+              All Exhibitions
+            </ToggleButton>
+            <ToggleButton value="mine" aria-label="my exhibitions" sx={{ fontSize: "10px" }}>
+              My Exhibitions
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>}
       <InfiniteScroll
         dataLength={exhibitions.length}
         next={() => setPage(prev => prev + 1)}
@@ -451,53 +424,53 @@ const Exhibition = () => {
         loader={<Typography>Loading...</Typography>}
         endMessage={<Typography>No more Exhibitions</Typography>}
       >
-      <Box sx={{ mt: 2 }}>
-        {exhibitions.map((exhibition) => (
-          <Card key={exhibition._id} sx={{ mb: 2 }}>
-            <CardContent>
-              <Typography variant="h5">
-              <span style={{ cursor: 'pointer', marginRight: 10 }}>
-                <a href={`/view-exhibition?exhibitionId=${exhibition._id}`} target="_blank" rel="noopener noreferrer" style={{color: 'black', textDecoration: 'none'}}>
-                  <Typography variant="h6" component="span">
-                    {exhibition.title}
-                  </Typography>
-                </a>
-              </span>
-                <span style={{ fontSize: 'small', color: "#616161" }}>
-                  ({dayjs(exhibition.dateTime).format('MMMM D, YYYY h:mm A')})
-                </span>
-                <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
-                  {exhibition.status}
-                </span>
-              </Typography>
-              <Typography variant="caption">{exhibition.industries.join(', ')}, {exhibition.subjects.join(', ')}</Typography>
-              <Typography sx={{ display: "flex", float: "right" }}>
-              {userType === "Admin" && (
-                <IconButton onClick={() => handleEditExhibition(exhibition)}>
-                <Tooltip title="Edit">
-                  <EditIcon />
-                  </Tooltip>
-                </IconButton>
-                 )}
-                {userType === "Admin" && (
+        <Box sx={{ mt: 2 }}>
+          {exhibitions.map((exhibition) => (
+            <Card key={exhibition._id} sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant="h5">
+                  <span style={{ cursor: 'pointer', marginRight: 10 }}>
+                    <a href={`/view-exhibition?exhibitionId=${exhibition._id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'black', textDecoration: 'none' }}>
+                      <Typography variant="h6" component="span">
+                        {exhibition.title}
+                      </Typography>
+                    </a>
+                  </span>
+                  <span style={{ fontSize: 'small', color: "#616161" }}>
+                    ({!exhibition.exhbTime ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT): exhibition.dateTime} {exhibition.exhbTime || ''})
+                  </span>
+                  <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
+                    {exhibition.status}
+                  </span>
+                </Typography>
+                <Typography variant="caption">{exhibition.industries.join(', ')} | {exhibition.subjects.join(', ')}</Typography>
+                <Typography sx={{ display: "flex", float: "right" }}>
+                  {userType === "Admin" && (
+                    <IconButton onClick={() => handleEditExhibition(exhibition)}>
+                      <Tooltip title="Edit">
+                        <EditIcon />
+                      </Tooltip>
+                    </IconButton>
+                  )}
+                  {userType === "Admin" && (
                     <IconButton onClick={() => handleConfirmDelete(exhibition)}>
                       <Tooltip title="Delete">
                         <DeleteRoundedIcon />
                       </Tooltip>
                     </IconButton>
                   )}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
       </InfiniteScroll>
       <DeleteConfirmationDialog
-      open={confirmDelete.open}
-      onCancel={handleCancelDelete}
-      onConfirm={handleDeleteExhibition}
-      title={confirmDelete.exhibition?.title || ''}
-/>
+        open={confirmDelete.open}
+        onCancel={handleCancelDelete}
+        onConfirm={handleDeleteExhibition}
+        title={confirmDelete.exhibition?.title || ''}
+      />
     </Box>
   );
 };

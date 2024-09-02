@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Debug Nest Framework",
+        "runtimeExecutable": "npm",
+        "cwd": "${workspaceRoot}/backend/attmas_backend",
+        "runtimeArgs": [
+          "run",
+          "start:debug",
+          "--",
+          "--inspect-brk"
+        ],
+        "autoAttachChildProcesses": true,
+        "restart": true,
+        "sourceMaps": true,
+        "stopOnEntry": false,
+        "console": "integratedTerminal",
+      }
+    ]
+}

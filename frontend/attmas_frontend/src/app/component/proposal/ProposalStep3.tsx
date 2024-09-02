@@ -3,13 +3,15 @@ import { Box, TextField, Button, Typography } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import dayjs from 'dayjs';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => void, onPrevious: () => void }) => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     // Get current date
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = dayjs(new Date()).format(DATE_FORMAT);
 
     return (
         <Formik

@@ -411,7 +411,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Create'}
+                  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Apply'}
                 </Button>
               </Box>
             </Box>

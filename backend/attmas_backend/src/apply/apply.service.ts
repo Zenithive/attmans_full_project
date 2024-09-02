@@ -179,7 +179,7 @@ export class ApplyService {
         {
           $match: {
             userId: userId,
-            status: 'Awarded',
+            status: 'Approved',
           },
         },
         // Stage 2: Project fields for debugging before lookup

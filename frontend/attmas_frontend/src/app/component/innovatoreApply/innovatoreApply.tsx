@@ -6,7 +6,6 @@ import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { pubsub } from '@/app/services/pubsub.service';
 import { Formik, Form, ErrorMessage, FieldArray } from 'formik';
@@ -198,7 +197,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
             onClose={handleCancel}
         >
             <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
-                <h2>Create Apply</h2>
+                <h2>Apply</h2>
                 <IconButton aria-label="close" onClick={handleCancel} sx={{ p: 0, right: 0 }}>
                     <CloseIcon />
                 </IconButton>
@@ -209,8 +208,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                     <Form onSubmit={handleSubmit}>
                         <Box sx={{ p: 2 }}>
 
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                                <Box sx={{ flex: '1 1 45%' }}>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 1 }}>
+                                <Box sx={{ flex: '1 1 70%' }}>
                                     <TextField
                                         label="Title"
                                         name="title"
@@ -224,26 +223,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         helperText={<ErrorMessage name="title" />}
                                     />
                                 </Box>
-                                <Box sx={{ flex: '1 1 45%' }}>
-                                    <TextField
-                                        label="Description"
-                                        name="description"
-                                        color='secondary'
-                                        variant="outlined"
-                                        value={values.description}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        multiline
-
-                                        fullWidth
-                                        error={!!(errors.description && touched.description)}
-                                        helperText={<ErrorMessage name="description" />}
-                                    />
-                                </Box>
-                            </Box>
-
-                            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                                <Box sx={{ flex: '1 1 45%' }}>
+                                <Box sx={{ flex: '1 1 20%' }}>
                                     <TextField
                                         fullWidth
                                         name="Budget"
@@ -275,7 +255,25 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         }}
                                     />
                                 </Box>
-                                <Box sx={{ flex: '1 1 45%', marginBottom: '30px' }}>
+                            </Box>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                                <Box sx={{ flex: '1 1 70%' }}>
+                                    <TextField
+                                        label="Description"
+                                        name="description"
+                                        color='secondary'
+                                        variant="outlined"
+                                        value={values.description}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        multiline
+                                        fullWidth
+                                        error={!!(errors.description && touched.description)}
+                                        helperText={<ErrorMessage name="description" />}
+                                    />
+                                </Box>
+
+                                <Box sx={{ flex: '1 1 20%', marginBottom: '30px' }}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
                                             format={DATE_FORMAT}
@@ -291,15 +289,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                     </LocalizationProvider>
                                 </Box>
                             </Box>
-                            {/* <Box
-                                sx={{
-                                    marginTop: 8,
-                                    padding: 4,
-                                    marginBottom: '50px',
-                                    borderRadius: 2,
-                                    boxShadow: 5,
-                                }}
-                            > */}
+                            
                             {fetchError && (
                                 <Typography color="error" align="center" mt={2}>
                                     {fetchError}
@@ -387,7 +377,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
 
                                         </>
 
-                                        <Grid item xs={12} sm={6} sx={{ marginBottom: '20px' }}>
+                                        <Grid item xs={12} sm={6}>
                                             <TextField
                                                 fullWidth
                                                 label="Do you have a patent?"
@@ -426,7 +416,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         </Grid>
                                         <Grid item xs={12} sm={12}>
                                             <Typography variant="h6" sx={{ marginBottom: 1 }}>
-                                                Subcategories
+                                                Subject Matter Expertise
                                             </Typography>
                                             <TextField
                                                 fullWidth
@@ -441,10 +431,6 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                 </Paper>
                             )}
                         </Box>
-
-
-
-
 
                         {fetchError && (
                             <Typography color="error" align="center" mt={2}>
@@ -461,7 +447,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                 type="submit"
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Create'}
+                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Apply'}
                             </Button>
                         </Box>
                         {/* </Box> */}
