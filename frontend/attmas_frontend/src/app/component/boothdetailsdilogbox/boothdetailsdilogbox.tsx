@@ -31,6 +31,8 @@ import axios from 'axios';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import InterestedModal from '../booth/intrestedUsers';
+import { DATE_TIME_FORMAT } from '@/app/constants/common.constants';
+
 
 interface Product {
   productName: string;
@@ -185,7 +187,7 @@ const closeInterestedModals = () => setShowInterestedModals(false);
             <Box sx={{ position: 'relative' }}>
               <Box sx={{ position: 'absolute', top: 16, right: 16, '@media (max-width: 767px)': { position: 'relative', top: '-10px', left: '5px' } }}>
                 <Typography variant="body1" sx={{'@media (max-width: 767px)': {fontSize:'1.25rem'}}} color="text.secondary">
-                  Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
+                  Status: {booth.status}, Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}
                 </Typography>
                 <Box sx={{position:'relative',right:'45%',top:'15px'}}>
                 {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
