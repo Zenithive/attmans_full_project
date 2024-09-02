@@ -18,6 +18,7 @@ import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import ConfirmationDialogWithCommentForCancel from '../All_ConfirmationBox/ConfirmationDialogWithCommentForCancel';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
 
 
 
@@ -66,6 +67,7 @@ interface Apply {
   lastName: string;
   username: string;
   jobId: string;
+  userId?: UserSchema;
   availableSolution: string;
   SolutionUSP: string;
 }
@@ -86,8 +88,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   handleApproveDialogOpen,
   handleRejectDialogOpen,
 }) => {
-  const isApproved = viewingJob?.status === 'Approved';
-  const isRejected = viewingJob?.status === 'Rejected';
+  const isApproved = viewingJob?.status === PROJECT_STATUSES.approved;
+  const isRejected = viewingJob?.status === PROJECT_STATUSES.rejected;
   const [filter, setFilter] = useState<string>('All');
   const [selectedUser, setSelectedUser] = React.useState<string>('');
   const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
@@ -102,20 +104,38 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const currentUser = userDetails.username;
+  const currentUserId = userDetails._id;
+  const currentUserType = userDetails.userType;
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   // const [filteredApplications, setFilteredApplications] = useState<Apply[]>([]);
-  
+
 
 
 
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const setApplicationsBasedOnUser = (applies: Apply[]) => {
+    const tmpApplies: Apply[] = [];
+    for (let index = 0; index < applies.length; index++) {
+      const element = applies[index];
+      const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
+      const isProjectOwner = currentUserType === "Project Owner" && element?.status !== APPLY_STATUSES.pendingForApproval;
+      const isAdmin = currentUserType === "Admin";
+      if (isFreelancer || isProjectOwner || isAdmin) {
+        tmpApplies.push(element);
+      }
+    }
+
+    setApplications(tmpApplies);
+  }
+
   const fetchApplications = useCallback(async () => {
     if (viewingJob?._id) {
       try {
         const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
-        setApplications(response.data);
+
+        setApplicationsBasedOnUser(response.data);
         // getFilteredApplications(response.data);
       } catch (error) {
         console.error('Error fetching applications:', error);
@@ -170,7 +190,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   //       return app.username === currentUser;
   //     }
   //     return true;
-  
+
   //   setFilteredApplications(tmpFilteredApps);
   //   });
   // }
@@ -183,15 +203,15 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     return app.status === filter;
   }).filter(app => {
     if (userType === 'Project Owner') {
-      return (app.status === 'Approved' || app.status === 'Awarded') 
-      && currentUser === viewingJob?.username;
+      return (app.status === APPLY_STATUSES.approvedPendingForProposal || app.status === APPLY_STATUSES.awarded)
+        && currentUser === viewingJob?.username;
     }
     if (userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser;
     }
     return true;
   });
-  
+
 
   const handleCommentSubmitted = () => {
     fetchApplications();
@@ -204,8 +224,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
-    (userType === 'Innovators' || userType === 'Freelancer') 
-    && filteredApplicationse.some(app => app.username === currentUser && app.status === 'Approved' || app.status === 'Awarded');
+    (userType === 'Innovators' || userType === 'Freelancer')
+    && filteredApplicationse.some(app => app.username === currentUser && app.status === APPLY_STATUSES.approvedPendingForProposal || app.status === APPLY_STATUSES.awarded);
 
   const handleReward = async (applicationId: string, Comment: string) => {
     try {
@@ -222,8 +242,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       // Update all other applications to "Not Awarded"
       const updatedApplications = applications.map((app) =>
         app._id === applicationId
-          ? { ...app, status: 'Awarded' }
-          : { ...app, status: 'Not Awarded' }
+          ? { ...app, status: APPLY_STATUSES.awarded }
+          : { ...app, status: APPLY_STATUSES.notAwarded }
       );
 
 
@@ -367,7 +387,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
         </DialogTitle>
         <DialogContent>
           {viewingJob && (
-            <Box sx={{pt: 1}}>
+            <Box sx={{ pt: 1 }}>
               {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right', mb: 2 }} />}
               {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right', mb: 2 }} />}
 
@@ -392,8 +412,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     aria-readonly
                     sx={{ mb: 2, cursor: "pointer" }}
                   />
-                </Grid>: ''}
-                <Grid item xs={12} sm={6}>
+                </Grid> : ''}
+                <Grid item xs={12} sm={5}>
                   <TextField
                     label="Select Service"
                     value={viewingJob.SelectService}
@@ -403,10 +423,21 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     sx={{ mb: 2 }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={3}>
                   <TextField
                     label="Created Date"
                     value={dayjs(viewingJob.createdAt).format(DATE_FORMAT)}
+                    fullWidth
+                    color='secondary'
+                    aria-readonly
+                    sx={{ mb: 2 }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={3}>
+                  <TextField
+                    label="Timeframe"
+                    value={dayjs(viewingJob.TimeFrame).format(DATE_FORMAT)}
                     fullWidth
                     color='secondary'
                     aria-readonly
@@ -558,9 +589,9 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                {userType === 'Admin' && viewingJob.status !== 'Approved' && viewingJob.status !== 'Rejected' && viewingJob.status !== 'Project Closed by Admin' && viewingJob.status !== 'Project Finished and close' && (
+                {userType === 'Admin' && viewingJob.status !== PROJECT_STATUSES.approved && viewingJob.status !== PROJECT_STATUSES.rejected && viewingJob.status !== PROJECT_STATUSES.closed && viewingJob.status !== PROJECT_STATUSES.requestForClose && (
                   <>
-                    <Button sx={{mr: 2}} onClick={() => handleApproveDialogOpen(viewingJob)}>
+                    <Button sx={{ mr: 2 }} onClick={() => handleApproveDialogOpen(viewingJob)}>
                       Approve
                     </Button>
                     <Button onClick={() => handleRejectDialogOpen(viewingJob)}>
@@ -572,7 +603,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                {userType === 'Admin' && (viewingJob.status === 'Project Closed by Admin' || viewingJob.status === 'Project Finished and close') && (
+                {userType === 'Admin' && viewingJob.status === PROJECT_STATUSES.requestForClose && (
                   <>
                     <Button sx={{ mr: 1 }} onClick={handleCancelClick2}>Cancel</Button>
                     <Button onClick={handleCloseClick}>Close</Button>
@@ -626,7 +657,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     <Card
                       key={app._id}
                       sx={{
-                        width: 300,
+                        width: 400,
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
@@ -635,59 +666,63 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     >
                       <CardContent sx={{ flex: 1 }}>
 
-
-                        <Chip
-                          label={app.status}
-                          variant="outlined"
-                          sx={{
-                            borderColor: app.status === 'Approved'
-                              ? 'green'
-                              : app.status === 'Rejected'
-                                ? 'red'
-                                : app.status === 'Awarded'
-                                  ? 'blue'
-                                  : app.status === 'Not Awarded'
-                                    ? 'grey'
-                                    : 'default',
-                            color: app.status === 'Approved'
-                              ? 'green'
-                              : app.status === 'Rejected'
-                                ? 'red'
-                                : app.status === 'Awarded'
-                                  ? 'blue'
-                                  : app.status === 'Not Awarded'
-                                    ? 'grey'
-                                    : 'default',
-                            borderRadius: '16px',
-                            float: 'right',
-                            mb: 2,
-                          }}
-                        />
-
-                        <Typography variant="h6" sx={{ mb: 1 }}>
-                          {app.title}
-                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                          <Typography variant="h6" sx={{ mb: 1 }}>
+                            {app.title}
+                          </Typography>
+                          <Chip
+                            label={app.status}
+                            size='small'
+                            variant="outlined"
+                            sx={{
+                              borderColor: app.status === APPLY_STATUSES.approvedPendingForProposal
+                                ? 'green'
+                                : app.status === APPLY_STATUSES.rejected
+                                  ? 'red'
+                                  : app.status === APPLY_STATUSES.awarded
+                                    ? 'blue'
+                                    : app.status === APPLY_STATUSES.notAwarded
+                                      ? 'grey'
+                                      : 'default',
+                              color: app.status === APPLY_STATUSES.approvedPendingForProposal
+                                ? 'green'
+                                : app.status === APPLY_STATUSES.rejected
+                                  ? 'red'
+                                  : app.status === APPLY_STATUSES.awarded
+                                    ? 'blue'
+                                    : app.status === APPLY_STATUSES.notAwarded
+                                      ? 'grey'
+                                      : 'default',
+                              borderRadius: '16px',
+                              px: 1,
+                              mb: 2,
+                            }}
+                          />
+                        </Box>
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Applied User: </b> 
+                          <b>Applied User: </b>
                           <a
-                                href="javascript:void(0);"
-                                onClick={(e) => {
-                                  handleUserClick(app?.username || "")
-                                }}
-                                style={{
-                                  textDecoration: 'underline',
-                                  color: '#1976d2',
-                                  fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
-                                }}
-                              >{app.firstName} {app.lastName}
-                              </a>
+                            href="javascript:void(0);"
+                            onClick={(e) => {
+                              handleUserClick(app?.username || "")
+                            }}
+                            style={{
+                              textDecoration: 'underline',
+                              color: '#1976d2',
+                              fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                            }}
+                          >{app.firstName} {app.lastName}
+                          </a>
                         </Typography>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format(DATE_FORMAT) : 'N/A'}
-                        </Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                            <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                            <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format(DATE_FORMAT) : 'N/A'}
+                          </Typography>
+                        </Box>
 
                         {userDetails && (
                           (userType === 'Admin' ||
@@ -711,50 +746,42 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                               >
                                 View Details
                               </a>
+                              {app.status === APPLY_STATUSES.pendingForApproval &&
+                                userType === 'Admin' && (
+                                  <Box>
+                                    <Button
+                                      variant="contained"
+                                      color="primary"
+                                      size='small'
+                                      onClick={() => {
+                                        setApproveDialogOpen({ open: true, apply: app });
+                                      }}
+                                      sx={{ mr: 1 }}
+                                    >
+                                      Approve
+                                    </Button>
+                                    <Button
+                                      variant="contained"
+                                      color="secondary"
+                                      size='small'
+                                      onClick={() => {
+                                        setRejectDialogOpen({ open: true, apply: app });
+                                      }}
+                                    >
+                                      Reject
+                                    </Button>
+                                  </Box>
+                                )}
+
+                              {app.status !== APPLY_STATUSES.proposalSubmitted && userType === 'Project Owner' && (
+                                <Button variant="contained" color="primary" onClick={() => handleOpenConfirmationDialog(app._id!)} size='small'>
+                                  Award
+                                </Button>
+                              )}
                             </Box>
                           )}
 
                       </CardContent>
-                      <Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end' }}>
-
-                        <div>
-                          {app.status !== 'Awarded' && userType === 'Project Owner' && (
-                            <Button variant="contained" color="primary" onClick={() => handleOpenConfirmationDialog(app._id!)}>
-                              Award
-                            </Button>
-                          )}
-                        </div>
-
-
-                        {app.status !== 'Approved' &&
-                          app.status !== 'Rejected' &&
-                          app.status !== 'Awarded' &&
-                          app.status !== 'Not Awarded' &&
-                          userType === 'Admin' && (
-                            <>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => {
-                                  setApproveDialogOpen({ open: true, apply: app });
-                                }}
-                                sx={{ mr: 1 }}
-                              >
-                                Approve
-                              </Button>
-                              <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={() => {
-                                  setRejectDialogOpen({ open: true, apply: app });
-                                }}
-                              >
-                                Reject
-                              </Button>
-                            </>
-                          )}
-
-                      </Box>
                     </Card>
                   ))
                 ) : (

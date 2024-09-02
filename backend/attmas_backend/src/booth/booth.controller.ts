@@ -13,7 +13,7 @@ import { Booth, Product } from './booth.schema';
 
 @Controller('booths')
 export class BoothController {
-  constructor(private readonly boothService: BoothService) { }
+  constructor(private readonly boothService: BoothService) {}
 
   @Post()
   async create(@Body() createBoothDto: CreateBoothDto): Promise<Booth> {
@@ -21,7 +21,9 @@ export class BoothController {
   }
 
   @Get('username/:username')
-  async findBoothProducts(@Param('username') username: string): Promise<Product[]> {
+  async findBoothProducts(
+    @Param('username') username: string,
+  ): Promise<Product[]> {
     return this.boothService.findBoothProduct(username);
   }
 
@@ -34,7 +36,6 @@ export class BoothController {
   async findOne(@Param('id') id: string): Promise<Booth> {
     return this.boothService.findOne(id);
   }
-
 
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<Booth> {

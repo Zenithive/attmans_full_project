@@ -10,6 +10,7 @@ import {
 } from 'src/exhibition/schema/exhibition.schema';
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 import { WorkExprience } from 'src/profile/schemas/work.exprience.schema';
+import { BOOTH_STATUSES } from 'src/common/constant/status.constant';
 
 @Injectable()
 export class BoothService {
@@ -111,7 +112,7 @@ export class BoothService {
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
-    booth.status = 'Approved';
+    booth.status = BOOTH_STATUSES.approved;
     booth.buttonsHidden = true;
     await booth.save();
 
@@ -145,7 +146,7 @@ export class BoothService {
     if (!booth) {
       throw new NotFoundException('Booth not found');
     }
-    booth.status = 'Rejected';
+    booth.status = BOOTH_STATUSES.rejected;
     booth.buttonsHidden = true;
     booth.rejectComment = comment;
     await booth.save();

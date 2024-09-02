@@ -260,8 +260,6 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                 name="products"
                 render={(arrayHelpers) => (
                   <div>
-
-
                     <ProductTableForBooth
                       products={values.products}
                       productDetails={productDetails}
@@ -270,8 +268,6 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                         setFieldValue(`products[${index}]`, updatedProduct)
                       }
                     />
-
-                    
 
                     <Button
                       variant="outlined"
