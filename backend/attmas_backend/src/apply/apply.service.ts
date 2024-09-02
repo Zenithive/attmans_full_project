@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -28,33 +29,47 @@ export class ApplyService {
   ) {}
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
+    // Convert jobId to ObjectId if it is not already
+    let jobId: Types.ObjectId;
+    try {
+      jobId = new Types.ObjectId(createApplyDto.jobId);
+    } catch (error) {
+      throw new BadRequestException('Invalid jobId format');
+    }
+  
+    // Check for existing application
     const existingApplication = await this.ApplyModel.findOne({
       userId: createApplyDto.userId,
-      jobId: createApplyDto.jobId,
+      jobId: jobId,
     }).exec();
-
+  
     console.log('existingApplication', existingApplication);
     if (existingApplication) {
       throw new ConflictException('User has already applied for this job');
     }
-
-    const createdApply = new this.ApplyModel(createApplyDto);
+  
+    // Create and save new application
+    const createdApply = new this.ApplyModel({
+      ...createApplyDto,
+      jobId: jobId,
+    });
     await createdApply.save();
-
+  
+    // Find user and send email notification
     const user = await this.userModel
       .findOne({ username: createApplyDto.username })
       .exec();
     if (user) {
       const emailText = `
         Hi ${user.firstName},
-
+  
         A new application has been created:
         
         Title: ${createApplyDto.title}
         Description: ${createApplyDto.description}
         Budget: ${createApplyDto.Budget}
         Time Frame: ${createApplyDto.TimeFrame}
-
+  
         Best regards,
         Your Team
       `;
@@ -65,10 +80,10 @@ export class ApplyService {
         text: emailText,
       });
     }
-    // console.log('createdApply', createdApply);
-
+    
     return createdApply;
   }
+  
 
   async findAll(): Promise<Apply[]> {
     return this.ApplyModel.find()
