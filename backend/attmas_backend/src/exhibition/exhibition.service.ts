@@ -86,6 +86,103 @@ export class ExhibitionService {
     return result;
   }
 
+  // async findAll(
+  //   page: number,
+  //   limit: number,
+  //   userId?: string,
+  //   title?: string,
+  //   industries?: string[],
+  //   subjects?: string[],
+  //   createdAt?: string,
+  //   dateTime?: string,
+  //   status?: string,
+  // ): Promise<Exhibition[]> {
+  //   const skip = (page - 1) * limit;
+  //   const filter: any = {};
+
+  //   const allNativeFiltersArray = {
+  //     title,
+  //     industries,
+  //     subjects,
+  //     createdAt,
+  //     dateTime,
+  //     status,
+  //   };
+
+  //   for (const key in allNativeFiltersArray) {
+  //     if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+  //       const element = allNativeFiltersArray[key];
+  //       if (key === 'createdAt' && element) {
+  //         const sameDateISOs = getSameDateISOs(element);
+  //         filter[key] = {
+  //           $gte: sameDateISOs.startOfDay,
+  //           $lte: sameDateISOs.endOfDay,
+  //         };
+  //       } else if (key === 'userId' && element) {
+  //         filter[key] = new Types.ObjectId(userId);
+  //       } else if (element) {
+  //         filter[key] = new RegExp(element, 'i');
+  //       }
+  //     }
+  //   }
+
+  //   const pipeline: PipelineStage[] = [
+  //     {
+  //       $lookup: {
+  //         from: 'users',
+  //         localField: 'userId',
+  //         foreignField: '_id',
+  //         as: 'userId',
+  //       },
+  //     },
+  //     {
+  //       $unwind: {
+  //         path: '$userId',
+  //         preserveNullAndEmptyArrays: true,
+  //       },
+  //     },
+  //     {
+  //       $match: {
+  //         ...filter,
+  //         ...(userId && {
+  //           'userId._id': new Types.ObjectId(userId),
+  //         }),
+  //       },
+  //     },
+  //     { $sort: { createdAt: -1 } },
+  //     { $skip: skip },
+  //     { $limit: limit },
+  //     {
+  //       $project: {
+  //         _id: 1,
+  //         title: 1,
+  //         description: 1,
+  //         status: 1,
+  //         meetingUrl: 1,
+  //         industries: 1,
+  //         subjects: 1,
+  //         dateTime: 1,
+  //         exhbTime: 1,
+  //         username: 1,
+  //         videoUrl: 1,
+  //         innovators: 1,
+  //         createdAt: 1,
+  //         userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
+  //       },
+  //     },
+  //   ];
+
+  //   return await this.exhibitionModel.aggregate(pipeline);
+
+  //   // return this.exhibitionModel
+  //   //   .find(filter)
+  //   //   .skip(skip)
+  //   //   .sort({ createdAt: -1 })
+  //   //   .limit(limit)
+  //   //   .populate('userId', 'firstName lastName username', this.userModel)
+  //   //   .exec();
+  // }
+
   async findAll(
     page: number,
     limit: number,
@@ -99,7 +196,7 @@ export class ExhibitionService {
   ): Promise<Exhibition[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
-
+  
     const allNativeFiltersArray = {
       title,
       industries,
@@ -108,7 +205,7 @@ export class ExhibitionService {
       dateTime,
       status,
     };
-
+  
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
@@ -125,7 +222,7 @@ export class ExhibitionService {
         }
       }
     }
-
+  
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -139,6 +236,35 @@ export class ExhibitionService {
         $unwind: {
           path: '$userId',
           preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'booths',
+          localField: '_id',
+          foreignField: 'exhibitionId',
+          as: 'booths',
+        },
+      },
+      {
+        $addFields: {
+          boothCounts: {
+            $reduce: {
+              input: '$booths',
+              initialValue: { pending: 0, approved: 0, rejected: 0 },
+              in: {
+                pending: {
+                  $cond: [{ $eq: ['$$this.status', 'Pending'] }, { $add: ['$$value.pending', 1] }, '$$value.pending'],
+                },
+                approved: {
+                  $cond: [{ $eq: ['$$this.status', 'Approved'] }, { $add: ['$$value.approved', 1] }, '$$value.approved'],
+                },
+                rejected: {
+                  $cond: [{ $eq: ['$$this.status', 'Rejected'] }, { $add: ['$$value.rejected', 1] }, '$$value.rejected'],
+                },
+              },
+            },
+          },
         },
       },
       {
@@ -168,20 +294,15 @@ export class ExhibitionService {
           innovators: 1,
           createdAt: 1,
           userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
+          boothCounts: 1, // Include the booth counts in the output
         },
       },
     ];
-
+  
     return await this.exhibitionModel.aggregate(pipeline);
-
-    // return this.exhibitionModel
-    //   .find(filter)
-    //   .skip(skip)
-    //   .sort({ createdAt: -1 })
-    //   .limit(limit)
-    //   .populate('userId', 'firstName lastName username', this.userModel)
-    //   .exec();
   }
+  
+  
 
   async update(
     id: string,

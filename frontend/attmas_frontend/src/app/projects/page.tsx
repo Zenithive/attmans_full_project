@@ -155,7 +155,7 @@ const Jobs = () => {
     };
 
     const getParamForJobs = (page: number) => {
-        if(userType === 'Project Owner'){
+        if (userType === 'Project Owner') {
             return `?page=${page}&userId=${userDetails._id}&${filter}`;
         }else if(userType === 'Freelancer'){
             return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Outsource Research and Development&${filter}`;
@@ -494,7 +494,6 @@ const Jobs = () => {
                         ))}
                     </Box>
                 ) : (
-                    // Render job listings
                     <InfiniteScroll
                         key={appliedJobs.join(',')}
                         dataLength={jobs.length}
@@ -503,22 +502,19 @@ const Jobs = () => {
                         loader={<Typography>Loading...</Typography>}
                         endMessage={<Typography>No more Projects</Typography>}
                     >
-
                         <Box sx={{ mt: 2 }}>
                             {jobs.map((job) => (
                                 <Card key={job._id} sx={{ mb: 2 }}>
                                     <CardContent>
                                         <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-
                                             <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
                                                 <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
-                                                    {job.title} 
+                                                    {job.title}
                                                 </a>
                                                 <span style={{ fontSize: 'small', color: "#616161", marginLeft: 10 }}>
                                                     ({dayjs(job.TimeFrame).format(DATE_FORMAT)})
                                                 </span>
                                             </Box>
-
                                             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                 <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
                                                     <CustomChip
@@ -526,7 +522,6 @@ const Jobs = () => {
                                                         color={job.status === PROJECT_STATUSES.approved ? 'success' : job.status === PROJECT_STATUSES.rejected ? 'error' : 'default'}
                                                     />
                                                 </Box>
-
                                                 <Box sx={{ flexShrink: 0, mr: 2 }}>
                                                     <Chip
                                                         label={job.SelectService}
@@ -534,17 +529,19 @@ const Jobs = () => {
                                                         color='secondary'
                                                     />
                                                 </Box>
-
                                                 <Box sx={{ flexShrink: 0, fontSize: 'small', fontWeight: 'bolder' }}>
                                                     {job.Expertiselevel}
                                                 </Box>
                                             </Box>
-
                                         </Typography>
-                                        <Box sx={{ marginTop: '10px' }}>
 
+                                        <Box sx={{ mt: 2 }}>
                                             <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+
+                                            <Typography variant="body2" sx={{ mt: 1, fontWeight: 'bold' }}>
+                                                Applications: {job.appliesCount} {/* Display the count of applications in bold */}
+                                            </Typography>
 
                                             <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
                                                 {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (
@@ -570,7 +567,6 @@ const Jobs = () => {
                                                 >
                                                     <MoreVertIcon />
                                                 </IconButton>
-
 
                                                 <Menu
                                                     id="simple-menu"
@@ -604,6 +600,7 @@ const Jobs = () => {
                                                     )}
                                                 </Menu>
                                             </Box>
+
                                             <Box sx={{ position: 'relative', bottom: '10px' }}>
                                                 {(userType === 'Freelancer') && !appliedJobs.includes(job._id || '') && (
                                                     <Button
@@ -627,7 +624,6 @@ const Jobs = () => {
                                                 )}
                                             </Box>
                                         </Box>
-
                                     </CardContent>
                                 </Card>
                             ))}
@@ -635,6 +631,7 @@ const Jobs = () => {
                     </InfiniteScroll>
                 )}
             </Box>
+
 
 
             <AddApply

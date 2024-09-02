@@ -9,6 +9,7 @@ export interface Job {
     TimeFrame: string | null;
     Category: string[];
     Subcategorys: string[];
+    appliesCount?: number;
 
     // ******** op ******** //
     DetailsOfInnovationChallenge: string;

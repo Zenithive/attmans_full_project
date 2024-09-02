@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Booth, BoothDocument, Product } from './booth.schema';
 import { CreateBoothDto } from './create-booth.dto';
 import { User, UserDocument } from 'src/users/user.schema';
@@ -22,14 +22,32 @@ export class BoothService {
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
     private emailService: EmailService2,
-  ) {}
+  ) { }
 
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
     console.log('Booth Products:', createBoothDto.products);
 
+    // for (let index = 0; index < createBoothDto.products.length; index++) {
+    //   //let element: string = createBoothDto.products[index];
+    //   createBoothDto.products[index] = new Types.ObjectId(createBoothDto.products[index]);
+    // }
+
+    // Convert `_id` to `ObjectId` if it is a valid string
+    // createBoothDto.products = createBoothDto.products.forEach((product) => {
+    //   if (typeof product === 'string' && Types.ObjectId.isValid(product)) {
+    //     return { ...product, _id: new Types.ObjectId(product) }; // Convert string to ObjectId
+    //   }
+    //   return product; // Return as is if not a string or already an ObjectId
+    // });
+
+    // Convert `exhibitionId` to ObjectId if it is a valid string
+    if (typeof createBoothDto.exhibitionId === 'string' && Types.ObjectId.isValid(createBoothDto.exhibitionId)) {
+      createBoothDto.exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
+    }
+
     const existingBooth = await this.boothModel.findOne({
       exhibitionId: createBoothDto.exhibitionId,
-      userId: createBoothDto.userId, // Ensure that this comes from the user details in your DTO
+      userId: createBoothDto.userId,
     });
 
     if (existingBooth) {
@@ -43,13 +61,13 @@ export class BoothService {
       (product) => !product._id,
     );
 
-    if (newProducts.length > 0) {
-      // Update WorkExprience by matching the username and pushing new products
-      await this.workExperienceModel.updateOne(
-        { username: createBoothDto.username }, // Match by username
-        { $push: { products: { $each: newProducts } } }, // Push new products into products array
-      );
-    }
+    // if (newProducts.length > 0) {
+    //   // Update WorkExperience by matching the username and pushing new products
+    //   await this.workExperienceModel.updateOne(
+    //     { username: createBoothDto.username },
+    //     { $push: { products: { $each: newProducts } } },
+    //   );
+    // }
 
     const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
 
@@ -71,6 +89,7 @@ export class BoothService {
     return booth;
   }
 
+
   async findAll(status?: string): Promise<Booth[]> {
     const filter = status ? { status } : {};
     return this.boothModel
@@ -78,6 +97,53 @@ export class BoothService {
       .populate('userId', 'firstName lastName', this.userModel)
       .exec();
   }
+
+  // async findWorkExpriencesWithProductDetails(productId: string): Promise<any[]> {
+  //   return this.workExperienceModel.aggregate([
+  //     {
+  //       $unwind: '$products', // Deconstruct the products array to process each ObjectId individually
+  //     },
+  //     {
+  //       $match: {
+  //         products: new mongoose.Types.ObjectId(productId), // Match documents with the given productId in the products array
+  //       },
+  //     },
+  //     {
+  //       $lookup: {
+  //         from: 'workexpriences', // The collection to join with
+  //         localField: 'products', // Field from the workexpriences collection (ObjectId)
+  //         foreignField: '_id', // Field from the products collection (ObjectId)
+  //         as: 'productDetails', // Output field that will contain the joined documents
+  //       },
+  //     },
+  //     {
+  //       $unwind: '$productDetails', // Deconstruct the productDetails array to process each product individually
+  //     },
+  //     {
+  //       $project: {
+  //         _id: 1,
+  //         workAddress: 1,
+  //         productToMarket: 1,
+  //         qualification: 1,
+  //         organization: 1,
+  //         sector: 1,
+  //         designation: 1,
+  //         userType: 1,
+  //         hasPatent: 1,
+  //         products: {
+  //           productName: '$productDetails.productName',
+  //           productDescription: '$productDetails.productDescription',
+  //           // productType: '$productDetails.productType',
+  //           productPrice: '$productDetails.productPrice',
+  //           currency: '$productDetails.currency',
+  //           videourlForproduct: '$productDetails.videourlForproduct',
+  //         },
+  //       },
+  //     },
+  //   ]).exec();
+  // }
+
+
 
   async findOne(id: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id).exec();
@@ -87,17 +153,17 @@ export class BoothService {
     return booth;
   }
 
-  async findBoothProduct(username: string): Promise<Product[]> {
-    const booth = await this.boothModel
-      .findOne({ username })
-      .select('products')
-      .exec();
-    if (!booth) {
-      throw new NotFoundException(`Booth with username  ${username} not found`);
-    }
-    console.log('booth.products', booth.products);
-    return booth.products;
-  }
+  // async findBoothProduct(username: string): Promise<Product[]> {
+  //   const booth = await this.boothModel
+  //     .findOne({ username })
+  //     .select('products')
+  //     .exec();
+  //   if (!booth) {
+  //     throw new NotFoundException(`Booth with username  ${username} not found`);
+  //   }
+  //   console.log('booth.products', booth.products);
+  //   return booth.products;
+  // }
 
   async delete(id: string): Promise<Booth> {
     const deletedBooth = await this.boothModel.findByIdAndDelete(id).exec();
@@ -106,6 +172,40 @@ export class BoothService {
     }
     return deletedBooth;
   }
+
+  // async approveBooth(id: string): Promise<Booth> {
+  //   const booth = await this.boothModel.findById(id);
+  //   if (!booth) {
+  //     throw new NotFoundException('Booth not found');
+  //   }
+  //   booth.status = 'Approved';
+  //   booth.buttonsHidden = true;
+  //   await booth.save();
+
+  //   const exhibitionId = new Types.ObjectId(booth.exhibitionId);
+
+  //   const exhibition: any = await this.exhibitionModel
+  //     .findById(exhibitionId)
+  //     .populate('userId', 'firstName lastName username', this.userModel)
+  //     .exec();
+  //   if (exhibition) {
+  //     const innovator = await this.userModel.findById(booth.userId);
+  //     if (innovator) {
+  //       await this.emailService.sendBoothStatusEmail(
+  //         innovator.username,
+  //         'Booth Approved',
+  //         (exhibition._id as Types.ObjectId).toHexString(),
+  //         booth.title,
+  //         'approved',
+  //         booth.username,
+  //         exhibition.userId.firstName,
+  //         exhibition.userId.lastName,
+  //       );
+  //     }
+  //   }
+
+  //   return booth;
+  // }
 
   async approveBooth(id: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id);
@@ -122,7 +222,12 @@ export class BoothService {
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
-    if (exhibition) {
+      console.log("exhibition", exhibition);
+      console.log("exhibition.userId", exhibition.userId);
+    if (exhibition && exhibition.userId) {
+      console.log("exhibition", exhibition);
+      console.log("exhibition.userId", exhibition.userId);
+      
       const innovator = await this.userModel.findById(booth.userId);
       if (innovator) {
         await this.emailService.sendBoothStatusEmail(
@@ -136,10 +241,15 @@ export class BoothService {
           exhibition.userId.lastName,
         );
       }
+    } else {
+      // Handle the case where exhibition or exhibition.userId is null
+      console.error('Exhibition or userId is null');
+      // You might want to handle this scenario gracefully
     }
 
     return booth;
   }
+
 
   async rejectBooth(id: string, comment: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id);

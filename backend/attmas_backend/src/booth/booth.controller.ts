@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { BoothService } from './booth.service';
 import { CreateBoothDto } from './create-booth.dto';
-import { Booth, Product } from './booth.schema';
+import { Booth } from './booth.schema';
 
 @Controller('booths')
 export class BoothController {
@@ -20,12 +20,10 @@ export class BoothController {
     return this.boothService.create(createBoothDto);
   }
 
-  @Get('username/:username')
-  async findBoothProducts(
-    @Param('username') username: string,
-  ): Promise<Product[]> {
-    return this.boothService.findBoothProduct(username);
-  }
+  // @Get('username/:username')
+  // async findBoothProducts(@Param('username') username: string): Promise<Product[]> {
+  //   return this.boothService.findBoothProduct(username);
+  // }
 
   @Get()
   async findAll(@Query('status') status: string): Promise<Booth[]> {

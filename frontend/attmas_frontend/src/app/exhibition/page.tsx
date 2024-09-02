@@ -34,142 +34,16 @@ interface Exhibition {
   subjects: string[];
   userId?: string;
   username: string;
+  boothCounts?: BoothCounts;
 }
 
-const subjects = [
-  {
-    category: "Chemistry",
-    items: [
-      "Chemical Reagent Development",
-      "Dewatering & Drying Technology",
-      "Electronics",
-      "Catalysis",
-      "Trace Elements",
-      "Mathematical Chemistry",
-      "Dispersion Chemistry",
-      "Surface Science"
-    ]
-  },
-  {
-    category: "Materials Science & Engineering",
-    items: [
-      "Nanotechnology & Nanomaterials",
-      "Surface Chemistry",
-      "Metallurgy",
-      "Glass Science",
-      "Ceramic Engineering",
-      "Corrosion",
-      "Structural Chemistry",
-      "Microencapsulation",
-      "Supramolecular Chemistry",
-      "Fiber & Textile Engineering",
-      "Carbon Materials",
-      "Nanotechnology"
-    ]
-  },
-  {
-    category: "Biomaterials",
-    items: [
-      "Collagen",
-      "Bioplastics",
-      "Powder Metallurgy",
-      "Powders & Bulk Materials",
-      "Refractory Materials",
-      "Composite Materials",
-      "Electronic, Optical & Magnetic Materials",
-      "Dental Materials",
-      "Biocatalysis",
-      "Marine Chemistry",
-      "Coordination Compounds",
-      "Inorganic Chemistry",
-      "Natural Product Chemistry",
-      "Molecular Engineering",
-      "Physical Chemistry"
-    ]
-  },
-  {
-    category: "Physical Chemistry",
-    items: [
-      "Molecular Docking",
-      "Chemoinformatics",
-      "Biopolymers",
-      "Polymer Chemistry"
-    ]
-  },
-  {
-    category: "Analytical Chemistry",
-    items: [
-      "Deformulation",
-      "Separation & Purification Crystallography",
-      "X-Ray Crystallography Spectroscopy",
-      'Atomic Absorption Spectroscopy',
-      'Atomic Emission Spectroscopy',
-      'UV Spectroscopy ',
-      'Fluorescence Spectroscopy',
-      'Raman Spectroscopy',
-      'NMR Spectroscopy',
-      'Circular Dichroism Spectroscopy',
-      'Spectrophotometry',
-      'Mass Spectrometry',
-      'Molecular Imaging',
-      'Liquid Chromatography/HPLC',
-      'Thermal Analysis',
-      'Microcalorimetry',
-      'Gas Chromatography',
-      'Optical Rotation',
-      'Particle Size Distribution',
-      'Stable Isotope Analysis',
-      'Particle-Induced X-Ray Emission',
-      'Electrochemistry',
-      'Agricultural Chemistry',
-      "Cosmochemistry",
-      "Radiochemistry",
-      "Astrochemistry",
-      "Petrochemistry",
-    ]
-  },
-  {
-    category: "Solid State Sciences",
-    items: [
-      "Condensed Matter Physics",
-      "Solid-State Chemistry",
-      "Flow Chemistry",
-      "Green Chemistry",
-      "Refractory Materials",
-      "Organometallic Chemistry",
-      "Photochemistry",
-      "Quantum Chemistry",
-    ]
-  },
-  {
-    category: "Organic Chemistry",
-    items: [
-      "Retrosynthesis",
-      "Thermochemistry",
-      "Computational Chemistry",
-      "Mechanochemistry",
-      "Sonochemistry",
-      "Peptide Synthesis",
-      "Physical Organic Chemistry",
-      "Adhesion Technology",
-      "Applied Chemistry",
-    ]
-  },
-  {
-    category: "Agriculture",
-    items: [
-      "Plant Science:",
-      "Agronomy:",
-      "Plant Breeding:",
-      "Mechanochemistry",
-      "Sonochemistry",
-      "Peptide Synthesis",
-      "Physical Organic Chemistry",
-      "Adhesion Technology",
-      "Applied Chemistry",
-    ]
-  },
-];
+type BoothCounts = {
+  approved: number;
+  pending: number;
+  rejected: number;
+};
+
+
 
 
 const Exhibition = () => {
@@ -328,7 +202,7 @@ const Exhibition = () => {
     setFilterType(newFilterType);
     if (newFilterType == 'mine') {
       setToggleFilter(`&userId=${userId}`);
-    }else{
+    } else {
       setToggleFilter(``);
     }
   };
@@ -386,37 +260,37 @@ const Exhibition = () => {
           <Filters column={column} onFilter={changeFilterOrPage}></Filters>
           <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
         </Box>
-      
+
       </Box>
       {userType === "Admin" && <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            mb: 2,
-            height: "30px",
-            position: "relative",
-            top: "8px",
-            '@media (max-width: 767px)': {
-              position: 'relative',
-              right: '-106px',
-              top: '-27px',
-            },
-          }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-start',
+          mb: 2,
+          height: "30px",
+          position: "relative",
+          top: "8px",
+          '@media (max-width: 767px)': {
+            position: 'relative',
+            right: '-106px',
+            top: '-27px',
+          },
+        }}
+      >
+        <ToggleButtonGroup
+          value={filterType}
+          exclusive
+          onChange={handleFilterTypeChange}
+          aria-label="filter exhibitions"
         >
-          <ToggleButtonGroup
-            value={filterType}
-            exclusive
-            onChange={handleFilterTypeChange}
-            aria-label="filter exhibitions"
-          >
-            <ToggleButton value="all" aria-label="all exhibitions" sx={{ fontSize: "10px" }}>
-              All Exhibitions
-            </ToggleButton>
-            <ToggleButton value="mine" aria-label="my exhibitions" sx={{ fontSize: "10px" }}>
-              My Exhibitions
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>}
+          <ToggleButton value="all" aria-label="all exhibitions" sx={{ fontSize: "10px" }}>
+            All Exhibitions
+          </ToggleButton>
+          <ToggleButton value="mine" aria-label="my exhibitions" sx={{ fontSize: "10px" }}>
+            My Exhibitions
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>}
       <InfiniteScroll
         dataLength={exhibitions.length}
         next={() => setPage(prev => prev + 1)}
@@ -425,7 +299,7 @@ const Exhibition = () => {
         endMessage={<Typography>No more Exhibitions</Typography>}
       >
         <Box sx={{ mt: 2 }}>
-          {exhibitions.map((exhibition) => (
+          {/* {exhibitions.map((exhibition) => (
             <Card key={exhibition._id} sx={{ mb: 2 }}>
               <CardContent>
                 <Typography variant="h5">
@@ -462,7 +336,68 @@ const Exhibition = () => {
                 </Typography>
               </CardContent>
             </Card>
-          ))}
+          ))} */}
+
+{exhibitions.map((exhibition) => (
+  <Card key={exhibition._id} sx={{ mb: 2 }}>
+    <CardContent>
+      <Typography variant="h5">
+        <span style={{ cursor: 'pointer', marginRight: 10 }}>
+          <a
+            href={`/view-exhibition?exhibitionId=${exhibition._id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'black', textDecoration: 'none' }}
+          >
+            <Typography variant="h6" component="span">
+              {exhibition.title}
+            </Typography>
+          </a>
+        </span>
+        <span style={{ fontSize: 'small', color: "#616161" }}>
+          (
+          {!exhibition.exhbTime
+            ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT)
+            : exhibition.dateTime} {exhibition.exhbTime || ''}
+          )
+        </span>
+        <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
+          {exhibition.status}
+        </span>
+      </Typography>
+
+      <Typography variant="caption">
+        {exhibition.industries.join(', ')} | {exhibition.subjects.join(', ')}
+      </Typography>
+
+      {/* Booth Status Counts (Visible only to Admin) */}
+      {userType === "Admin" && (
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          <strong>Booth:</strong> (<strong>Approved:</strong> {exhibition.boothCounts?.approved || 0} | <strong>Rejected:</strong> {exhibition.boothCounts?.rejected || 0} | <strong>Pending:</strong> {exhibition.boothCounts?.pending || 0})
+        </Typography>
+      )}
+
+      <Typography sx={{ display: "flex", float: "right" }}>
+        {userType === "Admin" && (
+          <IconButton onClick={() => handleEditExhibition(exhibition)}>
+            <Tooltip title="Edit">
+              <EditIcon />
+            </Tooltip>
+          </IconButton>
+        )}
+        {userType === "Admin" && (
+          <IconButton onClick={() => handleConfirmDelete(exhibition)}>
+            <Tooltip title="Delete">
+              <DeleteRoundedIcon />
+            </Tooltip>
+          </IconButton>
+        )}
+      </Typography>
+    </CardContent>
+  </Card>
+))}
+
+
         </Box>
       </InfiniteScroll>
       <DeleteConfirmationDialog

@@ -10,32 +10,62 @@ import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
 class ProductDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
+  
+  // @IsNotEmpty()
+  @Type(() => String) // Ensure _id is treated as a string for validation
+  _id: Types.ObjectId;
 
-  @IsNotEmpty()
-  @IsString()
-  description: string;
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @IsString()
-  productType: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  price: number;
-
+  productName: string;
+  // @IsNotEmpty()
   @IsString()
-  @IsNotEmpty()
+  CompetitiveAdvantages: string;
+  // @IsNotEmpty()
+  @IsString()
+  challengesorrisks: string;
+  // @IsNotEmpty()
+  @IsString()
   currency: string;
-
+  // @IsNotEmpty()
   @IsString()
-  @IsNotEmpty()
+  feasibilityofthesolution: string;
+  // @IsNotEmpty()
+  @IsString()
+  howdoesthesolutionwork: string;
+  // @IsNotEmpty()
+  @IsString()
+  intellectualpropertyconsiderations: string;
+  // @IsNotEmpty()
+  @IsString()
+  potentialbenefits: string;
+  // @IsNotEmpty()
+  @IsString()
+  problemaddressed: string;
+  // @IsNotEmpty()
+  @IsString()
+  productDescription: string;
+  // @IsNotEmpty()
+  @IsString()
+  technologyused: string;
+  // @IsNotEmpty()
+  @IsString()
   videourlForproduct: string;
-
+  // @IsNotEmpty()
   @IsString()
-  _id: string;
+  stageofdevelopmentdropdown: string;
+  // @IsNotEmpty()
+  @IsString()
+  targetaudience: string;
+  // @IsNotEmpty()
+  @IsNumber()
+  productPrice: string;
+  // @IsNotEmpty()
+  @IsNumber()
+  productQuantity: number;
+  // @IsNotEmpty()
+ 
 }
 
 export class CreateBoothDto {

@@ -49,7 +49,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; }[];
+  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; stageofdevelopmentdropdown: string; productQuantity: number;      }[];
   userId: {
     firstName: string;
     lastName: string;
@@ -606,7 +606,7 @@ const ExhibitionsPage: React.FC = () => {
                           ))}
 
                           <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
-                          <Typography>Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
+                          <Typography>Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}</Typography>
                           <Box sx={{
                             position: 'relative', left: '76%', width: '48%', bottom: '45px', '@media (max-width: 767px)': {
                               position: 'relative', top: '-65px', left: '71%'

@@ -31,14 +31,18 @@ import axios from 'axios';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import InterestedModal from '../booth/intrestedUsers';
+import { DATE_TIME_FORMAT } from '@/app/constants/common.constants';
+
 
 interface Product {
   productName: string;
   productDescription: string;
-  productType: string;
+  // productType: string;
   productPrice: number;
   currency: string;
   videourlForproduct: string;
+  stageofdevelopmentdropdown: string;
+  productQuantity: number;
 }
 
 interface Booth {
@@ -183,7 +187,7 @@ const closeInterestedModals = () => setShowInterestedModals(false);
             <Box sx={{ position: 'relative' }}>
               <Box sx={{ position: 'absolute', top: 16, right: 16, '@media (max-width: 767px)': { position: 'relative', top: '-10px', left: '5px' } }}>
                 <Typography variant="body1" sx={{'@media (max-width: 767px)': {fontSize:'1.25rem'}}} color="text.secondary">
-                  Status: {booth.status}, Date: {dayjs(booth.createdAt).format('MMMM D, YYYY h:mm A')}
+                  Status: {booth.status}, Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}
                 </Typography>
                 <Box sx={{position:'relative',right:'45%',top:'15px'}}>
                 {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
@@ -231,7 +235,8 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                           <TableRow>
                             <TableCell><strong>Name</strong></TableCell>
                             <TableCell><strong>Description</strong></TableCell>
-                            <TableCell><strong>Type</strong></TableCell>
+                            <TableCell><strong>Quantity</strong></TableCell>
+                            <TableCell><strong>Stage Of Development</strong></TableCell>
                             <TableCell><strong>Price</strong></TableCell>
                             <TableCell><strong>Video</strong></TableCell>
                           </TableRow>
@@ -241,7 +246,8 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                             <TableRow key={index}>
                               <TableCell>{product.productName}</TableCell>
                               <TableCell>{product.productDescription}</TableCell>
-                              <TableCell>{product.productType}</TableCell>
+                              <TableCell>{product.productQuantity}</TableCell>
+                              <TableCell>{product.stageofdevelopmentdropdown}</TableCell>
                               <TableCell>{product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</TableCell>
                               <TableCell>
                                 <Tooltip
@@ -275,7 +281,7 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                         <CardContent>
                           <Typography variant="body1" sx={{marginBottom:'15px', fontSize:'1.25rem'}}><strong>Name:</strong> {product.productName}</Typography>
                           <Typography variant="body1" sx={{marginBottom:'15px',fontSize:'1.25rem'}}><strong>Description:</strong> {product.productDescription}</Typography>
-                          <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Type:</strong> {product.productType}</Typography>
+                          {/* <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Type:</strong> {product.productType}</Typography> */}
                           <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
                           <Box sx={{ mt: 1 ,'@media (max-width: 767px)': {
                         position: 'relative',

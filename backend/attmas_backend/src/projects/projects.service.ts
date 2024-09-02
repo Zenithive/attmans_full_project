@@ -68,6 +68,134 @@ export class JobsService {
     }
   }
 
+  // async filterJobs(
+  //   page: number,
+  //   limit: number,
+  //   Category: string[],
+  //   userId?: string,
+  //   Subcategorys?: string[],
+  //   Expertiselevel?: string[],
+  //   status?: string,
+  //   SelectService?: string[],
+  //   title?: string,
+  //   createdAt?: string,
+  //   TimeFrame?: string,
+  //   ProjectOwner?: string,
+  // ): Promise<Jobs[]> {
+  //   const skip = (page - 1) * limit;
+  //   const filter: any = {};
+  //   const filterQuery: any = {};
+
+  //   const allNativeFiltersArray = {
+  //     title,
+  //     status,
+  //     SelectService,
+  //     Subcategorys,
+  //     Category,
+  //     createdAt,
+  //     TimeFrame,
+  //   };
+
+  //   for (const key in allNativeFiltersArray) {
+  //     if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+  //       const element = allNativeFiltersArray[key];
+  //       if ((key === 'createdAt' || key === 'TimeFrame') && element) {
+  //         const sameDateISOs = getSameDateISOs(element);
+  //         filterQuery[key] = {
+  //           $gte: sameDateISOs.startOfDay,
+  //           $lte: sameDateISOs.endOfDay,
+  //         };
+  //       } else if (element) {
+  //         filterQuery[key] = new RegExp(element, 'i');
+  //       }
+  //     }
+  //   }
+
+  //   if (ProjectOwner) {
+  //     filter.ProjectOwner = new RegExp(ProjectOwner, 'i');
+  //   }
+
+  //   if (Category && Category.length > 0) {
+  //     filter.Category = { $in: Category };
+  //   }
+
+  //   if (Subcategorys && Subcategorys.length > 0) {
+  //     filter.Subcategorys = { $in: Subcategorys };
+  //   }
+
+  //   if (Expertiselevel && Expertiselevel.length > 0) {
+  //     filter.Expertiselevel = { $in: Expertiselevel };
+  //   }
+
+  //   if (status) {
+  //     filter.status = status;
+  //   }
+
+  //   if (SelectService && SelectService.length > 0) {
+  //     filter.SelectService = { $in: SelectService };
+  //   }
+
+  //   const pipeline: PipelineStage[] = [
+  //     {
+  //       $lookup: {
+  //         from: 'users',
+  //         localField: 'userId',
+  //         foreignField: '_id',
+  //         as: 'userId',
+  //       },
+  //     },
+  //     {
+  //       $unwind: {
+  //         path: '$userId',
+  //         preserveNullAndEmptyArrays: true,
+  //       },
+  //     },
+  //     {
+  //       $match: {
+  //         ...filterQuery,
+  //         ...(userId && {
+  //           'userId._id': new Types.ObjectId(userId),
+  //         }),
+  //         ...(filter.ProjectOwner && {
+  //           $or: [
+  //             { 'userId.firstName': filter.ProjectOwner },
+  //             { 'userId.lastName': filter.ProjectOwner },
+  //           ],
+  //         }),
+  //       },
+  //     },
+  //     { $sort: { createdAt: -1 } },
+  //     { $skip: skip },
+  //     { $limit: limit },
+  //     {
+  //       $project: {
+  //         _id: 1,
+  //         Quantity: 1,
+  //         Budget: 1,
+  //         Category: 1,
+  //         DetailsOfInnovationChallenge: 1,
+  //         Expectedoutcomes: 1,
+  //         Expertiselevel: 1,
+  //         IPRownership: 1,
+  //         Objective: 1,
+  //         ProductDescription: 1,
+  //         Sector: 1,
+  //         SelectService: 1,
+  //         Subcategorys: 1,
+  //         TimeFrame: 1,
+  //         title: 1,
+  //         currency: 1,
+  //         description: 1,
+  //         createdAt: 1,
+  //         status: 1,
+  //         userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
+  //       },
+  //     },
+  //   ];
+
+  //   return await this.jobsModel.aggregate(pipeline);
+  // }
+
   async filterJobs(
     page: number,
     limit: number,
@@ -85,7 +213,7 @@ export class JobsService {
     const skip = (page - 1) * limit;
     const filter: any = {};
     const filterQuery: any = {};
-
+  
     const allNativeFiltersArray = {
       title,
       status,
@@ -95,7 +223,7 @@ export class JobsService {
       createdAt,
       TimeFrame,
     };
-
+  
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
@@ -110,32 +238,45 @@ export class JobsService {
         }
       }
     }
-
+  
     if (ProjectOwner) {
       filter.ProjectOwner = new RegExp(ProjectOwner, 'i');
     }
-
+  
     if (Category && Category.length > 0) {
       filter.Category = { $in: Category };
     }
-
+  
     if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
-
+  
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
     }
-
+  
     if (status) {
       filter.status = status;
     }
-
+  
     if (SelectService && SelectService.length > 0) {
       filter.SelectService = { $in: SelectService };
     }
-
+  
     const pipeline: PipelineStage[] = [
+      {
+        $lookup: {
+          from: 'applies',
+          localField: '_id',
+          foreignField: 'jobId',
+          as: 'applies',
+        },
+      },
+      {
+        $addFields: {
+          appliesCount: { $size: '$applies' }, // Add the count of applies
+        },
+      },
       {
         $lookup: {
           from: 'users',
@@ -189,12 +330,15 @@ export class JobsService {
           createdAt: 1,
           status: 1,
           userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
+          appliesCount: 1, // Include appliesCount in the projection
         },
       },
     ];
-
+  
     return await this.jobsModel.aggregate(pipeline);
   }
+  
+  
 
   async findJobWithUser(id: string): Promise<Jobs> {
     return this.jobsModel
