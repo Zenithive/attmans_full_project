@@ -24,7 +24,6 @@ export const drawerWidth = 240;
 
 export default function MainSideBar() {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  console.log("userDetails", userDetails.userType);
 
   const [isClient, setIsClient] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);

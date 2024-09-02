@@ -11,6 +11,7 @@ import RejectMilestoneDialog from '../rejectformilston/rejectformilston';
 import BillingData from '../addpaymentshow/addpaymentshow';
 import CloseIcon from '@mui/icons-material/Close';
 import BillingModal from '../billingmodel/billingmodel';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 export interface Milestone {
     scopeOfWork: string;
@@ -340,13 +341,13 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                                                                 Milestone {milestoneIndex + 1}
                                                                                                 {milestone.submittedAt && (
                                                                                                     <Typography component="span" sx={{ ml: 2, color: 'green', }}>
-                                                                                                        Submitted Date: ({dayjs(milestone.submittedAt).format('MMMM D, YYYY h:mm A')})
+                                                                                                        Submitted Date: ({dayjs(milestone.submittedAt).format(DATE_FORMAT)})
                                                                                                     </Typography>
                                                                                                 )}
                                                                                                 <Box sx={{ position: 'relative', top: '5px' }}>
                                                                                                     {milestone.name.timeFrame && (
                                                                                                         <Typography variant="body2" sx={{ color: 'green', }}>
-                                                                                                            Deadline Date: ({dayjs(milestone.name.timeFrame).format('MMMM D, YYYY h:mm A')})
+                                                                                                            Deadline Date: ({dayjs(milestone.name.timeFrame).format(DATE_FORMAT)})
                                                                                                         </Typography>
                                                                                                     )}
                                                                                                 </Box>

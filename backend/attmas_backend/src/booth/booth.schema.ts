@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { BOOTH_STATUSES } from 'src/common/constant/status.constant';
 
 export type BoothDocument = Booth & Document;
 
@@ -85,7 +86,7 @@ export class Booth {
   @Prop({ default: Date.now })
   createdAt: Date;
 
-  @Prop({ default: 'Pending' })
+  @Prop({ default: BOOTH_STATUSES.pending })
   status: string;
 
   @Prop({ default: false })

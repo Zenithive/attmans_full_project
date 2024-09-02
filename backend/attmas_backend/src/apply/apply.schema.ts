@@ -4,6 +4,7 @@ import {
   Types,
   // Types
 } from 'mongoose';
+import { APPLY_STATUSES } from 'src/common/constant/status.constant';
 
 export type ApplyDocument = Apply & Document;
 
@@ -39,7 +40,7 @@ export class Apply {
   @Prop({ required: true })
   lastName: string;
 
-  @Prop({ default: 'Pending' })
+  @Prop({ default: APPLY_STATUSES.pendingForApproval })
   status: string;
 
   @Prop({ default: 'Pending' })

@@ -199,56 +199,60 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 error={!!(errors.description && touched.description)}
                 helperText={<ErrorMessage name="description" />}
               />
-              <TextField
-                fullWidth
-                name="Budget"
-                label="Budget"
-                type="number"
-                color='secondary'
-                value={values.Budget}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.Budget && Boolean(errors.Budget)}
-                helperText={touched.Budget && errors.Budget}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <FormControl variant="standard">
-                        <Select
-                          value={values.currency}
-                          onChange={(e) => {
-                            const selectedCurrency = e.target.value as string;
-                            setFieldValue('currency', selectedCurrency);
-                          }}
-                        >
-                          <MenuItem value="INR">INR</MenuItem>
-                          <MenuItem value="USD">USD</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                  format={DATE_FORMAT}
-                  label="Time Frame"
-                  value={values.TimeFrame}
-                  slotProps={{
-                    textField: {
-                      color: 'secondary'
-                    },
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                <TextField
+                  
+                  name="Budget"
+                  label="Budget"
+                  type="number"
+                  color='secondary'
+                  value={values.Budget}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.Budget && Boolean(errors.Budget)}
+                  helperText={touched.Budget && errors.Budget}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FormControl variant="standard">
+                          <Select
+                            value={values.currency}
+                            onChange={(e) => {
+                              const selectedCurrency = e.target.value as string;
+                              setFieldValue('currency', selectedCurrency);
+                            }}
+                          >
+                            <MenuItem value="INR">INR</MenuItem>
+                            <MenuItem value="USD">USD</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </InputAdornment>
+                    ),
                   }}
-                  onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                 />
-              </LocalizationProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    format={DATE_FORMAT}
+                    label="Time Frame"
+                    value={values.TimeFrame}
+                    slotProps={{
+                      textField: {
+                        color: 'secondary'
+                      },
+                    }}
+                    onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
+                  />
+                </LocalizationProvider>
+              </Box>
 
               <FieldArray
                 name="milestones"
                 render={(arrayHelpers) => (
                   <Box>
                     {values.milestones.map((milestoneGroup, index) => (
-                      <Paper key={index} elevation={3} sx={{ p: 2, mt: 3 }}>
+                      <Paper key={index} elevation={2} sx={{ p: 2, mt: 1 }}>
                         <Typography variant="h5" gutterBottom sx={{ marginBottom: '40px' }}>
                           Scope of Work
                         </Typography>
@@ -301,7 +305,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
 
                                   <Grid item xs={12} sm={5}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
+                                      <DatePicker
                                         format={DATE_FORMAT}
                                         label="Milestone Deadline Date"
                                         value={milestone.name.timeFrame ? dayjs(milestone.name.timeFrame) : null}
@@ -331,7 +335,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                               ))}
 
                               <Button
-                                onClick={() => milestoneArrayHelpers.push({  name: { text: '', timeFrame: null }, })}
+                                onClick={() => milestoneArrayHelpers.push({ name: { text: '', timeFrame: null }, })}
                                 variant="outlined"
                                 sx={{ mt: 1, textTransform: 'none' }}
                                 startIcon={<AddIcon />}

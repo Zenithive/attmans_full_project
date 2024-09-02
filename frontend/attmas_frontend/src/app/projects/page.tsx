@@ -25,6 +25,7 @@ import { CustomChip } from './projectinterface';
 import { AddApplyForInnovatores } from '../component/innovatoreApply/innovatoreApply';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { DATE_FORMAT } from '../constants/common.constants';
+import { PROJECT_STATUSES } from '../constants/status.constant';
 
 
 const Jobs = () => {
@@ -156,11 +157,11 @@ const Jobs = () => {
     const getParamForJobs = (page: number) => {
         if (userType === 'Project Owner') {
             return `?page=${page}&userId=${userDetails._id}&${filter}`;
-        } else if (userType === 'Freelancer') {
-            return `?page=${page}&status=Approved&SelectService=Outsource Research and Development&${filter}`;
-        } else if (userType === 'Innovators') {
-            return `?page=${page}&status=Approved&SelectService=Innovative product&${filter}`;
-        } else {
+        }else if(userType === 'Freelancer'){
+            return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Outsource Research and Development&${filter}`;
+        }else if(userType === 'Innovators'){
+            return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Innovative product&${filter}`;
+        }else {
             return `?page=${page}&${filter}`;
         }
     }
@@ -355,8 +356,8 @@ const Jobs = () => {
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
-        setIsApproved(job.status === 'Approved');
-        setIsRejected(job.status === 'Rejected');
+        setIsApproved(job.status === PROJECT_STATUSES.approved);
+        setIsRejected(job.status === PROJECT_STATUSES.rejected);
         setApplyOpen(false);
         setApplyOpenForInnovators(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
@@ -370,18 +371,18 @@ const Jobs = () => {
             await axios.post(`${APIS.APPROVE_PROJECT}/${job._id}`);
             setJobs(prevJobs =>
                 prevJobs.map(prevJob =>
-                    prevJob._id === job._id ? { ...prevJob, status: 'Approved' } : prevJob
+                    prevJob._id === job._id ? { ...prevJob, status: PROJECT_STATUSES.approved } : prevJob
                 )
             );
             if (viewingJob && viewingJob._id === job._id) {
                 setViewingJob(prevViewingJob => ({
                     ...prevViewingJob!,
-                    status: 'Approved'
+                    status: PROJECT_STATUSES.approved
                 }));
             }
             setViewingJob(null);
             handleApproveDialogClose();
-            setSelectedStatus('Approved');
+            setSelectedStatus(PROJECT_STATUSES.approved);
             refetch();
         } catch (error) {
             console.error('Error approving job:', error);
@@ -397,18 +398,18 @@ const Jobs = () => {
             await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
             setJobs(prevJobs =>
                 prevJobs.map(prevJob =>
-                    prevJob._id === job._id ? { ...prevJob, status: 'Rejected', rejectComment: comment } : prevJob
+                    prevJob._id === job._id ? { ...prevJob, status: PROJECT_STATUSES.rejected, rejectComment: comment } : prevJob
                 )
             );
             if (viewingJob && viewingJob._id === job._id) {
                 setViewingJob(prevViewingJob => ({
                     ...prevViewingJob!,
-                    status: 'Rejected',
+                    status: PROJECT_STATUSES.rejected,
                     rejectComment: comment
                 }));
             }
             setViewingJob(null);
-            setSelectedStatus('Rejected');
+            setSelectedStatus(PROJECT_STATUSES.rejected);
             handleRejectDialogClose();
             refetch();
         } catch (error) {
@@ -517,8 +518,8 @@ const Jobs = () => {
                                             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                 <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
                                                     <CustomChip
-                                                        label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                        color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+                                                        label={job.status === PROJECT_STATUSES.approved ? PROJECT_STATUSES.approved : job.status === PROJECT_STATUSES.rejected ? PROJECT_STATUSES.rejected : PROJECT_STATUSES.pending}
+                                                        color={job.status === PROJECT_STATUSES.approved ? 'success' : job.status === PROJECT_STATUSES.rejected ? 'error' : 'default'}
                                                     />
                                                 </Box>
                                                 <Box sx={{ flexShrink: 0, mr: 2 }}>

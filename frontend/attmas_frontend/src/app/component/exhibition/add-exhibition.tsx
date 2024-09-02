@@ -22,6 +22,7 @@ import SubjectMatterExpertise from '../SubjectMatterExpertise';
 import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from '@/app/constants/common.constants';
 import { formatToLocal, formatToUTC } from '@/app/services/date.service';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { EXHIBITION_STATUSES } from '@/app/constants/status.constant';
 interface Exhibition {
     _id?: string;
     title: string;
@@ -65,7 +66,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
     const initialValues = React.useMemo(() => ({
         title: '',
         description: '',
-        status: editingExhibition ? (editingExhibition.status || '') : 'open',
+        status: editingExhibition ? (editingExhibition.status || '') : EXHIBITION_STATUSES.open,
         videoUrl: '',
         meetingUrl: '',
         dateTime: null as Dayjs | null,
@@ -171,7 +172,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                     initialValues={editingExhibition ? {
                         title: editingExhibition.title || '',
                         description: editingExhibition.description || '',
-                        status: editingExhibition ? editingExhibition.status : 'open',
+                        status: editingExhibition ? editingExhibition.status : EXHIBITION_STATUSES.open,
                         videoUrl: editingExhibition.videoUrl || '',
                         meetingUrl: editingExhibition.meetingUrl || '',
                         dateTime: editingExhibition.dateTime ? dayjs(editingExhibition.dateTime) : null,
@@ -252,8 +253,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                         onBlur={handleBlur}
                                         label="Status"
                                     >
-                                        <MenuItem value="open">open</MenuItem>
-                                        <MenuItem value="close">close</MenuItem>
+                                        <MenuItem value={EXHIBITION_STATUSES.open}>{EXHIBITION_STATUSES.open}</MenuItem>
+                                        <MenuItem value={EXHIBITION_STATUSES.close}>{EXHIBITION_STATUSES.close}</MenuItem>
                                     </Select>
                                 </FormControl>
 

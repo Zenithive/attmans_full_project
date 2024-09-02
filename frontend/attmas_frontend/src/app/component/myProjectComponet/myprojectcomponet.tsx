@@ -10,6 +10,7 @@ import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
 import dayjs from 'dayjs';
 import ApplicationsForProject from '../applicationforproject/applicationforproject';
+import { APPLY_STATUSES } from '@/app/constants/status.constant';
 
 export interface Job {
     _id?: string;
@@ -73,6 +74,7 @@ export interface Apply {
     jobId: string;
     availableSolution: string;
     SolutionUSP: string;
+    userId?: UserSchema;
 }
 
 export interface ProjectDrawerProps {
@@ -111,6 +113,23 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const currentUser = userDetails.username;
+    const currentUserType = userDetails.userType;
+    const currentUserId = userDetails._id;
+
+    const setApplicationsBasedOnUser = (applies: Apply[]) => {
+        const tmpApplies: Apply[] = [];
+        for (let index = 0; index < applies.length; index++) {
+          const element = applies[index];
+          const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
+          const isProjectOwner = currentUserType === "Project Owner" && element?.status !== APPLY_STATUSES.pendingForApproval;
+          const isAdmin = currentUserType === "Admin";
+          if (isFreelancer || isProjectOwner || isAdmin) {
+            tmpApplies.push(element);
+          }
+        }
+    
+        setApplications(tmpApplies);
+      }
 
     useEffect(() => {
         if (viewingJob?._id) {
@@ -119,7 +138,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 try {
                     const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
                     console.log('Applications fetched:', response.data);
-                    setApplications(response.data);
+                    setApplicationsBasedOnUser(response.data);
                 } catch (error) {
                     console.error('Error fetching applications:', error);
                 }
