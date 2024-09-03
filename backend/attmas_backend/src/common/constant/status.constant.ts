@@ -17,6 +17,7 @@ export const APPLY_STATUSES = {
 
 export const PROPOSAL_STATUSES = {
   pending: 'Pending',
+  proposalUnderReview: 'Proposal Under Review',
   approvedAndAwarded: 'Approved and Awarded',
   rejected: 'Rejected',
 };

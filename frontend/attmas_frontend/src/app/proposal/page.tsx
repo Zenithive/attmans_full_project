@@ -21,6 +21,7 @@ import UserDrawer from '../component/UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '../constants/common.constants';
 import ApplyDetailsDialog from '../component/projectsDetails/projectDetails';
 import ConfirmationDialog from '../component/All_ConfirmationBox/ConfirmationDialog';
+import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
 
 interface Proposal {
     _id: string;
@@ -32,7 +33,7 @@ interface Proposal {
     jobDetails: JobDetails;
     userId?: UserSchema;
     userName: string;
-    applyId : string;
+    applyId: string;
 }
 
 interface JobDetails {
@@ -77,7 +78,7 @@ const proposal = () => {
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [currentAction, setCurrentAction] = useState<'Approve' | 'Reject'>('Approve');
     const [selectedProposalId, setSelectedProposalId] = useState<string>('');
-
+    const [hasSubmittedProposal, setHasSubmittedProposal] = useState(false);
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -168,8 +169,8 @@ const proposal = () => {
                 console.log('respons page', response.data);
                 const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
                 console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-                setApplications(response.data);
                 setAppliedJobs(fetchedAppliedJobs);
+                setApplications(response.data);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);
             }
@@ -186,6 +187,21 @@ const proposal = () => {
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
 
+    useEffect(() => {
+        const fetchProposalStatus = async () => {
+          try {
+            const response = await axios.get(`${SERVER_URL}/proposals/user${
+                selectedApply?._id}`);
+            console.log('response for fetchProposalStatus',response.data);
+            setHasSubmittedProposal(!!response.data);
+             // Update state based on whether proposal exists
+          } catch (error) {
+            console.error('Error fetching proposal status', error);
+          }
+        };
+    
+        fetchProposalStatus();
+      }, [selectedApply?._id]);
 
     const handleNextStep = (values: any) => {
         setFormValues((prevValues) => ({ ...prevValues, ...values }));
@@ -197,13 +213,13 @@ const proposal = () => {
     };
 
     const handleSubmit = async (values: any) => {
-
+        console.log('values',values);
         const finalValues = {
             ...formValues, ...values,
             userID: userDetails._id,
             userName: userDetails.username,
-            projectId: selectedProject?._id, 
-            applyId: selectedApply?._id  ,   // Correct
+            projectId: selectedProject?._id,
+            applyId: selectedApply?._id,   // Correct
             projectTitle: selectedProject?.title,          // Correct
             // projectCurrency: selectedProject?.jobDetails?.currency,
             Status: 'Pending',
@@ -212,6 +228,7 @@ const proposal = () => {
             lastname: userDetails.lastName,
 
         };
+        console.log('finalValues', finalValues);
         console.log("finalValues.projectId", finalValues.projectId);
         console.log("finalValues.projectTitle", finalValues.projectTitle);
 
@@ -219,6 +236,7 @@ const proposal = () => {
         try {
             await axios.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
             setOpen(false);
+            setHasSubmittedProposal(true);
             setStep(1);
             setFormValues({});
         } catch (error) {
@@ -322,6 +340,15 @@ const proposal = () => {
             handleCloseConfirmationDialog();
         }
     };
+
+    const [showCommentSection, setShowCommentSection] = useState(false);
+
+    useEffect(() => {
+        if (userDetails.userType === 'Admin') {
+            setShowCommentSection(true);
+        }
+    }, [userDetails.userType]);
+
 
 
     return (
@@ -439,7 +466,7 @@ const proposal = () => {
                                         <Typography variant="h6">{proposal.projectTitle}</Typography>
                                         <Typography variant="body1">
                                             <span style={{ fontWeight: 'bold' }} onClick={() => {
-
+                                                console.log('proposal?.jobDetails?.username',proposal?.jobDetails?.username);
                                                 handleUserClick(proposal?.jobDetails?.username);
                                             }}>
                                                 Project Owner Name:
@@ -448,10 +475,13 @@ const proposal = () => {
                                         </Typography>
                                         {userDetails.userType === 'Admin' && (
                                             <Typography variant="body1">
-                                                <span style={{ fontWeight: 'bold' }} onClick={() => {
+                                                <span style={{ fontWeight: 'bold' }}
+                                                 onClick={() => {
                                                     console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
                                                     handleUserClick(proposal?.userName);
-                                                }}>Freelancer Name:</span>
+                                                }}
+                                                >
+                                                    Freelancer Name:</span>
                                                 {` ${proposal.firstname} ${proposal.lastname}`}
                                             </Typography>
                                         )}
@@ -540,18 +570,51 @@ const proposal = () => {
                                                         fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
                                                     }}
                                                 >
-                                                    View Details
+                                                    {application.title}
                                                 </a>
                                                 <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
                                                     {dayjs(application.TimeFrame).format(DATE_FORMAT)}
                                                 </Box>
                                             </Typography>
 
+                                            <Chip
+                                                label={application.status}
+                                                size='small'
+                                                variant="outlined"
+                                                sx={{
+                                                    borderColor: application.status === APPLY_STATUSES.approvedPendingForProposal
+                                                        ? 'green'
+                                                        : application.status === APPLY_STATUSES.rejected
+                                                            ? 'red'
+                                                            : application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                                ? 'green'
+                                                                : application.status === APPLY_STATUSES.awarded
+                                                                    ? 'blue'
+                                                                    : application.status === APPLY_STATUSES.notAwarded
+                                                                        ? 'grey'
+                                                                        : 'default',
+                                                    color: application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                        ? 'green'
+                                                        : application.status === APPLY_STATUSES.rejected
+                                                            ? 'red'
+                                                            : application.status === APPLY_STATUSES.rejected
+                                                                ? 'green'
+                                                                : application.status === APPLY_STATUSES.awarded
+                                                                    ? 'blue'
+                                                                    : application.status === APPLY_STATUSES.notAwarded
+                                                                        ? 'grey'
+                                                                        : 'default',
+                                                    borderRadius: '16px',
+                                                    px: 1,
+                                                    mb: 2,
+                                                }}
+                                            />
+
 
                                             <Typography variant="body1" sx={{ mt: 1 }}>
                                                 {application.currency} {application.Budget}
                                             </Typography>
-
+                                            {!hasSubmittedProposal && (
                                             <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
 
                                                 <Box sx={{
@@ -561,6 +624,7 @@ const proposal = () => {
                                                         variant="contained"
                                                         size='small'
                                                         onClick={() => {
+                                                            console.log('application.jobDetails',application.jobDetails._id);
                                                             handleViewJob(application.jobDetails); // Call handleViewJob with the relevant job details
                                                             setOpen(true); // Open the proposal dialog
                                                         }}
@@ -580,10 +644,9 @@ const proposal = () => {
                                                         </DialogActions>
                                                     </Dialog>
 
-
-
                                                 </Box>
                                             </Box>
+                                            )}
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Button
                                                     aria-controls="simple-menu"
@@ -637,10 +700,8 @@ const proposal = () => {
                     onClose={() => setDialogOpen(false)}
                     apply={selectedApply}
                     jobId={viewingJob?._id || ''}
-                    canAddComment={true}
-                    onCommentSubmitted={() => {
-                        console.log('My Console')
-                    }}
+                    canAddComment={showCommentSection}
+                    onCommentSubmitted={() => { console.log('Comment has been submitted') }}
                 />
             )}
             <ConfirmationDialog

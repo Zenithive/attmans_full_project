@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Proposal } from './proposal.schema';
+import { APPLY_STATUSES } from 'src/common/constant/status.constant';
 
 @Injectable()
 export class ProposalService {
@@ -10,6 +11,13 @@ export class ProposalService {
   ) {}
 
   async createProposal(createProposalDto: any): Promise<Proposal> {
+    const existingProposal = await this.proposalModel
+      .findOne({ userId: createProposalDto.userId })
+      .exec();
+    if (existingProposal) {
+      throw new Error('A proposal has already been created for this user.');
+    }
+    createProposalDto.Status = APPLY_STATUSES.proposalUnderReview;
     const createdProposal = new this.proposalModel(createProposalDto);
     return createdProposal.save();
   }
@@ -63,9 +71,10 @@ export class ProposalService {
             externalEquipment: 1,
             pilotProductionTesting: 1,
             mentoringRequired: 1,
-            userId: 1,
+            userID: 1,
             userName: 1,
             projectId: 1,
+            applyId: 1,
             projectTitle: 1,
             firstname: 1,
             lastname: 1,
@@ -106,7 +115,7 @@ export class ProposalService {
       .exec();
   }
 
-  async findProposalById(id: string): Promise<Proposal | null> {
-    return this.proposalModel.findById(id).exec();
+  async findProposalByUserId(userId: string): Promise<Proposal | null> {
+    return this.proposalModel.findOne({ userId }).exec();
   }
 }

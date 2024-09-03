@@ -31,6 +31,7 @@ export class ApplyService {
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     // Convert jobId to ObjectId if it is not already
+    const userId = new Types.ObjectId(createApplyDto.userId);
     let jobId: Types.ObjectId;
     try {
       jobId = new Types.ObjectId(createApplyDto.jobId);
@@ -40,7 +41,7 @@ export class ApplyService {
 
     // Check for existing application
     const existingApplication = await this.ApplyModel.findOne({
-      userId: createApplyDto.userId,
+      userId: userId,
       jobId: jobId,
     }).exec();
 
@@ -411,12 +412,12 @@ export class ApplyService {
     }).exec();
 
     const updatedApplications = otherApplications.map((app) => ({
-      _id: app._id.toString(),
+      _id: app._id as Types.ObjectId,
       status: 'Not Awarded',
-      jobId: app.jobId.toString(),
+      jobId: app.jobId as Types.ObjectId,
       comment_Reward_Nonreward:
         'Thank you for your application. Although we cannot award this application, we value your interest and encourage you to apply for other roles or opportunities with us in the future.', // Default comment
-      userId: app.userId.toString(),
+      userId: app.userId as Types.ObjectId,
       username: app.username.toString(),
     }));
 

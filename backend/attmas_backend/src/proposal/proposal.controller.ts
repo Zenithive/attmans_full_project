@@ -46,4 +46,9 @@ export class ProposalController {
   ) {
     return this.proposalService.updateStatusProposal(id, status, comment);
   }
+
+  @Get('/user/:userId')
+  async getProposalByUserId(@Param('userId') userId: string) {
+    return this.proposalService.findProposalByUserId(userId);
+  }
 }
