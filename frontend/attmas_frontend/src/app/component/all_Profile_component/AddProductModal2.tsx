@@ -9,7 +9,7 @@ import {
     MenuItem
 } from '@mui/material';
 
-interface Product {
+export interface Product {
     id: string;
     productName: string;
     productDescription: string;

@@ -33,16 +33,8 @@ import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import InterestedModal from '../booth/intrestedUsers';
 import { DATE_TIME_FORMAT } from '@/app/constants/common.constants';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import AddProductModal2, { Product } from '../all_Profile_component/AddProductModal2';
 
-interface Product {
-  productName: string;
-  productDescription: string;
-  productPrice: number;
-  currency: string;
-  videourlForproduct: string;
-  stageofdevelopmentdropdown: string;
-  productQuantity: number;
-}
 
 interface Booth {
   _id: string;
@@ -89,6 +81,19 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const searchParams = useSearchParams();
   const [isBoothInterestedBtnVisible, setIsBoothInterestedBtnVisible] = useState(true);
+
+  const [modalOpen, setModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+    const handleViewProduct = (product: Product) => {
+      setSelectedProduct(product);
+      setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+      setModalOpen(false);
+      setSelectedProduct(null);
+  };
 
 
 
@@ -268,7 +273,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                                     ],
                                   }}
                                 >
-                                  <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
+                                  <IconButton color="secondary" onClick={() => handleVideoOpen(product?.videourlForproduct || '')}>
                                     <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
                                   </IconButton>
                                 </Tooltip>
@@ -276,7 +281,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                               <TableCell>
                                 <Tooltip title="View Details" placement="top" arrow>
                                   <IconButton color="primary">
-                                    <VisibilityIcon />
+                                    <VisibilityIcon onClick={() => handleViewProduct(product)} />
                                   </IconButton>
                                 </Tooltip>
                               </TableCell>
@@ -314,7 +319,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                                 ],
                               }}
                             >
-                              <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
+                              <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct || '')}>
                                 <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
                               </IconButton>
                             </Tooltip>
@@ -328,6 +333,13 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
               <InterestedModal open={showInterestedModals} onClose={closeInterestedModals} exhibitionId={exhibitionId} boothId={booth._id} interestType={'InterestedUserForBooth'} />
             </Box>
           )}
+          <AddProductModal2
+                open={modalOpen}
+                onClose={handleCloseModal}
+                onSave={() => {}}
+                product={selectedProduct}
+                viewOnly={true}
+            />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">
