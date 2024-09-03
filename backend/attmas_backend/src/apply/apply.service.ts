@@ -27,7 +27,7 @@ export class ApplyService {
     private usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
-  ) {}
+  ) { }
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     // Convert jobId to ObjectId if it is not already
@@ -37,25 +37,25 @@ export class ApplyService {
     } catch (error) {
       throw new BadRequestException('Invalid jobId format');
     }
-  
+
     // Check for existing application
     const existingApplication = await this.ApplyModel.findOne({
       userId: createApplyDto.userId,
       jobId: jobId,
     }).exec();
-  
+
     console.log('existingApplication', existingApplication);
     if (existingApplication) {
       throw new ConflictException('User has already applied for this job');
     }
-  
+
     // Create and save new application
     const createdApply = new this.ApplyModel({
       ...createApplyDto,
       jobId: jobId,
     });
     await createdApply.save();
-  
+
     // Find user and send email notification
     const user = await this.userModel
       .findOne({ username: createApplyDto.username })
@@ -81,10 +81,10 @@ export class ApplyService {
         text: emailText,
       });
     }
-    
+
     return createdApply;
   }
-  
+
 
   async findAll(): Promise<Apply[]> {
     return this.ApplyModel.find()
@@ -197,9 +197,9 @@ export class ApplyService {
             userId: userId,
             status: {
               $in: [
-                APPLY_STATUSES.approvedPendingForProposal,
-                APPLY_STATUSES.proposalApprovalPending,
-                APPLY_STATUSES.proposalUnderReview,
+                // APPLY_STATUSES.approvedPendingForProposal,
+                // APPLY_STATUSES.proposalApprovalPending,
+                // APPLY_STATUSES.proposalUnderReview,
                 APPLY_STATUSES.awarded,
               ],
             },
@@ -262,7 +262,13 @@ export class ApplyService {
       throw new NotFoundException(`Application with id ${id} not found`);
     }
     //application.status = 'Approved';
-    application.status = APPLY_STATUSES.approvedPendingForProposal;
+    if (application.applyType === "InnovatorsApply") {
+
+      application.status = APPLY_STATUSES.approvedPendingForProposalForInnovators;
+    }else{
+      
+      application.status = APPLY_STATUSES.approvedPendingForProposal;
+    }
     application.buttonsHidden = true;
     await application.save();
 
@@ -319,11 +325,23 @@ export class ApplyService {
     }
     return application;
   }
+
+
   async findByJobId(jobId: string): Promise<Apply[]> {
-    return this.ApplyModel.find({ jobId })
+    // Convert jobId to ObjectId if it is a valid string
+    let jobObjectId: Types.ObjectId;
+    if (Types.ObjectId.isValid(jobId)) {
+      jobObjectId = new Types.ObjectId(jobId);
+    } else {
+      throw new Error('Invalid jobId format');
+    }
+
+    return this.ApplyModel.find({ jobId: jobObjectId })
       .populate('userId', 'firstName lastName username')
       .exec();
   }
+
+
   async findApplicationsByUserId(userId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ userId }).exec();
   }
@@ -367,9 +385,14 @@ export class ApplyService {
 
     const application = await this.ApplyModel.findById(id).exec();
 
+    const validStatusesForAward = [
+      APPLY_STATUSES.approvedPendingForProposalForInnovators,
+      APPLY_STATUSES.proposalUnderReview
+    ];
+    console.log("application", application);
     if (
-      !application ||
-      application.status !== APPLY_STATUSES.approvedPendingForProposal
+      !application?._id ||
+      (!validStatusesForAward.includes(application.status))
     ) {
       throw new NotFoundException(
         `Application with id ${id} and status 'Approved' not found`,
