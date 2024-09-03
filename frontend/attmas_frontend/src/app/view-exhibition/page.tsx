@@ -155,7 +155,7 @@ const ExhibitionsPage: React.FC = () => {
 
 
 
-          if (element.userId === userDetails._id && element.interestType === 'InterestedUserForExhibition') {
+          if (element.userId === userDetails._id ) {
             setIsInterestedBtnShow(false);
           }
         }

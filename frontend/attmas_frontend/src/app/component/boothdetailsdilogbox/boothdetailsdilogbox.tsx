@@ -25,25 +25,16 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
-import { APIS } from '@/app/constants/api.constant';
+import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import InterestedModal from '../booth/intrestedUsers';
 import { DATE_TIME_FORMAT } from '@/app/constants/common.constants';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import AddProductModal2, { Product } from '../all_Profile_component/AddProductModal2';
 
-
-interface Product {
-  productName: string;
-  productDescription: string;
-  // productType: string;
-  productPrice: number;
-  currency: string;
-  videourlForproduct: string;
-  stageofdevelopmentdropdown: string;
-  productQuantity: number;
-}
 
 interface Booth {
   _id: string;
@@ -69,8 +60,8 @@ interface Visitor {
   mobileNumber: string;
   timestamps: string;
   exhibitionId: string;
-  userId:string;
-  interestType:string;
+  userId: string;
+  interestType: string;
 }
 
 
@@ -89,11 +80,24 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const searchParams = useSearchParams();
-  const [isBoothInterestedBtnVisible, setIsBoothInterestedBtnVisible] = useState(true); 
+  const [isBoothInterestedBtnVisible, setIsBoothInterestedBtnVisible] = useState(true);
+
+  const [modalOpen, setModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+    const handleViewProduct = (product: Product) => {
+      setSelectedProduct(product);
+      setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+      setModalOpen(false);
+      setSelectedProduct(null);
+  };
 
 
 
-  
+
   useEffect(() => {
     const fetchVisitors = async () => {
       try {
@@ -104,50 +108,53 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
           console.error('Booth ID or Exhibition ID not found');
           return;
         }
-  
-        const response = await axios.get('http://localhost:3000/interested-users/booth-visitors-by-exhibition', {
+
+        const response = await axios.get(`${SERVER_URL}/interested-users/booth-visitors-by-exhibition`, {
           params: {
             boothId,
             exhibitionId,
           },
         });
-  
+
         console.log('Fetched visitors:', response.data);
 
-  
- 
+
+
         const hasUserShownInterest = response.data.some(
-          (visitor:Visitor) => visitor.userId === userDetails._id && visitor.interestType === 'InterestedUserForBooth'
+          (visitor: Visitor) => visitor.userId === userDetails._id && visitor.interestType === 'InterestedUserForBooth'
         );
-        
-  
+
+
         if (hasUserShownInterest) {
           console.log('Condition met: user has shown interest in booth');
           setIsBoothInterestedBtnVisible(false);
         }
 
         setVisitors(response.data);
-  
+
       } catch (error) {
         console.error('Error fetching booth visitors:', error);
       }
-      
+
     };
-  
+
     if (view === 'boothDetails') {
       fetchVisitors();
     }
   }, [userDetails._id, searchParams, view, booth?._id]);
-  
 
-const openInterestedModals = () => setShowInterestedModals(true);
-const closeInterestedModals = () => setShowInterestedModals(false);
+
+  const openInterestedModals = () => setShowInterestedModals(true);
+  const closeInterestedModals = () => setShowInterestedModals(false);
 
   const exhibitionId = searchParams.get('exhibitionId');
-  
+
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+ 
+
 
   const handleVideoOpen = (url: string) => {
     setSelectedVideoUrl(url);
@@ -161,11 +168,11 @@ const closeInterestedModals = () => setShowInterestedModals(false);
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth sx={{ 
-        '& .MuiDialog-paper': { 
-          maxWidth: '100%', 
-          maxHeight:'100%'
-        } 
+      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth sx={{
+        '& .MuiDialog-paper': {
+          maxWidth: '100%',
+          maxHeight: '100%'
+        }
       }}>
         <DialogTitle sx={{ m: 0, p: 2 }}>
           Booth Details
@@ -186,20 +193,20 @@ const closeInterestedModals = () => setShowInterestedModals(false);
           {booth && (
             <Box sx={{ position: 'relative' }}>
               <Box sx={{ position: 'absolute', top: 16, right: 16, '@media (max-width: 767px)': { position: 'relative', top: '-10px', left: '5px' } }}>
-                <Typography variant="body1" sx={{'@media (max-width: 767px)': {fontSize:'1.25rem'}}} color="text.secondary">
+                <Typography variant="body1" sx={{ '@media (max-width: 767px)': { fontSize: '1.25rem' } }} color="text.secondary">
                   Status: {booth.status}, Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}
                 </Typography>
-                <Box sx={{position:'relative',right:'45%',top:'15px'}}>
-                {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={openInterestedModals}
-                sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
-              >
-                Interested
-              </Button>
-            )}
+                <Box sx={{ position: 'relative', right: '45%', top: '15px' }}>
+                  {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={openInterestedModals}
+                      sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+                    >
+                      Interested
+                    </Button>
+                  )}
                 </Box>
               </Box>
               <Grid container spacing={2}>
@@ -209,8 +216,8 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="body1"  sx={{ mb: 2 ,fontSize:'1.25rem', '@media (max-width: 767px)': { position: 'relative',fontSize:'1.25rem' } }}>
-                  <strong>Description: </strong>{booth.description}
+                  <Typography variant="body1" sx={{ mb: 2, fontSize: '1.25rem', '@media (max-width: 767px)': { position: 'relative', fontSize: '1.25rem' } }}>
+                    <strong>Description: </strong>{booth.description}
                   </Typography>
                 </Grid>
                 {booth.rejectComment && (
@@ -239,6 +246,7 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                             <TableCell><strong>Stage Of Development</strong></TableCell>
                             <TableCell><strong>Price</strong></TableCell>
                             <TableCell><strong>Video</strong></TableCell>
+                            <TableCell><strong>Action</strong></TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -265,8 +273,15 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                                     ],
                                   }}
                                 >
-                                  <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
+                                  <IconButton color="secondary" onClick={() => handleVideoOpen(product?.videourlForproduct || '')}>
                                     <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
+                              <TableCell>
+                                <Tooltip title="View Details" placement="top" arrow>
+                                  <IconButton color="primary">
+                                    <VisibilityIcon onClick={() => handleViewProduct(product)} />
                                   </IconButton>
                                 </Tooltip>
                               </TableCell>
@@ -277,16 +292,18 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                     </TableContainer>
                   ) : (
                     booth.products.map((product, index) => (
-                      <Card key={index} sx={{ mb: 2}}>
+                      <Card key={index} sx={{ mb: 2 }}>
                         <CardContent>
-                          <Typography variant="body1" sx={{marginBottom:'15px', fontSize:'1.25rem'}}><strong>Name:</strong> {product.productName}</Typography>
-                          <Typography variant="body1" sx={{marginBottom:'15px',fontSize:'1.25rem'}}><strong>Description:</strong> {product.productDescription}</Typography>
-                          {/* <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Type:</strong> {product.productType}</Typography> */}
-                          <Typography variant="body1" sx={{fontSize:'1.25rem'}}><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
-                          <Box sx={{ mt: 1 ,'@media (max-width: 767px)': {
-                        position: 'relative',
-                        float: 'right',
-                        bottom: '45px'}}}>
+                          <Typography variant="body1" sx={{ marginBottom: '15px', fontSize: '1.25rem' }}><strong>Name:</strong> {product.productName}</Typography>
+                          <Typography variant="body1" sx={{ marginBottom: '15px', fontSize: '1.25rem' }}><strong>Description:</strong> {product.productDescription}</Typography>
+                          <Typography variant="body1" sx={{ fontSize: '1.25rem' }}><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
+                          <Box sx={{
+                            mt: 1, '@media (max-width: 767px)': {
+                              position: 'relative',
+                              float: 'right',
+                              bottom: '45px'
+                            }
+                          }}>
                             <Tooltip
                               title="Play Video"
                               placement="top"
@@ -302,7 +319,7 @@ const closeInterestedModals = () => setShowInterestedModals(false);
                                 ],
                               }}
                             >
-                              <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct)}>
+                              <IconButton color="secondary" onClick={() => handleVideoOpen(product.videourlForproduct || '')}>
                                 <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
                               </IconButton>
                             </Tooltip>
@@ -316,6 +333,13 @@ const closeInterestedModals = () => setShowInterestedModals(false);
               <InterestedModal open={showInterestedModals} onClose={closeInterestedModals} exhibitionId={exhibitionId} boothId={booth._id} interestType={'InterestedUserForBooth'} />
             </Box>
           )}
+          <AddProductModal2
+                open={modalOpen}
+                onClose={handleCloseModal}
+                onSave={() => {}}
+                product={selectedProduct}
+                viewOnly={true}
+            />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">
