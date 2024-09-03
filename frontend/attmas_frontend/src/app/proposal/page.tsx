@@ -189,19 +189,18 @@ const proposal = () => {
 
     useEffect(() => {
         const fetchProposalStatus = async () => {
-          try {
-            const response = await axios.get(`${SERVER_URL}/proposals/user${
-                selectedApply?._id}`);
-            console.log('response for fetchProposalStatus',response.data);
-            setHasSubmittedProposal(!!response.data);
-             // Update state based on whether proposal exists
-          } catch (error) {
-            console.error('Error fetching proposal status', error);
-          }
+            try {
+                const response = await axios.get(`${SERVER_URL}/proposals/user${selectedApply?._id}`);
+                console.log('response for fetchProposalStatus', response.data);
+                setHasSubmittedProposal(!!response.data);
+                // Update state based on whether proposal exists
+            } catch (error) {
+                console.error('Error fetching proposal status', error);
+            }
         };
-    
+
         fetchProposalStatus();
-      }, [selectedApply?._id]);
+    }, [selectedApply?._id]);
 
     const handleNextStep = (values: any) => {
         setFormValues((prevValues) => ({ ...prevValues, ...values }));
@@ -213,12 +212,12 @@ const proposal = () => {
     };
 
     const handleSubmit = async (values: any) => {
-        console.log('values',values);
+        console.log('values', values);
         const finalValues = {
             ...formValues, ...values,
             userID: userDetails._id,
             userName: userDetails.username,
-            projectId: selectedProject?._id,
+            projectId: selectedProject?._id || viewingJob?._id,
             applyId: selectedApply?._id,   // Correct
             projectTitle: selectedProject?.title,          // Correct
             // projectCurrency: selectedProject?.jobDetails?.currency,
@@ -343,6 +342,21 @@ const proposal = () => {
 
     const [showCommentSection, setShowCommentSection] = useState(false);
 
+    const showProposalModal = (application: Apply) => {
+        console.log('application.jobDetails', application.jobDetails._id);
+        handleViewJob(application.jobDetails); // Call handleViewJob with the relevant job details
+        setSelectedApply(application);
+        setOpen(true); // Open the proposal dialog
+    }
+
+    const fetchProjectDetails = async (application: Apply) => {
+        const response = await axios.get(`${APIS.JOBS}?projId=${application.jobId}`);
+        console.log("fetchProjectDetails", response.data)
+        if(response.data && response.data.length){
+            showProposalModal({...application, jobDetails: {...response.data[0]}});
+        }
+    }
+
     useEffect(() => {
         if (userDetails.userType === 'Admin') {
             setShowCommentSection(true);
@@ -466,7 +480,7 @@ const proposal = () => {
                                         <Typography variant="h6">{proposal.projectTitle}</Typography>
                                         <Typography variant="body1">
                                             <span style={{ fontWeight: 'bold' }} onClick={() => {
-                                                console.log('proposal?.jobDetails?.username',proposal?.jobDetails?.username);
+                                                console.log('proposal?.jobDetails?.username', proposal?.jobDetails?.username);
                                                 handleUserClick(proposal?.jobDetails?.username);
                                             }}>
                                                 Project Owner Name:
@@ -476,10 +490,10 @@ const proposal = () => {
                                         {userDetails.userType === 'Admin' && (
                                             <Typography variant="body1">
                                                 <span style={{ fontWeight: 'bold' }}
-                                                 onClick={() => {
-                                                    console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
-                                                    handleUserClick(proposal?.userName);
-                                                }}
+                                                    onClick={() => {
+                                                        console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
+                                                        handleUserClick(proposal?.userName);
+                                                    }}
                                                 >
                                                     Freelancer Name:</span>
                                                 {` ${proposal.firstname} ${proposal.lastname}`}
@@ -615,37 +629,35 @@ const proposal = () => {
                                                 {application.currency} {application.Budget}
                                             </Typography>
                                             {!hasSubmittedProposal && (
-                                            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
 
-                                                <Box sx={{
-                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
-                                                }}>
-                                                    <Button
-                                                        variant="contained"
-                                                        size='small'
-                                                        onClick={() => {
-                                                            console.log('application.jobDetails',application.jobDetails._id);
-                                                            handleViewJob(application.jobDetails); // Call handleViewJob with the relevant job details
-                                                            setOpen(true); // Open the proposal dialog
-                                                        }}
-                                                    >
-                                                        Submit Proposal
-                                                    </Button>
+                                                    <Box sx={{
+                                                        fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
+                                                    }}>
+                                                        <Button
+                                                            variant="contained"
+                                                            size='small'
+                                                            onClick={() => {
+                                                                fetchProjectDetails(application);
+                                                            }}
+                                                        >
+                                                            Submit Proposal
+                                                        </Button>
 
-                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
-                                                        <DialogTitle>Submit Proposal</DialogTitle>
-                                                        <DialogContent>
-                                                            {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
-                                                            {step === 2 && <ProposalStep2 onNext={handleNextStep} onPrevious={handlePreviousStep} />}
-                                                            {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={handlePreviousStep} />}
-                                                        </DialogContent>
-                                                        <DialogActions>
-                                                            <Button onClick={() => setOpen(false)}>Cancel</Button>
-                                                        </DialogActions>
-                                                    </Dialog>
+                                                        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
+                                                            <DialogTitle>Submit Proposal</DialogTitle>
+                                                            <DialogContent>
+                                                                {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
+                                                                {step === 2 && <ProposalStep2 onNext={handleNextStep} onPrevious={handlePreviousStep} />}
+                                                                {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={handlePreviousStep} />}
+                                                            </DialogContent>
+                                                            <DialogActions>
+                                                                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                                                            </DialogActions>
+                                                        </Dialog>
 
+                                                    </Box>
                                                 </Box>
-                                            </Box>
                                             )}
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Button
