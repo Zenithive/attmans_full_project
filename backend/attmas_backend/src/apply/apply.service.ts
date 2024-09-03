@@ -194,7 +194,7 @@ export class ApplyService {
         {
           $match: {
             userId: userId,
-            status: 'Approved',
+            status: 'Awarded',
           },
         },
         // Stage 2: Project fields for debugging before lookup
@@ -310,11 +310,23 @@ export class ApplyService {
     }
     return application;
   }
+
+
   async findByJobId(jobId: string): Promise<Apply[]> {
-    return this.ApplyModel.find({ jobId })
-      .populate('userId', 'firstName lastName username')
-      .exec();
+  // Convert jobId to ObjectId if it is a valid string
+  let jobObjectId: Types.ObjectId;
+  if (Types.ObjectId.isValid(jobId)) {
+    jobObjectId = new Types.ObjectId(jobId);
+  } else {
+    throw new Error('Invalid jobId format');
   }
+
+  return this.ApplyModel.find({ jobId: jobObjectId })
+    .populate('userId', 'firstName lastName username')
+    .exec();
+}
+
+
   async findApplicationsByUserId(userId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ userId }).exec();
   }
