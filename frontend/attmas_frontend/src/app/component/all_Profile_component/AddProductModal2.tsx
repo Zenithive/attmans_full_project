@@ -100,7 +100,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
         };
     
         onSave(newProduct);
-        onClose();
+        handleClose();
 
         
     
