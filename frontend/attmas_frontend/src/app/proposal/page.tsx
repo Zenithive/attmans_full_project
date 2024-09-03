@@ -168,10 +168,6 @@ const proposal = () => {
         fetchAppliedJobs();
     }, [userId]);
 
-
-
-
-
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         console.log("Viewing Job:", job);
@@ -181,14 +177,6 @@ const proposal = () => {
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
 
-
-
-
-
-
-
-
-    ////////////// Proposal ///////////////
 
     const handleNextStep = (values: any) => {
         setFormValues((prevValues) => ({ ...prevValues, ...values }));
@@ -283,7 +271,7 @@ const proposal = () => {
             >
                 {userDetails.userType === 'Freelancer' && (
                     <Typography component="h2" sx={{ marginY: 0 }}>
-                        My Projects
+                        My Projects Proposals
                     </Typography>
                 )}
                 {userDetails.userType === 'Admin' && (
@@ -496,31 +484,31 @@ const proposal = () => {
 
                                                 </Box>
                                             </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Button
-                                                        aria-controls="simple-menu"
-                                                        aria-haspopup="true"
-                                                        onClick={handleClick}
-                                                        sx={{ display: { xs: 'block', md: 'none' } }}
-                                                        endIcon={<MoreVertIcon />}
-                                                    >
-                                                        More
-                                                    </Button>
-                                                    <Menu
-                                                        id="simple-menu"
-                                                        anchorEl={anchorEl}
-                                                        keepMounted
-                                                        open={Boolean(anchorEl)}
-                                                        onClose={handleClose}
-                                                        PaperProps={{
-                                                            sx: {
-                                                                border: '1px solid',
-                                                                boxShadow: 'none',
-                                                            },
-                                                        }}
-                                                    >
-                                                    </Menu>
-                                                </Box>
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Button
+                                                    aria-controls="simple-menu"
+                                                    aria-haspopup="true"
+                                                    onClick={handleClick}
+                                                    sx={{ display: { xs: 'block', md: 'none' } }}
+                                                    endIcon={<MoreVertIcon />}
+                                                >
+                                                    More
+                                                </Button>
+                                                <Menu
+                                                    id="simple-menu"
+                                                    anchorEl={anchorEl}
+                                                    keepMounted
+                                                    open={Boolean(anchorEl)}
+                                                    onClose={handleClose}
+                                                    PaperProps={{
+                                                        sx: {
+                                                            border: '1px solid',
+                                                            boxShadow: 'none',
+                                                        },
+                                                    }}
+                                                >
+                                                </Menu>
+                                            </Box>
                                         </CardContent>
                                     </Card>
                                 ))}

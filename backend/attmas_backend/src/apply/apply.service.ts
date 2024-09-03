@@ -15,6 +15,7 @@ import { UsersService } from 'src/users/users.service';
 // import { ObjectId } from 'typeorm';
 // import mongoose from 'mongoose';
 import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
+import { APPLY_STATUSES } from 'src/common/constant/status.constant';
 
 @Injectable()
 export class ApplyService {
@@ -194,7 +195,14 @@ export class ApplyService {
         {
           $match: {
             userId: userId,
-            status: 'Awarded',
+            status: {
+              $in: [
+                APPLY_STATUSES.approvedPendingForProposal,
+                APPLY_STATUSES.proposalApprovalPending,
+                APPLY_STATUSES.proposalUnderReview,
+                APPLY_STATUSES.awarded,
+              ],
+            },
           },
         },
         // Stage 2: Project fields for debugging before lookup
@@ -253,7 +261,8 @@ export class ApplyService {
     if (!application) {
       throw new NotFoundException(`Application with id ${id} not found`);
     }
-    application.status = 'Approved';
+    //application.status = 'Approved';
+    application.status = APPLY_STATUSES.approvedPendingForProposal;
     application.buttonsHidden = true;
     await application.save();
 
@@ -284,7 +293,7 @@ export class ApplyService {
     if (!application) {
       throw new NotFoundException(`Application with id ${id} not found`);
     }
-    application.status = 'Rejected';
+    application.status = APPLY_STATUSES.rejected;
     application.rejectComment = rejectComment;
     application.buttonsHidden = true;
     await application.save();
@@ -335,10 +344,6 @@ export class ApplyService {
     return this.ApplyModel.find({ userId }).exec();
   }
 
-  // async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {
-  //   return this.ApplyModel.find({ status }).exec();
-  // }
-
   async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {
     return this.ApplyModel.aggregate([
       // Match documents with the specified status
@@ -374,7 +379,10 @@ export class ApplyService {
 
     const application = await this.ApplyModel.findById(id).exec();
 
-    if (!application || application.status !== 'Approved') {
+    if (
+      !application ||
+      application.status !== APPLY_STATUSES.approvedPendingForProposal
+    ) {
       throw new NotFoundException(
         `Application with id ${id} and status 'Approved' not found`,
       );

@@ -314,9 +314,6 @@ const myproject = () => {
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>My Projects</Typography>
 
-
-
-
             </Box>
 
 
