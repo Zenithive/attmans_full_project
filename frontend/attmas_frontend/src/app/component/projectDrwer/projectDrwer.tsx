@@ -56,6 +56,7 @@ interface Milestone {
 
 interface Apply {
   _id?: string;
+  jobDetails:any;
   title: string;
   description: string;
   Budget: number;
@@ -134,7 +135,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     if (viewingJob?._id) {
       try {
         const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
-
+        console.log('response for Apply',response.data)
         setApplicationsBasedOnUser(response.data);
         // getFilteredApplications(response.data);
       } catch (error) {

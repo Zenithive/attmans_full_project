@@ -94,6 +94,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [isResubmitting, setIsResubmitting] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log('apply',apply);
     if (apply?._id) {
       axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
         .then(response => {

@@ -5,7 +5,7 @@ export const PROJECT_STATUSES = {
 };
 
 export const APPLY_STATUSES = {
-  pendingForApproval: 'PendingForApproval',
+  pendingForApproval: 'Pending For Approval',
   rejected: 'Rejected',
   approvedPendingForProposal: 'Approved, Pending for Proposal',
   proposalApprovalPending: 'Proposal Approval Pending',

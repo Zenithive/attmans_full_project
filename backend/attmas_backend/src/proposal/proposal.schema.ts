@@ -53,6 +53,7 @@ export const ProposalSchema = new Schema({
   userId: { type: String, required: false },
   userName: { type: String, required: false },
   projectId: { type: String, required: false },
+  applyId: { type: String, required: false },
   projectTitle: { type: String, required: false },
   projectCurrency: { type: String, required: false },
   Status: { type: String, required: false },
@@ -109,6 +110,7 @@ export interface Proposal extends Document {
   userId?: string;
   userName?: string;
   projectId: string;
+  appyId: string;
   applyId: string;
   projectTitle: string;
   projectCurrency: string;

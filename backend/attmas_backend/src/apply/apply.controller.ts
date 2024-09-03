@@ -6,12 +6,15 @@ import {
   NotFoundException,
   Param,
   Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { ApplyService } from './apply.service';
 import { CreateApplyDto } from './apply.dto';
 import { Apply } from './apply.schema';
 import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
+import { Types } from 'mongoose';
 
 @Controller('Apply')
 export class ApplyController {
@@ -77,7 +80,18 @@ export class ApplyController {
 
   @Get('jobId/:jobId')
   async findByJobId(@Param('jobId') jobId: string) {
-    return this.applyService.findByJobId(jobId);
+    try {
+      const objectId = new Types.ObjectId(jobId);
+      const applications = await this.applyService.findByJobId(objectId);
+      console.log('Applications:', applications);
+      return applications;
+    } catch (error) {
+      console.error('Error in findByJobId:', error);
+      throw new HttpException(
+        'Error fetching applications',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get('user/:userId')

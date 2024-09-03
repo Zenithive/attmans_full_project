@@ -37,25 +37,25 @@ export class ApplyService {
     } catch (error) {
       throw new BadRequestException('Invalid jobId format');
     }
-  
+
     // Check for existing application
     const existingApplication = await this.ApplyModel.findOne({
       userId: createApplyDto.userId,
       jobId: jobId,
     }).exec();
-  
+
     console.log('existingApplication', existingApplication);
     if (existingApplication) {
       throw new ConflictException('User has already applied for this job');
     }
-  
+
     // Create and save new application
     const createdApply = new this.ApplyModel({
       ...createApplyDto,
       jobId: jobId,
     });
     await createdApply.save();
-  
+
     // Find user and send email notification
     const user = await this.userModel
       .findOne({ username: createApplyDto.username })
@@ -81,10 +81,9 @@ export class ApplyService {
         text: emailText,
       });
     }
-    
+
     return createdApply;
   }
-  
 
   async findAll(): Promise<Apply[]> {
     return this.ApplyModel.find()
@@ -319,7 +318,8 @@ export class ApplyService {
     }
     return application;
   }
-  async findByJobId(jobId: string): Promise<Apply[]> {
+  async findByJobId(jobId: Types.ObjectId): Promise<Apply[]> {
+    console.log('myJob', jobId);
     return this.ApplyModel.find({ jobId })
       .populate('userId', 'firstName lastName username')
       .exec();
