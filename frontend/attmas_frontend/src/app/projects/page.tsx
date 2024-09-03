@@ -539,9 +539,13 @@ const Jobs = () => {
                                             <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                            <Typography variant="body2" sx={{ mt: 1, fontWeight: 'bold' }}>
-                                                Applications: {job.appliesCount} {/* Display the count of applications in bold */}
-                                            </Typography>
+                                            
+
+                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
+                                                <Typography variant="body2" sx={{ mt: 1, fontWeight: 'bold' }}>
+                                                    Applications: {job.appliesCount}
+                                                </Typography>
+                                            )}
 
                                             <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
                                                 {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (

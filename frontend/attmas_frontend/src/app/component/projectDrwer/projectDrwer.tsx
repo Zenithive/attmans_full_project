@@ -680,15 +680,19 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 ? 'green'
                                 : app.status === APPLY_STATUSES.rejected
                                   ? 'red'
+                                : app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                  ? 'green'
                                   : app.status === APPLY_STATUSES.awarded
                                     ? 'blue'
                                     : app.status === APPLY_STATUSES.notAwarded
                                       ? 'grey'
                                       : 'default',
-                              color: app.status === APPLY_STATUSES.approvedPendingForProposal
+                              color: app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
                                 ? 'green'
                                 : app.status === APPLY_STATUSES.rejected
                                   ? 'red'
+                                : app.status === APPLY_STATUSES.rejected
+                                  ? 'green'
                                   : app.status === APPLY_STATUSES.awarded
                                     ? 'blue'
                                     : app.status === APPLY_STATUSES.notAwarded

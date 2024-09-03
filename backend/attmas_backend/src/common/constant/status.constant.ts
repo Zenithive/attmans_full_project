@@ -8,6 +8,7 @@ export const APPLY_STATUSES = {
   pendingForApproval: 'Pending For Approval',
   rejected: 'Rejected',
   approvedPendingForProposal: 'Approved, Pending for Proposal',
+  approvedPendingForProposalForInnovators: 'Approved',
   proposalApprovalPending: 'Proposal Approval Pending',
   proposalUnderReview: 'Proposal Under Review',
   awarded: 'Awarded',

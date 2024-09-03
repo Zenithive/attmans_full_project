@@ -196,9 +196,9 @@ export class ApplyService {
             userId: userId,
             status: {
               $in: [
-                APPLY_STATUSES.approvedPendingForProposal,
-                APPLY_STATUSES.proposalApprovalPending,
-                APPLY_STATUSES.proposalUnderReview,
+                // APPLY_STATUSES.approvedPendingForProposal,
+                // APPLY_STATUSES.proposalApprovalPending,
+                // APPLY_STATUSES.proposalUnderReview,
                 APPLY_STATUSES.awarded,
               ],
             },
@@ -261,7 +261,12 @@ export class ApplyService {
       throw new NotFoundException(`Application with id ${id} not found`);
     }
     //application.status = 'Approved';
-    application.status = APPLY_STATUSES.approvedPendingForProposal;
+    if (application.applyType === 'InnovatorsApply') {
+      application.status =
+        APPLY_STATUSES.approvedPendingForProposalForInnovators;
+    } else {
+      application.status = APPLY_STATUSES.approvedPendingForProposal;
+    }
     application.buttonsHidden = true;
     await application.save();
 
@@ -318,12 +323,21 @@ export class ApplyService {
     }
     return application;
   }
+
   async findByJobId(jobId: Types.ObjectId): Promise<Apply[]> {
-    console.log('myJob', jobId);
-    return this.ApplyModel.find({ jobId })
+    // Convert jobId to ObjectId if it is a valid string
+    let jobObjectId: Types.ObjectId;
+    if (Types.ObjectId.isValid(jobId)) {
+      jobObjectId = new Types.ObjectId(jobId);
+    } else {
+      throw new Error('Invalid jobId format');
+    }
+
+    return this.ApplyModel.find({ jobId: jobObjectId })
       .populate('userId', 'firstName lastName username')
       .exec();
   }
+
   async findApplicationsByUserId(userId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ userId }).exec();
   }
@@ -367,9 +381,14 @@ export class ApplyService {
 
     const application = await this.ApplyModel.findById(id).exec();
 
+    const validStatusesForAward = [
+      APPLY_STATUSES.approvedPendingForProposalForInnovators,
+      APPLY_STATUSES.proposalUnderReview,
+    ];
+    console.log('application', application);
     if (
-      !application ||
-      application.status !== APPLY_STATUSES.approvedPendingForProposal
+      !application?._id ||
+      !validStatusesForAward.includes(application.status)
     ) {
       throw new NotFoundException(
         `Application with id ${id} and status 'Approved' not found`,
