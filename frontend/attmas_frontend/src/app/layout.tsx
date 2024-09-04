@@ -125,7 +125,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className} style={{ width: '100%', height: "100%" }}>
+      <body className={inter.className} style={{ width: '100%', height: "100%", margin: 0 }}>
         <ThemeProvider theme={theme}>
           <Provider store={store}>
             {isValidPage ? (
