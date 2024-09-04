@@ -6,12 +6,17 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Proposal } from './proposal.schema';
-import { PROPOSAL_STATUSES } from 'src/common/constant/status.constant';
+import {
+  APPLY_STATUSES,
+  PROPOSAL_STATUSES,
+} from 'src/common/constant/status.constant';
+import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 
 @Injectable()
 export class ProposalService {
   constructor(
     @InjectModel('Proposal') private readonly proposalModel: Model<Proposal>,
+    @InjectModel(Apply.name) private applyModel: Model<ApplyDocument>,
   ) {}
 
   async createProposal(createProposalDto: any): Promise<Proposal> {
@@ -131,13 +136,38 @@ export class ProposalService {
         ? PROPOSAL_STATUSES.proposalUnderReview
         : PROPOSAL_STATUSES.rejected;
 
-    return this.proposalModel
+    const updatedProposal = await this.proposalModel
       .findByIdAndUpdate(
         id,
         { Status: newStatus, comment: comment },
         { new: true },
       )
       .exec();
+
+    const statusMatchObj = {
+      [PROPOSAL_STATUSES.pending]: APPLY_STATUSES.proposalApprovalPending,
+      [PROPOSAL_STATUSES.proposalUnderReview]:
+        APPLY_STATUSES.proposalUnderReview,
+      [PROPOSAL_STATUSES.approvedAndAwarded]: APPLY_STATUSES.awarded,
+      [PROPOSAL_STATUSES.rejected]: APPLY_STATUSES.rejected,
+    };
+
+    try {
+      const result = await this.applyModel
+        .updateOne(
+          {
+            _id: proposal.applyId,
+          },
+          { $set: { status: statusMatchObj[newStatus] } },
+        )
+        .exec();
+
+      console.log('ApplyModel update result:', result);
+    } catch (error) {
+      console.error('Error updating ApplyModel:', error);
+    }
+
+    return updatedProposal;
   }
   async findProposalByUserId(projectId: string): Promise<Proposal | null> {
     return this.proposalModel.findOne({ projectId }).exec();
