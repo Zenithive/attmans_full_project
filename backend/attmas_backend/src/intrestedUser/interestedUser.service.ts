@@ -32,31 +32,32 @@ export class InterestedUserService {
       userType,
       interestType,
     } = createInterestedUserDto;
-  
+
     // Convert userId and exhibitionId to ObjectId
     const userObjectId = new Types.ObjectId(userId);
     const exhibitionObjectId = new Types.ObjectId(exhibitionId);
-  
+
+    // Check if the user already has an interest in the booth
     const existingInterest = await this.interestedUserModel
       .findOne({ userId: userObjectId, boothId, interestType: 'InterestedUserForBooth' })
       .exec();
-  
+
     if (existingInterest) {
       throw new Error('User has already shown interest in this booth');
     }
-  
+
     try {
       const exhibition = await this.exhibitionModel
         .findById(exhibitionObjectId)
         .exec();
-  
+
       if (!exhibition) {
         throw new Error('Exhibition not found');
       }
-  
+
       const adminEmail = exhibition.username;
       console.log('Exhibition Admin Email:', adminEmail);
-  
+
       let boothTitle: string | undefined;
       if (boothId) {
         const booth = await this.boothModel
@@ -65,16 +66,21 @@ export class InterestedUserService {
           .exec();
         boothTitle = booth?.title;
       }
-  
+
       // Check if the user exists by username
       const existingUser = await this.userModel
         .findOne({ username: username })
         .exec();
-  
+
       if (existingUser) {
+        // If boothId is null, do not create the interested user entry
+        // if (boothId === null) {
+        //   console.log('BoothId is null. Skipping creation of interested user entry.');
+        //   return;
+        // }
+
         // Send "abc" message
         const backendBaseUrl = process.env.BACKEND_BASE_URL;
-  
         const exhibitionUrl = `${backendBaseUrl}/view-exhibition?exhibitionId=${exhibitionId}`;
         await this.mailerService.sendEmail(
           username,
@@ -82,7 +88,7 @@ export class InterestedUserService {
           `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nClick <a href="${exhibitionUrl}">here</a> to participate in the Exhibition.\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Email sent to existing user successfully.');
-  
+
         // Create interested user entry with null or blank values
         const createdUser = new this.interestedUserModel({
           username,
@@ -97,9 +103,9 @@ export class InterestedUserService {
           interestType,
           adminEmail,
         });
-  
+
         await createdUser.save();
-  
+
         console.log('Attempting to send email to admin:', adminEmail);
         await this.mailerService.sendEmail(
           adminEmail,
@@ -107,7 +113,7 @@ export class InterestedUserService {
           `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Email sent to exhibition admin successfully.');
-  
+
         return createdUser;
       } else {
         // Send "xyz" message
@@ -117,7 +123,7 @@ export class InterestedUserService {
           `Hello ${firstName},\n\nThank you for showing interest in our Attmas service!\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Email sent to new user successfully.');
-  
+
         // Send welcome email
         console.log('Sending welcome email to new user:', username);
         await this.mailerService.sendEmail(
@@ -126,7 +132,7 @@ export class InterestedUserService {
           `Hello ${firstName},\n\nWelcome to Attmas! We're excited to have you on board.\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Welcome email sent to new user successfully.');
-  
+
         // Create interested user entry with provided values
         const createdUser = new this.interestedUserModel({
           username,
@@ -139,14 +145,15 @@ export class InterestedUserService {
           userType,
           adminEmail,
         });
-  
+
         return createdUser.save();
       }
     } catch (error) {
       console.error('Error sending email:', error);
       throw error;
     }
-  }
+}
+
 
   async findExhibitionsByUser(userId: string): Promise<InterestedUser[]> {
     return this.interestedUserModel.find({ userId }).exec();

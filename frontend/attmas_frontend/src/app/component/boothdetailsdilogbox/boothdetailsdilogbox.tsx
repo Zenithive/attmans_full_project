@@ -166,6 +166,8 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
     setSelectedVideoUrl(null);
   };
 
+
+
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth sx={{
@@ -201,7 +203,14 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={openInterestedModals}
+                      onClick={() => {
+                        if (!userDetails._id) {
+                          openInterestedModals(); // Open modal if userId is not present
+                        } else {
+                          console.log('User details already present, modal will not open');
+                          openInterestedModals();
+                        }
+                      }}
                       sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
                     >
                       Interested
@@ -280,7 +289,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                               </TableCell>
                               <TableCell>
                                 <Tooltip title="View Details" placement="top" arrow>
-                                  <IconButton color="primary">
+                                  <IconButton>
                                     <VisibilityIcon onClick={() => handleViewProduct(product)} />
                                   </IconButton>
                                 </Tooltip>

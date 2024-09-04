@@ -134,37 +134,44 @@ const ExhibitionsPage: React.FC = () => {
       try {
         const exhibitionId = searchParams.get('exhibitionId');
         const boothId = searchParams.get('boothId');
-        console.log('boothId', boothId)
+        console.log('boothId', boothId);
         if (!exhibitionId) {
           console.error('id not found');
           return;
         }
+        
         const response = await axios.get(`${APIS.GET_VISITORS}`, {
           params: {
             exhibitionId,
             interestType,
-            
           },
         });
+    
         console.log('Fetched visitors:', response.data);
-        console.log("userDetails._id", userDetails._id);
-
-        for (let index = 0; index < response.data.length; index++) {
-          const element = response.data[index];
-          console.log("element.userId", element.userId);
-
-
-
-          if (element.userId === userDetails._id ) {
+        console.log('userDetails._id', userDetails._id);
+    
+        // Remove duplicates based on interestType and username
+        const uniqueVisitors = response.data.filter((visitor: { interestType: any; username: any; }, index: any, self: any[]) =>
+          index === self.findIndex(v => 
+            v.interestType === visitor.interestType && v.username === visitor.username
+          )
+        );
+    
+        for (let index = 0; index < uniqueVisitors.length; index++) {
+          const element = uniqueVisitors[index];
+          console.log('element.userId', element.userId);
+    
+          if (element.userId === userDetails._id) {
             setIsInterestedBtnShow(false);
           }
         }
-
-        setVisitors(response.data);
+    
+        setVisitors(uniqueVisitors);
       } catch (error) {
         console.error('Error fetching visitors:', error);
       }
     };
+    
 
     fetchExhibitions();
     fetchBooths();
@@ -563,7 +570,7 @@ const ExhibitionsPage: React.FC = () => {
                           }}>
                             <h2>{booth.title}</h2>
                           </Typography>
-                          {(userDetails && (userType === 'Admin' || userType === 'Innovators' || userType === 'Visitors')) && (
+                          {(userDetails && (userType === 'Admin' || userType === 'Innovators' || userType === 'Visitors' || !userType)) && (
                           <a
                             href="#"
                             onClick={(e) => {
