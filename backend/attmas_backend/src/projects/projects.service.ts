@@ -201,6 +201,7 @@ export class JobsService {
     limit: number,
     Category: string[],
     userId?: string,
+    projId?: string,
     Subcategorys?: string[],
     Expertiselevel?: string[],
     status?: string,
@@ -213,7 +214,7 @@ export class JobsService {
     const skip = (page - 1) * limit;
     const filter: any = {};
     const filterQuery: any = {};
-  
+
     const allNativeFiltersArray = {
       title,
       status,
@@ -223,7 +224,7 @@ export class JobsService {
       createdAt,
       TimeFrame,
     };
-  
+
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
@@ -238,31 +239,31 @@ export class JobsService {
         }
       }
     }
-  
+
     if (ProjectOwner) {
       filter.ProjectOwner = new RegExp(ProjectOwner, 'i');
     }
-  
+
     if (Category && Category.length > 0) {
       filter.Category = { $in: Category };
     }
-  
+
     if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
-  
+
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
     }
-  
+
     if (status) {
       filter.status = status;
     }
-  
+
     if (SelectService && SelectService.length > 0) {
       filter.SelectService = { $in: SelectService };
     }
-  
+
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -296,6 +297,9 @@ export class JobsService {
           ...filterQuery,
           ...(userId && {
             'userId._id': new Types.ObjectId(userId),
+          }),
+          ...(projId && {
+            _id: new Types.ObjectId(projId),
           }),
           ...(filter.ProjectOwner && {
             $or: [
@@ -334,11 +338,9 @@ export class JobsService {
         },
       },
     ];
-  
+
     return await this.jobsModel.aggregate(pipeline);
   }
-  
-  
 
   async findJobWithUser(id: string): Promise<Jobs> {
     return this.jobsModel

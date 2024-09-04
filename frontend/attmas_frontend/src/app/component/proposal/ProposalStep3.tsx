@@ -29,7 +29,7 @@ const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => vo
         >
             {({ handleSubmit }) => (
                 <Form onSubmit={handleSubmit}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 1 }}>
                         <Field
                             name="otherCommitments"
                             color='secondary'
