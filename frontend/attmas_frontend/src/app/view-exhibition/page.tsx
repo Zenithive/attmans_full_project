@@ -16,6 +16,7 @@ import IntrestedModal from '../component/booth/intrestedUsers';
 import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
+import { EXHIBITION_STATUSES } from '../constants/status.constant';
 
 interface Exhibition {
   _id?: string;
@@ -357,7 +358,7 @@ const ExhibitionsPage: React.FC = () => {
     return exhibitionDate.isSame(currentDate);
   };
 
-  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === 'close';
+  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === EXHIBITION_STATUSES.close;
 
 
   return (
@@ -377,11 +378,12 @@ const ExhibitionsPage: React.FC = () => {
         }
       }}>
       
-        <Box sx={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
+        <Box sx={{ color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "100%", bottom: "15px", height: '6%', padding: '10px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <Box sx={{ '@media (max-width: 767px)': { position: 'relative', right: '34px' } }}><h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1></Box>
           <Box sx={{
+            mx: 2,
             '@media (max-width: 767px)': {
-              position: 'relative', left: '72px', top: '10px'
+              position: 'relative', top: '10px'
 
             }
           }}>
@@ -393,8 +395,9 @@ const ExhibitionsPage: React.FC = () => {
                 color="primary"
                 onClick={openModal}
                 sx={{
-                  position: 'absolute', right: '80px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold', '@media (max-width: 767px)': {
-                    position: 'absolute', right: '95px'
+                  mx: 2,
+                   background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold', '@media (max-width: 767px)': {
+                    
                   }
                 }}
               >
@@ -408,7 +411,7 @@ const ExhibitionsPage: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={openInterestedModal}
-                sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+                sx={{ mx: 2, background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
               >
                 Interested
               </Button>
@@ -419,7 +422,7 @@ const ExhibitionsPage: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleJoinLiveClick}
-                sx={{ position: 'absolute', right: '330px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+                sx={{ background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
               >
                 Webinar
               </Button>

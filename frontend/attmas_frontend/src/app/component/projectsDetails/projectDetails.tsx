@@ -260,12 +260,27 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   },
                 }}
               >
-                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right', fontSize: 14, mb: 0.5 }}>
                   Status: {apply.status}
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right', fontSize: 14, mb: 0.5 }}>
                   Date: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
                 </Typography>
+                {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1, ml: 2, textAlign: 'right', fontSize: 14 }}>
+                    <b>Applied User: &nbsp;</b>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={(e) => {
+                        handleUserClick(apply?.userId?.username || "")
+                      }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#1976d2',
+                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                      }}
+                    >{apply?.userId?.firstName} {apply?.userId?.lastName}
+                    </a>
+                  </Typography>}
               </Box>
               <Grid container spacing={2} flexDirection={'column'}>
                 <Grid item xs={12} sm={5}>
@@ -286,18 +301,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     fullWidth
                     color='secondary'
                     aria-readonly
-                    sx={{ mb: 2 }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <TextField
-                    onClick={() => handleUserClick(apply?.userId?.username || "")}
-                    label="Applied User"
-                    value={`${apply.firstName} ${apply.lastName}`}
-                    fullWidth
-                    color='secondary'
-                    aria-readonly
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 1 }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -307,7 +311,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     fullWidth
                     color='secondary'
                     aria-readonly
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 1 }}
                   />
                 </Grid>
                 <Grid item xs={12}>
