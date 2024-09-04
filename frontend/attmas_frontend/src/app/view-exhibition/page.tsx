@@ -563,7 +563,7 @@ const ExhibitionsPage: React.FC = () => {
                           }}>
                             <h2>{booth.title}</h2>
                           </Typography>
-                          {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
+                          {(userDetails && (userType === 'Admin' || userType === 'Innovators' || userType === 'Visitors')) && (
                           <a
                             href="#"
                             onClick={(e) => {

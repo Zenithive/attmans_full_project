@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InterestedUser } from './InterestedUser.schema';
 import { User } from 'src/users/user.schema'; // Assuming User schema is in src/users directory
 import { MailerService } from 'src/common/service/UserEmailSend'; // Assuming MailerService is in src/common/service
@@ -32,27 +32,31 @@ export class InterestedUserService {
       userType,
       interestType,
     } = createInterestedUserDto;
-
+  
+    // Convert userId and exhibitionId to ObjectId
+    const userObjectId = new Types.ObjectId(userId);
+    const exhibitionObjectId = new Types.ObjectId(exhibitionId);
+  
     const existingInterest = await this.interestedUserModel
-      .findOne({ userId, boothId, interestType: 'InterestedUserForBooth' })
+      .findOne({ userId: userObjectId, boothId, interestType: 'InterestedUserForBooth' })
       .exec();
-
+  
     if (existingInterest) {
       throw new Error('User has already shown interest in this booth');
     }
-
+  
     try {
       const exhibition = await this.exhibitionModel
-        .findById(exhibitionId)
+        .findById(exhibitionObjectId)
         .exec();
-
+  
       if (!exhibition) {
         throw new Error('Exhibition not found');
       }
-
+  
       const adminEmail = exhibition.username;
       console.log('Exhibition Admin Email:', adminEmail);
-
+  
       let boothTitle: string | undefined;
       if (boothId) {
         const booth = await this.boothModel
@@ -61,16 +65,16 @@ export class InterestedUserService {
           .exec();
         boothTitle = booth?.title;
       }
-
+  
       // Check if the user exists by username
       const existingUser = await this.userModel
         .findOne({ username: username })
         .exec();
-
+  
       if (existingUser) {
         // Send "abc" message
         const backendBaseUrl = process.env.BACKEND_BASE_URL;
-
+  
         const exhibitionUrl = `${backendBaseUrl}/view-exhibition?exhibitionId=${exhibitionId}`;
         await this.mailerService.sendEmail(
           username,
@@ -78,24 +82,24 @@ export class InterestedUserService {
           `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nClick <a href="${exhibitionUrl}">here</a> to participate in the Exhibition.\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Email sent to existing user successfully.');
-
+  
         // Create interested user entry with null or blank values
         const createdUser = new this.interestedUserModel({
           username,
           firstName,
           lastName,
           mobileNumber,
-          exhibitionId,
+          exhibitionId: exhibitionObjectId,
           boothId,
-          userId,
+          userId: userObjectId,
           userType,
           boothTitle,
           interestType,
           adminEmail,
         });
-
+  
         await createdUser.save();
-
+  
         console.log('Attempting to send email to admin:', adminEmail);
         await this.mailerService.sendEmail(
           adminEmail,
@@ -103,7 +107,7 @@ export class InterestedUserService {
           `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Email sent to exhibition admin successfully.');
-
+  
         return createdUser;
       } else {
         // Send "xyz" message
@@ -113,7 +117,7 @@ export class InterestedUserService {
           `Hello ${firstName},\n\nThank you for showing interest in our Attmas service!\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Email sent to new user successfully.');
-
+  
         // Send welcome email
         console.log('Sending welcome email to new user:', username);
         await this.mailerService.sendEmail(
@@ -122,20 +126,20 @@ export class InterestedUserService {
           `Hello ${firstName},\n\nWelcome to Attmas! We're excited to have you on board.\n\nBest regards,\nTeam Attmas`,
         );
         console.log('Welcome email sent to new user successfully.');
-
+  
         // Create interested user entry with provided values
         const createdUser = new this.interestedUserModel({
           username,
           firstName,
           lastName,
           mobileNumber,
-          exhibitionId,
+          exhibitionId: exhibitionObjectId,
           boothId,
-          userId,
+          userId: userObjectId,
           userType,
           adminEmail,
         });
-
+  
         return createdUser.save();
       }
     } catch (error) {
