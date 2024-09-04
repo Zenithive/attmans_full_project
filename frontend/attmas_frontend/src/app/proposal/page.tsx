@@ -21,7 +21,7 @@ import UserDrawer from '../component/UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '../constants/common.constants';
 import ApplyDetailsDialog from '../component/projectsDetails/projectDetails';
 import ConfirmationDialog from '../component/All_ConfirmationBox/ConfirmationDialog';
-import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
+import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 
 interface Proposal {
     _id: string;
@@ -187,20 +187,6 @@ const proposal = () => {
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
 
-    useEffect(() => {
-        const fetchProposalStatus = async () => {
-            try {
-                const response = await axios.get(`${SERVER_URL}/proposals/user${selectedApply?._id}`);
-                console.log('response for fetchProposalStatus', response.data);
-                setHasSubmittedProposal(!!response.data);
-                // Update state based on whether proposal exists
-            } catch (error) {
-                console.error('Error fetching proposal status', error);
-            }
-        };
-
-        fetchProposalStatus();
-    }, [selectedApply?._id]);
 
     const handleNextStep = (values: any) => {
         setFormValues((prevValues) => ({ ...prevValues, ...values }));
@@ -245,6 +231,22 @@ const proposal = () => {
 
 
 
+    useEffect(() => {
+        const fetchProposalStatus = async () => {
+            console.log('selectedProject?._id',selectedProject?._id);
+            if (!selectedProject?._id) return;
+            try {
+                const response = await axios.get(`${SERVER_URL}/proposals/user/${selectedProject?._id}`);
+                console.log('response for fetchProposalStatus', response.data);
+                setHasSubmittedProposal(!!response.data);
+                // Update state based on whether proposal exists
+            } catch (error) {
+                console.error('Error fetching proposal status', error);
+            }
+        };
+
+        fetchProposalStatus();
+    }, [selectedProject?._id]);
 
     const handleApprove = (proposalId: string) => {
         setCurrentAction('Approve');
@@ -265,7 +267,13 @@ const proposal = () => {
                 comment
             });
             // Refresh the proposals list after update
-            fetchAllProposals();
+            setProposals(prevProposals =>
+                prevProposals.map(proposal =>
+                    proposal._id === selectedProposalId ? { ...proposal, Status: status } : proposal
+                )
+            );
+
+            setConfirmationOpen(false);
         } catch (error) {
             console.error('Error updating proposal status:', error);
         }
@@ -352,8 +360,8 @@ const proposal = () => {
     const fetchProjectDetails = async (application: Apply) => {
         const response = await axios.get(`${APIS.JOBS}?projId=${application.jobId}`);
         console.log("fetchProjectDetails", response.data)
-        if(response.data && response.data.length){
-            showProposalModal({...application, jobDetails: {...response.data[0]}});
+        if (response.data && response.data.length) {
+            showProposalModal({ ...application, jobDetails: { ...response.data[0] } });
         }
     }
 
@@ -390,12 +398,18 @@ const proposal = () => {
                 }}
             >
                 {userDetails.userType === 'Freelancer' && (
-                    <Typography component="h2" sx={{ marginY: 0 }}>
+                    <Typography component="h4" sx={{ marginY: 0 }}>
                         My Projects Proposals
                     </Typography>
                 )}
                 {userDetails.userType === 'Admin' && (
                     <Typography variant="h4">All Proposals</Typography>
+                )}
+
+                {userDetails.userType === 'Project Owner' && (
+                    <Typography component="h4" sx={{ marginY: 0 }}>
+                        My Projects Proposals
+                    </Typography>
                 )}
 
             </Box>
@@ -511,25 +525,29 @@ const proposal = () => {
                                             <Chip
                                                 label={proposal.Status}
                                                 variant="outlined"
-                                                color={proposal.Status === 'Approved' ? 'success' : 'error'}
+                                                color={proposal.Status === PROPOSAL_STATUSES.proposalUnderReview ? 'success' : 'error'}
                                             />
                                         </Box>
                                         {userDetails.userType === 'Admin' && (
                                             <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                                <Button
-                                                    variant="contained"
-                                                    color="success"
-                                                    onClick={() => handleApprove(proposal._id)}
-                                                >
-                                                    Approve
-                                                </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    color="error"
-                                                    onClick={() => handleReject(proposal._id)}
-                                                >
-                                                    Reject
-                                                </Button>
+                                                {proposal.Status !== PROPOSAL_STATUSES.pending || proposal.Status !== 'Rejected' && (
+                                                    <>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="success"
+                                                            onClick={() => handleApprove(proposal._id)}
+                                                        >
+                                                            Approve
+                                                        </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="error"
+                                                            onClick={() => handleReject(proposal._id)}
+                                                        >
+                                                            Reject
+                                                        </Button>
+                                                    </>
+                                                )}
                                             </Box>
                                         )}
                                         {userDetails.userType === 'Project Owner' && proposal.applyId && isAwardButtonVisible && (
@@ -628,7 +646,7 @@ const proposal = () => {
                                             <Typography variant="body1" sx={{ mt: 1 }}>
                                                 {application.currency} {application.Budget}
                                             </Typography>
-                                            {!hasSubmittedProposal && (
+                                            {!hasSubmittedProposal &&(
                                                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
 
                                                     <Box sx={{

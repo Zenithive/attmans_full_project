@@ -15,15 +15,20 @@ import { UsersService } from 'src/users/users.service';
 // import { ObjectId } from 'typeorm';
 // import mongoose from 'mongoose';
 import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
-import { APPLY_STATUSES } from 'src/common/constant/status.constant';
+import { Proposal } from 'src/proposal/proposal.schema';
+
+import {
+  APPLY_STATUSES,
+  PROPOSAL_STATUSES,
+} from 'src/common/constant/status.constant';
 
 @Injectable()
 export class ApplyService {
-  [x: string]: any;
   constructor(
     @InjectModel(Apply.name)
     private ApplyModel: Model<ApplyDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel('Proposal') private readonly proposalModel: Model<Proposal>,
     private usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
@@ -403,6 +408,18 @@ export class ApplyService {
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
     // console.log(`Application with ID: ${id} awarded.`);
+
+    const proposal = await this.proposalModel
+      .findOne({
+        applyId: application._id,
+      })
+      .exec();
+
+    console.log('proposal', proposal.applyId);
+    if (proposal.applyId) {
+      proposal.Status = PROPOSAL_STATUSES.approvedAndAwarded;
+      await proposal.save();
+    }
 
     // Get all other applications and set their status to 'Not Awarded'
     const otherApplications = await this.ApplyModel.find({

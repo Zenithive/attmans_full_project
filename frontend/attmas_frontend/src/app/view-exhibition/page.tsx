@@ -16,6 +16,7 @@ import IntrestedModal from '../component/booth/intrestedUsers';
 import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
+import { Product } from '../component/all_Profile_component/AddProductModal2';
 
 interface Exhibition {
   _id?: string;
@@ -49,7 +50,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; stageofdevelopmentdropdown: string; productQuantity: number;      }[];
+  products:  Product[];
   userId: {
     firstName: string;
     lastName: string;

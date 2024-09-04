@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Proposal } from './proposal.schema';
-import { APPLY_STATUSES } from 'src/common/constant/status.constant';
+import { PROPOSAL_STATUSES } from 'src/common/constant/status.constant';
 
 @Injectable()
 export class ProposalService {
@@ -12,12 +16,15 @@ export class ProposalService {
 
   async createProposal(createProposalDto: any): Promise<Proposal> {
     const existingProposal = await this.proposalModel
-      .findOne({ userId: createProposalDto.userId })
+      .findOne({
+        userId: createProposalDto.userId,
+        projectId: createProposalDto.projectId,
+      })
       .exec();
     if (existingProposal) {
       throw new Error('A proposal has already been created for this user.');
     }
-    createProposalDto.Status = APPLY_STATUSES.proposalUnderReview;
+    createProposalDto.Status = PROPOSAL_STATUSES.pending;
     const createdProposal = new this.proposalModel(createProposalDto);
     return createdProposal.save();
   }
@@ -106,16 +113,33 @@ export class ProposalService {
     status: 'Approved' | 'Rejected',
     comment: string,
   ): Promise<Proposal> {
+    const proposal = await this.proposalModel.findById(id).exec();
+    if (!proposal) {
+      throw new NotFoundException('Proposal not found');
+    }
+    if (
+      proposal.Status === PROPOSAL_STATUSES.proposalUnderReview ||
+      proposal.Status === PROPOSAL_STATUSES.rejected
+    ) {
+      throw new ConflictException(
+        'Proposal has already been approved or rpejected',
+      );
+    }
+
+    const newStatus =
+      status === 'Approved'
+        ? PROPOSAL_STATUSES.proposalUnderReview
+        : PROPOSAL_STATUSES.rejected;
+
     return this.proposalModel
       .findByIdAndUpdate(
         id,
-        { Status: status, comment: comment },
+        { Status: newStatus, comment: comment },
         { new: true },
       )
       .exec();
   }
-
-  async findProposalByUserId(userId: string): Promise<Proposal | null> {
-    return this.proposalModel.findOne({ userId }).exec();
+  async findProposalByUserId(projectId: string): Promise<Proposal | null> {
+    return this.proposalModel.findOne({ projectId }).exec();
   }
 }

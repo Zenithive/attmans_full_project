@@ -1,4 +1,8 @@
 import { Schema, Document } from 'mongoose';
+import {
+  PROPOSAL_STATUSES,
+  APPLY_STATUSES,
+} from 'src/common/constant/status.constant';
 
 // Define the schema for the proposal data
 export const ProposalSchema = new Schema({
@@ -118,3 +122,106 @@ export interface Proposal extends Document {
   lastname: string;
   comment: string;
 }
+
+// ProposalSchema.post('save', async function (doc: Proposal) {
+//   const ApplyModel = this.model('Apply') as Model<Apply>;
+
+//   if (doc.Status === PROPOSAL_STATUSES.pending) {
+//     console.log(
+//       'doc.Status === PROPOSAL_STATUSES.pending',
+//       doc.Status === PROPOSAL_STATUSES.pending,
+//     );
+
+//     console.log('userId:', doc.userID);
+//     console.log('ApplyId', doc.applyId);
+//     console.log(
+//       'Updating ApplyModel where status is:',
+//       APPLY_STATUSES.pendingForApproval,
+//     );
+//     try {
+//       const result = await ApplyModel.updateOne(
+//         {
+//           userId: doc.userID,
+//           _id: doc.applyId,
+//           status: APPLY_STATUSES.approvedPendingForProposal,
+//         },
+//         { $set: { status: APPLY_STATUSES.proposalApprovalPending } },
+//       ).exec();
+
+//       console.log('Update result:', result);
+//     } catch (error) {
+//       console.error('Error updating ApplyModel:', error);
+//     }
+//   }
+//   console.log(
+//     'doc.Status === PROPOSAL_STATUSES.proposalUnderReview',
+//     doc.Status === PROPOSAL_STATUSES.proposalUnderReview,
+//   );
+//   if (doc.Status === PROPOSAL_STATUSES.proposalUnderReview) {
+//     console.log(
+//       'Proposal approved, updating ApplyModel status to proposalUnderReview',
+//     );
+//     try {
+//       const result = await ApplyModel.updateOne(
+//         {
+//           userId: doc.userID,
+//           _id: doc.applyId,
+//           status: APPLY_STATUSES.proposalApprovalPending,
+//         },
+//         { $set: { status: APPLY_STATUSES.proposalUnderReview } },
+//       ).exec();
+
+//       console.log('Update result:', result);
+//     } catch (error) {
+//       console.error('Error updating ApplyModel:', error);
+//     }
+//   }
+// });
+
+ProposalSchema.post('save', async function (doc: Proposal) {
+  const ApplyModel = this.model('Apply');
+  const statusMatchObj = {
+    [PROPOSAL_STATUSES.pending]: APPLY_STATUSES.proposalApprovalPending,
+    [PROPOSAL_STATUSES.proposalUnderReview]: APPLY_STATUSES.proposalUnderReview,
+    [PROPOSAL_STATUSES.approvedAndAwarded]: APPLY_STATUSES.awarded,
+    [PROPOSAL_STATUSES.rejected]: APPLY_STATUSES.rejected,
+  };
+  console.log('statusMatchObj', statusMatchObj);
+
+  console.log(this, 'doc.Status:', doc.Status);
+  try {
+    const result = await ApplyModel.updateOne(
+      {
+        _id: doc.applyId,
+      },
+      { $set: { status: statusMatchObj[doc.Status] } },
+    ).exec();
+    console.log('Update result:', result);
+  } catch (error) {
+    console.error('Error updating ApplyModel:', error);
+  }
+});
+
+ProposalSchema.post('findOneAndUpdate', async function (doc: Proposal) {
+  const ApplyModel = new this.model('Apply');
+  const statusMatchObj = {
+    [PROPOSAL_STATUSES.pending]: APPLY_STATUSES.proposalApprovalPending,
+    [PROPOSAL_STATUSES.proposalUnderReview]: APPLY_STATUSES.proposalUnderReview,
+    [PROPOSAL_STATUSES.approvedAndAwarded]: APPLY_STATUSES.awarded,
+    [PROPOSAL_STATUSES.rejected]: APPLY_STATUSES.rejected,
+  };
+  console.log('statusMatchObj', statusMatchObj);
+
+  console.log(this, 'doc.Status:', doc.Status);
+  try {
+    const result = await ApplyModel.updateOne(
+      {
+        _id: doc.applyId,
+      },
+      { $set: { status: statusMatchObj[doc.Status] } },
+    ).exec();
+    console.log('Update result:', result);
+  } catch (error) {
+    console.error('Error updating ApplyModel:', error);
+  }
+});
