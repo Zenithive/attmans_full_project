@@ -403,15 +403,21 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   />
                 </Grid>
                 {userType === "Admin" ? <Grid item xs={12} sm={6}>
-                  <TextField
-                    onClick={() => handleUserClick(viewingJob?.userId?.username || "")}
-                    label="Project Owner"
-                    value={`${viewingJob?.userId?.firstName} ${viewingJob?.userId?.lastName}`}
-                    fullWidth
-                    color='secondary'
-                    aria-readonly
-                    sx={{ mb: 2, cursor: "pointer" }}
-                  />
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                    <b>Project Owner: &nbsp;</b>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={(e) => {
+                        handleUserClick(viewingJob?.userId?.username || "")
+                      }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#1976d2',
+                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                      }}
+                    >{viewingJob?.userId?.firstName} {viewingJob?.userId?.lastName}
+                    </a>
+                  </Typography>
                 </Grid> : ''}
                 <Grid item xs={12} sm={5}>
                   <TextField
@@ -679,31 +685,31 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 ? 'green'
                                 : app.status === APPLY_STATUSES.rejected
                                   ? 'red'
-                                : app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
-                                  ? 'green'
-                                  : app.status === APPLY_STATUSES.awarded
-                                    ? 'blue'
-                                    : app.status === APPLY_STATUSES.notAwarded
-                                      ? 'grey'
-                                      : 'default',
+                                  : app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                    ? 'green'
+                                    : app.status === APPLY_STATUSES.awarded
+                                      ? 'blue'
+                                      : app.status === APPLY_STATUSES.notAwarded
+                                        ? 'grey'
+                                        : 'default',
                               color: app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
                                 ? 'green'
                                 : app.status === APPLY_STATUSES.rejected
                                   ? 'red'
-                                : app.status === APPLY_STATUSES.rejected
-                                  ? 'green'
-                                  : app.status === APPLY_STATUSES.awarded
-                                    ? 'blue'
-                                    : app.status === APPLY_STATUSES.notAwarded
-                                      ? 'grey'
-                                      : 'default',
+                                  : app.status === APPLY_STATUSES.rejected
+                                    ? 'green'
+                                    : app.status === APPLY_STATUSES.awarded
+                                      ? 'blue'
+                                      : app.status === APPLY_STATUSES.notAwarded
+                                        ? 'grey'
+                                        : 'default',
                               borderRadius: '16px',
                               px: 1,
                               mb: 2,
                             }}
                           />
                         </Box>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                       {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                           <b>Applied User: </b>
                           <a
                             href="javascript:void(0);"
@@ -717,7 +723,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             }}
                           >{app.firstName} {app.lastName}
                           </a>
-                        </Typography>
+                        </Typography>}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
