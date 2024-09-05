@@ -20,6 +20,8 @@ import { EXHIBITION_STATUSES } from '../constants/status.constant';
 import axiosInstance from '../services/axios.service';
 import { pubsub } from '../services/pubsub.service';
 import { PUB_SUB_ACTIONS } from '../constants/pubsub.constant';
+import UserDrawer from '../component/UserNameSeperate/UserDrawer';
+import { User } from '../component/Freelancer&InnovatorsCard';
 
 interface Exhibition {
   _id?: string;
@@ -58,6 +60,7 @@ interface Booth {
   userId: {
     firstName: string;
     lastName: string;
+    username?: string;
     _id: string;
   };
   status: string;
@@ -95,6 +98,9 @@ const ExhibitionsPage: React.FC = () => {
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
   const [interestType, setInterestType] = useState<string>('InterestedUserForExhibition');
 
+  const [selectedUser, setSelectedUser] = React.useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
+
   const fetchVisitorsforExhibition = async () => {
     try {
       const exhibitionId = searchParams.get('exhibitionId');
@@ -114,13 +120,13 @@ const ExhibitionsPage: React.FC = () => {
 
       // Remove duplicates based on username and interestType
       const uniqueVisitors = response.data.filter((visitor1: Visitor, index: number, self: Visitor[]) =>
-        index === self.findIndex((v:Visitor) =>
+        index === self.findIndex((v: Visitor) =>
           v.interestType === visitor1.interestType && v.username === visitor1.username
         )
       );
 
       // Check if the current user is in the list of unique visitors
-      const isCurrentUserInterested = uniqueVisitors.some((visitor:Visitor) => visitor.userId === userDetails._id);
+      const isCurrentUserInterested = uniqueVisitors.some((visitor: Visitor) => visitor.userId === userDetails._id);
       setIsInterestedBtnShow(!isCurrentUserInterested);
 
       // Store unique visitors
@@ -131,7 +137,7 @@ const ExhibitionsPage: React.FC = () => {
     }
   };
 
-  const getBoothName = (elem:Visitor) => {
+  const getBoothName = (elem: Visitor) => {
     const tmpBooth = booths.find(val => val._id === elem.boothId);
     return tmpBooth?.title || "Test"
   }
@@ -164,24 +170,32 @@ const ExhibitionsPage: React.FC = () => {
       }
     };
 
+    const filerBoothBasedOnRoles = (tmpBooths: Booth[]) => {
+
+      setBooths(tmpBooths);
+
+      const userHasBooth = tmpBooths.some((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
+      setHasUserBooth(userHasBooth);
+      setParticipateButtonVisible(!userHasBooth);
+    }
+
     const fetchBooths = async () => {
       try {
-        pubsub.publish(PUB_SUB_ACTIONS.backDropOpen, { message: 'Backdrop modal open' });
+        const exhibitionId = searchParams.get('exhibitionId');
+        if (!exhibitionId) {
+          console.error('id not found');
+          return;
+        }
         const response = await axiosInstance.get(`${APIS.GET_BOOTH}`, {
           params: {
             userId: userDetails?._id,
+            exhibitionId,
             status: statusFilter === 'All' ? '' : statusFilter,
           },
         });
 
-        const booths = response.data;
+        filerBoothBasedOnRoles(response.data);
 
-        setBooths(booths);
-
-        pubsub.publish(PUB_SUB_ACTIONS.backDropClose, { message: 'Backdrop modal Close' });
-        const userHasBooth = booths.some((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
-        setHasUserBooth(userHasBooth);
-        setParticipateButtonVisible(!userHasBooth);
       } catch (error) {
         console.error('Error fetching booths:', error);
       }
@@ -209,7 +223,7 @@ const ExhibitionsPage: React.FC = () => {
         try {
           const response = await axiosInstance.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
             params: { interestType, exhibitionId },
-            
+
           });
           setVisitors(response.data);
         } catch (error) {
@@ -379,6 +393,17 @@ const ExhibitionsPage: React.FC = () => {
   };
 
   const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === EXHIBITION_STATUSES.close;
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleUserClick = (username: string) => {
+    console.log("username", username)
+    setSelectedUser(username || '');
+    setDrawerOpen(true);
+  };
 
 
   return (
@@ -581,7 +606,7 @@ const ExhibitionsPage: React.FC = () => {
                         return booth.status === statusFilter;
                       }
                     })
-                    .filter(booth => userType === 'Innovators' || userType === 'Admin' || booth.status === 'Approved')
+                    .filter(booth => ((userType === 'Innovators' || userType === 'Visitors') && booth.status === 'Approved') || userType === 'Admin')
                     .map(booth => (
                       <Grid item xs={12} sm={6} md={4} key={booth._id}>
                         <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
@@ -635,7 +660,19 @@ const ExhibitionsPage: React.FC = () => {
                               </Box>
                             ))}
 
-                            <Typography>{booth.userId.firstName} {booth.userId.lastName}</Typography>
+                            
+                            {userType === 'Admin' ? <Typography><a
+                              href="javascript:void(0);"
+                              onClick={(e) => {
+                                handleUserClick(booth?.userId?.username || "")
+                              }}
+                              style={{
+                                textDecoration: 'underline',
+                                color: '#1976d2',
+                                fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                              }}
+                            >{booth?.userId?.firstName} {booth?.userId?.lastName}
+                            </a></Typography> : ''}
                             <Typography>Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}</Typography>
                             <Box sx={{
                               position: 'relative', left: '76%', width: '48%', bottom: '45px', '@media (max-width: 767px)': {
@@ -753,6 +790,14 @@ const ExhibitionsPage: React.FC = () => {
               />
             )}
           </div>
+
+          {selectedUser && (
+            <UserDrawer
+              open={drawerOpen}
+              onClose={handleDrawerClose}
+              username={selectedUser}
+            />
+          )}
         </Box>
       )}
     </>

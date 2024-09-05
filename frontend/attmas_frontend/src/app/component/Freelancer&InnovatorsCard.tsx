@@ -17,7 +17,7 @@ import UserFullName from './UserNameSeperate/UserFullName';
 import Filters, { FilterColumn } from './filter/filter.component';
 import axiosInstance from '../services/axios.service';
 
-interface User {
+export interface User {
   _id: string;
   firstName: string;
   lastName: string;
