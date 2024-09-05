@@ -1,25 +1,19 @@
 import React from 'react';
 import { Box, TextField, Button, RadioGroup, FormControlLabel, Radio, FormHelperText, Typography } from '@mui/material';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field, ErrorMessage, FormikValues } from 'formik';
 import * as Yup from 'yup';
+import { Proposal } from '@/app/proposal/page';
 
 interface ProposalStep1Props {
+    initialValues?: Proposal | null;
     onNext: (values: any) => void;
+    readOnly?: boolean; // Add readOnly prop
 }
 
-const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
+const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext, initialValues, readOnly }) => {
     return (
         <Formik
-            initialValues={{
-                industryProblem: '',
-                impactProductOutput: '',
-                natureOfProject: '',
-                haveTechnology: '',
-                patentPreference: '',
-                projectObjective: '',
-                projectOutline: '',
-                marketNiche: ''
-            }}
+            initialValues={initialValues as FormikValues}
             validationSchema={Yup.object({
                 natureOfProject: Yup.string().required('Nature of Project is required'),
                 patentPreference: Yup.string().required('Patent Preference is required'),
@@ -37,6 +31,7 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             multiline
                             rows={4}
                             fullWidth
+                            InputProps={{ readOnly: readOnly }} // Set readOnly
                             error={touched.industryProblem && !!errors.industryProblem}
                             helperText={<ErrorMessage name="industryProblem" />}
                         />
@@ -49,6 +44,7 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             multiline
                             rows={4}
                             fullWidth
+                            InputProps={{ readOnly: readOnly }} // Set readOnly
                             error={touched.impactProductOutput && !!errors.impactProductOutput}
                             helperText={<ErrorMessage name="impactProductOutput" />}
                         />
@@ -64,23 +60,27 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             >
                                 <FormControlLabel
                                     value="Research, Development & Engineering (R,D & E) leading to production capability"
-                                    control={<Radio color='secondary'/>}
+                                    control={<Radio color='secondary' />}
                                     label="Research, Development & Engineering (R,D & E) leading to production capability"
+                                    disabled={readOnly} // Set disabled
                                 />
                                 <FormControlLabel
                                     value="Application oriented Research, Design and Development (R,D&D) having production potential"
-                                    control={<Radio color='secondary'/>}
+                                    control={<Radio color='secondary' />}
                                     label="Application oriented Research, Design and Development (R,D&D) having production potential"
+                                    disabled={readOnly} // Set disabled
                                 />
                                 <FormControlLabel
                                     value="Basic R&D addressing the Industry problem but needs efforts to take it to applied research or production capability"
                                     control={<Radio color='secondary' />}
                                     label="Basic R&D addressing the Industry problem but needs efforts to take it to applied research or production capability"
+                                    disabled={readOnly} // Set disabled
                                 />
                                 <FormControlLabel
                                     value="Do you already have a technology that meets the requirement of the industry problem statement shared? If yes, can you elaborate?"
                                     control={<Radio color='secondary' />}
                                     label="Do you already have a technology that meets the requirement of the industry problem statement shared? If yes, can you elaborate?"
+                                    disabled={readOnly} // Set disabled
                                 />
                             </RadioGroup>
                             <FormHelperText error={touched.natureOfProject && !!errors.natureOfProject}>
@@ -96,12 +96,12 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             multiline
                             rows={4}
                             fullWidth
+                            InputProps={{ readOnly: readOnly }} // Set readOnly
                             error={touched.haveTechnology && !!errors.haveTechnology}
                             helperText={<ErrorMessage name="haveTechnology" />}
                         />
 
                         <Box sx={{ padding: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-
                             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                                 Are you fine if the Patent is as follows:
                             </Typography>
@@ -115,16 +115,19 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                                     value="Patent is only with the Industry member"
                                     control={<Radio color='secondary' />}
                                     label="Patent is only with the Industry member"
+                                    disabled={readOnly} // Set disabled
                                 />
                                 <FormControlLabel
                                     value="Joint patent with Industry member"
                                     control={<Radio color='secondary' />}
                                     label="Joint patent with Industry member"
+                                    disabled={readOnly} // Set disabled
                                 />
                                 <FormControlLabel
                                     value="Public patent which means anyone can use the technology for larger good"
                                     control={<Radio color='secondary' />}
                                     label="Public patent which means anyone can use the technology for larger good"
+                                    disabled={readOnly} // Set disabled
                                 />
                             </RadioGroup>
                             <FormHelperText error={touched.patentPreference && !!errors.patentPreference}>
@@ -140,6 +143,7 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             multiline
                             rows={4}
                             fullWidth
+                            InputProps={{ readOnly: readOnly }} // Set readOnly
                             error={touched.projectObjective && !!errors.projectObjective}
                             helperText={<ErrorMessage name="projectObjective" />}
                         />
@@ -152,6 +156,7 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             multiline
                             rows={4}
                             fullWidth
+                            InputProps={{ readOnly: readOnly }} // Set readOnly
                             error={touched.projectOutline && !!errors.projectOutline}
                             helperText={<ErrorMessage name="projectOutline" />}
                         />
@@ -164,13 +169,14 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext }) => {
                             multiline
                             rows={4}
                             fullWidth
+                            InputProps={{ readOnly: readOnly }} // Set readOnly
                             error={touched.marketNiche && !!errors.marketNiche}
                             helperText={<ErrorMessage name="marketNiche" />}
                         />
 
-                        <Button type="submit" variant="contained" sx={{ width: '50%', margin: 'auto' }}>
-                            Next
-                        </Button>
+                            <Button type="submit" variant="contained" sx={{ width: '50%', margin: 'auto' }}>
+                                Next
+                            </Button>
                     </Box>
                 </Form>
             )}
