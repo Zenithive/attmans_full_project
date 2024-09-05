@@ -456,6 +456,7 @@ const proposal = () => {
     const handleViewProposal = (proposal: Proposal) => {
         setSelectedProposal(proposal); // Set the selected proposal in state
         setCurrentStep(1); // Set to the first step
+        setStep(1);
         setOpen(true); // Open the dialog
     };
 
@@ -854,14 +855,14 @@ const proposal = () => {
 
                     {step === 1 && <ProposalStep1 onNext={handleNextStep} 
                     initialValues={selectedProposal || null}
-                    readOnly= {true}
+                    readOnly= {selectedProposal ? true : false}
                     />}
 
 
 
                     {step === 2 && <ProposalStep2  
                     initialValues={selectedProposal || null}
-                    readOnly= {true}
+                    readOnly= {selectedProposal ? true : false}
                     onNext={handleNextStep} 
                     onPrevious={handlePreviousStep} 
                      />}
@@ -870,7 +871,7 @@ const proposal = () => {
 
                     {step === 3 && <ProposalStep3 
                     initialValues={selectedProposal || null}
-                    readOnly= {true}
+                    readOnly= {selectedProposal ? true : false}
                     onSubmit={handleSubmit} 
                     onPrevious={handlePreviousStep} 
                     />}

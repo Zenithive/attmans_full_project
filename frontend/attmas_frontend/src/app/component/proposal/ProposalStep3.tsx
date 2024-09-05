@@ -24,7 +24,16 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
   
     return (
       <Formik
-        initialValues={initialValues as FormikValues}
+        initialValues={(initialValues || {
+            otherCommitments: '',
+            progressReportTemplate: '',
+            milestones: '',
+            totalDaysCompletion: '',
+            labStrengths: '',
+            externalEquipment: '',
+            pilotProductionTesting: '',
+            mentoringRequired: '',
+        }) as FormikValues}
         onSubmit={(values) => onSubmit(values)}
       >
         {({ handleSubmit }) => (

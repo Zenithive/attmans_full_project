@@ -11,9 +11,19 @@ interface ProposalStep1Props {
 }
 
 const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext, initialValues, readOnly }) => {
+    
     return (
         <Formik
-            initialValues={initialValues as FormikValues}
+            initialValues={(initialValues || {
+                industryProblem: '',
+                impactProductOutput: '',
+                natureOfProject: '',
+                haveTechnology: '',
+                patentPreference: '',
+                projectObjective: '',
+                projectOutline: '',
+                marketNiche: ''
+            }) as FormikValues}
             validationSchema={Yup.object({
                 natureOfProject: Yup.string().required('Nature of Project is required'),
                 patentPreference: Yup.string().required('Patent Preference is required'),
@@ -55,7 +65,7 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext, initialValues, re
                             </Typography>
                             <RadioGroup
                                 name="natureOfProject"
-                                value={values.natureOfProject}
+                                value={values?.natureOfProject || ''}
                                 onChange={(e) => setFieldValue('natureOfProject', e.target.value)}
                             >
                                 <FormControlLabel
