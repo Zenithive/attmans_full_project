@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import axiosInstance from '@/app/services/axios.service';
 
 export const useProfileForm = (initialValues: any, onSubmit: (values: any) => Promise<void>) => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -44,7 +44,7 @@ export const useProfileForm = (initialValues: any, onSubmit: (values: any) => Pr
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${SERVER_URL}/profile/profileByUsername?username=${userDetails.username}`);
+        const response = await axiosInstance.get(`/profile/profileByUsername?username=${userDetails.username}`);
         const userData = response.data;
         formik.setValues({
           ...formik.values,

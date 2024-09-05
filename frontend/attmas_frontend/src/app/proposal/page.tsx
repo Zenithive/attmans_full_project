@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -22,6 +21,7 @@ import { DATE_FORMAT } from '../constants/common.constants';
 import ApplyDetailsDialog from '../component/projectsDetails/projectDetails';
 import ConfirmationDialog from '../component/All_ConfirmationBox/ConfirmationDialog';
 import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/constants/status.constant';
+import axiosInstance from '../services/axios.service';
 
 interface Proposal {
     _id: string;
@@ -109,7 +109,7 @@ const proposal = () => {
 
     const fetchAllProjects = useCallback(async () => {
         try {
-            const response = await axios.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
+            const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
                 params: {
                     userId: userDetails._id, // Include userId in the request
 
@@ -125,7 +125,7 @@ const proposal = () => {
     const fetchAllProposals = useCallback(async () => {
         if (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') {
             try {
-                const response = await axios.get(APIS.GET_ALL_PROPOSALS);
+                const response = await axiosInstance.get(APIS.GET_ALL_PROPOSALS);
                 console.log('Fetched Proposals:', response.data);
                 setProposals(response.data);
             } catch (error) {
@@ -165,7 +165,7 @@ const proposal = () => {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             try {
-                const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
+                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
                 console.log('respons page', response.data);
                 const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
                 console.log('fetchedAppliedJobs', fetchedAppliedJobs);
@@ -219,7 +219,7 @@ const proposal = () => {
 
         // Submit finalValues to the backend
         try {
-            await axios.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
+            await axiosInstance.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
             setOpen(false);
             setHasSubmittedProposal(true);
             setStep(1);
@@ -234,7 +234,7 @@ const proposal = () => {
     useEffect(() => {
         const checkProposalStatus = async () => {
           try {
-            const response = await axios.get(`${SERVER_URL}/proposals/check`, {
+            const response = await axiosInstance.get(`${SERVER_URL}/proposals/check`, {
               params: {
                 userID: userId,
                 applyId: selectedApply?._id, 
@@ -268,7 +268,7 @@ const proposal = () => {
 
     const handleConfirmation = async (status: 'Approved' | 'Rejected', comment: string) => {
         try {
-            await axios.put(`${SERVER_URL}/proposals/${selectedProposalId}/status`, {
+            await axiosInstance.put(`/proposals/${selectedProposalId}/status`, {
                 status,
                 comment
             });
@@ -297,7 +297,7 @@ const proposal = () => {
             //   jobId, // Include jobId in the payload
             // });
 
-            await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+            await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
                 jobId: viewingJob?._id, // Include jobId in the payload
                 Comment
             });
@@ -364,7 +364,7 @@ const proposal = () => {
     }
 
     const fetchProjectDetails = async (application: Apply) => {
-        const response = await axios.get(`${APIS.JOBS}?projId=${application.jobId}`);
+        const response = await axiosInstance.get(`${APIS.JOBS}?projId=${application.jobId}`);
         console.log("fetchProjectDetails", response.data)
         if (response.data && response.data.length) {
             showProposalModal({ ...application, jobDetails: { ...response.data[0] } });

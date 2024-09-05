@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Grid, TextField, Chip, Button, IconButton, Card, CardContent, Typography, Box, Divider, CircularProgress } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import ProjectDrawer from '../projectDrwer/projectDrwer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
@@ -11,6 +10,7 @@ import AddComment from '../projectComment/projectComment';
 import dayjs from 'dayjs';
 import ApplicationsForProject from '../applicationforproject/applicationforproject';
 import { APPLY_STATUSES } from '@/app/constants/status.constant';
+import axiosInstance from '@/app/services/axios.service';
 
 export interface Job {
     _id?: string;
@@ -136,7 +136,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
             console.log('Fetching applications for job ID:', viewingJob._id);
             const fetchApplications = async () => {
                 try {
-                    const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
+                    const response = await axiosInstance.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
                     console.log('Applications fetched:', response.data);
                     setApplicationsBasedOnUser(response.data);
                 } catch (error) {
@@ -154,7 +154,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 if (app._id) {
                     const fetchMilestonesForApply = async (applyId: string) => {
                         try {
-                            const response = await axios.get(`${APIS.MILESTONES}/apply/${applyId}`);
+                            const response = await axiosInstance.get(`${APIS.MILESTONES}/apply/${applyId}`);
 
                             if (Array.isArray(response.data)) {
                                 const milestoneData = response.data.map((milestone: Milestone) => {
@@ -239,7 +239,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         }));
 
         try {
-            await axios.post(`${APIS.MILESTONES}/submit-comment`, { applyId, milestoneIndex, comment });
+            await axiosInstance.post(`${APIS.MILESTONES}/submit-comment`, { applyId, milestoneIndex, comment });
 
             setMilestones(prevState => {
                 const updatedMilestones = { ...prevState };
@@ -298,7 +298,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
     const fetchCommentsForJob = async (jobId: string) => {
         try {
-            const response = await axios.get(`${APIS.GET_COMMENT}/jobId/${jobId}`);
+            const response = await axiosInstance.get(`${APIS.GET_COMMENT}/jobId/${jobId}`);
             console.log('Comments fetched:', response.data);
         } catch (error) {
             console.error('Error fetching comments:', error);

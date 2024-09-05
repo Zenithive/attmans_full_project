@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants, Grid } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -18,6 +17,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import axiosInstance from '@/app/services/axios.service';
 
 interface AddApplyProps {
   open: boolean;
@@ -118,7 +118,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
         applyType: 'FreelancerApply',
       };
 
-      const applyResponse = await axios.post(APIS.APPLY, applyData);
+      const applyResponse = await axiosInstance.post(APIS.APPLY, applyData);
       const applyId = applyResponse.data._id;
 
       const milestonePromises = values.milestones.map(milestone => {
@@ -132,7 +132,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
           applyId: applyId,
         };
 
-        return axios.post(APIS.MILESTONES, formattedMilestone);
+        return axiosInstance.post(APIS.MILESTONES, formattedMilestone);
       });
 
       await Promise.all(milestonePromises);

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
+import axiosInstance from '@/app/services/axios.service';
 
 interface JobDetailProps {
   jobId: string;
@@ -17,7 +17,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
 
   const fetchJobDetails = async () => {
     try {
-      const response = await axios.get(`${APIS.JOBS}/${jobId}`);
+      const response = await axiosInstance.get(`${APIS.JOBS}/${jobId}`);
       setJob(response.data);
     } catch (error) {
       console.error('Error fetching job details:', error);
@@ -26,7 +26,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`${APIS.GET_COMMENT}/job/${jobId}/apply/${applyId}`);
+      const response = await axiosInstance.get(`${APIS.GET_COMMENT}/job/${jobId}/apply/${applyId}`);
       setJob((prevJob: any) => ({ ...prevJob, comments: response.data }));
     } catch (error) {
       console.error('Error fetching comments:', error);

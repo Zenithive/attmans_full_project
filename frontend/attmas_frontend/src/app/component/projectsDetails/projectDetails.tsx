@@ -19,7 +19,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
@@ -27,6 +26,7 @@ import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { PROPOSAL_STATUSES } from '@/app/constants/status.constant';
+import axiosInstance from '@/app/services/axios.service';
 
 
 
@@ -110,7 +110,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   useEffect(() => {
     console.log('apply', apply);
     if (apply?._id) {
-      axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
+      axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
         .then(response => {
           console.log("Fetched milestones:", response.data);
           setMilestones(response.data);
@@ -134,7 +134,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const fetchAllProposals = useCallback(async () => {
     if (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') {
       try {
-        const response = await axios.get(APIS.GET_ALL_PROPOSALS);
+        const response = await axiosInstance.get(APIS.GET_ALL_PROPOSALS);
         console.log('Fetched Proposals:', response.data);
         setProposals(response.data);
       } catch (error) {
@@ -153,14 +153,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
       if (!applicationId) return;
       console.log("applicationId", applicationId);
 
-
-      // First, award the selected application
-      // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
-      // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
-      //   jobId, // Include jobId in the payload
-      // });
-
-      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+      await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
         jobId, // Include jobId in the payload
         Comment
       });
@@ -171,9 +164,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
           ? { ...app, status: 'Awarded' }
           : { ...app, status: 'Not Awarded' }
       );
-
-      // Make an API call to update all applications' statuses on the server
-      // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
 
       // Update the local state with the new statuses
       setApplications(updatedApplications);
@@ -231,7 +221,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     try {
       setIsResubmitting(true);
       console.log(`Resubmitting milestone ${milestoneIndex} for applyId ${applyId} with comment: ${comment}`);
-      await axios.post(`${APIS.MILESTONES}/resubmit`, {
+      await axiosInstance.post(`${APIS.MILESTONES}/resubmit`, {
         applyId,
         milestoneIndex,
         resubmitComment: comment
@@ -292,12 +282,27 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   },
                 }}
               >
-                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right', fontSize: 14, mb: 0.5 }}>
                   Status: {apply.status}
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right' }}>
+                <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right', fontSize: 14, mb: 0.5 }}>
                   Date: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
                 </Typography>
+                {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1, ml: 2, textAlign: 'right', fontSize: 14 }}>
+                    <b>Applied User: &nbsp;</b>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={(e) => {
+                        handleUserClick(apply?.userId?.username || "")
+                      }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#1976d2',
+                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                      }}
+                    >{apply?.userId?.firstName} {apply?.userId?.lastName}
+                    </a>
+                  </Typography>}
               </Box>
               <Grid container spacing={2} flexDirection={'column'}>
                 <Grid item xs={12} sm={5}>
@@ -318,18 +323,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     fullWidth
                     color='secondary'
                     aria-readonly
-                    sx={{ mb: 2 }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                  <TextField
-                    onClick={() => handleUserClick(apply?.userId?.username || "")}
-                    label="Applied User"
-                    value={`${apply.firstName} ${apply.lastName}`}
-                    fullWidth
-                    color='secondary'
-                    aria-readonly
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 1 }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -339,7 +333,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     fullWidth
                     color='secondary'
                     aria-readonly
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 1 }}
                   />
                 </Grid>
                 <Grid item xs={12}>

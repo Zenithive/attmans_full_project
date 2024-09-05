@@ -5,13 +5,13 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { pubsub } from '@/app/services/pubsub.service';
 import defaultProfileImg from '../../assets/Zenithithive Logo Black PNG  (1).png'
+import axiosInstance from '@/app/services/axios.service';
 
 
 const defaultProfileImgSrc = defaultProfileImg || defaultProfileImg;
@@ -66,7 +66,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
         formData.append(key, (values as any)[key]);
       });
 
-      await axios.post(APIS.FORM1, formData, {
+      await axiosInstance.post(APIS.FORM1, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
