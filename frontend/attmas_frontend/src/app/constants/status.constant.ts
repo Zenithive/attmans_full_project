@@ -12,6 +12,7 @@ export const APPLY_STATUSES = {
   rejected: "Rejected",
   approvedPendingForProposal: "Approved, Pending for Proposal",
   approvedPendingForProposalINNOVATORS: "Approved",
+  proposalApprovalPending: 'Proposal Approval Pending',
   proposalSubmitted: "Proposal Submitted",
   proposalUnderReview: 'Proposal Under Review',
   awarded: "Awarded",
@@ -20,6 +21,7 @@ export const APPLY_STATUSES = {
 
 export const PROPOSAL_STATUSES = {
   pending: "Pending",
+  proposalUnderReview: 'Proposal Under Review',
   approvedAndAwarded: "Approved and Awarded",
   rejected: "Rejected",
 };

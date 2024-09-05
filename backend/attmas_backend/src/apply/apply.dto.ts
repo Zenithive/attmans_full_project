@@ -15,6 +15,7 @@ export class CreateApplyDto {
   TimeFrame: Date;
 
   @IsNotEmpty()
+  @IsString()
   userId: Types.ObjectId;
 
   @IsNotEmpty()

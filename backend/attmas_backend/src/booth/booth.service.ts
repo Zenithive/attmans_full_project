@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Types } from 'mongoose';
-import { Booth, BoothDocument, Product } from './booth.schema';
+import { Model, Types } from 'mongoose';
+import { Booth, BoothDocument } from './booth.schema';
 import { CreateBoothDto } from './create-booth.dto';
 import { User, UserDocument } from 'src/users/user.schema';
 import {
@@ -22,7 +22,7 @@ export class BoothService {
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
     private emailService: EmailService2,
-  ) { }
+  ) {}
 
   // async create(createBoothDto: CreateBoothDto): Promise<Booth> {
   //   console.log('Booth Products:', createBoothDto.products);
@@ -88,37 +88,43 @@ export class BoothService {
   //   console.log('exhibition', exhibition);
   //   return booth;
   // }
-  
+
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
     console.log('Booth Products:', createBoothDto.products);
-  
+
     let exhibitionId: Types.ObjectId;
-    
+
     // Convert `exhibitionId` to ObjectId if it is a string
-    if (typeof createBoothDto.exhibitionId === 'string' && Types.ObjectId.isValid(createBoothDto.exhibitionId)) {
+    if (
+      typeof createBoothDto.exhibitionId === 'string' &&
+      Types.ObjectId.isValid(createBoothDto.exhibitionId)
+    ) {
       exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
     } else if (createBoothDto.exhibitionId instanceof Types.ObjectId) {
       exhibitionId = createBoothDto.exhibitionId;
     } else {
       throw new Error('Invalid exhibitionId');
     }
-  
+
     const existingBooth = await this.boothModel.findOne({
       exhibitionId,
       userId: createBoothDto.userId,
     });
-  
+
     if (existingBooth) {
       throw new Error('You have already participated in this exhibition');
     }
-  
-    const createdBooth = new this.boothModel({ ...createBoothDto, exhibitionId });
+
+    const createdBooth = new this.boothModel({
+      ...createBoothDto,
+      exhibitionId,
+    });
     const booth = await createdBooth.save();
-  
-    const newProducts = createBoothDto.products.filter(
-      (product) => !product._id,
-    );
-  
+
+    // const newProducts = createBoothDto.products.filter(
+    //   (product) => !product._id,
+    // );
+
     // Update WorkExperience if needed
     // if (newProducts.length > 0) {
     //   await this.workExperienceModel.updateOne(
@@ -126,20 +132,20 @@ export class BoothService {
     //     { $push: { products: { $each: newProducts } } },
     //   );
     // }
-  
+
     this.sendEmailToExhibition(exhibitionId, booth);
-  
+
     console.log('Booth created:', booth);
     return booth;
   }
-  
+
   // Email sending method remains the same
   async sendEmailToExhibition(exhibitionId: Types.ObjectId, booth: Booth) {
     const exhibition = await this.exhibitionModel
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
-  
+
     if (exhibition) {
       const { username } = exhibition;
       await this.emailService.sendEmailtoExhibition(
@@ -152,7 +158,6 @@ export class BoothService {
     }
     console.log('Exhibition email sent:', exhibition);
   }
-
 
   async findAll(status?: string): Promise<Booth[]> {
     const filter = status ? { status } : {};
@@ -206,8 +211,6 @@ export class BoothService {
   //     },
   //   ]).exec();
   // }
-
-
 
   async findOne(id: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id).exec();
@@ -286,12 +289,12 @@ export class BoothService {
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
-      console.log("exhibition", exhibition);
-      console.log("exhibition.userId", exhibition.userId);
+    console.log('exhibition', exhibition);
+    console.log('exhibition.userId', exhibition.userId);
     if (exhibition && exhibition.userId) {
-      console.log("exhibition", exhibition);
-      console.log("exhibition.userId", exhibition.userId);
-      
+      console.log('exhibition', exhibition);
+      console.log('exhibition.userId', exhibition.userId);
+
       const innovator = await this.userModel.findById(booth.userId);
       if (innovator) {
         await this.emailService.sendBoothStatusEmail(
@@ -313,7 +316,6 @@ export class BoothService {
 
     return booth;
   }
-
 
   async rejectBooth(id: string, comment: string): Promise<Booth> {
     const booth = await this.boothModel.findById(id);

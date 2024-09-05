@@ -1,4 +1,9 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Document, Model, Types } from 'mongoose';
+import { Apply } from 'src/apply/apply.schema';
+import {
+  PROPOSAL_STATUSES,
+  APPLY_STATUSES,
+} from 'src/common/constant/status.constant';
 
 // Define the schema for the proposal data
 export const ProposalSchema = new Schema({
@@ -36,9 +41,9 @@ export const ProposalSchema = new Schema({
     },
   ],
 
-  pastCredentials: { type: String, required: true },
-  briefProfile: { type: String, required: true },
-  proposalOwnerCredentials: { type: String, required: true },
+  pastCredentials: { type: String, required: false },
+  briefProfile: { type: String, required: false },
+  proposalOwnerCredentials: { type: String, required: false },
 
   otherCommitments: { type: String, required: true },
   progressReportTemplate: { type: String, required: true },
@@ -50,9 +55,10 @@ export const ProposalSchema = new Schema({
   mentoringRequired: { type: String, required: true },
 
   // New fields added
-  userID: { type: String, required: false },
+  userID: { type: Types.ObjectId, required: false },
   userName: { type: String, required: false },
-  projectId: { type: String, required: false },
+  projectId: { type: Types.ObjectId, required: false },
+  applyId: { type: Schema.Types.ObjectId, required: false },
   projectTitle: { type: String, required: false },
   projectCurrency: { type: String, required: false },
   Status: { type: String, required: false },
@@ -106,10 +112,10 @@ export interface Proposal extends Document {
   mentoringRequired: string;
 
   // New fields added to the interface
-  userID?: string;
+  userID?: Types.ObjectId;
   userName?: string;
-  projectId: string;
-  applyId: string;
+  projectId: Types.ObjectId;
+  applyId: Types.ObjectId;
   projectTitle: string;
   projectCurrency: string;
   Status: string;
@@ -117,3 +123,27 @@ export interface Proposal extends Document {
   lastname: string;
   comment: string;
 }
+
+ProposalSchema.post('save', async function (doc: Proposal) {
+  const ApplyModel = this.model('Apply') as Model<Apply>;
+  const statusMatchObj = {
+    [PROPOSAL_STATUSES.pending]: APPLY_STATUSES.proposalApprovalPending,
+    [PROPOSAL_STATUSES.proposalUnderReview]: APPLY_STATUSES.proposalUnderReview,
+    [PROPOSAL_STATUSES.approvedAndAwarded]: APPLY_STATUSES.awarded,
+    [PROPOSAL_STATUSES.rejected]: APPLY_STATUSES.rejected,
+  };
+  console.log('statusMatchObj', statusMatchObj);
+
+  console.log(this, 'doc.Status:', doc.Status);
+  try {
+    const result = await ApplyModel.updateOne(
+      {
+        _id: doc.applyId,
+      },
+      { $set: { status: statusMatchObj[doc.Status] } },
+    ).exec();
+    console.log('Update result:', result);
+  } catch (error) {
+    console.error('Error updating ApplyModel:', error);
+  }
+});

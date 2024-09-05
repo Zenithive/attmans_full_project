@@ -46,4 +46,18 @@ export class ProposalController {
   ) {
     return this.proposalService.updateStatusProposal(id, status, comment);
   }
+
+  // @Get('check-submission/:userID/:applyId')
+  // async checkSubmission(
+  //   @Param('userID') userID: string,
+  //   @Param('applyId') applyId: string,
+  // ): Promise<{ hasSubmittedProposal: boolean }> {
+  //   const hasSubmittedProposal =
+  //     await this.proposalService.hasSubmittedProposal(
+  //       userID as unknown as Types.ObjectId,
+  //       applyId as unknown as Types.ObjectId,
+  //     );
+  //   console.log('hasSubmittedProposal', hasSubmittedProposal);
+  //   return { hasSubmittedProposal };
+  // }
 }

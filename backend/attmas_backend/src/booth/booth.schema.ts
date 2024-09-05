@@ -6,18 +6,14 @@ export type BoothDocument = Booth & Document;
 
 @Schema()
 export class Product {
-
-
   @Prop({ type: Types.ObjectId, required: false }) // Specify type as ObjectId
   _id?: Types.ObjectId;
 
   @Prop({ required: false })
   productName: string;
 
-
   @Prop({ required: false })
   CompetitiveAdvantages: string;
-
 
   @Prop({ required: false })
   challengesorrisks: string;
@@ -42,7 +38,7 @@ export class Product {
 
   @Prop({ required: false })
   productDescription: string;
-  
+
   @Prop({ required: false })
   productPrice: number;
   @Prop({ required: false })
@@ -55,7 +51,6 @@ export class Product {
   technologyused: string;
   @Prop({ required: false })
   videourlForproduct: string;
-  
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

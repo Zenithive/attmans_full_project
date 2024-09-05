@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button, Link } from '@mui/material';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -18,9 +18,13 @@ import ProposalStep3 from '../component/proposal/ProposalStep3'
 import ProposalConfirmationDialog from '../component/All_ConfirmationBox/ProposalConfirmationDialog';
 import UserDrawer from '../component/UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '../constants/common.constants';
+import ApplyDetailsDialog from '../component/projectsDetails/projectDetails';
+import ConfirmationDialog from '../component/All_ConfirmationBox/ConfirmationDialog';
+import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '../services/axios.service';
+import { pubsub } from '../services/pubsub.service';
 
-interface Proposal {
+export interface Proposal {
     _id: string;
     projectTitle: string;
     Status: string;
@@ -30,7 +34,56 @@ interface Proposal {
     jobDetails: JobDetails;
     userId?: UserSchema;
     userName: string;
+    applyId: string;
+    industryProblem: string;
+    impactProductOutput: string;
+    natureOfProject: string;
+    haveTechnology: string;
+    patentPreference: string;
+    projectObjective: string;
+    projectOutline: string;
+    marketNiche: string;
+
+    otherCommitments: string;
+    progressReportTemplate: string;
+    milestones: string;
+    totalDaysCompletion: string;
+    labStrengths: string;
+    externalEquipment: string;
+    pilotProductionTesting: string;
+    mentoringRequired: string;
+
 }
+
+export interface ProposalStep2Values {
+  isPeerReviewed: string;
+  expectedOutcome: string;
+  detailedMethodology: string;
+  physicalAchievements: string;
+  budgetOutlay: BudgetOutlay[];
+  manpowerDetails: ManpowerDetail[];
+  pastCredentials: string;
+  briefProfile: string;
+  proposalOwnerCredentials: string;
+}
+
+export interface BudgetOutlay {
+    head: string;
+    firstYear: string;
+    secondYear: string;
+    thirdYear: string;
+    total: string;
+  }
+  
+ export interface ManpowerDetail {
+    designation: string;
+    monthlySalary: string;
+    firstYear: string;
+    secondYear: string;
+    totalExpenditure: string;
+  }
+  
+  
 
 interface JobDetails {
 
@@ -60,16 +113,26 @@ const proposal = () => {
     const [projects, setProjects] = useState<Apply[]>([]);
     const [selectedUser, setSelectedUser] = React.useState<string>('');
     const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
-
+    const [selectedApply, setSelectedApply] = useState<Apply | null>(null);
+    const [applications, setApplications] = useState<Apply[]>([]);
+    const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
+    const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+    const [isAwardButtonVisible, setIsAwardButtonVisible] = useState(true);
 
     const [selectedProject, setSelectedProject] = useState<Job | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const [proposals, setProposals] = useState<Proposal[]>([]);
 
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [currentAction, setCurrentAction] = useState<'Approve' | 'Reject'>('Approve');
     const [selectedProposalId, setSelectedProposalId] = useState<string>('');
+    const [hasSubmittedProposal, setHasSubmittedProposal] = useState(false);
 
+
+    const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+    const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step
+    const [openDialog, setOpenDialog] = useState(false);
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -114,7 +177,7 @@ const proposal = () => {
     }, [userDetails._id]);
 
     const fetchAllProposals = useCallback(async () => {
-        if (userDetails.userType === 'Admin') {
+        if (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') {
             try {
                 const response = await axiosInstance.get(APIS.GET_ALL_PROPOSALS);
                 console.log('Fetched Proposals:', response.data);
@@ -152,22 +215,30 @@ const proposal = () => {
     }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
 
 
+    const fetchAppliedJobs = async () => {
+        try {
+            const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
+            console.log('respons page', response.data);
+            const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
+            console.log('fetchedAppliedJobs', fetchedAppliedJobs);
+            setAppliedJobs(fetchedAppliedJobs);
+            setApplications(response.data);
+        } catch (error) {
+            console.error('Error fetching applied jobs:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchAppliedJobs = async () => {
-            try {
-                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-                console.log('respons page', response.data);
-                const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-                console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-                setAppliedJobs(fetchedAppliedJobs);
-            } catch (error) {
-                console.error('Error fetching applied jobs:', error);
-            }
-        };
         fetchAppliedJobs();
     }, [userId]);
 
+    useEffect(() => {
+        pubsub.subscribe('ProposalRefetch', fetchAppliedJobs);
+
+        return () => {
+            pubsub.unsubscribe('ProposalRefetch', fetchAppliedJobs);
+        };
+    }, [fetchAppliedJobs]);
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         console.log("Viewing Job:", job);
@@ -188,12 +259,13 @@ const proposal = () => {
     };
 
     const handleSubmit = async (values: any) => {
-
+        console.log('values', values);
         const finalValues = {
             ...formValues, ...values,
             userID: userDetails._id,
             userName: userDetails.username,
-            projectId: selectedProject?._id,               // Correct
+            projectId: selectedProject?._id || viewingJob?._id,
+            applyId: selectedApply?._id,   // Correct
             projectTitle: selectedProject?.title,          // Correct
             // projectCurrency: selectedProject?.jobDetails?.currency,
             Status: 'Pending',
@@ -202,6 +274,7 @@ const proposal = () => {
             lastname: userDetails.lastName,
 
         };
+        console.log('finalValues', finalValues);
         console.log("finalValues.projectId", finalValues.projectId);
         console.log("finalValues.projectTitle", finalValues.projectTitle);
 
@@ -209,8 +282,10 @@ const proposal = () => {
         try {
             await axiosInstance.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
             setOpen(false);
+            setHasSubmittedProposal(true);
             setStep(1);
             setFormValues({});
+            pubsub.publish('ProposalRefetch' ,{Message:'Proposal Refetched'});
         } catch (error) {
             console.error('Error submitting proposal:', error);
         }
@@ -218,17 +293,39 @@ const proposal = () => {
 
 
 
+    // useEffect(() => {
+    //     const checkProposalStatus = async () => {
+    //       try {
+    //         const response = await axiosInstance.get(`${SERVER_URL}/proposals/check`, {
+    //           params: {
+    //             userID: userId,
+    //             applyId: selectedApply?._id, 
+    //           },
+    //         });
+    //         console.log('response for checkProposalStatus',response);
+    //         setHasSubmittedProposal(response.data !== null);
+    //       } catch (error) {
+    //         console.error('Error checking proposal status:', error);
+    //       }
+    //     };
+
+    //     checkProposalStatus();
+    //   }, [selectedApply?._id, userId]);
+
 
     const handleApprove = (proposalId: string) => {
+        setConfirmationOpen(true);
         setCurrentAction('Approve');
         setSelectedProposalId(proposalId);
-        setConfirmationOpen(true);
+
     };
 
     const handleReject = (proposalId: string) => {
-        setCurrentAction('Reject');
-        setSelectedProposalId(proposalId);
         setConfirmationOpen(true);
+        setCurrentAction('Reject');
+
+        setSelectedProposalId(proposalId);
+
     };
 
     const handleConfirmation = async (status: 'Approved' | 'Rejected', comment: string) => {
@@ -238,11 +335,137 @@ const proposal = () => {
                 comment
             });
             // Refresh the proposals list after update
-            fetchAllProposals();
+            setProposals(prevProposals =>
+                prevProposals.map(proposal =>
+                    proposal._id === selectedProposalId ? { ...proposal, Status: status } : proposal
+                )
+            );
+
+            setConfirmationOpen(false);
         } catch (error) {
             console.error('Error updating proposal status:', error);
         }
     };
+
+    const handleReward = async (applicationId: string, Comment: string) => {
+        try {
+            if (!applicationId) return;
+            console.log("applicationId", applicationId);
+
+
+            // First, award the selected application
+            // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
+            // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+            //   jobId, // Include jobId in the payload
+            // });
+
+            await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+                jobId: viewingJob?._id, // Include jobId in the payload
+                Comment
+            });
+
+            // Update all other applications to "Not Awarded"
+            const updatedApplications = applications.map((app) =>
+                app._id === applicationId
+                    ? { ...app, status: 'Awarded' }
+                    : { ...app, status: 'Not Awarded' }
+            );
+
+            // Make an API call to update all applications' statuses on the server
+            // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
+
+            // Update the local state with the new statuses
+            setApplications(updatedApplications);
+            // Hide the Award button
+            setIsAwardButtonVisible(false);
+
+            // Hide all the buttons
+            // setButtonsHidden((prev) => {
+            //   const updated = { ...prev };
+            //   Object.keys(updated).forEach((key) => {
+            //     updated[key] = true;
+            //   });
+            //   return updated;
+            // });
+
+        } catch (error) {
+            console.error('Error rewarding application:', error);
+        }
+    };
+
+
+    const handleOpenConfirmationDialog = (applicationId: string) => {
+        console.log("applicationId", applicationId);
+
+        setCurrentApplicationId(applicationId);
+        setConfirmationDialogOpen(true);
+    };
+
+    const handleCloseConfirmationDialog = () => {
+        setConfirmationDialogOpen(false);
+        setCurrentApplicationId(null);
+    };
+
+    const handleConfirm = (comment: string) => {
+        if (currentApplicationId) {
+            // Perform the action with currentApplicationId
+            console.log(`Awarding application with ID: ${currentApplicationId}`);
+            handleReward(currentApplicationId, comment)
+            // Close the dialog after confirming
+            handleCloseConfirmationDialog();
+        }
+    };
+
+    const [showCommentSection, setShowCommentSection] = useState(false);
+
+    const showProposalModal = (application: Apply) => {
+        console.log('application.jobDetails', application.jobDetails._id);
+        handleViewJob(application.jobDetails); // Call handleViewJob with the relevant job details
+        setSelectedApply(application);
+        setOpen(true); // Open the proposal dialog
+    }
+
+    const fetchProjectDetails = async (application: Apply) => {
+        const response = await axiosInstance.get(`${APIS.JOBS}?projId=${application.jobId}`);
+        console.log("fetchProjectDetails", response.data)
+        if (response.data && response.data.length) {
+            showProposalModal({ ...application, jobDetails: { ...response.data[0] } });
+        }
+    }
+
+    useEffect(() => {
+        if (userDetails.userType === 'Admin') {
+            setShowCommentSection(true);
+        }
+    }, [userDetails.userType]);
+
+    // useEffect(() => {
+    //     const fetchProposalStatus = async () => {
+    //       try {
+    //         console.log('Fetching proposal status with:', userDetails._id);
+    //         const response = await axiosInstance.get(`${APIS.CHECK_PROPOSAL_SUBMISSION}/${userDetails._id}/${selectedApply?._id}`);
+    //         console.log('response for Proposal',response);
+    //         setHasSubmittedProposal(response.data.hasSubmittedProposal);
+    //       } catch (error) {
+    //         console.error('Error fetching proposal status:', error);
+    //       }
+    //     };
+
+    //     fetchProposalStatus();
+    //   }, [userDetails._id, selectedApply?._id]);
+    const handleViewProposal = (proposal: Proposal) => {
+        setSelectedProposal(proposal); // Set the selected proposal in state
+        setCurrentStep(1); // Set to the first step
+        setOpen(true); // Open the dialog
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+   
+
+
 
 
     return (
@@ -270,12 +493,18 @@ const proposal = () => {
                 }}
             >
                 {userDetails.userType === 'Freelancer' && (
-                    <Typography component="h2" sx={{ marginY: 0 }}>
+                    <Typography component="h4" sx={{ marginY: 0 }}>
                         My Projects Proposals
                     </Typography>
                 )}
                 {userDetails.userType === 'Admin' && (
                     <Typography variant="h4">All Proposals</Typography>
+                )}
+
+                {userDetails.userType === 'Project Owner' && (
+                    <Typography component="h4" sx={{ marginY: 0 }}>
+                        My Projects Proposals
+                    </Typography>
                 )}
 
             </Box>
@@ -351,67 +580,106 @@ const proposal = () => {
             )}
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {userDetails.userType === 'Admin' && (
+                {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
                     <Box>
                         {proposals.length > 0 ? (
-                            proposals.map((proposal) => (
-                                <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
-                                    <CardContent>
-                                        <Typography variant="h6">{proposal.projectTitle}</Typography>
-                                        <Typography variant="body1">
-                                            <span style={{ fontWeight: 'bold' }} onClick={() => {
-
-                                                handleUserClick(proposal?.jobDetails?.username);
-                                            }}>
-                                                Project Owner Name:
-                                            </span>
-                                            {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
-                                        </Typography>
-                                        <Typography variant="body1">
-                                            <span style={{ fontWeight: 'bold' }} onClick={() => {
-                                                console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
-                                                handleUserClick(proposal?.userName);
-                                            }}>Freelancer Name:</span>
-                                            {` ${proposal.firstname} ${proposal.lastname}`}
-                                        </Typography>
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 8,
-                                                right: 8,
-                                                display: 'flex',
-                                                alignItems: 'center'
-                                            }}
-                                        >
-                                            <Chip
-                                                label={proposal.Status}
-                                                variant="outlined"
-                                                color={proposal.Status === 'Approved' ? 'success' : 'error'}
-                                            />
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                            <Button
-                                                variant="contained"
-                                                color="success"
-                                                onClick={() => handleApprove(proposal._id)}
+                            proposals
+                                .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && (proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded)))
+                                .map((proposal) => (
+                                    <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
+                                        <CardContent>
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Typography variant="h6">{proposal.projectTitle}</Typography>
+                                                <Link
+                                                    component="button"
+                                                    // variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleViewProposal(proposal)}
+                                                    sx={{
+                                                        color: 'blue',
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer'
+                                                    }} // Style to ensure link is blue with underline
+                                                >
+                                                    View Proposal
+                                                </Link>
+                                            </Box>
+                                            <Typography variant="body1">
+                                                <span style={{ fontWeight: 'bold' }} onClick={() => {
+                                                    console.log('proposal?.jobDetails?.username', proposal?.jobDetails?.username);
+                                                    handleUserClick(proposal?.jobDetails?.username);
+                                                }}>
+                                                    Project Owner Name:
+                                                </span>
+                                                {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
+                                            </Typography>
+                                            {userDetails.userType === 'Admin' && (
+                                                <Typography variant="body1">
+                                                    <span style={{ fontWeight: 'bold' }}
+                                                        onClick={() => {
+                                                            console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
+                                                            handleUserClick(proposal?.userName);
+                                                        }}
+                                                    >
+                                                        Freelancer Name:
+                                                    </span>
+                                                    {` ${proposal.firstname} ${proposal.lastname}`}
+                                                </Typography>
+                                            )}
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    display: 'flex',
+                                                    alignItems: 'center'
+                                                }}
                                             >
-                                                Approve
-                                            </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="error"
-                                                onClick={() => handleReject(proposal._id)}
-                                            >
-                                                Reject
-                                            </Button>
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            ))
+                                                <Chip
+                                                    label={proposal.Status}
+                                                    variant="outlined"
+                                                    color={proposal.Status === PROPOSAL_STATUSES.proposalUnderReview ? 'success' : 'error'}
+                                                />
+                                            </Box>
+                                            {userDetails.userType === 'Admin' && (
+                                                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                                    {proposal.Status !== PROPOSAL_STATUSES.pending || proposal.Status !== 'Rejected' && (
+                                                        <>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="success"
+                                                                onClick={() => handleApprove(proposal._id)}
+                                                            >
+                                                                Approve
+                                                            </Button>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="error"
+                                                                onClick={() => handleReject(proposal._id)}
+                                                            >
+                                                                Reject
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                </Box>
+                                            )}
+                                            {userDetails.userType === 'Project Owner' && proposal.applyId && isAwardButtonVisible && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview && (
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleOpenConfirmationDialog(proposal.applyId as string)}
+                                                >
+                                                    Award
+                                                </Button>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))
                         ) : (
                             <Typography>No proposals available</Typography>
                         )}
                     </Box>
+
                 )}
             </Box>
 
@@ -425,65 +693,92 @@ const proposal = () => {
             />
 
 
+
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Innovators' || userDetails.userType === 'Freelancer') && (
+                {(userDetails.userType === 'Freelancer') && (
                     <>
-                        {projects.length > 0 ? (
+                        {applications.length > 0 ? (
                             <Box>
-                                {projects.map((project) => (
-                                    <Card key={project._id} sx={{ mb: 2 }}>
-                                        <CardContent>
-                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box
-                                                    onClick={() => handleViewJob(project.jobDetails)}
-                                                    sx={{ cursor: 'pointer' }}
-                                                >
-                                                    {project.jobDetails.title}
-                                                </Box>
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
-                                                </Box>
-                                            </Typography>
-
-
-                                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                                {project.jobDetails.currency} {project.jobDetails.Budget}
-                                            </Typography>
-
-                                            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                                <Typography variant="body2" sx={{ mt: 1 }}>
-                                                    {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? ` | ${project.jobDetails.Subcategorys.join(', ')}` : ''}
-                                                </Typography>
-                                                <Box sx={{
-                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
-                                                }}>
-                                                    <Button
-                                                        variant="contained"
-                                                        size='small'
-                                                        onClick={() => {
-                                                            handleViewJob(project.jobDetails); // Call handleViewJob with the relevant job details
-                                                            setOpen(true); // Open the proposal dialog
+                                {applications.map((application) => (
+                                    (application.status === APPLY_STATUSES.approvedPendingForProposal ||
+                                        application.status === APPLY_STATUSES.rejected ||
+                                        application.status === APPLY_STATUSES.proposalApprovalPending ||
+                                        application.status === APPLY_STATUSES.proposalUnderReview ||
+                                        application.status === APPLY_STATUSES.awarded ||
+                                        application.status === APPLY_STATUSES.notAwarded) && (
+                                        <Card key={application._id} sx={{ mb: 2 }}>
+                                            <CardContent>
+                                                <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedApply(application);
+                                                            setDialogOpen(true);
+                                                        }}
+                                                        style={{
+                                                            textDecoration: 'underline',
+                                                            color: '#1976d2',
+                                                            fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
                                                         }}
                                                     >
-                                                        Submit Proposal
-                                                    </Button>
+                                                        {application.title}
+                                                    </a>
+                                                    <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                        {dayjs(application.TimeFrame).format(DATE_FORMAT)}
+                                                    </Box>
+                                                </Typography>
 
-                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
-                                                        <DialogTitle>Submit Proposal</DialogTitle>
-                                                        <DialogContent>
-                                                            {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
-                                                            {step === 2 && <ProposalStep2 onNext={handleNextStep} onPrevious={handlePreviousStep} />}
-                                                            {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={handlePreviousStep} />}
-                                                        </DialogContent>
-                                                        <DialogActions>
-                                                            <Button onClick={() => setOpen(false)}>Cancel</Button>
-                                                        </DialogActions>
-                                                    </Dialog>
+                                                <Chip
+                                                    label={application.status}
+                                                    size='small'
+                                                    variant="outlined"
+                                                    sx={{
+                                                        borderColor: application.status === APPLY_STATUSES.approvedPendingForProposal
+                                                            ? 'green'
+                                                            : application.status === APPLY_STATUSES.rejected
+                                                                ? 'red'
+                                                                : application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                                    ? 'green'
+                                                                    : application.status === APPLY_STATUSES.awarded
+                                                                        ? 'blue'
+                                                                        : application.status === APPLY_STATUSES.notAwarded
+                                                                            ? 'grey'
+                                                                            : 'default',
+                                                        color: application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                            ? 'green'
+                                                            : application.status === APPLY_STATUSES.rejected
+                                                                ? 'red'
+                                                                : application.status === APPLY_STATUSES.rejected
+                                                                    ? 'green'
+                                                                    : application.status === APPLY_STATUSES.awarded
+                                                                        ? 'blue'
+                                                                        : application.status === APPLY_STATUSES.notAwarded
+                                                                            ? 'grey'
+                                                                            : 'default',
+                                                        borderRadius: '16px',
+                                                        px: 1,
+                                                        mb: 2,
+                                                    }}
+                                                />
 
 
-
+                                                <Typography variant="body1" sx={{ mt: 1 }}>
+                                                    {application.currency} {application.Budget}
+                                                </Typography>
+                                                <Box sx={{ fontSize: 'small', fontWeight: 'bolder', display: 'flex', alignItems: 'center' }}>
+                                                {(!application.proposalsDetails || application.proposalsDetails.length === 0) && (
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            onClick={() => fetchProjectDetails(application)}
+                                                        >
+                                                            Submit Proposal
+                                                        </Button>
+                                                    )}
                                                 </Box>
-                                            </Box>
+                                          
+      
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Button
                                                     aria-controls="simple-menu"
@@ -511,113 +806,20 @@ const proposal = () => {
                                             </Box>
                                         </CardContent>
                                     </Card>
+                        )
                                 ))}
-                            </Box>
-                        ) : (
-                            <Typography>No projects available</Typography>
+                    </Box>
+                ) : (
+                <Typography>No projects available</Typography>
                         )}
-                    </>
+            </>
                 )}
 
 
             </Box>
 
 
-            {/* <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Freelancer') && (
-                    <>
-                        {projects.length > 0 ? (
-                            <Box>
-                                {projects.map((project) => (
-                                    <Card key={project._id} sx={{ mb: 2 }}>
-                                        <CardContent>
-                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box
-                                                    onClick={() => handleViewJob(project.jobDetails)}
-                                                    sx={{ cursor: 'pointer' }}
-                                                >
-                                                    {project.title}
-                                                </Box>
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(project.TimeFrame).format('MMMM D, YYYY h:mm A')}
-                                                </Box>
-                                            </Typography>
 
-
-
-                                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                                {project.jobDetails.currency} {project.jobDetails.Budget}
-                                            </Typography>
-
-
-                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box sx={{
-                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
-                                                }}>
-
-
-                                                    <Button
-                                                        variant="contained"
-                                                        onClick={() => {
-                                                            handleViewJob(project.jobDetails); // Call handleViewJob with the relevant job details
-                                                            setOpen(true); // Open the proposal dialog
-                                                        }}
-                                                    >
-                                                        Proposal
-                                                    </Button>
-
-                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
-                                                        <DialogTitle>Submit Proposal</DialogTitle>
-                                                        <DialogContent>
-                                                            {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
-                                                            {step === 2 && <ProposalStep2 onNext={handleNextStep} onPrevious={handlePreviousStep} />}
-                                                            {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={handlePreviousStep} />}
-                                                        </DialogContent>
-                                                        <DialogActions>
-                                                            <Button onClick={() => setOpen(false)}>Cancel</Button>
-                                                        </DialogActions>
-                                                    </Dialog>
-
-
-
-                                                </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Button
-                                                        aria-controls="simple-menu"
-                                                        aria-haspopup="true"
-                                                        onClick={handleClick}
-                                                        sx={{ display: { xs: 'block', md: 'none' } }}
-                                                        endIcon={<MoreVertIcon />}
-                                                    >
-                                                        More
-                                                    </Button>
-                                                    <Menu
-                                                        id="simple-menu"
-                                                        anchorEl={anchorEl}
-                                                        keepMounted
-                                                        open={Boolean(anchorEl)}
-                                                        onClose={handleClose}
-                                                        PaperProps={{
-                                                            sx: {
-                                                                border: '1px solid',
-                                                                boxShadow: 'none',
-                                                            },
-                                                        }}
-                                                    >
-                                                    </Menu>
-                                                </Box>
-                                            </Box>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </Box>
-                        ) : (
-                            <Typography>No projects available</Typography>
-                        )}
-                    </>
-                )}
-
-            </Box> */}
 
             {selectedUser ? (
                 <UserDrawer
@@ -626,7 +828,62 @@ const proposal = () => {
                     username={selectedUser}
                 />
             ) : ""}
+
+            {selectedApply && (
+                <ApplyDetailsDialog
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)}
+                    apply={selectedApply}
+                    jobId={viewingJob?._id || ''}
+                    canAddComment={showCommentSection}
+                    onCommentSubmitted={() => { console.log('Comment has been submitted') }}
+                />
+            )}
+            <ConfirmationDialog
+                open={confirmationDialogOpen}
+                onClose={handleCloseConfirmationDialog}
+                onConfirm={handleConfirm}
+                message="Are you sure you want to award this application?"
+            />
+
+
+            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
+                <DialogTitle>Submit Proposal</DialogTitle>
+                <DialogContent>
+
+
+                    {step === 1 && <ProposalStep1 onNext={handleNextStep} 
+                    initialValues={selectedProposal || null}
+                    readOnly= {true}
+                    />}
+
+
+
+                    {step === 2 && <ProposalStep2  
+                    initialValues={selectedProposal || null}
+                    readOnly= {true}
+                    onNext={handleNextStep} 
+                    onPrevious={handlePreviousStep} 
+                     />}
+
+
+
+                    {step === 3 && <ProposalStep3 
+                    initialValues={selectedProposal || null}
+                    readOnly= {true}
+                    onSubmit={handleSubmit} 
+                    onPrevious={handlePreviousStep} 
+                    />}
+
+
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
+
+
     );
 };
 

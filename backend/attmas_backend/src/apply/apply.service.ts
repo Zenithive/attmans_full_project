@@ -15,23 +15,35 @@ import { UsersService } from 'src/users/users.service';
 // import { ObjectId } from 'typeorm';
 // import mongoose from 'mongoose';
 import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
-import { APPLY_STATUSES } from 'src/common/constant/status.constant';
+import { Proposal } from 'src/proposal/proposal.schema';
+
+import {
+  APPLY_STATUSES,
+  PROPOSAL_STATUSES,
+} from 'src/common/constant/status.constant';
 
 @Injectable()
 export class ApplyService {
-  [x: string]: any;
   constructor(
     @InjectModel(Apply.name)
     private ApplyModel: Model<ApplyDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel('Proposal') private readonly proposalModel: Model<Proposal>,
     private usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
-  ) { }
+  ) {}
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     // Convert jobId to ObjectId if it is not already
+    let userId: Types.ObjectId;
     let jobId: Types.ObjectId;
+
+    try {
+      userId = new Types.ObjectId(createApplyDto.userId);
+    } catch (error) {
+      throw new BadRequestException('Invalid userId format');
+    }
     try {
       jobId = new Types.ObjectId(createApplyDto.jobId);
     } catch (error) {
@@ -40,7 +52,7 @@ export class ApplyService {
 
     // Check for existing application
     const existingApplication = await this.ApplyModel.findOne({
-      userId: createApplyDto.userId,
+      userId: userId,
       jobId: jobId,
     }).exec();
 
@@ -52,6 +64,7 @@ export class ApplyService {
     // Create and save new application
     const createdApply = new this.ApplyModel({
       ...createApplyDto,
+      userId: userId,
       jobId: jobId,
     });
     await createdApply.save();
@@ -85,101 +98,11 @@ export class ApplyService {
     return createdApply;
   }
 
-
   async findAll(): Promise<Apply[]> {
     return this.ApplyModel.find()
       .populate('userId', 'firstName lastName username', this.userModel)
       .exec();
   }
-
-  // async findAllMyProject(userId: string): Promise<Apply[]> {
-  //   console.log('UserId received:', userId); // Log the received userId
-
-  //   // Check if userId is a valid ObjectId
-  //   if (!Types.ObjectId.isValid(userId)) {
-  //     throw new Error('Invalid userId format');
-  //   }
-
-  //   // Query to find documents with the given userId and status 'Awarded'
-  //   return this.ApplyModel.find({
-  //       userId: userId,
-  //       status: 'Awarded'
-  //     })
-  //     .populate('userId', 'firstName lastName username', this.userModel)
-  //     .exec()
-  //     .then(results => {
-  //       console.log("Results:", results); // Log the results
-  //       return results;
-  //     });
-  // }
-
-  // async findAllMyProject(userId: string): Promise<Apply[]> {
-  //   console.log('UserId received:', userId); // Log the received userId
-
-  //   // Check if userId is a valid ObjectId
-  //   if (!Types.ObjectId.isValid(userId)) {
-  //     throw new Error('Invalid userId format');
-  //   }
-
-  //   return this.ApplyModel.aggregate([
-  //     // Stage 1: Match documents by userId and status
-  //     {
-  //       $match: {
-  //         userId: userId,
-  //         status: 'Awarded',
-  //       },
-  //     },
-  //     // Stage 2: Lookup to get job details from the Job collection
-  //     {
-  //       $lookup: {
-  //         from: 'jobs', // Name of the Job collection
-  //         localField: 'jobId', // Field from Apply collection
-  //         foreignField: '_id', // Field from Job collection
-  //         as: 'jobDetails' // Output array field
-  //       },
-  //     },
-  //     // Stage 3: Unwind the jobDetails array to get individual job detail documents
-  //     {
-  //       $unwind: {
-  //         path: '$jobDetails',
-  //         preserveNullAndEmptyArrays: true,
-  //       },
-  //     },
-  //     // Stage 4: Project fields to include in the result
-  //     {
-  //       $project: {
-  //         jobTitle: '$jobDetails.title',
-  //         jobCurrency: '$jobDetails.currency',
-  //         description: '$jobDetails.description',
-  //         Objective: '$jobDetails.Objective',
-  //         Expectedoutcomes: '$jobDetails.Expectedoutcomes',
-  //         IPRownership: '$jobDetails.IPRownership',
-  //         Expertiselevel: '$jobDetails.Expertiselevel',
-  //         DetailsOfInnovationChallenge: '$jobDetails.DetailsOfInnovationChallenge',
-  //         Sector: '$jobDetails.Sector',
-  //         AreaOfProduct: '$jobDetails.AreaOfProduct',
-  //         ProductDescription: '$jobDetails.ProductDescription',
-  //         Category: '$jobDetails.Category',
-  //         Subcategorys: '$jobDetails.Subcategorys',
-  //         SelectService: '$jobDetails.SelectService',
-  //         TimeFrame: '$jobDetails.TimeFrame',
-  //         Budget: '$jobDetails.Budget',
-  //         userId: 1,
-  //         status: 1,
-  //         buttonsHidden: 1,
-  //         username: '$userId.username', // Assuming you also want to include username from the Apply document
-  //         createdAt: 1,
-  //         comments: 1,
-  //         firstName: '$userId.firstName', // Assuming you have populated this field
-  //         lastName: '$userId.lastName', // Assuming you have populated this field
-  //       },
-  //     },
-  //   ])
-  //   .then(results => {
-  //     console.log("Results:", results); // Log the results
-  //     return results;
-  //   });
-  // }
 
   async findAllMyProject(userId: string): Promise<any[]> {
     console.log('UserId received:', userId); // Log the received userId
@@ -196,12 +119,7 @@ export class ApplyService {
           $match: {
             userId: userId,
             status: {
-              $in: [
-                // APPLY_STATUSES.approvedPendingForProposal,
-                // APPLY_STATUSES.proposalApprovalPending,
-                // APPLY_STATUSES.proposalUnderReview,
-                APPLY_STATUSES.awarded,
-              ],
+              $in: [APPLY_STATUSES.awarded],
             },
           },
         },
@@ -262,11 +180,10 @@ export class ApplyService {
       throw new NotFoundException(`Application with id ${id} not found`);
     }
     //application.status = 'Approved';
-    if (application.applyType === "InnovatorsApply") {
-
-      application.status = APPLY_STATUSES.approvedPendingForProposalForInnovators;
-    }else{
-      
+    if (application.applyType === 'InnovatorsApply') {
+      application.status =
+        APPLY_STATUSES.approvedPendingForProposalForInnovators;
+    } else {
       application.status = APPLY_STATUSES.approvedPendingForProposal;
     }
     application.buttonsHidden = true;
@@ -326,8 +243,7 @@ export class ApplyService {
     return application;
   }
 
-
-  async findByJobId(jobId: string): Promise<Apply[]> {
+  async findByJobId(jobId: Types.ObjectId): Promise<Apply[]> {
     // Convert jobId to ObjectId if it is a valid string
     let jobObjectId: Types.ObjectId;
     if (Types.ObjectId.isValid(jobId)) {
@@ -341,13 +257,66 @@ export class ApplyService {
       .exec();
   }
 
-
   async findApplicationsByUserId(userId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ userId }).exec();
   }
 
-  async findAppliedJobs(userId: string): Promise<Apply[]> {
-    return this.ApplyModel.find({ userId }).exec();
+  async findAppliedJobs(userId: string): Promise<any[]> {
+    try {
+      const results = await this.ApplyModel.aggregate([
+        {
+          $match: {
+            userId: new Types.ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'proposals',
+            localField: '_id',
+            foreignField: 'applyId',
+            as: 'proposalsDetails',
+          },
+        },
+        {
+          $unwind: {
+            path: '$proposalsDetails',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        { $limit: 10 },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            description: 1,
+            applyType: 1,
+            SolutionUSP: 1,
+            availableSolution: 1,
+            buttonsHidden: 1,
+            jobId: 1,
+            rejectComment: 1,
+            comment_Reward_Nonreward: 1,
+            status: 1,
+            lastName: 1,
+            firstName: 1,
+            username: 1,
+            userId: 1,
+            currency: 1,
+            Budget: 1,
+            createdAt: 1,
+            TimeFrame: 1,
+            proposalsDetails: {
+              _id: 1,
+            },
+          },
+        },
+      ]).exec();
+      console.log('result for Applied Jobs', results);
+      return results;
+    } catch (error) {
+      console.error('Error during aggregation:', error);
+      throw error;
+    }
   }
 
   async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {
@@ -387,12 +356,12 @@ export class ApplyService {
 
     const validStatusesForAward = [
       APPLY_STATUSES.approvedPendingForProposalForInnovators,
-      APPLY_STATUSES.proposalUnderReview
+      APPLY_STATUSES.proposalUnderReview,
     ];
-    console.log("application", application);
+    console.log('application', application);
     if (
       !application?._id ||
-      (!validStatusesForAward.includes(application.status))
+      !validStatusesForAward.includes(application.status)
     ) {
       throw new NotFoundException(
         `Application with id ${id} and status 'Approved' not found`,
@@ -407,6 +376,18 @@ export class ApplyService {
     await application.save();
     // console.log(`Application with ID: ${id} awarded.`);
 
+    const proposal = await this.proposalModel
+      .findOne({
+        applyId: application._id,
+      })
+      .exec();
+
+    console.log('proposal', proposal.applyId);
+    if (proposal.applyId) {
+      proposal.Status = PROPOSAL_STATUSES.approvedAndAwarded;
+      await proposal.save();
+    }
+
     // Get all other applications and set their status to 'Not Awarded'
     const otherApplications = await this.ApplyModel.find({
       _id: { $ne: id },
@@ -415,12 +396,12 @@ export class ApplyService {
     }).exec();
 
     const updatedApplications = otherApplications.map((app) => ({
-      _id: app._id.toString(),
+      _id: app._id as Types.ObjectId,
       status: 'Not Awarded',
-      jobId: app.jobId.toString(),
+      jobId: app.jobId as Types.ObjectId,
       comment_Reward_Nonreward:
         'Thank you for your application. Although we cannot award this application, we value your interest and encourage you to apply for other roles or opportunities with us in the future.', // Default comment
-      userId: app.userId.toString(),
+      userId: app.userId as Types.ObjectId,
       username: app.username.toString(),
     }));
 

@@ -56,6 +56,7 @@ interface Milestone {
 
 interface Apply {
   _id?: string;
+  jobDetails:any;
   title: string;
   description: string;
   Budget: number;
@@ -206,7 +207,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       return (app.status === APPLY_STATUSES.approvedPendingForProposal || app.status === APPLY_STATUSES.awarded)
         && currentUser === viewingJob?.username;
     }
-    if (userType === 'Innovators' || userType === 'Freelancer') {
+    if (userDetails.userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser;
     }
     return true;

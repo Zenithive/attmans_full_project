@@ -1,22 +1,22 @@
 // update-statuses.dto.ts
 import { IsArray, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Types } from 'mongoose';
 
 class ApplicationStatusDto {
   @IsString()
-  _id: string;
+  _id: Types.ObjectId;
 
   @IsString()
   status: string;
 
   @IsString()
-  jobId: string;
+  jobId: Types.ObjectId;
 
   @IsString()
   comment_Reward_Nonreward: string;
 
   @IsString()
-  userId: string;
+  userId: Types.ObjectId;
 
   @IsString()
   username: string;
@@ -24,6 +24,5 @@ class ApplicationStatusDto {
 
 export class UpdateStatusesDto {
   @IsArray()
-  @Type(() => ApplicationStatusDto)
   applications: ApplicationStatusDto[];
 }

@@ -1,4 +1,5 @@
 import { Chip, styled } from "@mui/material";
+import { UserSchema } from "../reducers/userReducer";
 
 export interface Job {
     _id?: string;
@@ -32,18 +33,24 @@ export interface Job {
 
 
 export interface Apply {
-    jobDetails: any;
+    jobDetails:any;
     _id?: string;
     title: string;
     description: string;
     Budget: number;
     currency: string;
     TimeFrame: string | null;
-    jobId: string;
+    rejectComment: string;
+    proposalsDetails:any;
+    status: string;
     firstName: string;
     lastName: string;
-    applyType:string;
-}
+    username: string;
+    jobId: string;
+    userId?: UserSchema;
+    availableSolution: string;
+    SolutionUSP: string;
+  }
 
 export const Expertiselevel = [
     "Beginner",
