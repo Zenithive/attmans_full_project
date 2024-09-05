@@ -17,6 +17,7 @@ import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
 import { EXHIBITION_STATUSES } from '../constants/status.constant';
+import { Product } from '../component/all_Profile_component/AddProductModal2';
 
 interface Exhibition {
   _id?: string;
@@ -50,7 +51,7 @@ interface Booth {
   _id: string;
   title: string;
   description: string;
-  products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; videourlForproduct: string; stageofdevelopmentdropdown: string; productQuantity: number;      }[];
+  products: Product[];
   userId: {
     firstName: string;
     lastName: string;
@@ -132,11 +133,11 @@ const ExhibitionsPage: React.FC = () => {
 
 
     const fetchVisitorsforExhibition = async (
-      searchParams: URLSearchParams,
-      interestType: string,
+      // searchParams: URLSearchParams,
+      // interestType: string,
       // userDetails: UserDetails,
-      setVisitors: React.Dispatch<React.SetStateAction<Visitor[]>>,
-      setIsInterestedBtnShow: React.Dispatch<React.SetStateAction<boolean>>
+      // setVisitors: React.Dispatch<React.SetStateAction<Visitor[]>>,
+      // setIsInterestedBtnShow: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
       try {
         const exhibitionId = searchParams.get('exhibitionId');

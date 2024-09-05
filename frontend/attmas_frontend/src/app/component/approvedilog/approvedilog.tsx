@@ -1,12 +1,14 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
+import { Product } from '../all_Profile_component/AddProductModal2';
 
 interface Booth {
     _id: string;
     title: string;
     description: string;
-    products: { productName: string; productDescription: string; productType: string; productPrice: number; currency: string; }[];
+  products: Product[];
+   
     userId: {
       firstName: string;
       lastName: string;
