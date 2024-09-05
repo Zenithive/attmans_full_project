@@ -232,25 +232,23 @@ const proposal = () => {
 
 
     useEffect(() => {
-        const fetchProposalStatus = async () => {
-            console.log('S')
-            if (!selectedApply?._id) return;
-            try {
-                const response = await axios.get(`${SERVER_URL}/proposals/user/${selectedApply._id}`);
-                console.log('response for fetchProposalStatus', response.data);
-    
-                const hasSubmitted = response.data.some((proposal: Proposal) => proposal.applyId === selectedApply._id);
-                console.log('hasSubmitted',hasSubmitted);
-                setHasSubmittedProposal(hasSubmitted);
-    
-                // You might want to update other states or handle response data here
-            } catch (error) {
-                console.error('Error fetching proposal status', error);
-            }
+        const checkProposalStatus = async () => {
+          try {
+            const response = await axios.get(`${SERVER_URL}/proposals/check`, {
+              params: {
+                userID: userId,
+                applyId: selectedApply?._id, 
+              },
+            });
+            console.log('response for checkProposalStatus',response);
+            setHasSubmittedProposal(response.data !== null);
+          } catch (error) {
+            console.error('Error checking proposal status:', error);
+          }
         };
     
-        fetchProposalStatus();
-    }, [selectedApply?._id]); // Ensure the effect runs when `selectedApply._id` changes
+        checkProposalStatus();
+      }, [selectedApply?._id, userId]);
     
 
     const handleApprove = (proposalId: string) => {
