@@ -9,6 +9,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Provider } from "react-redux";
 import { store } from "./reducers/store";
 import Toast from "./component/toast/Toast"; // Adjust the import path accordingly
+import BackDropLoader from "./component/BackdropLoader/backDropLoader.component";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -134,6 +135,7 @@ export default function RootLayout({
               children
             )}
             <Toast /> {/* Add Toast component here */}
+            <BackDropLoader></BackDropLoader>
           </Provider>
         </ThemeProvider>
       </body>

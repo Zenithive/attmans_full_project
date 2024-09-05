@@ -43,7 +43,11 @@ export class InterestedUserController {
   @Get('/visitors-by-interest-type')
   async findVisitorsByInterestType(
     @Query('interestType') interestType: string,
+    @Query('exhibitionId') exhibitionId: string,
   ): Promise<any> {
-    return this.interestedUserService.findVisitorsByInterestType(interestType);
+    return this.interestedUserService.findVisitorsByInterestType(
+      interestType,
+      exhibitionId,
+    );
   }
 }

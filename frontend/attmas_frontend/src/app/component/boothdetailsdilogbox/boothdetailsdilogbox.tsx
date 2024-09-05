@@ -33,6 +33,7 @@ import { DATE_TIME_FORMAT } from '@/app/constants/common.constants';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddProductModal2, { Product } from '../all_Profile_component/AddProductModal2';
 import axiosInstance from '@/app/services/axios.service';
+import { pubsub } from '@/app/services/pubsub.service';
 
 
 interface Booth {
@@ -82,60 +83,62 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   const [isBoothInterestedBtnVisible, setIsBoothInterestedBtnVisible] = useState(true);
 
   const [modalOpen, setModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-    const handleViewProduct = (product: Product) => {
-      setSelectedProduct(product);
-      setModalOpen(true);
+  const handleViewProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setModalOpen(true);
   };
 
   const handleCloseModal = () => {
-      setModalOpen(false);
-      setSelectedProduct(null);
+    setModalOpen(false);
+    setSelectedProduct(null);
   };
 
+  const fetchVisitors = async () => {
+    try {
+      setIsBoothInterestedBtnVisible(true);
+      const boothId = booth?._id;
+      const exhibitionId = searchParams.get('exhibitionId');
+      if (!boothId || !exhibitionId) {
+        console.error('Booth ID or Exhibition ID not found');
+        return;
+      }
 
+      const response = await axiosInstance.get(`/interested-users/booth-visitors-by-exhibition`, {
+        params: {
+          boothId,
+          exhibitionId,
+        },
+      });
+
+      const hasUserShownInterest = response.data.some(
+        (visitor: Visitor) => visitor.userId === userDetails._id && visitor.interestType === 'InterestedUserForBooth'
+      );
+
+
+      if (hasUserShownInterest) {
+        console.log('Condition met: user has shown interest in booth');
+        setIsBoothInterestedBtnVisible(false);
+      }
+
+      setVisitors(response.data);
+
+    } catch (error) {
+      console.error('Error fetching booth visitors:', error);
+    }
+
+  };
+
+  useEffect(() => {
+    pubsub.subscribe('VisitorUpdated', fetchVisitors);
+    return () => {
+      pubsub.unsubscribe('VisitorUpdated', fetchVisitors);
+    };
+  }, [fetchVisitors]);
 
 
   useEffect(() => {
-    const fetchVisitors = async () => {
-      try {
-        setIsBoothInterestedBtnVisible(true);
-        const boothId = booth?._id;
-        const exhibitionId = searchParams.get('exhibitionId');
-        if (!boothId || !exhibitionId) {
-          console.error('Booth ID or Exhibition ID not found');
-          return;
-        }
-
-        const response = await axiosInstance.get(`/interested-users/booth-visitors-by-exhibition`, {
-          params: {
-            boothId,
-            exhibitionId,
-          },
-        });
-
-        console.log('Fetched visitors:', response.data);
-
-
-
-        const hasUserShownInterest = response.data.some(
-          (visitor: Visitor) => visitor.userId === userDetails._id && visitor.interestType === 'InterestedUserForBooth'
-        );
-
-
-        if (hasUserShownInterest) {
-          console.log('Condition met: user has shown interest in booth');
-          setIsBoothInterestedBtnVisible(false);
-        }
-
-        setVisitors(response.data);
-
-      } catch (error) {
-        console.error('Error fetching booth visitors:', error);
-      }
-
-    };
 
     if (view === 'boothDetails') {
       fetchVisitors();
@@ -152,7 +155,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
- 
+
 
 
   const handleVideoOpen = (url: string) => {
@@ -342,12 +345,12 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
             </Box>
           )}
           <AddProductModal2
-                open={modalOpen}
-                onClose={handleCloseModal}
-                onSave={() => {}}
-                product={selectedProduct}
-                viewOnly={true}
-            />
+            open={modalOpen}
+            onClose={handleCloseModal}
+            onSave={() => { }}
+            product={selectedProduct}
+            viewOnly={true}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">

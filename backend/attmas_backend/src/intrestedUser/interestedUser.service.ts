@@ -34,12 +34,17 @@ export class InterestedUserService {
     } = createInterestedUserDto;
 
     // Convert userId and exhibitionId to ObjectId
-    const userObjectId = new Types.ObjectId(userId);
-    const exhibitionObjectId = new Types.ObjectId(exhibitionId);
+    const userObjectId = new Types.ObjectId(userId as string);
+    const exhibitionObjectId = new Types.ObjectId(exhibitionId as string);
+    const newBoothId = new Types.ObjectId(boothId as string);
 
     // Check if the user already has an interest in the booth
     const existingInterest = await this.interestedUserModel
-      .findOne({ userId: userObjectId, boothId, interestType: 'InterestedUserForBooth' })
+      .findOne({
+        userId: userObjectId,
+        newBoothId,
+        interestType: 'InterestedUserForBooth',
+      })
       .exec();
 
     if (existingInterest) {
@@ -73,22 +78,6 @@ export class InterestedUserService {
         .exec();
 
       if (existingUser) {
-        // If boothId is null, do not create the interested user entry
-        // if (boothId === null) {
-        //   console.log('BoothId is null. Skipping creation of interested user entry.');
-        //   return;
-        // }
-
-        // Send "abc" message
-        const backendBaseUrl = process.env.BACKEND_BASE_URL;
-        const exhibitionUrl = `${backendBaseUrl}/view-exhibition?exhibitionId=${exhibitionId}`;
-        await this.mailerService.sendEmail(
-          username,
-          'Existing User of Attmas',
-          `Hello ${existingUser.firstName},\n\nYou have already signed up for our Attmas service!\n\nClick <a href="${exhibitionUrl}">here</a> to participate in the Exhibition.\n\nBest regards,\nTeam Attmas`,
-        );
-        console.log('Email sent to existing user successfully.');
-
         // Create interested user entry with null or blank values
         const createdUser = new this.interestedUserModel({
           username,
@@ -96,7 +85,7 @@ export class InterestedUserService {
           lastName,
           mobileNumber,
           exhibitionId: exhibitionObjectId,
-          boothId,
+          boothId: newBoothId,
           userId: userObjectId,
           userType,
           boothTitle,
@@ -104,20 +93,16 @@ export class InterestedUserService {
           adminEmail,
         });
 
-        await createdUser.save();
-
-        console.log('Attempting to send email to admin:', adminEmail);
-        await this.mailerService.sendEmail(
+        this.mailerService.sendEmail(
           adminEmail,
           'New Booth Interest',
           `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`,
         );
-        console.log('Email sent to exhibition admin successfully.');
 
-        return createdUser;
+        return await createdUser.save();
       } else {
         // Send "xyz" message
-        await this.mailerService.sendEmail(
+        this.mailerService.sendEmail(
           username,
           'New User Interest in Attmas',
           `Hello ${firstName},\n\nThank you for showing interest in our Attmas service!\n\nBest regards,\nTeam Attmas`,
@@ -126,7 +111,7 @@ export class InterestedUserService {
 
         // Send welcome email
         console.log('Sending welcome email to new user:', username);
-        await this.mailerService.sendEmail(
+        this.mailerService.sendEmail(
           username,
           'Welcome to Attmas!',
           `Hello ${firstName},\n\nWelcome to Attmas! We're excited to have you on board.\n\nBest regards,\nTeam Attmas`,
@@ -140,7 +125,7 @@ export class InterestedUserService {
           lastName,
           mobileNumber,
           exhibitionId: exhibitionObjectId,
-          boothId,
+          boothId: newBoothId,
           userId: userObjectId,
           userType,
           adminEmail,
@@ -152,8 +137,7 @@ export class InterestedUserService {
       console.error('Error sending email:', error);
       throw error;
     }
-}
-
+  }
 
   async findExhibitionsByUser(userId: string): Promise<InterestedUser[]> {
     return this.interestedUserModel.find({ userId }).exec();
@@ -184,10 +168,12 @@ export class InterestedUserService {
 
   async findVisitorsByInterestType(
     interestType: string,
+    exhibitionId: string,
   ): Promise<InterestedUser[]> {
     return this.interestedUserModel
       .find({
         interestType,
+        exhibitionId: new Types.ObjectId(exhibitionId),
       })
       .exec();
   }
