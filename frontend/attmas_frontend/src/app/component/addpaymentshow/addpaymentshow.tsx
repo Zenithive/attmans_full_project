@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 import { SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import axiosInstance from '@/app/services/axios.service';
 
 interface Billing {
     _id?: string;
@@ -51,7 +51,7 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
                     setError('No apply ID available');
                     return;
                 }
-                const response = await axios.get<Billing[]>(`${SERVER_URL}/billing/by-apply/${apply._id}`);
+                const response = await axiosInstance.get<Billing[]>(`/billing/by-apply/${apply._id}`);
                 console.log('response.data', response.data);
                 setBillingData(response.data);
             } catch (error) {

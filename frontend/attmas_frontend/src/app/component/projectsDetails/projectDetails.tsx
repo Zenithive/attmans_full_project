@@ -19,13 +19,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import ConfirmationDialog from '../All_ConfirmationBox/ConfirmationDialog';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import axiosInstance from '@/app/services/axios.service';
 
 
 
@@ -95,7 +95,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
   useEffect(() => {
     if (apply?._id) {
-      axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
+      axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
         .then(response => {
           console.log("Fetched milestones:", response.data);
           setMilestones(response.data);
@@ -121,14 +121,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
       if (!applicationId) return;
       console.log("applicationId", applicationId);
 
-
-      // First, award the selected application
-      // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
-      // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
-      //   jobId, // Include jobId in the payload
-      // });
-
-      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+      await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
         jobId, // Include jobId in the payload
         Comment
       });
@@ -139,9 +132,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
           ? { ...app, status: 'Awarded' }
           : { ...app, status: 'Not Awarded' }
       );
-
-      // Make an API call to update all applications' statuses on the server
-      // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
 
       // Update the local state with the new statuses
       setApplications(updatedApplications);
@@ -199,7 +189,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     try {
       setIsResubmitting(true);
       console.log(`Resubmitting milestone ${milestoneIndex} for applyId ${applyId} with comment: ${comment}`);
-      await axios.post(`${APIS.MILESTONES}/resubmit`, {
+      await axiosInstance.post(`${APIS.MILESTONES}/resubmit`, {
         applyId,
         milestoneIndex,
         resubmitComment: comment

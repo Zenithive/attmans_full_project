@@ -25,15 +25,14 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import dayjs from 'dayjs';
-import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useSearchParams } from 'next/navigation';
-import axios from 'axios';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import InterestedModal from '../booth/intrestedUsers';
 import { DATE_TIME_FORMAT } from '@/app/constants/common.constants';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddProductModal2, { Product } from '../all_Profile_component/AddProductModal2';
+import axiosInstance from '@/app/services/axios.service';
 
 
 interface Booth {
@@ -109,7 +108,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
           return;
         }
 
-        const response = await axios.get(`${SERVER_URL}/interested-users/booth-visitors-by-exhibition`, {
+        const response = await axiosInstance.get(`/interested-users/booth-visitors-by-exhibition`, {
           params: {
             boothId,
             exhibitionId,

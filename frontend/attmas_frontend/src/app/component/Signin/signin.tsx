@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
@@ -19,6 +18,7 @@ import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReduc
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { getRoleBasedAccess } from '@/app/services/user.access.service';
 import { AxiosError } from 'axios';
+import axiosInstance from '@/app/services/axios.service';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -57,7 +57,8 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
       password: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-        const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
+      try {
+        const response = await axiosInstance.post(APIS.LOGIN, { username: values.email, password: values.password });
 
         const res = response.data.user;
         const user = {
@@ -74,8 +75,29 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
         
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
+      }  
+        catch (error) {
+          if (error instanceof AxiosError) {
+            const simulatedError = {
+              response: {
+                data: {
+                  message: 'User has already shown interest in this exhibition'
+                }
+              }
+            };
+            
+            const errorMessage = (simulatedError).response?.data.message;
         
-      },
+            if (errorMessage === 'User has already shown interest in the exhibition') {
+              formik.setStatus({ error: 'You have already shown interest for the exhibition.' });
+            } else {
+              formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
+            }
+          } else {
+            formik.setStatus({ error: 'An unexpected error occurred.' });
+          }
+        }  
+      }
         
   });
   

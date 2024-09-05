@@ -5,14 +5,13 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Formik, Form, FormikProps } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector, useAppDispatch } from '@/app/reducers/hooks.redux';
 import { addUser, selectUserSession, UserSchema, updateProfilePhoto } from '@/app/reducers/userReducer';
 import { pubsub } from '@/app/services/pubsub.service';
 import router from 'next/router';
+import axiosInstance from '@/app/services/axios.service';
 
 const EditProfile1: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -51,7 +50,7 @@ const EditProfile1: React.FC = () => {
   const fetchUserProfile = async (setValues: (values: typeof initialValues) => void) => {
     setLoading(true);
     try {
-      const response = await axios.get(`${SERVER_URL}/profile/profileByUsername?username=${userDetails.username}`, {
+      const response = await axiosInstance.get(`/profile/profileByUsername?username=${userDetails.username}`, {
         headers: { username: userDetails.username },
       });
       const userData = response.data;
@@ -83,7 +82,7 @@ const EditProfile1: React.FC = () => {
         formData.append('profilePhoto', profilePhoto);
       }
 
-      await axios.post(APIS.FORM1, formData, {
+      await axiosInstance.post(APIS.FORM1, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

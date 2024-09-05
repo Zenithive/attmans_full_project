@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Typography, Card, CardContent, IconButton, Autocomplete, TextField, Tooltip, ToggleButton, ToggleButtonGroup, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { AddExhibition } from '../component/exhibition/add-exhibition';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
@@ -20,6 +19,7 @@ import EditProfile from '../component/EditProfileComponents/editUserProfile';
 import { categories } from '../constants/categories';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
+import axiosInstance from '../services/axios.service';
 
 interface Exhibition {
   _id?: string;
@@ -108,7 +108,7 @@ const Exhibition = () => {
 
   const fetchExhibitions = useCallback(async (page: number) => {
     try {
-      const response = await axios.get(`${APIS.EXHIBITION}?page=${page}${toggleFilter}&${filter}`);
+      const response = await axiosInstance.get(`${APIS.EXHIBITION}?page=${page}${toggleFilter}&${filter}`);
       if (response.data.length === 0) {
         setHasMore(false);
       } else {
@@ -174,7 +174,7 @@ const Exhibition = () => {
   const handleDeleteExhibition = useCallback(async () => {
     if (confirmDelete.exhibition) {
       try {
-        await axios.delete(`${APIS.EXHIBITION}/${confirmDelete.exhibition._id}`);
+        await axiosInstance.delete(`${APIS.EXHIBITION}/${confirmDelete.exhibition._id}`);
         setExhibitions(exhibitions.filter(exhibition => exhibition._id !== confirmDelete.exhibition!._id));
         pubsub.publish('ExhibitionDeleted', { message: 'Exhibition Deleted' });
       } catch (error) {

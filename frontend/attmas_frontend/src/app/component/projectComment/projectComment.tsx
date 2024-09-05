@@ -1,11 +1,11 @@
 import React from 'react';
 import { Box, TextField, Button, CircularProgress } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import * as Yup from 'yup';
+import axiosInstance from '@/app/services/axios.service';
 
 interface AddCommentProps {
   jobId: string;
@@ -25,7 +25,7 @@ const AddComment: React.FC<AddCommentProps> = ({ jobId,applyId,onCommentSubmitte
     { setSubmitting, resetForm }: any
   ) => {
     try {
-      await axios.post(`${APIS.ADD_COMMENT}`, {
+      await axiosInstance.post(`${APIS.ADD_COMMENT}`, {
         createdBy: userDetails._id,
         commentText: values.comment,
         jobId,
