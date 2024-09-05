@@ -137,4 +137,6 @@ export const APIS = {
 
     BILLING: `/billing`,
     GET_BILLING: (id: string) => `/billing/${id}`,
+
+    CHECK_PROPOSAL_SUBMISSION: `/proposals/check-submission`,
 }

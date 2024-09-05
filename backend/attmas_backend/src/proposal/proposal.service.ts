@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Proposal } from './proposal.schema';
 import {
   APPLY_STATUSES,
@@ -48,13 +48,16 @@ export class ProposalService {
 
     return createdProposal.save();
   }
-
-  async findProposalByUserAndApply(
-    userId: string,
-    applyId: Types.ObjectId,
-  ): Promise<Proposal | null> {
-    return this.proposalModel.findOne({ userId, applyId }).exec();
-  }
+  // async hasSubmittedProposal(
+  //   userID: Types.ObjectId,
+  //   applyId: Types.ObjectId,
+  // ): Promise<boolean> {
+  //   const proposal = await this.proposalModel
+  //     .findOne({ userID, applyId })
+  //     .exec();
+  //   console.log('proposal', proposal);
+  //   return !!proposal;
+  // }
 
   async findAllProposal(): Promise<Proposal[]> {
     try {
@@ -212,9 +215,5 @@ export class ProposalService {
     }
 
     return updatedProposal;
-  }
-  async findProposalByUserId(userID: string): Promise<Proposal | null> {
-    console.log('userID', userID);
-    return this.proposalModel.findOne({ userID }).exec();
   }
 }

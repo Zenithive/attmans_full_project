@@ -41,9 +41,9 @@ export const ProposalSchema = new Schema({
     },
   ],
 
-  pastCredentials: { type: String, required: true },
-  briefProfile: { type: String, required: true },
-  proposalOwnerCredentials: { type: String, required: true },
+  pastCredentials: { type: String, required: false },
+  briefProfile: { type: String, required: false },
+  proposalOwnerCredentials: { type: String, required: false },
 
   otherCommitments: { type: String, required: true },
   progressReportTemplate: { type: String, required: true },
@@ -55,10 +55,10 @@ export const ProposalSchema = new Schema({
   mentoringRequired: { type: String, required: true },
 
   // New fields added
-  userID: { type: String, required: false },
+  userID: { type: Types.ObjectId, required: false },
   userName: { type: String, required: false },
   projectId: { type: Types.ObjectId, required: false },
-  applyId: { type: Types.ObjectId, required: false },
+  applyId: { type: Schema.Types.ObjectId, required: false },
   projectTitle: { type: String, required: false },
   projectCurrency: { type: String, required: false },
   Status: { type: String, required: false },
@@ -112,7 +112,7 @@ export interface Proposal extends Document {
   mentoringRequired: string;
 
   // New fields added to the interface
-  userID?: string;
+  userID?: Types.ObjectId;
   userName?: string;
   projectId: Types.ObjectId;
   applyId: Types.ObjectId;

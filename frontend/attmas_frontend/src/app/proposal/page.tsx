@@ -22,6 +22,7 @@ import ApplyDetailsDialog from '../component/projectsDetails/projectDetails';
 import ConfirmationDialog from '../component/All_ConfirmationBox/ConfirmationDialog';
 import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '../services/axios.service';
+import { pubsub } from '../services/pubsub.service';
 
 interface Proposal {
     _id: string;
@@ -161,23 +162,30 @@ const proposal = () => {
     }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
 
 
+    const fetchAppliedJobs = async () => {
+        try {
+            const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
+            console.log('respons page', response.data);
+            const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
+            console.log('fetchedAppliedJobs', fetchedAppliedJobs);
+            setAppliedJobs(fetchedAppliedJobs);
+            setApplications(response.data);
+        } catch (error) {
+            console.error('Error fetching applied jobs:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchAppliedJobs = async () => {
-            try {
-                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-                console.log('respons page', response.data);
-                const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-                console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-                setAppliedJobs(fetchedAppliedJobs);
-                setApplications(response.data);
-            } catch (error) {
-                console.error('Error fetching applied jobs:', error);
-            }
-        };
         fetchAppliedJobs();
     }, [userId]);
 
+    useEffect(() => {
+        pubsub.subscribe('ProposalRefetch', fetchAppliedJobs);
+
+        return () => {
+            pubsub.unsubscribe('ProposalRefetch', fetchAppliedJobs);
+        };
+    }, [fetchAppliedJobs]);
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         console.log("Viewing Job:", job);
@@ -224,6 +232,7 @@ const proposal = () => {
             setHasSubmittedProposal(true);
             setStep(1);
             setFormValues({});
+            pubsub.publish('ProposalRefetch' ,{Message:'Proposal Refetched'});
         } catch (error) {
             console.error('Error submitting proposal:', error);
         }
@@ -231,25 +240,25 @@ const proposal = () => {
 
 
 
-    useEffect(() => {
-        const checkProposalStatus = async () => {
-          try {
-            const response = await axiosInstance.get(`${SERVER_URL}/proposals/check`, {
-              params: {
-                userID: userId,
-                applyId: selectedApply?._id, 
-              },
-            });
-            console.log('response for checkProposalStatus',response);
-            setHasSubmittedProposal(response.data !== null);
-          } catch (error) {
-            console.error('Error checking proposal status:', error);
-          }
-        };
-    
-        checkProposalStatus();
-      }, [selectedApply?._id, userId]);
-    
+    // useEffect(() => {
+    //     const checkProposalStatus = async () => {
+    //       try {
+    //         const response = await axiosInstance.get(`${SERVER_URL}/proposals/check`, {
+    //           params: {
+    //             userID: userId,
+    //             applyId: selectedApply?._id, 
+    //           },
+    //         });
+    //         console.log('response for checkProposalStatus',response);
+    //         setHasSubmittedProposal(response.data !== null);
+    //       } catch (error) {
+    //         console.error('Error checking proposal status:', error);
+    //       }
+    //     };
+
+    //     checkProposalStatus();
+    //   }, [selectedApply?._id, userId]);
+
 
     const handleApprove = (proposalId: string) => {
         setConfirmationOpen(true);
@@ -261,9 +270,9 @@ const proposal = () => {
     const handleReject = (proposalId: string) => {
         setConfirmationOpen(true);
         setCurrentAction('Reject');
-      
+
         setSelectedProposalId(proposalId);
-       
+
     };
 
     const handleConfirmation = async (status: 'Approved' | 'Rejected', comment: string) => {
@@ -376,6 +385,21 @@ const proposal = () => {
             setShowCommentSection(true);
         }
     }, [userDetails.userType]);
+
+    // useEffect(() => {
+    //     const fetchProposalStatus = async () => {
+    //       try {
+    //         console.log('Fetching proposal status with:', userDetails._id);
+    //         const response = await axiosInstance.get(`${APIS.CHECK_PROPOSAL_SUBMISSION}/${userDetails._id}/${selectedApply?._id}`);
+    //         console.log('response for Proposal',response);
+    //         setHasSubmittedProposal(response.data.hasSubmittedProposal);
+    //       } catch (error) {
+    //         console.error('Error fetching proposal status:', error);
+    //       }
+    //     };
+
+    //     fetchProposalStatus();
+    //   }, [userDetails._id, selectedApply?._id]);
 
 
 
@@ -491,85 +515,85 @@ const proposal = () => {
             )}
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner')  && (
+                {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
                     <Box>
                         {proposals.length > 0 ? (
                             proposals
-                            .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded))
-                            .map((proposal) => (
-                                <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
-                                    <CardContent>
-                                        <Typography variant="h6">{proposal.projectTitle}</Typography>
-                                        <Typography variant="body1">
-                                            <span style={{ fontWeight: 'bold' }} onClick={() => {
-                                                console.log('proposal?.jobDetails?.username', proposal?.jobDetails?.username);
-                                                handleUserClick(proposal?.jobDetails?.username);
-                                            }}>
-                                                Project Owner Name:
-                                            </span>
-                                            {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
-                                        </Typography>
-                                        {userDetails.userType === 'Admin' && (
+                                .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded))
+                                .map((proposal) => (
+                                    <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
+                                        <CardContent>
+                                            <Typography variant="h6">{proposal.projectTitle}</Typography>
                                             <Typography variant="body1">
-                                                <span style={{ fontWeight: 'bold' }}
-                                                    onClick={() => {
-                                                        console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
-                                                        handleUserClick(proposal?.userName);
-                                                    }}
-                                                >
-                                                    Freelancer Name:</span>
-                                                {` ${proposal.firstname} ${proposal.lastname}`}
+                                                <span style={{ fontWeight: 'bold' }} onClick={() => {
+                                                    console.log('proposal?.jobDetails?.username', proposal?.jobDetails?.username);
+                                                    handleUserClick(proposal?.jobDetails?.username);
+                                                }}>
+                                                    Project Owner Name:
+                                                </span>
+                                                {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
                                             </Typography>
-                                        )}
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 8,
-                                                right: 8,
-                                                display: 'flex',
-                                                alignItems: 'center'
-                                            }}
-                                        >
-                                            <Chip
-                                                label={proposal.Status}
-                                                variant="outlined"
-                                                color={proposal.Status === PROPOSAL_STATUSES.proposalUnderReview ? 'success' : 'error'}
-                                            />
-                                        </Box>
-                                        {userDetails.userType === 'Admin' && (
-                                            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                                {proposal.Status !== PROPOSAL_STATUSES.pending || proposal.Status !== 'Rejected' && (
-                                                    <>
-                                                        <Button
-                                                            variant="contained"
-                                                            color="success"
-                                                            onClick={() => handleApprove(proposal._id)}
-                                                        >
-                                                            Approve
-                                                        </Button>
-                                                        <Button
-                                                            variant="contained"
-                                                            color="error"
-                                                            onClick={() => handleReject(proposal._id)}
-                                                        >
-                                                            Reject
-                                                        </Button>
-                                                    </>
-                                                )}
-                                            </Box>
-                                        )} 
-                                        {userDetails.userType === 'Project Owner' && proposal.applyId && isAwardButtonVisible && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview   && (
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                onClick={() => handleOpenConfirmationDialog(proposal.applyId as string)}
+                                            {userDetails.userType === 'Admin' && (
+                                                <Typography variant="body1">
+                                                    <span style={{ fontWeight: 'bold' }}
+                                                        onClick={() => {
+                                                            console.log(`Freelancer Name: ${proposal.firstname} ${proposal.lastname}`);
+                                                            handleUserClick(proposal?.userName);
+                                                        }}
+                                                    >
+                                                        Freelancer Name:</span>
+                                                    {` ${proposal.firstname} ${proposal.lastname}`}
+                                                </Typography>
+                                            )}
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    display: 'flex',
+                                                    alignItems: 'center'
+                                                }}
                                             >
-                                                Award
-                                            </Button>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            ))
+                                                <Chip
+                                                    label={proposal.Status}
+                                                    variant="outlined"
+                                                    color={proposal.Status === PROPOSAL_STATUSES.proposalUnderReview ? 'success' : 'error'}
+                                                />
+                                            </Box>
+                                            {userDetails.userType === 'Admin' && (
+                                                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                                    {proposal.Status !== PROPOSAL_STATUSES.pending || proposal.Status !== 'Rejected' && (
+                                                        <>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="success"
+                                                                onClick={() => handleApprove(proposal._id)}
+                                                            >
+                                                                Approve
+                                                            </Button>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="error"
+                                                                onClick={() => handleReject(proposal._id)}
+                                                            >
+                                                                Reject
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                </Box>
+                                            )}
+                                            {userDetails.userType === 'Project Owner' && proposal.applyId && isAwardButtonVisible && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview && (
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleOpenConfirmationDialog(proposal.applyId as string)}
+                                                >
+                                                    Award
+                                                </Button>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))
                         ) : (
                             <Typography>No proposals available</Typography>
                         )}
@@ -589,108 +613,101 @@ const proposal = () => {
 
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Freelancer') &&  (
+                {(userDetails.userType === 'Freelancer') && (
                     <>
                         {applications.length > 0 ? (
                             <Box>
                                 {applications.map((application) => (
-                                     (application.status === APPLY_STATUSES.approvedPendingForProposal ||
-                                     application.status === APPLY_STATUSES.rejected ||
-                                     application.status === APPLY_STATUSES.proposalApprovalPending ||
-                                     application.status === APPLY_STATUSES.proposalUnderReview ||
-                                     application.status === APPLY_STATUSES.awarded ||
-                                     application.status === APPLY_STATUSES.notAwarded) && (
-                                    <Card key={application._id} sx={{ mb: 2 }}>
-                                        <CardContent>
-                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <a
-                                                    href="#"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        setSelectedApply(application);
-                                                        setDialogOpen(true);
-                                                    }}
-                                                    style={{
-                                                        textDecoration: 'underline',
-                                                        color: '#1976d2',
-                                                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
-                                                    }}
-                                                >
-                                                    {application.title}
-                                                </a>
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(application.TimeFrame).format(DATE_FORMAT)}
-                                                </Box>
-                                            </Typography>
+                                    (application.status === APPLY_STATUSES.approvedPendingForProposal ||
+                                        application.status === APPLY_STATUSES.rejected ||
+                                        application.status === APPLY_STATUSES.proposalApprovalPending ||
+                                        application.status === APPLY_STATUSES.proposalUnderReview ||
+                                        application.status === APPLY_STATUSES.awarded ||
+                                        application.status === APPLY_STATUSES.notAwarded) && (
+                                        <Card key={application._id} sx={{ mb: 2 }}>
+                                            <CardContent>
+                                                <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSelectedApply(application);
+                                                            setDialogOpen(true);
+                                                        }}
+                                                        style={{
+                                                            textDecoration: 'underline',
+                                                            color: '#1976d2',
+                                                            fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                                                        }}
+                                                    >
+                                                        {application.title}
+                                                    </a>
+                                                    <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                        {dayjs(application.TimeFrame).format(DATE_FORMAT)}
+                                                    </Box>
+                                                </Typography>
 
-                                            <Chip
-                                                label={application.status}
-                                                size='small'
-                                                variant="outlined"
-                                                sx={{
-                                                    borderColor: application.status === APPLY_STATUSES.approvedPendingForProposal
-                                                        ? 'green'
-                                                        : application.status === APPLY_STATUSES.rejected
-                                                            ? 'red'
-                                                            : application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
-                                                                ? 'green'
-                                                                : application.status === APPLY_STATUSES.awarded
-                                                                    ? 'blue'
-                                                                    : application.status === APPLY_STATUSES.notAwarded
-                                                                        ? 'grey'
-                                                                        : 'default',
-                                                    color: application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
-                                                        ? 'green'
-                                                        : application.status === APPLY_STATUSES.rejected
-                                                            ? 'red'
+                                                <Chip
+                                                    label={application.status}
+                                                    size='small'
+                                                    variant="outlined"
+                                                    sx={{
+                                                        borderColor: application.status === APPLY_STATUSES.approvedPendingForProposal
+                                                            ? 'green'
                                                             : application.status === APPLY_STATUSES.rejected
-                                                                ? 'green'
-                                                                : application.status === APPLY_STATUSES.awarded
-                                                                    ? 'blue'
-                                                                    : application.status === APPLY_STATUSES.notAwarded
-                                                                        ? 'grey'
-                                                                        : 'default',
-                                                    borderRadius: '16px',
-                                                    px: 1,
-                                                    mb: 2,
-                                                }}
-                                            />
+                                                                ? 'red'
+                                                                : application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                                    ? 'green'
+                                                                    : application.status === APPLY_STATUSES.awarded
+                                                                        ? 'blue'
+                                                                        : application.status === APPLY_STATUSES.notAwarded
+                                                                            ? 'grey'
+                                                                            : 'default',
+                                                        color: application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                            ? 'green'
+                                                            : application.status === APPLY_STATUSES.rejected
+                                                                ? 'red'
+                                                                : application.status === APPLY_STATUSES.rejected
+                                                                    ? 'green'
+                                                                    : application.status === APPLY_STATUSES.awarded
+                                                                        ? 'blue'
+                                                                        : application.status === APPLY_STATUSES.notAwarded
+                                                                            ? 'grey'
+                                                                            : 'default',
+                                                        borderRadius: '16px',
+                                                        px: 1,
+                                                        mb: 2,
+                                                    }}
+                                                />
 
 
-                                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                                {application.currency} {application.Budget}
-                                            </Typography>
-                                            {!hasSubmittedProposal &&(
-                                                <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-
-                                                    <Box sx={{
-                                                        fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
-                                                    }}>
+                                                <Typography variant="body1" sx={{ mt: 1 }}>
+                                                    {application.currency} {application.Budget}
+                                                </Typography>
+                                                <Box sx={{ fontSize: 'small', fontWeight: 'bolder', display: 'flex', alignItems: 'center' }}>
+                                                {(!application.proposalsDetails || application.proposalsDetails.length === 0) && (
                                                         <Button
                                                             variant="contained"
-                                                            size='small'
-                                                            onClick={() => {
-                                                                fetchProjectDetails(application);
-                                                            }}
+                                                            size="small"
+                                                            onClick={() => fetchProjectDetails(application)}
                                                         >
                                                             Submit Proposal
                                                         </Button>
-
-                                                        <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
-                                                            <DialogTitle>Submit Proposal</DialogTitle>
-                                                            <DialogContent>
-                                                                {step === 1 && <ProposalStep1 onNext={handleNextStep} />}
-                                                                {step === 2 && <ProposalStep2 onNext={handleNextStep} onPrevious={handlePreviousStep} />}
-                                                                {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={handlePreviousStep} />}
-                                                            </DialogContent>
-                                                            <DialogActions>
-                                                                <Button onClick={() => setOpen(false)}>Cancel</Button>
-                                                            </DialogActions>
-                                                        </Dialog>
-
-                                                    </Box>
+                                                    )}
+                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
+                                                        <DialogTitle>Submit Proposal</DialogTitle>
+                                                        <DialogContent>
+                                                            {step === 1 && <ProposalStep1 onNext={() => setStep(step + 1)} />}
+                                                            {step === 2 && <ProposalStep2 onNext={() => setStep(step + 1)} onPrevious={() => setStep(step - 1)} />}
+                                                            {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={() => setStep(step - 1)} />}
+                                                        </DialogContent>
+                                                        <DialogActions>
+                                                            <Button onClick={() => setOpen(false)}>Cancel</Button>
+                                                        </DialogActions>
+                                                    </Dialog>
                                                 </Box>
-                                            )}
+                                          
+      
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Button
                                                     aria-controls="simple-menu"
@@ -718,44 +735,48 @@ const proposal = () => {
                                             </Box>
                                         </CardContent>
                                     </Card>
-                                     )
+                        )
                                 ))}
-                            </Box>
-                        ) : (
-                            <Typography>No projects available</Typography>
+                    </Box>
+                ) : (
+                <Typography>No projects available</Typography>
                         )}
-                    </>
+            </>
                 )}
 
 
-            </Box>
-
-
-            {selectedUser ? (
-                <UserDrawer
-                    open={drawerOpen}
-                    onClose={handleDrawerClose}
-                    username={selectedUser}
-                />
-            ) : ""}
-
-            {selectedApply && (
-                <ApplyDetailsDialog
-                    open={dialogOpen}
-                    onClose={() => setDialogOpen(false)}
-                    apply={selectedApply}
-                    jobId={viewingJob?._id || ''}
-                    canAddComment={showCommentSection}
-                    onCommentSubmitted={() => { console.log('Comment has been submitted') }}
-                />
-            )}
-            <ConfirmationDialog
-                open={confirmationDialogOpen}
-                onClose={handleCloseConfirmationDialog}
-                onConfirm={handleConfirm}
-                message="Are you sure you want to award this application?"
-            />
         </Box>
+
+
+            {
+        selectedUser ? (
+            <UserDrawer
+                open={drawerOpen}
+                onClose={handleDrawerClose}
+                username={selectedUser}
+            />
+        ) : ""
+    }
+
+    {
+        selectedApply && (
+            <ApplyDetailsDialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                apply={selectedApply}
+                jobId={viewingJob?._id || ''}
+                canAddComment={showCommentSection}
+                onCommentSubmitted={() => { console.log('Comment has been submitted') }}
+            />
+        )
+    }
+    <ConfirmationDialog
+        open={confirmationDialogOpen}
+        onClose={handleCloseConfirmationDialog}
+        onConfirm={handleConfirm}
+        message="Are you sure you want to award this application?"
+    />
+        </Box >
     );
 };
 

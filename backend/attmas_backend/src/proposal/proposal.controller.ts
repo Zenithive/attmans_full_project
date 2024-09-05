@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,11 +6,8 @@ import {
   Param,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { ProposalService } from './proposal.service';
-import { Proposal } from './proposal.schema';
-import { Types } from 'mongoose';
 
 @Controller('proposals')
 export class ProposalController {
@@ -51,28 +47,17 @@ export class ProposalController {
     return this.proposalService.updateStatusProposal(id, status, comment);
   }
 
-  @Get('/:userID')
-  async getProposalByUserId(@Param('userID') userID: string) {
-    console.log('userID', userID);
-    return this.proposalService.findProposalByUserId(userID);
-  }
-
-  @Get('check')
-  async checkProposal(
-    @Query('userID') userID: string,
-    @Query('applyId') applyId: string,
-  ): Promise<Proposal | null> {
-    console.log('Received userID:', userID);
-    console.log('Received applyId:', applyId);
-
-    let objectId: Types.ObjectId;
-    try {
-      objectId = new Types.ObjectId(applyId);
-    } catch (error) {
-      console.error('Invalid applyId format:', error);
-      throw new BadRequestException('Invalid applyId format');
-    }
-
-    return this.proposalService.findProposalByUserAndApply(userID, objectId);
-  }
+  // @Get('check-submission/:userID/:applyId')
+  // async checkSubmission(
+  //   @Param('userID') userID: string,
+  //   @Param('applyId') applyId: string,
+  // ): Promise<{ hasSubmittedProposal: boolean }> {
+  //   const hasSubmittedProposal =
+  //     await this.proposalService.hasSubmittedProposal(
+  //       userID as unknown as Types.ObjectId,
+  //       applyId as unknown as Types.ObjectId,
+  //     );
+  //   console.log('hasSubmittedProposal', hasSubmittedProposal);
+  //   return { hasSubmittedProposal };
+  // }
 }

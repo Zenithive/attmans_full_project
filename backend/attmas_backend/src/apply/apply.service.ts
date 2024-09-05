@@ -36,8 +36,14 @@ export class ApplyService {
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     // Convert jobId to ObjectId if it is not already
-    const userId = new Types.ObjectId(createApplyDto.userId);
+    let userId: Types.ObjectId;
     let jobId: Types.ObjectId;
+
+    try {
+      userId = new Types.ObjectId(createApplyDto.userId);
+    } catch (error) {
+      throw new BadRequestException('Invalid userId format');
+    }
     try {
       jobId = new Types.ObjectId(createApplyDto.jobId);
     } catch (error) {
@@ -58,6 +64,7 @@ export class ApplyService {
     // Create and save new application
     const createdApply = new this.ApplyModel({
       ...createApplyDto,
+      userId: userId,
       jobId: jobId,
     });
     await createdApply.save();
@@ -97,95 +104,6 @@ export class ApplyService {
       .exec();
   }
 
-  // async findAllMyProject(userId: string): Promise<Apply[]> {
-  //   console.log('UserId received:', userId); // Log the received userId
-
-  //   // Check if userId is a valid ObjectId
-  //   if (!Types.ObjectId.isValid(userId)) {
-  //     throw new Error('Invalid userId format');
-  //   }
-
-  //   // Query to find documents with the given userId and status 'Awarded'
-  //   return this.ApplyModel.find({
-  //       userId: userId,
-  //       status: 'Awarded'
-  //     })
-  //     .populate('userId', 'firstName lastName username', this.userModel)
-  //     .exec()
-  //     .then(results => {
-  //       console.log("Results:", results); // Log the results
-  //       return results;
-  //     });
-  // }
-
-  // async findAllMyProject(userId: string): Promise<Apply[]> {
-  //   console.log('UserId received:', userId); // Log the received userId
-
-  //   // Check if userId is a valid ObjectId
-  //   if (!Types.ObjectId.isValid(userId)) {
-  //     throw new Error('Invalid userId format');
-  //   }
-
-  //   return this.ApplyModel.aggregate([
-  //     // Stage 1: Match documents by userId and status
-  //     {
-  //       $match: {
-  //         userId: userId,
-  //         status: 'Awarded',
-  //       },
-  //     },
-  //     // Stage 2: Lookup to get job details from the Job collection
-  //     {
-  //       $lookup: {
-  //         from: 'jobs', // Name of the Job collection
-  //         localField: 'jobId', // Field from Apply collection
-  //         foreignField: '_id', // Field from Job collection
-  //         as: 'jobDetails' // Output array field
-  //       },
-  //     },
-  //     // Stage 3: Unwind the jobDetails array to get individual job detail documents
-  //     {
-  //       $unwind: {
-  //         path: '$jobDetails',
-  //         preserveNullAndEmptyArrays: true,
-  //       },
-  //     },
-  //     // Stage 4: Project fields to include in the result
-  //     {
-  //       $project: {
-  //         jobTitle: '$jobDetails.title',
-  //         jobCurrency: '$jobDetails.currency',
-  //         description: '$jobDetails.description',
-  //         Objective: '$jobDetails.Objective',
-  //         Expectedoutcomes: '$jobDetails.Expectedoutcomes',
-  //         IPRownership: '$jobDetails.IPRownership',
-  //         Expertiselevel: '$jobDetails.Expertiselevel',
-  //         DetailsOfInnovationChallenge: '$jobDetails.DetailsOfInnovationChallenge',
-  //         Sector: '$jobDetails.Sector',
-  //         AreaOfProduct: '$jobDetails.AreaOfProduct',
-  //         ProductDescription: '$jobDetails.ProductDescription',
-  //         Category: '$jobDetails.Category',
-  //         Subcategorys: '$jobDetails.Subcategorys',
-  //         SelectService: '$jobDetails.SelectService',
-  //         TimeFrame: '$jobDetails.TimeFrame',
-  //         Budget: '$jobDetails.Budget',
-  //         userId: 1,
-  //         status: 1,
-  //         buttonsHidden: 1,
-  //         username: '$userId.username', // Assuming you also want to include username from the Apply document
-  //         createdAt: 1,
-  //         comments: 1,
-  //         firstName: '$userId.firstName', // Assuming you have populated this field
-  //         lastName: '$userId.lastName', // Assuming you have populated this field
-  //       },
-  //     },
-  //   ])
-  //   .then(results => {
-  //     console.log("Results:", results); // Log the results
-  //     return results;
-  //   });
-  // }
-
   async findAllMyProject(userId: string): Promise<any[]> {
     console.log('UserId received:', userId); // Log the received userId
 
@@ -201,12 +119,7 @@ export class ApplyService {
           $match: {
             userId: userId,
             status: {
-              $in: [
-                // APPLY_STATUSES.approvedPendingForProposal,
-                // APPLY_STATUSES.proposalApprovalPending,
-                // APPLY_STATUSES.proposalUnderReview,
-                APPLY_STATUSES.awarded,
-              ],
+              $in: [APPLY_STATUSES.awarded],
             },
           },
         },
@@ -348,8 +261,62 @@ export class ApplyService {
     return this.ApplyModel.find({ userId }).exec();
   }
 
-  async findAppliedJobs(userId: string): Promise<Apply[]> {
-    return this.ApplyModel.find({ userId }).exec();
+  async findAppliedJobs(userId: string): Promise<any[]> {
+    try {
+      const results = await this.ApplyModel.aggregate([
+        {
+          $match: {
+            userId: new Types.ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: 'proposals',
+            localField: '_id',
+            foreignField: 'applyId',
+            as: 'proposalsDetails',
+          },
+        },
+        {
+          $unwind: {
+            path: '$proposalsDetails',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        { $limit: 10 },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            description: 1,
+            applyType: 1,
+            SolutionUSP: 1,
+            availableSolution: 1,
+            buttonsHidden: 1,
+            jobId: 1,
+            rejectComment: 1,
+            comment_Reward_Nonreward: 1,
+            status: 1,
+            lastName: 1,
+            firstName: 1,
+            username: 1,
+            userId: 1,
+            currency: 1,
+            Budget: 1,
+            createdAt: 1,
+            TimeFrame: 1,
+            proposalsDetails: {
+              _id: 1,
+            },
+          },
+        },
+      ]).exec();
+      console.log('result for Applied Jobs', results);
+      return results;
+    } catch (error) {
+      console.error('Error during aggregation:', error);
+      throw error;
+    }
   }
 
   async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {

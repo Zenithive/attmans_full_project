@@ -41,6 +41,7 @@ export interface Apply {
     currency: string;
     TimeFrame: string | null;
     rejectComment: string;
+    proposalsDetails:any;
     status: string;
     firstName: string;
     lastName: string;

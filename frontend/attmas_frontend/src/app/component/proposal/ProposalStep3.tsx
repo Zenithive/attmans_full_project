@@ -5,6 +5,8 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import dayjs from 'dayjs';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import { pubsub } from '@/app/services/pubsub.service';
+import { Message } from '@mui/icons-material';
 
 const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => void, onPrevious: () => void }) => {
 
@@ -25,7 +27,10 @@ const ProposalStep3 = ({ onSubmit, onPrevious }: { onSubmit: (values: any) => vo
                 pilotProductionTesting: '',
                 mentoringRequired: '',
             }}
-            onSubmit={(values) => onSubmit(values)}
+            onSubmit={(values) => {
+                onSubmit(values)
+                
+            }}
         >
             {({ handleSubmit }) => (
                 <Form onSubmit={handleSubmit}>
