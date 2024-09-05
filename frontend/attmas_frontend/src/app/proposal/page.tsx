@@ -233,31 +233,39 @@ const proposal = () => {
 
     useEffect(() => {
         const fetchProposalStatus = async () => {
-            console.log('selectedProject?._id',selectedProject?._id);
-            if (!selectedProject?._id) return;
+            console.log('S')
+            if (!selectedApply?._id) return;
             try {
-                const response = await axios.get(`${SERVER_URL}/proposals/user/${selectedProject?._id}`);
+                const response = await axios.get(`${SERVER_URL}/proposals/user/${selectedApply._id}`);
                 console.log('response for fetchProposalStatus', response.data);
-                setHasSubmittedProposal(!!response.data);
-                // Update state based on whether proposal exists
+    
+                const hasSubmitted = response.data.some((proposal: Proposal) => proposal.applyId === selectedApply._id);
+                console.log('hasSubmitted',hasSubmitted);
+                setHasSubmittedProposal(hasSubmitted);
+    
+                // You might want to update other states or handle response data here
             } catch (error) {
                 console.error('Error fetching proposal status', error);
             }
         };
-
+    
         fetchProposalStatus();
-    }, [selectedProject?._id]);
+    }, [selectedApply?._id]); // Ensure the effect runs when `selectedApply._id` changes
+    
 
     const handleApprove = (proposalId: string) => {
+        setConfirmationOpen(true);
         setCurrentAction('Approve');
         setSelectedProposalId(proposalId);
-        setConfirmationOpen(true);
+
     };
 
     const handleReject = (proposalId: string) => {
-        setCurrentAction('Reject');
-        setSelectedProposalId(proposalId);
         setConfirmationOpen(true);
+        setCurrentAction('Reject');
+      
+        setSelectedProposalId(proposalId);
+       
     };
 
     const handleConfirmation = async (status: 'Approved' | 'Rejected', comment: string) => {
@@ -485,10 +493,12 @@ const proposal = () => {
             )}
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
+                {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner')  && (
                     <Box>
                         {proposals.length > 0 ? (
-                            proposals.map((proposal) => (
+                            proposals
+                            .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded))
+                            .map((proposal) => (
                                 <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
                                     <CardContent>
                                         <Typography variant="h6">{proposal.projectTitle}</Typography>
@@ -549,8 +559,8 @@ const proposal = () => {
                                                     </>
                                                 )}
                                             </Box>
-                                        )}
-                                        {userDetails.userType === 'Project Owner' && proposal.applyId && isAwardButtonVisible && (
+                                        )} 
+                                        {userDetails.userType === 'Project Owner' && proposal.applyId && isAwardButtonVisible && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview   && (
                                             <Button
                                                 variant="contained"
                                                 color="primary"
@@ -581,11 +591,17 @@ const proposal = () => {
 
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Freelancer') && (
+                {(userDetails.userType === 'Freelancer') &&  (
                     <>
                         {applications.length > 0 ? (
                             <Box>
                                 {applications.map((application) => (
+                                     (application.status === APPLY_STATUSES.approvedPendingForProposal ||
+                                     application.status === APPLY_STATUSES.rejected ||
+                                     application.status === APPLY_STATUSES.proposalApprovalPending ||
+                                     application.status === APPLY_STATUSES.proposalUnderReview ||
+                                     application.status === APPLY_STATUSES.awarded ||
+                                     application.status === APPLY_STATUSES.notAwarded) && (
                                     <Card key={application._id} sx={{ mb: 2 }}>
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -704,6 +720,7 @@ const proposal = () => {
                                             </Box>
                                         </CardContent>
                                     </Card>
+                                     )
                                 ))}
                             </Box>
                         ) : (

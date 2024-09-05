@@ -26,6 +26,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import { PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 
 
 
@@ -46,6 +47,18 @@ export interface Milestone {
   isCommentSubmitted?: boolean;
   status?: string;
   milstonSubmitcomments: string[];
+}
+
+interface Proposal {
+  _id: string;
+  projectTitle: string;
+  Status: string;
+  // Add other fields as needed
+  firstname: string;
+  lastname: string;
+  userId?: UserSchema;
+  userName: string;
+  applyId: string;
 }
 interface Apply {
   _id?: string;
@@ -92,9 +105,10 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [commentsFetched, setCommentsFetched] = useState<boolean>(false);
   const [resubmitComment, setResubmitComment] = useState<string>('');
   const [isResubmitting, setIsResubmitting] = useState<boolean>(false);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
 
   useEffect(() => {
-    console.log('apply',apply);
+    console.log('apply', apply);
     if (apply?._id) {
       axios.get(`${APIS.MILESTONES}/apply/${apply._id}`)
         .then(response => {
@@ -116,6 +130,23 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         return 'black';
     }
   };
+
+  const fetchAllProposals = useCallback(async () => {
+    if (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') {
+      try {
+        const response = await axios.get(APIS.GET_ALL_PROPOSALS);
+        console.log('Fetched Proposals:', response.data);
+        setProposals(response.data);
+      } catch (error) {
+        console.error('Error fetching proposals:', error);
+      }
+    }
+  }, [userDetails.userType]);
+
+  useEffect(() => {
+    fetchAllProposals();
+    // Fetch proposals if user is Admin
+  }, [fetchAllProposals]);
 
   const handleReward = async (applicationId: string, Comment: string) => {
     try {
@@ -209,7 +240,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     } catch (error) {
       console.error('Error resubmitting milestone:', error);
     } finally {
-      setIsResubmitting(false); 
+      setIsResubmitting(false);
     }
   };
 
@@ -422,7 +453,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 value={resubmitComment}
                                                 onChange={(e) => setResubmitComment(e.target.value)}
                                                 multiline
-                                                 color='secondary'
+                                                color='secondary'
                                                 fullWidth
                                                 sx={{ mb: 2 }}
                                               />
@@ -526,15 +557,23 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         </DialogContent>
         <DialogActions>
 
-          {userDetails.userType === 'Project Owner' && apply?._id && isAwardButtonVisible && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleOpenConfirmationDialog(apply._id as string)}
-            >
-              Award
-            </Button>
-          )}
+          {proposals
+            .filter((proposal) => proposal.Status === PROPOSAL_STATUSES.proposalUnderReview)
+            .map((proposal) => (
+              userDetails.userType === 'Project Owner' &&
+              apply?._id &&
+              isAwardButtonVisible && (
+                <Button
+                  key={proposal._id}
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleOpenConfirmationDialog(apply._id as string)}
+                >
+                  Award
+                </Button>
+              )
+            ))}
+
           <Button
             onClick={onClose}
             sx={{

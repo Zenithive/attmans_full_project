@@ -1,4 +1,4 @@
-import { Schema, Document, Model } from 'mongoose';
+import { Schema, Document, Model, Types } from 'mongoose';
 import { Apply } from 'src/apply/apply.schema';
 import {
   PROPOSAL_STATUSES,
@@ -57,8 +57,8 @@ export const ProposalSchema = new Schema({
   // New fields added
   userID: { type: String, required: false },
   userName: { type: String, required: false },
-  projectId: { type: String, required: false },
-  applyId: { type: String, required: false },
+  projectId: { type: Types.ObjectId, required: false },
+  applyId: { type: Types.ObjectId, required: false },
   projectTitle: { type: String, required: false },
   projectCurrency: { type: String, required: false },
   Status: { type: String, required: false },
@@ -114,8 +114,8 @@ export interface Proposal extends Document {
   // New fields added to the interface
   userID?: string;
   userName?: string;
-  projectId: string;
-  applyId: string;
+  projectId: Types.ObjectId;
+  applyId: Types.ObjectId;
   projectTitle: string;
   projectCurrency: string;
   Status: string;
