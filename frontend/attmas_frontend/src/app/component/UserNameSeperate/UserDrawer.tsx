@@ -5,8 +5,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ProductTable, { Product } from '../ProductTable';
 import { ProductForBooth } from '../ProductTableForBooth';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
+import axiosInstance from '@/app/services/axios.service';
 
 interface User {
   _id: string;
@@ -72,7 +72,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
   const fetchProductDetailsForUser = async () => {
     try {
-      const response = await axios.get<ProductForBooth[]>(
+      const response = await axiosInstance.get<ProductForBooth[]>(
         `${APIS.PRODUCTNAME}?username=${user.username}`
       );
       setProductDetails(response.data || []);
@@ -83,8 +83,8 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
   const fetchUserDetailsUsingUsername = async () => {
     try {
-      const response = await axios.get<User[]>(
-        `${SERVER_URL}/users/filters?&page=1&limit=20&username=${username}`
+      const response = await axiosInstance.get<User[]>(
+        `/users/filters?&page=1&limit=20&username=${username}`
       );
       console.log('profile for',response.data)
       setUser(response.data[0] || []);

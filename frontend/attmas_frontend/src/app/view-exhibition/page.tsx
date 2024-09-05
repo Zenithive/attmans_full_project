@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useEffect, Suspense } from 'react';
-import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
@@ -17,6 +16,7 @@ import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
 import { EXHIBITION_STATUSES } from '../constants/status.constant';
+import axiosInstance from '../services/axios.service';
 
 interface Exhibition {
   _id?: string;
@@ -101,7 +101,7 @@ const ExhibitionsPage: React.FC = () => {
           console.error('id not found');
           return;
         }
-        const response = await axios.get(`${APIS.EXHIBITION}/${exhibitionId}`);
+        const response = await axiosInstance.get(`${APIS.EXHIBITION}/${exhibitionId}`);
         setExhibitions([response.data]);
         setSelectedExhibition(response.data);
       } catch (error) {
@@ -111,7 +111,7 @@ const ExhibitionsPage: React.FC = () => {
 
     const fetchBooths = async () => {
       try {
-        const response = await axios.get(`${APIS.GET_BOOTH}`, {
+        const response = await axiosInstance.get(`${APIS.GET_BOOTH}`, {
           params: {
             userId: userDetails?._id,
             status: statusFilter === 'All' ? '' : statusFilter,
@@ -140,7 +140,7 @@ const ExhibitionsPage: React.FC = () => {
           console.error('id not found');
           return;
         }
-        const response = await axios.get(`${APIS.GET_VISITORS}`, {
+        const response = await axiosInstance.get(`${APIS.GET_VISITORS}`, {
           params: {
             exhibitionId,
             interestType,
@@ -181,7 +181,7 @@ const ExhibitionsPage: React.FC = () => {
     if (interestType) {
       const fetchVisitorforinterestType = async () => {
         try {
-          const response = await axios.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
+          const response = await axiosInstance.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
             params: { interestType },
           });
           setVisitors(response.data);
@@ -211,7 +211,7 @@ const ExhibitionsPage: React.FC = () => {
 
       boothData.exhibitionId = exhibitionId;
 
-      const response = await axios.post(APIS.CREATE_BOOTH, boothData);
+      const response = await axiosInstance.post(APIS.CREATE_BOOTH, boothData);
       if (response.data.exhibitionId === exhibitionId) {
         setBooths(prevBooths => [...prevBooths, response.data]);
         setParticipateButtonVisible(false);
@@ -228,7 +228,7 @@ const ExhibitionsPage: React.FC = () => {
     try {
       const { booth } = approveDialogOpen;
       if (!booth) return;
-      await axios.post(`${APIS.APPROVE_BOOTH}/${booth._id}`);
+      await axiosInstance.post(`${APIS.APPROVE_BOOTH}/${booth._id}`);
       setBooths(prevBooths =>
         prevBooths.map(b =>
           b._id === booth._id ? { ...b, status: 'Approved' } : b
@@ -246,7 +246,7 @@ const ExhibitionsPage: React.FC = () => {
     try {
       const { booth } = rejectDialogOpen;
       if (!booth) return;
-      await axios.post(`${APIS.REJECT_BOOTH}/${booth._id}`, { comment });
+      await axiosInstance.post(`${APIS.REJECT_BOOTH}/${booth._id}`, { comment });
       setBooths(prevBooths =>
         prevBooths.map(b =>
           b._id === booth._id ? { ...b, status: 'Rejected', rejectComment: comment } : b

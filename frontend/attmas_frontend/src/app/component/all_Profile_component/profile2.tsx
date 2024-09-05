@@ -16,13 +16,13 @@ import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import ProductTable, { Product } from '../ProductTable';
 import { userType } from '@/app/services/user.access.service';
 import AddProductModal2 from './AddProductModal2';
 import NewProductTable from './NewProductTable';
+import axiosInstance from '@/app/services/axios.service';
 
 interface FormValues {
     qualification: string;
@@ -251,7 +251,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
             setLoading(true);
             console.log("Submitting products:", values.products);
             try {
-                const response = await axios.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
+                const response = await axiosInstance.post(APIS.FORM2, values); // Adjust endpoint as per your backend API
                 console.log('Form submitted successfully:', response.data);
 
                 setLoading(false);

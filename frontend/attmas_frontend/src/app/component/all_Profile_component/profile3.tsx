@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, CssBaseline, Typography, CircularProgress, Autocomplete, TextField, Button, Checkbox } from '@mui/material';
 import { useFormik } from 'formik';
-import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
@@ -11,6 +10,7 @@ import { pubsub } from '@/app/services/pubsub.service';
 import { categories, options } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise';
 import TermsAndConditionsModal from './TermsAndConditionsModal'; // Import the new modal component
+import axiosInstance from '@/app/services/axios.service';
 
 interface ProfileForm3Props {
   onPrevious: () => void;
@@ -34,7 +34,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        await axios.post(`${APIS.FORM3}?username=${userDetails.username}`, values);
+        await axiosInstance.post(`${APIS.FORM3}?username=${userDetails.username}`, values);
         pubsub.publish('toast', {
           message: 'Profile updated successfully!',
           severity: 'success',
@@ -58,7 +58,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`);
+        const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
         const userData = response.data;
         formik.setValues({
           ...formik.values,

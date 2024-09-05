@@ -3,11 +3,11 @@ import { Autocomplete, Box, Button, Card, CardContent, Checkbox, CircularProgres
 import CloseIcon from '@mui/icons-material/Close';
 import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { UserSchema, selectUserSession } from '../../reducers/userReducer';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { pubsub } from '@/app/services/pubsub.service';
+import axiosInstance from '@/app/services/axios.service';
 
 interface SendInnovatorsProps {
   onCancel: () => void;
@@ -42,7 +42,7 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
 
   const fetchSubmittedInnovators = async () => {
     try {
-      const response = await axios.get(`${APIS.GET_SUBMITTED_INNOVATORS}?userId=${userDetails._id}`);
+      const response = await axiosInstance.get(`${APIS.GET_SUBMITTED_INNOVATORS}?userId=${userDetails._id}`);
       console.log('Fetched submitted innovators:', response.data);
       setSubmittedInnovators(response.data);
     } catch (error) {
@@ -53,7 +53,7 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
   const fetchInnovators = async (page: number, searchQuery: string = '') => {
     try {
       setLoading(true);
-      const response = await axios.get(`${APIS.GET_INNOVATORS}&page=${page}&limit=6&search=${searchQuery}`);
+      const response = await axiosInstance.get(`${APIS.GET_INNOVATORS}&page=${page}&limit=6&search=${searchQuery}`);
       console.log('Fetched innovators:', response.data);
 
       if (response.data.length === 0) {
@@ -116,7 +116,7 @@ export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {
 
     try {
       // API call to send the message
-      await axios.post(APIS.SEND_INNOVATORS, sendInnovators);
+      await axiosInstance.post(APIS.SEND_INNOVATORS, sendInnovators);
       pubsub.publish('toast', { message: 'Exhibition sent successfully!', severity: 'success' });
       resetForm();
       setOpen(false);
