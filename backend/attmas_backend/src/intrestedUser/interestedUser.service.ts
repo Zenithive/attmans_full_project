@@ -42,7 +42,7 @@ export class InterestedUserService {
     const existingInterest = await this.interestedUserModel
       .findOne({
         userId: userObjectId,
-        newBoothId,
+        boothId: newBoothId,
         interestType: 'InterestedUserForBooth',
       })
       .exec();
@@ -53,7 +53,7 @@ export class InterestedUserService {
 
     try {
       const exhibition = await this.exhibitionModel
-        .findById(exhibitionObjectId)
+        .findById({ exhibitionId: exhibitionObjectId })
         .exec();
 
       if (!exhibition) {
