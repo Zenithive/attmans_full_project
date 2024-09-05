@@ -338,64 +338,78 @@ const Exhibition = () => {
             </Card>
           ))} */}
 
-{exhibitions.map((exhibition) => (
-  <Card key={exhibition._id} sx={{ mb: 2 }}>
-    <CardContent>
-      <Typography variant="h5">
-        <span style={{ cursor: 'pointer', marginRight: 10 }}>
-          <a
-            href={`/view-exhibition?exhibitionId=${exhibition._id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'black', textDecoration: 'none' }}
-          >
-            <Typography variant="h6" component="span">
-              {exhibition.title}
-            </Typography>
-          </a>
-        </span>
-        <span style={{ fontSize: 'small', color: "#616161" }}>
-          (
-          {!exhibition.exhbTime
-            ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT)
-            : exhibition.dateTime} {exhibition.exhbTime || ''}
-          )
-        </span>
-        <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
-          {exhibition.status}
-        </span>
-      </Typography>
+          {exhibitions.map((exhibition) => (
+            <Card key={exhibition._id} sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant="h5">
+                  <span style={{ cursor: 'pointer', marginRight: 10 }}>
+                    <a
+                      href={`/view-exhibition?exhibitionId=${exhibition._id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'black', textDecoration: 'none' }}
+                    >
+                      <Typography variant="h6" component="span">
+                        {exhibition.title}
+                      </Typography>
+                    </a>
 
-      <Typography variant="caption">
-        {exhibition.industries.join(', ')} | {exhibition.subjects.join(', ')}
-      </Typography>
+                  </span>
+                  <span style={{ fontSize: 'small', color: "#616161" }}>
+                    (
+                    {!exhibition.exhbTime
+                      ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT)
+                      : exhibition.dateTime} {exhibition.exhbTime || ''}
+                    )
+                  </span>
+                  <span style={{ fontSize: 'small', fontWeight: "bolder", float: "right" }}>
+                    {exhibition.status}
+                  </span>
+                </Typography>
 
-      {/* Booth Status Counts (Visible only to Admin) */}
-      {userType === "Admin" && (
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          <strong>Booth:</strong> (<strong>Approved:</strong> {exhibition.boothCounts?.approved || 0} | <strong>Rejected:</strong> {exhibition.boothCounts?.rejected || 0} | <strong>Pending:</strong> {exhibition.boothCounts?.pending || 0})
-        </Typography>
-      )}
+                <Typography variant="caption">
+                  {exhibition.industries.join(', ')} | {exhibition.subjects.join(', ')}
+                </Typography>
 
-      <Typography sx={{ display: "flex", float: "right" }}>
-        {userType === "Admin" && (
-          <IconButton onClick={() => handleEditExhibition(exhibition)}>
-            <Tooltip title="Edit">
-              <EditIcon />
-            </Tooltip>
-          </IconButton>
-        )}
-        {userType === "Admin" && (
-          <IconButton onClick={() => handleConfirmDelete(exhibition)}>
-            <Tooltip title="Delete">
-              <DeleteRoundedIcon />
-            </Tooltip>
-          </IconButton>
-        )}
-      </Typography>
-    </CardContent>
-  </Card>
-))}
+                {/* Booth Status Counts (Visible only to Admin) */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {userType === "Admin" && (
+                    <Typography variant="body2">
+                      <strong>Booth:</strong> (<strong>Approved:</strong> {exhibition.boothCounts?.approved || 0} | <strong>Rejected:</strong> {exhibition.boothCounts?.rejected || 0} | <strong>Pending:</strong> {exhibition.boothCounts?.pending || 0})
+                    </Typography>
+                  )}
+
+                  <a
+                    href={`/view-exhibition?exhibitionId=${exhibition._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'blue', textDecoration: 'underline', fontSize: 'medium' }}
+                  >
+                    <Typography variant="h6" component="span" sx={{ fontSize: 'inherit', color: 'inherit', textDecoration: 'inherit' }}>
+                      View Exhibition
+                    </Typography>
+                  </a>
+                </Box>
+
+                <Typography sx={{ display: "flex", float: "right" }}>
+                  {userType === "Admin" && (
+                    <IconButton onClick={() => handleEditExhibition(exhibition)}>
+                      <Tooltip title="Edit">
+                        <EditIcon />
+                      </Tooltip>
+                    </IconButton>
+                  )}
+                  {userType === "Admin" && (
+                    <IconButton onClick={() => handleConfirmDelete(exhibition)}>
+                      <Tooltip title="Delete">
+                        <DeleteRoundedIcon />
+                      </Tooltip>
+                    </IconButton>
+                  )}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
 
 
         </Box>

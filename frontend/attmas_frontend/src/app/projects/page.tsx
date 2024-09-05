@@ -157,11 +157,11 @@ const Jobs = () => {
     const getParamForJobs = (page: number) => {
         if (userType === 'Project Owner') {
             return `?page=${page}&userId=${userDetails._id}&${filter}`;
-        }else if(userType === 'Freelancer'){
+        } else if (userType === 'Freelancer') {
             return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Outsource Research and Development&${filter}`;
-        }else if(userType === 'Innovators'){
+        } else if (userType === 'Innovators') {
             return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Innovative product&${filter}`;
-        }else {
+        } else {
             return `?page=${page}&${filter}`;
         }
     }
@@ -514,6 +514,11 @@ const Jobs = () => {
                                                 <span style={{ fontSize: 'small', color: "#616161", marginLeft: 10 }}>
                                                     ({dayjs(job.TimeFrame).format(DATE_FORMAT)})
                                                 </span>
+
+
+
+
+
                                             </Box>
                                             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                 <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
@@ -539,13 +544,27 @@ const Jobs = () => {
                                             <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                             <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
 
-                                            
 
-                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
-                                                <Typography variant="body2" sx={{ mt: 1, fontWeight: 'bold' }}>
-                                                    Applications: {job.appliesCount}
-                                                </Typography>
-                                            )}
+
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
+                                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                                        Applications: {job.appliesCount}
+                                                    </Typography>
+                                                )}
+                                                <a
+                                                    onClick={() => handleViewJob(job)}
+                                                    style={{
+                                                        cursor: 'pointer',
+                                                        textDecoration: 'underline',
+                                                        color: 'blue',
+                                                        fontSize: 'medium',
+                                                    }}
+                                                >
+                                                    View Project
+                                                </a>
+                                            </Box>
+
 
                                             <Box sx={{ position: 'sticky', float: 'right', left: '92%', '@media (max-width: 767px)': { position: 'relative', left: '10px' } }}>
                                                 {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (
