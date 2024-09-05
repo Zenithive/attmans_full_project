@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -19,6 +18,7 @@ import ProposalStep3 from '../component/proposal/ProposalStep3'
 import ProposalConfirmationDialog from '../component/All_ConfirmationBox/ProposalConfirmationDialog';
 import UserDrawer from '../component/UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '../constants/common.constants';
+import axiosInstance from '../services/axios.service';
 
 interface Proposal {
     _id: string;
@@ -100,7 +100,7 @@ const proposal = () => {
 
     const fetchAllProjects = useCallback(async () => {
         try {
-            const response = await axios.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
+            const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
                 params: {
                     userId: userDetails._id, // Include userId in the request
 
@@ -116,7 +116,7 @@ const proposal = () => {
     const fetchAllProposals = useCallback(async () => {
         if (userDetails.userType === 'Admin') {
             try {
-                const response = await axios.get(APIS.GET_ALL_PROPOSALS);
+                const response = await axiosInstance.get(APIS.GET_ALL_PROPOSALS);
                 console.log('Fetched Proposals:', response.data);
                 setProposals(response.data);
             } catch (error) {
@@ -156,7 +156,7 @@ const proposal = () => {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             try {
-                const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
+                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
                 console.log('respons page', response.data);
                 const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
                 console.log('fetchedAppliedJobs', fetchedAppliedJobs);
@@ -207,7 +207,7 @@ const proposal = () => {
 
         // Submit finalValues to the backend
         try {
-            await axios.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
+            await axiosInstance.post(APIS.PROPOSAL, finalValues); // Updated to use APIS.PROPOSAL
             setOpen(false);
             setStep(1);
             setFormValues({});
@@ -233,7 +233,7 @@ const proposal = () => {
 
     const handleConfirmation = async (status: 'Approved' | 'Rejected', comment: string) => {
         try {
-            await axios.put(`${SERVER_URL}/proposals/${selectedProposalId}/status`, {
+            await axiosInstance.put(`/proposals/${selectedProposalId}/status`, {
                 status,
                 comment
             });

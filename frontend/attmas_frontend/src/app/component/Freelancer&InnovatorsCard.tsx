@@ -4,7 +4,6 @@ import * as React from 'react';
 import {
   Box, Card, CardContent, Typography, TextField, IconButton, Grid, Chip, Autocomplete
 } from '@mui/material';
-import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { APIS } from '../constants/api.constant';
 import { categories, subcategories1 } from '../constants/categories';
@@ -16,6 +15,7 @@ import UserDrawer from './UserNameSeperate/UserDrawer';
 import { ProductForBooth } from './ProductTableForBooth';
 import UserFullName from './UserNameSeperate/UserFullName';
 import Filters, { FilterColumn } from './filter/filter.component';
+import axiosInstance from '../services/axios.service';
 
 interface User {
   _id: string;
@@ -104,7 +104,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categoriesResponse = await axios.get<CategoryData[]>(APIS.CATEGORIES);
+        const categoriesResponse = await axiosInstance.get<CategoryData[]>(APIS.CATEGORIES);
         setCategoryData(categoriesResponse.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -125,7 +125,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get<User[]>(
+      const response = await axiosInstance.get<User[]>(
         `${apiUrl}&page=${page}&limit=20&${filter}`
       );
 

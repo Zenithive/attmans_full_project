@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Grid, TextField, Chip, Button, IconButton, Card, CardContent, Typography, Box, Divider, Tooltip, DialogContentText, DialogActions } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { APIS } from '@/app/constants/api.constant';
 import ApproveDialogForApply from '../applyapprove/applyapprove';
@@ -19,6 +18,7 @@ import ConfirmationDialogWithCommentForCancel from '../All_ConfirmationBox/Confi
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
+import axiosInstance from '@/app/services/axios.service';
 
 
 
@@ -133,7 +133,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const fetchApplications = useCallback(async () => {
     if (viewingJob?._id) {
       try {
-        const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
+        const response = await axiosInstance.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
 
         setApplicationsBasedOnUser(response.data);
         // getFilteredApplications(response.data);
@@ -155,7 +155,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const handleApprove = async (applicationId: string) => {
     try {
       if (!applicationId) return;
-      await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
+      await axiosInstance.post(`${APIS.APPLY}/approve/${applicationId}`);
       fetchApplications();
       setFilter('Approved');
       setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
@@ -168,7 +168,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     try {
       const rejectComment = comment;
       if (rejectComment) {
-        await axios.post(`${APIS.APPLY}/reject/${applicationId}`, { rejectComment });
+        await axiosInstance.post(`${APIS.APPLY}/reject/${applicationId}`, { rejectComment });
         fetchApplications();
         setFilter('Rejected');
         setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
@@ -234,7 +234,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
       // First, award the selected application
-      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+      await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
         jobId: viewingJob?._id, // Include jobId in the payload
         Comment
       });
@@ -295,7 +295,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     setConfirmOpen(false);
     try {
       // Send the POST request to close the project, including the ID in the URL
-      await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
+      await axiosInstance.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
         comment,     // Include the comment in the request body
         status: 'Project Closed by Admin' // Include the status in the request body
       });
@@ -332,7 +332,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
     try {
       // Send the POST request to close the project, including the ID in the URL
-      await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
+      await axiosInstance.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
         comment,     // Include the comment in the request body
         status: 'Approved' // Include the status in the request body
       });

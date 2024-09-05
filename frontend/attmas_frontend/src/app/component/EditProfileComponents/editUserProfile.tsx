@@ -14,12 +14,12 @@ import {
     Paper,
     Alert,
 } from '@mui/material';
-import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import axiosInstance from '@/app/services/axios.service';
 
 const EditProfile: React.FC = () => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -36,7 +36,7 @@ const EditProfile: React.FC = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get(`${SERVER_URL}/users/profile?username=${userDetails.username}`);
+                const response = await axiosInstance.get(`/users/profile?username=${userDetails.username}`);
                 const { firstName, lastName, username, mobileNumber } = response.data;
                 setInitialValues({ firstName, lastName, email: username, mobileNumber, password: '' });
                 setLoading(false);
@@ -67,7 +67,7 @@ const EditProfile: React.FC = () => {
                 const { password, ...restValues } = values;
                 const payload = changePassword ? values : restValues;
                 console.log('Payload:', payload);
-                await axios.put(`${SERVER_URL}/users/${userDetails._id}`, payload);
+                await axiosInstance.put(`/users/${userDetails._id}`, payload);
                 setStatus({ success: 'Profile updated successfully!' });
             } catch (error) {
                 setStatus({ error: 'Failed to update profile' });

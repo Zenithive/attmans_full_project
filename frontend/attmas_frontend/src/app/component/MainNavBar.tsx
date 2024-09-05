@@ -14,7 +14,6 @@ import { Divider, MenuItem, Typography } from '@mui/material';
 import { UserSchema, selectUserSession, updateProfilePhoto } from '../reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
 import DOMPurify from 'dompurify';
@@ -22,6 +21,7 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CircleIcon from '@mui/icons-material/Circle';
 import Jobs from '../projects/page';
 import { CommonAvatar } from './common-ui/avatar.component';
+import axiosInstance from '../services/axios.service';
 
 interface Email {
   _id: string;
@@ -76,7 +76,7 @@ export default function MainNavBar() {
   React.useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`${APIS.FORM1}?username=${userDetails.username}`, {
+        const response = await axiosInstance.get(`${APIS.FORM1}?username=${userDetails.username}`, {
           headers: { username: userDetails.username },
         });
         setProfilePhoto(response.data.profilePhoto);
@@ -93,7 +93,7 @@ export default function MainNavBar() {
   React.useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
+        const response = await axiosInstance.get(`${APIS.NOTIFICATIONS}?username=${userDetails.username}`);
         const notificationsWithTimestamp = response.data.map((notification: Email) => ({
           ...notification,
           sentAt: new Date(notification.sentAt),
@@ -133,7 +133,7 @@ export default function MainNavBar() {
 
   const handleNotificationClick = async (notificationId: string, exhibitionId: string) => {
     try {
-      await axios.post(`${APIS.MARK_AS_READ}`, { id: notificationId });
+      await axiosInstance.post(`${APIS.MARK_AS_READ}`, { id: notificationId });
       setNotifications(prevNotifications => {
         return prevNotifications.map(notification =>
           notification._id === notificationId ? { ...notification, read: true } : notification
@@ -147,7 +147,7 @@ export default function MainNavBar() {
 
   const handleLogout = async () => {
     try {
-      await axios.post(APIS.LOGOUT);
+      await axiosInstance.post(APIS.LOGOUT);
       localStorage.clear();
       clearCookies();
       setProfilePhoto(null);
@@ -425,11 +425,6 @@ export default function MainNavBar() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              {/* {profilePhoto ? (
-                <Avatar src={`${SERVER_URL}/${profilePhoto}`} />
-              ) : (
-                <AccountCircle />
-              )} */}
               <CommonAvatar name={`${userDetails.firstName} ${userDetails.lastName}`} url={`${SERVER_URL}/${profilePhoto}`}></CommonAvatar>
             </IconButton>
           </Box>
