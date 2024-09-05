@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
@@ -14,6 +13,7 @@ import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
+import axiosInstance from '@/app/services/axios.service';
 
 interface SignUpProps {
   showLinks?: boolean;
@@ -55,7 +55,7 @@ export const SignUp = ({ showLinks = true, onSignUpSuccess, userType = "non", is
     }),
     onSubmit: async (values, { setStatus }) => {
       try {
-        await axios.post(APIS.SIGNUP, {
+        await axiosInstance.post(APIS.SIGNUP, {
           firstName: values.firstName,
           lastName: values.lastName,
           username: values.email,

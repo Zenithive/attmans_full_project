@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
@@ -26,6 +25,7 @@ import { AddApplyForInnovatores } from '../component/innovatoreApply/innovatoreA
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { DATE_FORMAT } from '../constants/common.constants';
 import { PROJECT_STATUSES } from '../constants/status.constant';
+import axiosInstance from '../services/axios.service';
 
 
 const Jobs = () => {
@@ -171,7 +171,7 @@ const Jobs = () => {
         try {
             console.log('Fetch Jobs Params:', filter);
             const paramString = getParamForJobs(page);
-            const response = await axios.get(`${APIS.JOBS}${paramString}`)
+            const response = await axiosInstance.get(`${APIS.JOBS}${paramString}`)
 
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -192,7 +192,7 @@ const Jobs = () => {
     const fetchApplies = useCallback(async () => {
         try {
             console.log('Fetching applies...');
-            const response = await axios.get(`${APIS.APPLIED_APPLICATION}`);
+            const response = await axiosInstance.get(`${APIS.APPLIED_APPLICATION}`);
             console.log('Applies fetched:', response.data);
             setApplies(response.data);
             setIsShowingApplies(true);
@@ -204,7 +204,7 @@ const Jobs = () => {
 
     const fetchMyApplies = useCallback(async () => {
         try {
-            const response = await axios.get(`${APIS.USER_APPLICATIONS(userDetails._id)}`);
+            const response = await axiosInstance.get(`${APIS.USER_APPLICATIONS(userDetails._id)}`);
             setApplies(response.data);
             setIsShowingApplies(true);
             setShowingMyApplies(true);
@@ -285,7 +285,7 @@ const Jobs = () => {
     const handleDeleteJob = useCallback(async () => {
         if (confirmDelete.jobs) {
             try {
-                await axios.delete(`${APIS.JOBS}/${confirmDelete.jobs._id}`);
+                await axiosInstance.delete(`${APIS.JOBS}/${confirmDelete.jobs._id}`);
                 setJobs(jobs.filter(job => job._id !== confirmDelete.jobs!._id));
                 pubsub.publish('JobDeleted', {});
             } catch (error) {
@@ -308,7 +308,7 @@ const Jobs = () => {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             try {
-                const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
+                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
                 console.log('respons page', response.data);
                 const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
                 console.log('fetchedAppliedJobs', fetchedAppliedJobs);
@@ -328,7 +328,7 @@ const Jobs = () => {
 
             setAppliedJobs(prev => [...prev, job._id || '']);
 
-            await axios.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title });
+            await axiosInstance.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title });
 
             setApplyOpen(false);
         } catch (error) {
@@ -344,7 +344,7 @@ const Jobs = () => {
 
             setAppliedJobs(prev => [...prev, job._id || '']);
 
-            await axios.post(`${APIS.APPLY}`, { userId, jobId: job._id, title });
+            await axiosInstance.post(`${APIS.APPLY}`, { userId, jobId: job._id, title });
 
             setApplyOpenForInnovators(false);
         } catch (error) {
@@ -368,7 +368,7 @@ const Jobs = () => {
             return;
         }
         try {
-            await axios.post(`${APIS.APPROVE_PROJECT}/${job._id}`);
+            await axiosInstance.post(`${APIS.APPROVE_PROJECT}/${job._id}`);
             setJobs(prevJobs =>
                 prevJobs.map(prevJob =>
                     prevJob._id === job._id ? { ...prevJob, status: PROJECT_STATUSES.approved } : prevJob
@@ -395,7 +395,7 @@ const Jobs = () => {
         }
         try {
             console.log('Rejecting job with comment:', comment);
-            await axios.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
+            await axiosInstance.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
             setJobs(prevJobs =>
                 prevJobs.map(prevJob =>
                     prevJob._id === job._id ? { ...prevJob, status: PROJECT_STATUSES.rejected, rejectComment: comment } : prevJob

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Grid, TextField, Chip, Button, IconButton, Card, CardContent, Typography, Box, Divider, Tooltip, DialogContentText, DialogActions } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { APIS } from '@/app/constants/api.constant';
 import ApproveDialogForApply from '../applyapprove/applyapprove';
@@ -19,6 +18,7 @@ import ConfirmationDialogWithCommentForCancel from '../All_ConfirmationBox/Confi
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
+import axiosInstance from '@/app/services/axios.service';
 
 
 
@@ -134,8 +134,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const fetchApplications = useCallback(async () => {
     if (viewingJob?._id) {
       try {
-        const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
-        console.log('response for Apply',response.data)
+        const response = await axiosInstance.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
+
         setApplicationsBasedOnUser(response.data);
         // getFilteredApplications(response.data);
       } catch (error) {
@@ -156,7 +156,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const handleApprove = async (applicationId: string) => {
     try {
       if (!applicationId) return;
-      await axios.post(`${APIS.APPLY}/approve/${applicationId}`);
+      await axiosInstance.post(`${APIS.APPLY}/approve/${applicationId}`);
       fetchApplications();
       setFilter('Approved');
       setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
@@ -169,7 +169,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     try {
       const rejectComment = comment;
       if (rejectComment) {
-        await axios.post(`${APIS.APPLY}/reject/${applicationId}`, { rejectComment });
+        await axiosInstance.post(`${APIS.APPLY}/reject/${applicationId}`, { rejectComment });
         fetchApplications();
         setFilter('Rejected');
         setButtonsHidden(prev => ({ ...prev, [applicationId]: true }));
@@ -235,7 +235,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
       // First, award the selected application
-      await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
+      await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
         jobId: viewingJob?._id, // Include jobId in the payload
         Comment
       });
@@ -296,7 +296,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     setConfirmOpen(false);
     try {
       // Send the POST request to close the project, including the ID in the URL
-      await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
+      await axiosInstance.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
         comment,     // Include the comment in the request body
         status: 'Project Closed by Admin' // Include the status in the request body
       });
@@ -333,7 +333,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
     try {
       // Send the POST request to close the project, including the ID in the URL
-      await axios.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
+      await axiosInstance.post(`${APIS.CLOSED_BY_ADMIN}/${id}`, {
         comment,     // Include the comment in the request body
         status: 'Approved' // Include the status in the request body
       });
@@ -404,15 +404,21 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   />
                 </Grid>
                 {userType === "Admin" ? <Grid item xs={12} sm={6}>
-                  <TextField
-                    onClick={() => handleUserClick(viewingJob?.userId?.username || "")}
-                    label="Project Owner"
-                    value={`${viewingJob?.userId?.firstName} ${viewingJob?.userId?.lastName}`}
-                    fullWidth
-                    color='secondary'
-                    aria-readonly
-                    sx={{ mb: 2, cursor: "pointer" }}
-                  />
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                    <b>Project Owner: &nbsp;</b>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={(e) => {
+                        handleUserClick(viewingJob?.userId?.username || "")
+                      }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#1976d2',
+                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                      }}
+                    >{viewingJob?.userId?.firstName} {viewingJob?.userId?.lastName}
+                    </a>
+                  </Typography>
                 </Grid> : ''}
                 <Grid item xs={12} sm={5}>
                   <TextField
@@ -680,31 +686,31 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 ? 'green'
                                 : app.status === APPLY_STATUSES.rejected
                                   ? 'red'
-                                : app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
-                                  ? 'green'
-                                  : app.status === APPLY_STATUSES.awarded
-                                    ? 'blue'
-                                    : app.status === APPLY_STATUSES.notAwarded
-                                      ? 'grey'
-                                      : 'default',
+                                  : app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                    ? 'green'
+                                    : app.status === APPLY_STATUSES.awarded
+                                      ? 'blue'
+                                      : app.status === APPLY_STATUSES.notAwarded
+                                        ? 'grey'
+                                        : 'default',
                               color: app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
                                 ? 'green'
                                 : app.status === APPLY_STATUSES.rejected
                                   ? 'red'
-                                : app.status === APPLY_STATUSES.rejected
-                                  ? 'green'
-                                  : app.status === APPLY_STATUSES.awarded
-                                    ? 'blue'
-                                    : app.status === APPLY_STATUSES.notAwarded
-                                      ? 'grey'
-                                      : 'default',
+                                  : app.status === APPLY_STATUSES.rejected
+                                    ? 'green'
+                                    : app.status === APPLY_STATUSES.awarded
+                                      ? 'blue'
+                                      : app.status === APPLY_STATUSES.notAwarded
+                                        ? 'grey'
+                                        : 'default',
                               borderRadius: '16px',
                               px: 1,
                               mb: 2,
                             }}
                           />
                         </Box>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                       {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                           <b>Applied User: </b>
                           <a
                             href="javascript:void(0);"
@@ -718,7 +724,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             }}
                           >{app.firstName} {app.lastName}
                           </a>
-                        </Typography>
+                        </Typography>}
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>

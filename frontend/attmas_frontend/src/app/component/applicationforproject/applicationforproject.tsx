@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import ApproveMilestoneDialog from '../approveformilston/approveformilston';
 import RejectMilestoneDialog from '../rejectformilston/rejectformilston';
@@ -12,6 +11,7 @@ import BillingData from '../addpaymentshow/addpaymentshow';
 import CloseIcon from '@mui/icons-material/Close';
 import BillingModal from '../billingmodel/billingmodel';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import axiosInstance from '@/app/services/axios.service';
 
 export interface Milestone {
     scopeOfWork: string;
@@ -118,7 +118,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
 
             const submittedMilestonesData = await Promise.all(
                 filteredApplications.map(async (app) => {
-                    const response = await axios.get(`${SERVER_URL}/milestones/submitted/${app._id}`);
+                    const response = await axiosInstance.get(`/milestones/submitted/${app._id}`);
                     console.log("Mistlon Fetch With ApplyId", response.data)
                     return response.data;
                 })
@@ -184,7 +184,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
 
 
         try {
-            const response = await axios.post(APIS.BILLING, {
+            const response = await axiosInstance.post(APIS.BILLING, {
                 milestoneText: paymentDetails.milestoneText,
                 applyId: paymentDetails.applyId,
                 amount: paymentDetails.amount,
@@ -222,7 +222,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     const handleApproveMilestone = async (comment: string) => {
         if (selectedApplyId && selectedMilestoneIndex !== null) {
             try {
-                await axios.post(`${SERVER_URL}/milestones/approve`, {
+                await axiosInstance.post(`/milestones/approve`, {
                     applyId: selectedApplyId,
                     milestoneIndex: selectedMilestoneIndex,
                     comment
@@ -241,7 +241,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     const handleRejectMilestone = async (comment: string) => {
         if (selectedApplyId && selectedMilestoneIndex !== null) {
             try {
-                await axios.post(`${SERVER_URL}/milestones/reject`, {
+                await axiosInstance.post(`/milestones/reject`, {
                     applyId: selectedApplyId,
                     milestoneIndex: selectedMilestoneIndex,
                     comment

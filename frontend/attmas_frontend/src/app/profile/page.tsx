@@ -35,7 +35,6 @@
 
 "use client";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Profile1 from '../component/all_Profile_component/profile1';
 import Profile2 from '../component/all_Profile_component/profile2';
 import Profile3 from '../component/all_Profile_component/profile3';
@@ -44,6 +43,7 @@ import { APIS } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import MainSideBar from '../component/MainSideBar';
+import axiosInstance from '../services/axios.service';
 
 const Page: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number | null>(null);
@@ -53,7 +53,7 @@ const Page: React.FC = () => {
   useEffect(() => {
     const checkUserProfile = async () => {
       try {
-        const response = await axios.get(`${APIS.CHECK_PROFILE}?username=${userDetails.username}`);
+        const response = await axiosInstance.get(`${APIS.CHECK_PROFILE}?username=${userDetails.username}`);
         setCurrentStep(response.data.profileCompleted || 1);
       } catch (error) {
         console.error('Error fetching user profile:', error);

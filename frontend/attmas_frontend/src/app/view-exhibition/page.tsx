@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useEffect, Suspense } from 'react';
-import axios from 'axios';
 import { APIS } from '../constants/api.constant';
 import { useAppSelector } from '../reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '../reducers/userReducer';
@@ -17,6 +16,8 @@ import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
 import { Product } from '../component/all_Profile_component/AddProductModal2';
+import { EXHIBITION_STATUSES } from '../constants/status.constant';
+import axiosInstance from '../services/axios.service';
 
 interface Exhibition {
   _id?: string;
@@ -101,7 +102,7 @@ const ExhibitionsPage: React.FC = () => {
           console.error('id not found');
           return;
         }
-        const response = await axios.get(`${APIS.EXHIBITION}/${exhibitionId}`);
+        const response = await axiosInstance.get(`${APIS.EXHIBITION}/${exhibitionId}`);
         setExhibitions([response.data]);
         setSelectedExhibition(response.data);
       } catch (error) {
@@ -111,7 +112,7 @@ const ExhibitionsPage: React.FC = () => {
 
     const fetchBooths = async () => {
       try {
-        const response = await axios.get(`${APIS.GET_BOOTH}`, {
+        const response = await axiosInstance.get(`${APIS.GET_BOOTH}`, {
           params: {
             userId: userDetails?._id,
             status: statusFilter === 'All' ? '' : statusFilter,
@@ -140,7 +141,7 @@ const ExhibitionsPage: React.FC = () => {
           console.error('id not found');
           return;
         }
-        const response = await axios.get(`${APIS.GET_VISITORS}`, {
+        const response = await axiosInstance.get(`${APIS.GET_VISITORS}`, {
           params: {
             exhibitionId,
             interestType,
@@ -181,7 +182,7 @@ const ExhibitionsPage: React.FC = () => {
     if (interestType) {
       const fetchVisitorforinterestType = async () => {
         try {
-          const response = await axios.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
+          const response = await axiosInstance.get(`${APIS.GET_VISITORS_BY_INTEREST_TYPE}`, {
             params: { interestType },
           });
           setVisitors(response.data);
@@ -211,7 +212,7 @@ const ExhibitionsPage: React.FC = () => {
 
       boothData.exhibitionId = exhibitionId;
 
-      const response = await axios.post(APIS.CREATE_BOOTH, boothData);
+      const response = await axiosInstance.post(APIS.CREATE_BOOTH, boothData);
       if (response.data.exhibitionId === exhibitionId) {
         setBooths(prevBooths => [...prevBooths, response.data]);
         setParticipateButtonVisible(false);
@@ -228,7 +229,7 @@ const ExhibitionsPage: React.FC = () => {
     try {
       const { booth } = approveDialogOpen;
       if (!booth) return;
-      await axios.post(`${APIS.APPROVE_BOOTH}/${booth._id}`);
+      await axiosInstance.post(`${APIS.APPROVE_BOOTH}/${booth._id}`);
       setBooths(prevBooths =>
         prevBooths.map(b =>
           b._id === booth._id ? { ...b, status: 'Approved' } : b
@@ -246,7 +247,7 @@ const ExhibitionsPage: React.FC = () => {
     try {
       const { booth } = rejectDialogOpen;
       if (!booth) return;
-      await axios.post(`${APIS.REJECT_BOOTH}/${booth._id}`, { comment });
+      await axiosInstance.post(`${APIS.REJECT_BOOTH}/${booth._id}`, { comment });
       setBooths(prevBooths =>
         prevBooths.map(b =>
           b._id === booth._id ? { ...b, status: 'Rejected', rejectComment: comment } : b
@@ -351,7 +352,7 @@ const ExhibitionsPage: React.FC = () => {
     return exhibitionDate.isSame(currentDate);
   };
 
-  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === 'close';
+  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === EXHIBITION_STATUSES.close;
 
 
   return (
@@ -371,11 +372,12 @@ const ExhibitionsPage: React.FC = () => {
         }
       }}>
       
-        <Box sx={{ position: "relative", color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "102%", bottom: "15px", height: '6%', padding: '10px' }}>
+        <Box sx={{ color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "100%", bottom: "15px", height: '6%', padding: '10px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <Box sx={{ '@media (max-width: 767px)': { position: 'relative', right: '34px' } }}><h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1></Box>
           <Box sx={{
+            mx: 2,
             '@media (max-width: 767px)': {
-              position: 'relative', left: '72px', top: '10px'
+              position: 'relative', top: '10px'
 
             }
           }}>
@@ -387,8 +389,9 @@ const ExhibitionsPage: React.FC = () => {
                 color="primary"
                 onClick={openModal}
                 sx={{
-                  position: 'absolute', right: '80px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold', '@media (max-width: 767px)': {
-                    position: 'absolute', right: '95px'
+                  mx: 2,
+                   background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold', '@media (max-width: 767px)': {
+                    
                   }
                 }}
               >
@@ -402,7 +405,7 @@ const ExhibitionsPage: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={openInterestedModal}
-                sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+                sx={{ mx: 2, background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
               >
                 Interested
               </Button>
@@ -413,7 +416,7 @@ const ExhibitionsPage: React.FC = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleJoinLiveClick}
-                sx={{ position: 'absolute', right: '330px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+                sx={{ background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
               >
                 Webinar
               </Button>

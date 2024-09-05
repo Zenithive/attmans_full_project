@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import { CircularProgress, InputAdornment, MenuItem } from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, Select, TextField, Autocomplete } from '@mui/material';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -20,6 +19,7 @@ import { Category, options, Subcategorys } from '@/app/constants/categories';
 import SubjectMatterExpertise from '../SubjectMatterExpertise';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import axiosInstance from '@/app/services/axios.service';
 
 
 
@@ -133,12 +133,12 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
         try {
             if (editingJobs) {
                 console.log('Updating job with id:', editingJobs._id, jobsData);
-                await axios.put(`${APIS.JOBS}/${editingJobs._id}`, jobsData);
+                await axiosInstance.put(`${APIS.JOBS}/${editingJobs._id}`, jobsData);
                 pubsub.publish('JobUpdated', { message: 'Jobs updated' });
                 pubsub.publish('toast', { message: 'Edit Project successfully!', severity: 'success' });
 
             } else {
-                await axios.post(APIS.JOBS, jobsData);
+                await axiosInstance.post(APIS.JOBS, jobsData);
                 //onAddJobs(response.data);
                 pubsub.publish('JobCreated', { message: 'A new Job Created' });
                 pubsub.publish('toast', { message: 'Create Project successfully!', severity: 'success' });

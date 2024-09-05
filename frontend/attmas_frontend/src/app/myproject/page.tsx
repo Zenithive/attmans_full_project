@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -18,6 +17,7 @@ import { getSubcategorys } from '../projects/projectinterface';
 import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
+import axiosInstance from '../services/axios.service';
 
 
 const myproject = () => {
@@ -71,7 +71,7 @@ const myproject = () => {
     const fetchApplications = useCallback(async () => {
         if (viewingJob?._id) {
             try {
-                const response = await axios.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
+                const response = await axiosInstance.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
                 setApplications(response.data);
             } catch (error) {
                 console.error('Error fetching applications:', error);
@@ -87,7 +87,7 @@ const myproject = () => {
         try {
             console.log('Fetch Jobs Params:', { page, CategoryesFilter, SubcategorysFilter, ExpertiselevelFilter, statusFilter, filterType, selectedServices });
 
-            const response = await axios.get(APIS.JOBS, {
+            const response = await axiosInstance.get(APIS.JOBS, {
                 params: {
                     page,
                     limit: 10,
@@ -123,7 +123,7 @@ const myproject = () => {
 
     const fetchAllProjects = useCallback(async () => {
         try {
-            const response = await axios.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
+            const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
                 params: {
                     userId: userDetails._id, // Include userId in the request
                 },
@@ -166,7 +166,7 @@ const myproject = () => {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             try {
-                const response = await axios.get(`${APIS.APPLIED_JOBS}/${userId}`);
+                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
                 console.log('respons page', response.data);
                 const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
                 console.log('fetchedAppliedJobs', fetchedAppliedJobs);
@@ -184,7 +184,7 @@ const myproject = () => {
         // Function to fetch applied jobs for admin
         const fetchAppliedJobsForAdmin = async () => {
           try {
-            const response = await axios.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
+            const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
             console.log("ggg", response.data)
             setProjectsForAdmin(response.data)
     
@@ -275,7 +275,7 @@ const myproject = () => {
             const finalComment = comment || defaultComment;
 
             // Make a POST request to update the project with the provided status and comment
-            await axios.post(`${APIS.CLOSED_PROJECT}/${projectId}`, {
+            await axiosInstance.post(`${APIS.CLOSED_PROJECT}/${projectId}`, {
                 status,
                 comment: finalComment,
             });

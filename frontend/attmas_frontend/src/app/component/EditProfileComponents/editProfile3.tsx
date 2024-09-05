@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Container, CssBaseline, Typography, CircularProgress, Chip, Stack, Autocomplete, TextField, Checkbox } from '@mui/material';
 import { useFormik } from 'formik';
-import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useRouter } from 'next/navigation'; // Assuming it's next/router for routing
 import { useAppSelector } from '@/app/reducers/hooks.redux';
@@ -10,6 +9,7 @@ import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import { categories, options } from '@/app/constants/categories';
+import axiosInstance from '@/app/services/axios.service';
 
 type Option = {
   label: string;
@@ -37,7 +37,7 @@ const EditProfile3: React.FC = () => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        await axios.post(APIS.FORM3, values);
+        await axiosInstance.post(APIS.FORM3, values);
         pubsub.publish('toast', {
           message: 'Profile updated successfully!',
           severity: 'success',
@@ -61,7 +61,7 @@ const EditProfile3: React.FC = () => {
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`);
+        const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
         const userData = response.data;
         console.log('userData',userData);
         formik.setValues({

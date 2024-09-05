@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
@@ -19,6 +18,7 @@ import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReduc
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { getRoleBasedAccess } from '@/app/services/user.access.service';
 import { AxiosError } from 'axios';
+import axiosInstance from '@/app/services/axios.service';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -58,7 +58,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
     }),
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
+        const response = await axiosInstance.post(APIS.LOGIN, { username: values.email, password: values.password });
 
         const res = response.data.user;
         const user = {
@@ -90,7 +90,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
 
        
         if (exhibitionId || boothId) {
-          await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
+          await axiosInstance.post(APIS.CHECKINTRESTEDUSER, interestedUser);
         }
 
         if (onSignInSuccess) {

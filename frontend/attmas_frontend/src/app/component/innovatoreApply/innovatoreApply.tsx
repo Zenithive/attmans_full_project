@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { Box, IconButton, Divider, Drawer, TextField, Button, CircularProgress, FormControl, Select, MenuItem, InputAdornment, Paper, Typography, Tooltip, Grid, Card, CardContent, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import axios from 'axios';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -17,6 +16,7 @@ import { Product } from '../ProductTable';
 import NewProductTable from '../all_Profile_component/NewProductTable';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import axiosInstance from '@/app/services/axios.service';
 
 
 
@@ -98,7 +98,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
         if (open && userDetails?.username) {
             const fetchWorkExperience = async () => {
                 try {
-                    const response = await axios.get(`${SERVER_URL}/profile/profileByUsername2?username=${userDetails.username}`);
+                    const response = await axiosInstance.get(`/profile/profileByUsername2?username=${userDetails.username}`);
                     console.log('test@example.you', response.data);
                     setWorkExperience(response.data);
                 } catch (error) {
@@ -116,7 +116,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
         if (userDetails?.username) {
             const fetchUserProfile = async () => {
                 try {
-                    const response = await axios.get(`${SERVER_URL}/profile/profileByUsername3?username=${userDetails.username}`);
+                    const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
                     const userData = response.data;
                     console.log('userDataMy', userData);
                     setCategories(userData.categories || []);
@@ -155,7 +155,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                 applyType: 'InnovatorsApply',
             };
 
-            const applyResponse = await axios.post(APIS.APPLY, applyData);
+            const applyResponse = await axiosInstance.post(APIS.APPLY, applyData);
             const applyId = applyResponse.data._id;
 
 

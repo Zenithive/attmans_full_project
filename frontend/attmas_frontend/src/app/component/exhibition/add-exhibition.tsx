@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import { CircularProgress, MenuItem } from '@mui/material';
 import { Button, Chip, Divider, Drawer, FormControl, InputLabel, Select, TextField, Autocomplete } from '@mui/material';
-import axios from 'axios';
 import { APIS } from '@/app/constants/api.constant';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -23,6 +22,7 @@ import { DATE_FORMAT, DATE_TIME_FORMAT, TIME_FORMAT } from '@/app/constants/comm
 import { formatToLocal, formatToUTC } from '@/app/services/date.service';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { EXHIBITION_STATUSES } from '@/app/constants/status.constant';
+import axiosInstance from '@/app/services/axios.service';
 interface Exhibition {
     _id?: string;
     title: string;
@@ -85,7 +85,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         // Fetch the list of usernames from the backend
         const fetchUsernames = async () => {
             try {
-                const response = await axios.get(`${APIS.INNOVATORSFOREXIBITION}`);
+                const response = await axiosInstance.get(`${APIS.INNOVATORSFOREXIBITION}`);
                 console.log("response", response);
 
                 setUsernames(response.data);
@@ -124,11 +124,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
 
         try {
             if (editingExhibition) {
-                await axios.put(`${APIS.EXHIBITION}/${editingExhibition._id}`, exhibitionData);
+                await axiosInstance.put(`${APIS.EXHIBITION}/${editingExhibition._id}`, exhibitionData);
                 pubsub.publish('ExhibitionUpdated', { message: 'Exhibition updated' });
                 pubsub.publish('toast', { message: 'Exhibition updated successfully!', severity: 'success' });
             } else {
-                await axios.post(APIS.EXHIBITION, exhibitionData);
+                await axiosInstance.post(APIS.EXHIBITION, exhibitionData);
                 // onAddExhibition(response.data);
                 pubsub.publish('ExhibitionCreated', { message: 'A new exhibition Created' });
                 pubsub.publish('toast', { message: 'New exhibition created successfully!', severity: 'success' });
