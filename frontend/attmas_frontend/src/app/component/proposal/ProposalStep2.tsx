@@ -12,7 +12,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { Formik, Form, Field, FieldArray } from 'formik';
+import { Formik, Form, Field, FieldArray, FormikValues } from 'formik';
 import { Proposal } from '@/app/proposal/page';
 
 export interface BudgetOutlay {
@@ -67,7 +67,27 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
 
   return (
     <Formik
-      initialValues={defaultValues}
+      initialValues={(initialValues || {
+        isPeerReviewed: '',
+        expectedOutcome: '',
+        detailedMethodology: '',
+        physicalAchievements: '',
+        budgetOutlay: [
+          { head: 'Capital Equipment', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+          { head: 'Consumable Stores', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+          { head: 'Duty on Import', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+          { head: 'Manpower', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+          { head: 'Travel & Training', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+          { head: 'Contingencies', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+          { head: 'Overheads', firstYear: '', secondYear: '', thirdYear: '', total: '' },
+        ],
+        manpowerDetails: [
+          { designation: '', monthlySalary: '', firstYear: '', secondYear: '', totalExpenditure: '' },
+        ],
+        pastCredentials: '',
+        briefProfile: '',
+        proposalOwnerCredentials: '',
+      }) as FormikValues}
       onSubmit={(values) => onNext(values as ProposalStep2Values)}
     >
       {({ values, handleSubmit }) => (
@@ -134,7 +154,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                   <FieldArray
                     name="budgetOutlay"
                     render={() => (
-                      values.budgetOutlay.map((row, index) => (
+                      values.budgetOutlay.map((row: { head: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }, index: React.Key | null | undefined) => (
                         <TableRow key={index}>
                           <TableCell>{row.head}</TableCell>
                           <TableCell>
@@ -177,7 +197,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                     name="manpowerDetails"
                     render={arrayHelpers => (
                       <>
-                        {values.manpowerDetails.map((row, index) => (
+                        {values.manpowerDetails.map((row: any, index: React.Key | null | undefined) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Field name={`manpowerDetails[${index}].designation`} as={TextField} disabled={readOnly} />
@@ -251,10 +271,10 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
 
             {/* Navigation Buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button variant="outlined" onClick={onPrevious} disabled={readOnly}>
+              <Button variant="outlined" onClick={onPrevious}>
                 Previous
               </Button>
-              <Button type="submit" variant="contained" disabled={readOnly}>
+              <Button type="submit" variant="contained" >
                 Next
               </Button>
             </Box>

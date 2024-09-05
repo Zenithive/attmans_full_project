@@ -41,9 +41,9 @@ export const ProposalSchema = new Schema({
     },
   ],
 
-  pastCredentials: { type: String, required: false },
-  briefProfile: { type: String, required: false },
-  proposalOwnerCredentials: { type: String, required: false },
+  pastCredentials: { type: String, required: true },
+  briefProfile: { type: String, required: true },
+  proposalOwnerCredentials: { type: String, required: true },
 
   otherCommitments: { type: String, required: true },
   progressReportTemplate: { type: String, required: true },
