@@ -44,9 +44,10 @@ interface FormValues {
 
 const EditProfile2: React.FC = () => {
 
-    const [isFreelancer, setIsFreelancer] = useState(false);
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+    const [isFreelancer, setIsFreelancer] = useState(userDetails.userType === 'Freelancer' || false);
 
-    const [isInnovator, setIsInnovator] = useState(false);
+    const [isInnovator, setIsInnovator] = useState(userDetails.userType === 'Innovators' || false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
@@ -61,7 +62,6 @@ const EditProfile2: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-    const userDetails: UserSchema = useAppSelector(selectUserSession);
 
     const dispatch = useAppDispatch();
 
@@ -479,7 +479,7 @@ const EditProfile2: React.FC = () => {
                             </Grid>
 
 
-                            {isFreelancer ? (
+                            {isInnovator ? (
                                 <>
                                     <Grid item xs={12} sm={6}>
                                         <TextField
@@ -549,7 +549,7 @@ const EditProfile2: React.FC = () => {
                                 </>
                             ) : ""}
 
-                            {isFreelancer && showProductDetails && (
+                            {isInnovator && showProductDetails && (
                                 <Grid item xs={12}>
                                     <Button variant="contained" onClick={handleAddProduct}>
                                         Add Product
@@ -571,7 +571,7 @@ const EditProfile2: React.FC = () => {
                             />
 
 
-                            {isFreelancer && showProductDetails && (
+                            {isInnovator && showProductDetails && (
 
                                 <NewProductTable
                                     products={formik.values.products}

@@ -26,8 +26,11 @@ export class BoothController {
   // }
 
   @Get()
-  async findAll(@Query('status') status: string): Promise<Booth[]> {
-    return this.boothService.findAll(status);
+  async findAll(
+    @Query('status') status: string,
+    @Query('exhibitionId') exhibitionId: string,
+  ): Promise<Booth[]> {
+    return this.boothService.findAll(status, exhibitionId);
   }
 
   @Get(':id')

@@ -68,25 +68,30 @@ export class ApplyService {
       jobId: jobId,
     });
     await createdApply.save();
-
+    this.applyNotification(createApplyDto);
     // Find user and send email notification
+
+    return createdApply;
+  }
+
+  async applyNotification(createApplyDto) {
     const user = await this.userModel
       .findOne({ username: createApplyDto.username })
       .exec();
     if (user) {
       const emailText = `
-        Hi ${user.firstName},
-  
-        A new application has been created:
-        
-        Title: ${createApplyDto.title}
-        Description: ${createApplyDto.description}
-        Budget: ${createApplyDto.Budget}
-        Time Frame: ${createApplyDto.TimeFrame}
-  
-        Best regards,
-        Your Team
-      `;
+      Hi ${user.firstName},
+
+      A new application has been created:
+      
+      Title: ${createApplyDto.title}
+      Description: ${createApplyDto.description}
+      Budget: ${createApplyDto.Budget}
+      Time Frame: ${createApplyDto.TimeFrame}
+
+      Best regards,
+      Your Team
+    `;
       console.log(user.username);
       await this.emailService.sendEmail({
         to: user.username,
@@ -94,8 +99,6 @@ export class ApplyService {
         text: emailText,
       });
     }
-
-    return createdApply;
   }
 
   async findAll(): Promise<Apply[]> {

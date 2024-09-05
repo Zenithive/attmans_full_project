@@ -41,14 +41,19 @@ export class Product {
 
   @Prop({ required: false })
   productPrice: number;
+
   @Prop({ required: false })
   productQuantity: number;
+
   @Prop({ required: false })
   stageofdevelopmentdropdown: string;
+
   @Prop({ required: false })
   targetaudience: string;
+
   @Prop({ required: false })
   technologyused: string;
+
   @Prop({ required: false })
   videourlForproduct: string;
 }

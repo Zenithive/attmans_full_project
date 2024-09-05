@@ -39,6 +39,7 @@ export interface ProductForBooth {
   howdoesthesolutionwork: string;
   potentialbenefits: string;
   challengesorrisks: string;
+  productType?: string;
 }
 
 interface ProductTableProps {

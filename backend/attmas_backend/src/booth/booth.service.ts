@@ -24,71 +24,6 @@ export class BoothService {
     private emailService: EmailService2,
   ) {}
 
-  // async create(createBoothDto: CreateBoothDto): Promise<Booth> {
-  //   console.log('Booth Products:', createBoothDto.products);
-
-  //   // for (let index = 0; index < createBoothDto.products.length; index++) {
-  //   //   //let element: string = createBoothDto.products[index];
-  //   //   createBoothDto.products[index] = new Types.ObjectId(createBoothDto.products[index]);
-  //   // }
-
-  //   // Convert `_id` to `ObjectId` if it is a valid string
-  //   // createBoothDto.products = createBoothDto.products.forEach((product) => {
-  //   //   if (typeof product === 'string' && Types.ObjectId.isValid(product)) {
-  //   //     return { ...product, _id: new Types.ObjectId(product) }; // Convert string to ObjectId
-  //   //   }
-  //   //   return product; // Return as is if not a string or already an ObjectId
-  //   // });
-
-  //   // Convert `exhibitionId` to ObjectId if it is a valid string
-  //   if (typeof createBoothDto.exhibitionId === 'string' && Types.ObjectId.isValid(createBoothDto.exhibitionId)) {
-  //     createBoothDto.exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
-  //   }
-
-  //   const existingBooth = await this.boothModel.findOne({
-  //     exhibitionId: createBoothDto.exhibitionId,
-  //     userId: createBoothDto.userId,
-  //   });
-
-  //   if (existingBooth) {
-  //     throw new Error('You have already participated in this exhibition');
-  //   }
-
-  //   const createdBooth = new this.boothModel(createBoothDto);
-  //   const booth = await createdBooth.save();
-
-  //   const newProducts = createBoothDto.products.filter(
-  //     (product) => !product._id,
-  //   );
-
-  //   // if (newProducts.length > 0) {
-  //   //   // Update WorkExperience by matching the username and pushing new products
-  //   //   await this.workExperienceModel.updateOne(
-  //   //     { username: createBoothDto.username },
-  //   //     { $push: { products: { $each: newProducts } } },
-  //   //   );
-  //   // }
-
-  //   const exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
-
-  //   const exhibition = await this.exhibitionModel
-  //     .findById(exhibitionId)
-  //     .populate('userId', 'firstName lastName username', this.userModel)
-  //     .exec();
-  //   if (exhibition) {
-  //     const { username } = exhibition;
-  //     await this.emailService.sendEmailtoExhibition(
-  //       username,
-  //       'New Booth Created',
-  //       exhibitionId.toHexString(),
-  //       booth.username,
-  //       exhibition.title,
-  //     );
-  //   }
-  //   console.log('exhibition', exhibition);
-  //   return booth;
-  // }
-
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
     console.log('Booth Products:', createBoothDto.products);
 
@@ -117,6 +52,7 @@ export class BoothService {
 
     const createdBooth = new this.boothModel({
       ...createBoothDto,
+      userId: new Types.ObjectId(createBoothDto.userId),
       exhibitionId,
     });
     const booth = await createdBooth.save();
@@ -159,11 +95,17 @@ export class BoothService {
     console.log('Exhibition email sent:', exhibition);
   }
 
-  async findAll(status?: string): Promise<Booth[]> {
-    const filter = status ? { status } : {};
+  async findAll(status?: string, exhibitionId?: string): Promise<Booth[]> {
+    let filter = {};
+    if (status) {
+      filter = { ...filter, status };
+    }
+    if (exhibitionId) {
+      filter = { ...filter, exhibitionId: new Types.ObjectId(exhibitionId) };
+    }
     return this.boothModel
       .find(filter)
-      .populate('userId', 'firstName lastName', this.userModel)
+      .populate('userId', 'firstName lastName _id username', this.userModel)
       .exec();
   }
 
