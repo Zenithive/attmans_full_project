@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button, Link } from '@mui/material';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -24,7 +24,7 @@ import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/const
 import axiosInstance from '../services/axios.service';
 import { pubsub } from '../services/pubsub.service';
 
-interface Proposal {
+export interface Proposal {
     _id: string;
     projectTitle: string;
     Status: string;
@@ -35,7 +35,55 @@ interface Proposal {
     userId?: UserSchema;
     userName: string;
     applyId: string;
+    industryProblem: string;
+    impactProductOutput: string;
+    natureOfProject: string;
+    haveTechnology: string;
+    patentPreference: string;
+    projectObjective: string;
+    projectOutline: string;
+    marketNiche: string;
+
+    otherCommitments: string;
+    progressReportTemplate: string;
+    milestones: string;
+    totalDaysCompletion: string;
+    labStrengths: string;
+    externalEquipment: string;
+    pilotProductionTesting: string;
+    mentoringRequired: string;
+
 }
+
+export interface ProposalStep2Values {
+  isPeerReviewed: string;
+  expectedOutcome: string;
+  detailedMethodology: string;
+  physicalAchievements: string;
+  budgetOutlay: BudgetOutlay[];
+  manpowerDetails: ManpowerDetail[];
+  pastCredentials: string;
+  briefProfile: string;
+  proposalOwnerCredentials: string;
+}
+
+export interface BudgetOutlay {
+    head: string;
+    firstYear: string;
+    secondYear: string;
+    thirdYear: string;
+    total: string;
+  }
+  
+ export interface ManpowerDetail {
+    designation: string;
+    monthlySalary: string;
+    firstYear: string;
+    secondYear: string;
+    totalExpenditure: string;
+  }
+  
+  
 
 interface JobDetails {
 
@@ -80,6 +128,11 @@ const proposal = () => {
     const [currentAction, setCurrentAction] = useState<'Approve' | 'Reject'>('Approve');
     const [selectedProposalId, setSelectedProposalId] = useState<string>('');
     const [hasSubmittedProposal, setHasSubmittedProposal] = useState(false);
+
+
+    const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+    const [currentStep, setCurrentStep] = useState<number>(1); // Track the current step
+    const [openDialog, setOpenDialog] = useState(false);
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -400,6 +453,18 @@ const proposal = () => {
 
     //     fetchProposalStatus();
     //   }, [userDetails._id, selectedApply?._id]);
+    const handleViewProposal = (proposal: Proposal) => {
+        setSelectedProposal(proposal); // Set the selected proposal in state
+        setCurrentStep(1); // Set to the first step
+        setOpen(true); // Open the dialog
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+   
+
 
 
 
@@ -519,11 +584,26 @@ const proposal = () => {
                     <Box>
                         {proposals.length > 0 ? (
                             proposals
-                                .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded))
+                                .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && (proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded)))
                                 .map((proposal) => (
                                     <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>
-                                            <Typography variant="h6">{proposal.projectTitle}</Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Typography variant="h6">{proposal.projectTitle}</Typography>
+                                                <Link
+                                                    component="button"
+                                                    // variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleViewProposal(proposal)}
+                                                    sx={{
+                                                        color: 'blue',
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer'
+                                                    }} // Style to ensure link is blue with underline
+                                                >
+                                                    View Proposal
+                                                </Link>
+                                            </Box>
                                             <Typography variant="body1">
                                                 <span style={{ fontWeight: 'bold' }} onClick={() => {
                                                     console.log('proposal?.jobDetails?.username', proposal?.jobDetails?.username);
@@ -541,7 +621,8 @@ const proposal = () => {
                                                             handleUserClick(proposal?.userName);
                                                         }}
                                                     >
-                                                        Freelancer Name:</span>
+                                                        Freelancer Name:
+                                                    </span>
                                                     {` ${proposal.firstname} ${proposal.lastname}`}
                                                 </Typography>
                                             )}
@@ -598,6 +679,7 @@ const proposal = () => {
                             <Typography>No proposals available</Typography>
                         )}
                     </Box>
+
                 )}
             </Box>
 
@@ -694,17 +776,6 @@ const proposal = () => {
                                                             Submit Proposal
                                                         </Button>
                                                     )}
-                                                    <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
-                                                        <DialogTitle>Submit Proposal</DialogTitle>
-                                                        <DialogContent>
-                                                            {step === 1 && <ProposalStep1 onNext={() => setStep(step + 1)} />}
-                                                            {step === 2 && <ProposalStep2 onNext={() => setStep(step + 1)} onPrevious={() => setStep(step - 1)} />}
-                                                            {step === 3 && <ProposalStep3 onSubmit={handleSubmit} onPrevious={() => setStep(step - 1)} />}
-                                                        </DialogContent>
-                                                        <DialogActions>
-                                                            <Button onClick={() => setOpen(false)}>Cancel</Button>
-                                                        </DialogActions>
-                                                    </Dialog>
                                                 </Box>
                                           
       
@@ -745,38 +816,74 @@ const proposal = () => {
                 )}
 
 
+            </Box>
+
+
+
+
+            {selectedUser ? (
+                <UserDrawer
+                    open={drawerOpen}
+                    onClose={handleDrawerClose}
+                    username={selectedUser}
+                />
+            ) : ""}
+
+            {selectedApply && (
+                <ApplyDetailsDialog
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)}
+                    apply={selectedApply}
+                    jobId={viewingJob?._id || ''}
+                    canAddComment={showCommentSection}
+                    onCommentSubmitted={() => { console.log('Comment has been submitted') }}
+                />
+            )}
+            <ConfirmationDialog
+                open={confirmationDialogOpen}
+                onClose={handleCloseConfirmationDialog}
+                onConfirm={handleConfirm}
+                message="Are you sure you want to award this application?"
+            />
+
+
+            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
+                <DialogTitle>Submit Proposal</DialogTitle>
+                <DialogContent>
+
+
+                    {step === 1 && <ProposalStep1 onNext={handleNextStep} 
+                    initialValues={selectedProposal || null}
+                    readOnly= {true}
+                    />}
+
+
+
+                    {step === 2 && <ProposalStep2  
+                    initialValues={selectedProposal || null}
+                    readOnly= {true}
+                    onNext={handleNextStep} 
+                    onPrevious={handlePreviousStep} 
+                     />}
+
+
+
+                    {step === 3 && <ProposalStep3 
+                    initialValues={selectedProposal || null}
+                    readOnly= {true}
+                    onSubmit={handleSubmit} 
+                    onPrevious={handlePreviousStep} 
+                    />}
+
+
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
 
 
-            {
-        selectedUser ? (
-            <UserDrawer
-                open={drawerOpen}
-                onClose={handleDrawerClose}
-                username={selectedUser}
-            />
-        ) : ""
-    }
-
-    {
-        selectedApply && (
-            <ApplyDetailsDialog
-                open={dialogOpen}
-                onClose={() => setDialogOpen(false)}
-                apply={selectedApply}
-                jobId={viewingJob?._id || ''}
-                canAddComment={showCommentSection}
-                onCommentSubmitted={() => { console.log('Comment has been submitted') }}
-            />
-        )
-    }
-    <ConfirmationDialog
-        open={confirmationDialogOpen}
-        onClose={handleCloseConfirmationDialog}
-        onConfirm={handleConfirm}
-        message="Are you sure you want to award this application?"
-    />
-        </Box >
     );
 };
 
