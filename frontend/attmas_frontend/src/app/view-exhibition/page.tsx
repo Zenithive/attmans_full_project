@@ -131,17 +131,24 @@ const ExhibitionsPage: React.FC = () => {
     };
 
 
-    const fetchVisitorsforExhibition = async () => {
+    const fetchVisitorsforExhibition = async (
+      searchParams: URLSearchParams,
+      interestType: string,
+      // userDetails: UserDetails,
+      setVisitors: React.Dispatch<React.SetStateAction<Visitor[]>>,
+      setIsInterestedBtnShow: React.Dispatch<React.SetStateAction<boolean>>
+    ) => {
       try {
         const exhibitionId = searchParams.get('exhibitionId');
         const boothId = searchParams.get('boothId');
         console.log('boothId', boothId);
+    
         if (!exhibitionId) {
-          console.error('id not found');
+          console.error('Exhibition ID not found');
           return;
         }
         
-        const response = await axios.get(`${APIS.GET_VISITORS}`, {
+        const response = await axios.get<Visitor[]>(`${APIS.GET_VISITORS}`, {
           params: {
             exhibitionId,
             interestType,
@@ -151,23 +158,20 @@ const ExhibitionsPage: React.FC = () => {
         console.log('Fetched visitors:', response.data);
         console.log('userDetails._id', userDetails._id);
     
-        // Remove duplicates based on interestType and username
-        const uniqueVisitors = response.data.filter((visitor: { interestType: any; username: any; }, index: any, self: any[]) =>
-          index === self.findIndex(v => 
+        // Remove duplicates based on username and interestType
+        const uniqueVisitors = response.data.filter((visitor, index, self) =>
+          index === self.findIndex(v =>
             v.interestType === visitor.interestType && v.username === visitor.username
           )
         );
     
-        for (let index = 0; index < uniqueVisitors.length; index++) {
-          const element = uniqueVisitors[index];
-          console.log('element.userId', element.userId);
+        // Check if the current user is in the list of unique visitors
+        const isCurrentUserInterested = uniqueVisitors.some(visitor => visitor.userId === userDetails._id);
+        setIsInterestedBtnShow(!isCurrentUserInterested);
     
-          if (element.userId === userDetails._id) {
-            setIsInterestedBtnShow(false);
-          }
-        }
-    
+        // Store unique visitors
         setVisitors(uniqueVisitors);
+    
       } catch (error) {
         console.error('Error fetching visitors:', error);
       }

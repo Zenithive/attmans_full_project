@@ -57,7 +57,6 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
       password: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      try {
         const response = await axios.post(APIS.LOGIN, { username: values.email, password: values.password });
 
         const res = response.data.user;
@@ -72,69 +71,14 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
         };
 
         dispatch(addUser(user));
+        
         document.cookie = `access_token=${response.data.access_token}`;
         formik.setStatus({ success: 'Successfully signed in!' });
-
-        const interestedUser = {
-          username: values.email,
-          password: values.password,
-          userId: res._id,
-          userType: res.userType,
-          exhibitionId: exhibitionId || null,
-          boothId: boothId || null,
-          firstName: res.firstName,
-          lastName: res.lastName,
-          mobileNumber: res.mobileNumber,
-          interestType: interestType,
-        };
-
-       
-        if (exhibitionId || boothId) {
-          await axios.post(APIS.CHECKINTRESTEDUSER, interestedUser);
-        }
-
-        if (onSignInSuccess) {
-          onSignInSuccess();
-        } else {
-          const {
-            isAdmin,
-            isFreelancer,
-            isInnovator,
-            isProjectOwner,
-            isVisitor
-          } = getRoleBasedAccess(res.userType);
-
-          if (isVisitor) {
-            router.push("/exhibition");
-          } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
-            router.push("/dashboard");
-          } else {
-            router.push("/profile");
-          }
-        }
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          const simulatedError = {
-            response: {
-              data: {
-                message: 'User has already shown interest in this exhibition'
-              }
-            }
-          };
-          
-          const errorMessage = (simulatedError).response?.data.message;
-      
-          if (errorMessage === 'User has already shown interest in the exhibition') {
-            formik.setStatus({ error: 'You have already shown interest for the exhibition.' });
-          } else {
-            formik.setStatus({ error: 'Failed to sign in. Please check your credentials and try again.' });
-          }
-        } else {
-          formik.setStatus({ error: 'An unexpected error occurred.' });
-        }
-      }  
-    }
+        
+      },
+        
   });
+  
 
   return (
     <Container component="main" maxWidth="xs">
