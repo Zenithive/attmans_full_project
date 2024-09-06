@@ -314,7 +314,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                         sx={{ mb: 1 }}
                                                     />
                                                 </Box>
-                                                <Box sx={{ flex: 1 }}>
+                                                {userType == 'Admin' && <Box sx={{ flex: 1 }}>
                                                     <TextField
                                                         label="Applied User"
                                                         value={`${app.firstName} ${app.lastName}`}
@@ -323,7 +323,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                         disabled
                                                         sx={{ mb: 1 }}
                                                     />
-                                                </Box>
+                                                </Box>}
                                             </Box>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12}>

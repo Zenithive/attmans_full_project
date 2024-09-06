@@ -50,6 +50,7 @@ export interface Apply {
     userId?: UserSchema;
     availableSolution: string;
     SolutionUSP: string;
+    userDetails:any;
   }
 
 export const Expertiselevel = [

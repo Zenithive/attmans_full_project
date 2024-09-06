@@ -75,6 +75,7 @@ export interface Apply {
     availableSolution: string;
     SolutionUSP: string;
     userId?: UserSchema;
+    userDetails:any;
 }
 
 export interface ProjectDrawerProps {
@@ -121,8 +122,8 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         for (let index = 0; index < applies.length; index++) {
           const element = applies[index];
           const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
-          const isProjectOwner = currentUserType === "Project Owner" && element?.status !== APPLY_STATUSES.pendingForApproval;
-          const isAdmin = currentUserType === "Admin";
+          const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
+          const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
           if (isFreelancer || isProjectOwner || isAdmin) {
             tmpApplies.push(element);
           }

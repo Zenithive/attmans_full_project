@@ -395,7 +395,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
               >
                 Please Note: <br />
-                If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
+                {/* If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br /> */}
                 Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
               </Typography>
 

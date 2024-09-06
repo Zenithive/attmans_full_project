@@ -190,7 +190,6 @@ const proposal = () => {
             const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
                 params: {
                     userId: userDetails._id, // Include userId in the request
-
                 },
             });
             console.log('Fetched Projects:', response.data); // Log the response data
@@ -258,14 +257,17 @@ const proposal = () => {
 
     useEffect(() => {
         pubsub.subscribe('ProposalRefetch', fetchAppliedJobs);
+        pubsub.subscribe('ProposalRefetchAfterAward', fetchAllProposals);
 
         return () => {
             pubsub.unsubscribe('ProposalRefetch', fetchAppliedJobs);
+            pubsub.unsubscribe('ProposalRefetchAfterAward', fetchAllProposals);
         };
     }, [fetchAppliedJobs]);
     // Function to handle viewing job details
-    const handleViewJob = (job: Job) => {
+    const handleViewJob = (job: Job, isOpenProjectModal?: boolean) => {
         console.log("Viewing Job:", job);
+        isOpenProjectModal && setViewingJob(job);
         // setViewingJob(job);
         setSelectedProject(job);
         setApplyOpen(false);
@@ -403,14 +405,7 @@ const proposal = () => {
             // Hide the Award button
             setIsAwardButtonVisible(false);
 
-            // Hide all the buttons
-            // setButtonsHidden((prev) => {
-            //   const updated = { ...prev };
-            //   Object.keys(updated).forEach((key) => {
-            //     updated[key] = true;
-            //   });
-            //   return updated;
-            // });
+            pubsub.publish('ProposalRefetchAfterAward', { Message: 'Proposal Refetched' });
 
         } catch (error) {
             console.error('Error rewarding application:', error);
@@ -626,7 +621,7 @@ const proposal = () => {
                                                 }}>
                                                     Project Owner Name:
                                                 </span>
-                                                {` ${proposal.jobDetails.firstName} ${proposal.jobDetails.lastName}`}
+                                                {` ${proposal?.jobDetails?.firstName} ${proposal?.jobDetails?.lastName}`}
                                             </Typography>
                                             {userDetails.userType === 'Admin' && (
                                                 <Typography variant="body1">
@@ -650,23 +645,28 @@ const proposal = () => {
                                                 sx={{
                                                     color: 'blue',
                                                     textDecoration: 'underline',
-                                                    cursor: 'pointer'
+                                                    cursor: 'pointer',
+                                                    mr: 2
                                                 }} // Style to ensure link is blue with underline
                                             >
                                                 View Proposal
                                             </Link>
 
-                                            <a
-                                                onClick={() => handleViewJob(proposal.jobDetails)}
-                                                style={{
-                                                    cursor: 'pointer',
-                                                    textDecoration: 'underline',
+                                            <Link
+                                                component="button"
+                                                // variant="contained"
+                                                color="primary"
+                                                onClick={() => handleViewJob(proposal.jobDetails, true)}
+                                                sx={{
                                                     color: 'blue',
-                                                    fontSize: 'medium',
-                                                }}
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer',
+                                                    mr: 2
+                                                }} // Style to ensure link is blue with underline
                                             >
                                                 View Project
-                                            </a>
+                                            </Link>
+
                                             <Box
                                                 sx={{
                                                     position: 'absolute',
