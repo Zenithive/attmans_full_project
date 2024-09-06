@@ -606,7 +606,7 @@ const ExhibitionsPage: React.FC = () => {
                         return booth.status === statusFilter;
                       }
                     })
-                    .filter(booth => ((userType === 'Innovators' || userType === 'Visitors') && booth.status === 'Approved') || userType === 'Admin')
+                    .filter(booth => ((userType === 'Innovators' || userType === 'Visitors' || !userType) && booth.status === 'Approved') || userType === 'Admin')
                     .map(booth => (
                       <Grid item xs={12} sm={6} md={4} key={booth._id}>
                         <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
@@ -636,7 +636,7 @@ const ExhibitionsPage: React.FC = () => {
                                 View Details
                               </a>
                             )}
-                            {exhibitions.map((exhibition) => (
+                            {/* {exhibitions.map((exhibition) => (
                               <Box key={exhibition._id}>
                                 {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
                                   dayjs(exhibition.dateTime).isSame(dayjs(exhibition.serverDate), 'day') && (
@@ -658,7 +658,7 @@ const ExhibitionsPage: React.FC = () => {
                                     </a>
                                   )}
                               </Box>
-                            ))}
+                            ))} */}
 
                             
                             {userType === 'Admin' ? <Typography><a

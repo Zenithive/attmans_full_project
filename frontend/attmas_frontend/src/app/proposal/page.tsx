@@ -266,7 +266,7 @@ const proposal = () => {
     // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         console.log("Viewing Job:", job);
-        setViewingJob(job);
+        // setViewingJob(job);
         setSelectedProject(job);
         setApplyOpen(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer

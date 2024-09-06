@@ -218,6 +218,25 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                 <Typography variant="body1" sx={{ '@media (max-width: 767px)': { fontSize: '1.25rem' } }} color="text.secondary">
                   Status: {booth.status}
                 </Typography>
+                <Box sx={{ position: 'relative', right: '45%', top: '15px' }}>
+                  {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        if (!userDetails._id) {
+                          openInterestedModals(); // Open modal if userId is not present
+                        } else {
+                          console.log('User details already present, modal will not open');
+                          openInterestedModals();
+                        }
+                      }}
+                      sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
+                    >
+                      Interested
+                    </Button>
+                  )}
+                </Box>
                 <Typography
                   variant="body2"
                   sx={{
