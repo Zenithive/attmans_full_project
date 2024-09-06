@@ -200,7 +200,7 @@ export class ApplyService {
     const applyId = application._id.toString();
     for (const admin of adminUsers) {
       if (user) {
-        await this.emailService2.sendApplicationStatusEmail(
+        this.emailService2.sendApplicationStatusEmail(
           user.username,
           'Application Approved',
           applyId,
@@ -232,7 +232,7 @@ export class ApplyService {
     const applyId = application._id.toString();
     for (const admin of adminUsers) {
       if (user) {
-        await this.emailService2.sendApplicationStatusEmail(
+        this.emailService2.sendApplicationStatusEmail(
           user.username,
           'Application Rejected',
           applyId,
@@ -323,7 +323,7 @@ export class ApplyService {
   }
 
   async findAppliedJobsForAdmin(status: string): Promise<Apply[]> {
-    return this.ApplyModel.aggregate([
+    const result = await this.ApplyModel.aggregate([
       // Match documents with the specified status
       { $match: { status } },
 
@@ -339,13 +339,41 @@ export class ApplyService {
 
       // Optionally, unwind the jobDetails array to get a single document per match
       { $unwind: { path: '$jobDetails', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'users', // Name of the Jobs collection
+          localField: 'userId', // Field from the Apply collection
+          foreignField: '_id', // Field from the Jobs collection to match
+          as: 'userDetails', // Name of the output array field
+        },
+      },
+
+      { $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } },
     ]).exec();
+
+    console.log('result for Admin', result);
+    return result;
   }
 
   async findJobDetails(jobId: string): Promise<Apply[]> {
     return this.ApplyModel.find({ jobId })
       .populate('userId', 'firstName lastName username')
       .exec();
+  }
+
+  async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {
+    try {
+      const updateQuery = {
+        jobId,
+        _id: { $ne: new Types.ObjectId(appId) },
+      };
+      const result = await this.ApplyModel.updateMany(updateQuery, {
+        status: APPLY_STATUSES.notAwarded,
+      });
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async rewardApplication(
@@ -377,18 +405,30 @@ export class ApplyService {
       comment ||
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
+    this.updateAlltheApplications(application.jobId, id);
     // console.log(`Application with ID: ${id} awarded.`);
-
-    const proposal = await this.proposalModel
-      .findOne({
-        applyId: application._id,
+    const proposals = await this.proposalModel
+      .find({
+        projectId: application.jobId,
       })
       .exec();
 
-    console.log('proposal', proposal.applyId);
-    if (proposal.applyId) {
-      proposal.Status = PROPOSAL_STATUSES.approvedAndAwarded;
-      await proposal.save();
+    let awardedProposalFound = false;
+
+    for (const proposal of proposals) {
+      if (proposal.applyId.toString() === application._id.toString()) {
+        proposal.Status = PROPOSAL_STATUSES.approvedAndAwarded;
+        await proposal.save();
+        awardedProposalFound = true;
+      } else {
+        proposal.Status = PROPOSAL_STATUSES.notAwarded;
+        await proposal.save();
+      }
+    }
+
+    // Ensure that one proposal is awarded
+    if (!awardedProposalFound) {
+      throw new Error('No matching proposal found to award.');
     }
 
     // Get all other applications and set their status to 'Not Awarded'

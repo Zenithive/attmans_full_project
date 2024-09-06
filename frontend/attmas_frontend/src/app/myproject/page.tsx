@@ -18,6 +18,7 @@ import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 import axiosInstance from '../services/axios.service';
+import { APPLY_STATUSES } from '../constants/status.constant';
 
 
 const myproject = () => {
@@ -121,25 +122,25 @@ const myproject = () => {
 
 
 
-    const fetchAllProjects = useCallback(async () => {
-        try {
-            const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
-                params: {
-                    userId: userDetails._id, // Include userId in the request
-                },
-            });
-            console.log('Fetched Projects:', response.data); // Log the response data
-            setProjects(response.data);
-        } catch (error) {
-            console.error('Error fetching projects:', error);
-        }
-    }, [userDetails._id]);
+    // const fetchAllProjects = useCallback(async () => {
+    //     try {
+    //         const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
+    //             params: {
+    //                 userId: userDetails._id, // Include userId in the request
+    //             },
+    //         });
+    //         console.log('Fetched Projects:', response.data); // Log the response data
+    //         setProjects(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching projects:', error);
+    //     }
+    // }, [userDetails._id]);
 
 
-    useEffect(() => {
-        fetchAllProjects();
-        // Fetch all projects on component mount
-    }, [fetchAllProjects]);
+    // useEffect(() => {
+    //     fetchAllProjects();
+    //     // Fetch all projects on component mount
+    // }, [fetchAllProjects]);
 
 
     const refetch = useCallback(async () => {
@@ -163,20 +164,46 @@ const myproject = () => {
         }
     }, [page]);
 
-    useEffect(() => {
-        const fetchAppliedJobs = async () => {
-            try {
-                const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-                console.log('respons page', response.data);
-                const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-                console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-                setAppliedJobs(fetchedAppliedJobs);
-            } catch (error) {
-                console.error('Error fetching applied jobs:', error);
-            }
-        };
-        fetchAppliedJobs();
-    }, [userId]);
+    // useEffect(() => {
+    //     const fetchAppliedJobs = async () => {
+    //         try {
+    //             const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
+    //             console.log('respons page', response.data);
+    //             const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
+    //             console.log('fetchedAppliedJobs', fetchedAppliedJobs);
+    //             setAppliedJobs(fetchedAppliedJobs);
+    //             setProjects(fetchedAppliedJobs);
+    //         } catch (error) {
+    //             console.error('Error fetching applied jobs:', error);
+    //         }
+    //     };
+    //     fetchAppliedJobs();
+    // }, [userId]);
+
+    const currentUser = userDetails.username;
+    const currentUserType = userDetails.userType;
+    const currentUserId = userDetails._id;
+
+    const setApplicationsBasedOnUser = (applies: Apply[]) => {
+        const tmpApplies: Apply[] = [];
+        for (let index = 0; index < applies.length; index++) {
+          const element = applies[index];
+          console.log('element?.userId?._id === currentUserId ',element?.userDetails._id === currentUserId );
+          console.log('element?.userId?._id',element?.userDetails._id);
+          console.log('currentUserId',currentUserId);
+          const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
+          console.log("isFreelancer",isFreelancer);
+          const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
+          console.log('isProjectOwner',isProjectOwner)
+          const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
+          console.log('isAdmin',isAdmin);
+          if (isFreelancer || isProjectOwner || isAdmin) {
+            tmpApplies.push(element);
+          }
+        }
+    
+        setProjectsForAdmin(tmpApplies);
+      }
 
 
     
@@ -186,7 +213,7 @@ const myproject = () => {
           try {
             const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
             console.log("ggg", response.data)
-            setProjectsForAdmin(response.data)
+            setApplicationsBasedOnUser(response.data);
     
             console.log('response page', response.data);
             // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
@@ -200,7 +227,7 @@ const myproject = () => {
         };
     
         // Check if the user type is 'Admin' before fetching
-        if (userDetails.userType === 'Admin') {
+        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators'){
           fetchAppliedJobsForAdmin();
         }
       }, [userDetails]);
@@ -459,6 +486,7 @@ const myproject = () => {
                         {isShowingApplies ? (
                             <Box>
                                 {applies.map((apply) => (
+                            
                                     <Card key={apply._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -557,6 +585,7 @@ const myproject = () => {
                                                 </Box>
                                             </CardContent>
                                         </Card>
+                                    
                                     ))}
                                 </Box>
                      
@@ -578,11 +607,11 @@ const myproject = () => {
             
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
                     <>
-                        {projects.length > 0 ? (
+                        {projectsForAdmin.length > 0 ? (
                             <Box>
-                                {projects.map((project) => (
+                                {projectsForAdmin.map((project) => project.jobDetails && (
                                     <Card key={project._id} sx={{ mb: 2 }}>
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -592,6 +621,22 @@ const myproject = () => {
                                                 >
                                                     {project.jobDetails.title}
                                                 </Box>
+                                               
+                                                <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2,position:'relative',left:'25%' }}>
+                                                            <CustomChip
+                                                                label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                                color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                            />
+                                                        </Box>
+
+                                                        <Box sx={{ flexShrink: 0, mr: 2,position:'relative',left:'12%'}}>
+                                                            <Chip
+                                                                label={project.jobDetails.SelectService}
+                                                                variant="outlined"
+                                                                color='secondary'
+                                                            />
+                                                        </Box>
+                                              
                                                 <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
                                                     {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                                 </Box>
@@ -608,12 +653,14 @@ const myproject = () => {
                                             <Typography variant="body2" sx={{ mt: 1 }}>
                                                 {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
                                             </Typography>
+        
+                                
 
                                             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
                                                 <Box sx={{
                                                     fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
                                                 }}>
-                                                    <Chip
+                                                    {/* <Chip
                                                         label={project.jobDetails.status}
                                                         color={
                                                             project.jobDetails.status === 'Approved'
@@ -622,7 +669,7 @@ const myproject = () => {
                                                                     ? 'error'
                                                                     : 'default'
                                                         }
-                                                    />
+                                                    /> */}
 
 
                                                     <Button

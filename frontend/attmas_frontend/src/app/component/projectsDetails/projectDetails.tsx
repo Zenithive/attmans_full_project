@@ -25,7 +25,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
-import { PROPOSAL_STATUSES } from '@/app/constants/status.constant';
+import { APPLY_STATUSES, PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
 import { ProductForBooth } from '../ProductTableForBooth';
 import NewProductTable from '../all_Profile_component/NewProductTable';
@@ -295,7 +295,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   Status: {apply.status}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ color: getStatusColor(apply.status), textAlign: 'right', fontSize: 14, mb: 0.5 }}>
-                  Date: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
+                  Timeframe: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
                 </Typography>
                 {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1, ml: 2, textAlign: 'right', fontSize: 14 }}>
                   <b>Applied User: &nbsp;</b>
@@ -383,9 +383,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                 <Grid item xs={12} key={index}>
                                   <Card sx={{ marginBottom: '20px' }}>
                                     <CardContent>
-                                      <Typography variant="h6" gutterBottom>
-                                        Milestone {index + 1}
-                                      </Typography>
                                       <Grid container spacing={2}>
                                         <Grid item xs={12}>
                                           <TextField
@@ -506,7 +503,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                {userDetails.userType === 'Freelancer' && <>
+                {userDetails.userType !== 'Innovators' && <>
                   <Grid item xs={12}>
                     <TextField
                       label="Other available solutions"
@@ -577,7 +574,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
             .filter((proposal) => proposal.Status === PROPOSAL_STATUSES.proposalUnderReview)
             .map((proposal) => (
               userDetails.userType === 'Project Owner' &&
-              apply?._id &&
+              apply?._id && apply?.status === APPLY_STATUSES.proposalUnderReview &&
               isAwardButtonVisible && (
                 <Button
                   key={proposal._id}
