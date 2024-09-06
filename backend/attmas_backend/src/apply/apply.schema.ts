@@ -4,6 +4,7 @@ import {
   Types,
   // Types
 } from 'mongoose';
+import { Product } from 'src/booth/booth.schema';
 import { APPLY_STATUSES } from 'src/common/constant/status.constant';
 
 export type ApplyDocument = Apply & Document;
@@ -42,6 +43,9 @@ export class Apply {
 
   @Prop({ default: APPLY_STATUSES.pendingForApproval })
   status: string;
+
+  @Prop({ required: false })
+  products: Product[];
 
   @Prop({ default: 'Pending' })
   comment_Reward_Nonreward: string;

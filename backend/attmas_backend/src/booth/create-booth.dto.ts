@@ -9,12 +9,10 @@ import {
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
 
-class ProductDto {
-  
+export class ProductDto {
   // @IsNotEmpty()
   @Type(() => String) // Ensure _id is treated as a string for validation
   _id: Types.ObjectId;
-
 
   // @IsNotEmpty()
   @IsString()
@@ -65,7 +63,6 @@ class ProductDto {
   @IsNumber()
   productQuantity: number;
   // @IsNotEmpty()
- 
 }
 
 export class CreateBoothDto {

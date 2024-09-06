@@ -17,6 +17,7 @@ import NewProductTable from '../all_Profile_component/NewProductTable';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
+import LatestProductTableForBooth from '../booth/LatestProductTableForBooth';
 
 
 
@@ -58,6 +59,7 @@ interface FormValues {
     TimeFrame: Dayjs | null;
     jobId: string;
     applyType: string;
+    products: Product[] 
 }
 
 
@@ -68,6 +70,7 @@ const validationSchema = Yup.object().shape({
     Budget: Yup.number().required('Budget is required'),
     currency: Yup.string().required('Currency is required'),
     TimeFrame: Yup.date().nullable('Date & Time is required'),
+    products: Yup.array().min(1).max(1).required("Only One product is acceptable")
 });
 
 export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
@@ -78,8 +81,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
     const [subcategories, setSelectedValues] = React.useState<string[]>([]);
     const [categories, setCategories] = React.useState([]);
     const [products, setProducts] = React.useState<Product[]>([]);
-
-
+    const [selectedProducts, setSelectedProducts] = React.useState<Product[]>([]);
 
     const initialValues = {
         title: jobTitle,
@@ -90,6 +92,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
         jobId: jobId,
         applyType: 'InnovatorsApply',
         categories: [],
+        products: [] as Product[], // Updated type
         subcategories: []
     };
 
@@ -153,6 +156,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                 lastName: userDetails.lastName,
                 jobId: values.jobId,
                 applyType: 'InnovatorsApply',
+                products: values.products
             };
 
             const applyResponse = await axiosInstance.post(APIS.APPLY, applyData);
@@ -177,6 +181,17 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
         setOpen(false);
     };
 
+    const handleProductSelect = (product: Product, setFieldValue: Function) => {
+        setSelectedProducts((prevSelected) => {
+            const isSelected = prevSelected.some(p => p._id === product._id);
+            const updatedSelection = isSelected
+                ? prevSelected.filter(p => p._id !== product._id)
+                : [...prevSelected, product];
+
+            setFieldValue("products", updatedSelection);
+            return updatedSelection;
+        });
+    };
 
 
 
@@ -289,7 +304,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                     </LocalizationProvider>
                                 </Box>
                             </Box>
-                            
+
                             {fetchError && (
                                 <Typography color="error" align="center" mt={2}>
                                     {fetchError}
@@ -350,29 +365,20 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
 
                                         <>
                                             <Box sx={{ position: 'relative', left: '1.5%', width: '97%', marginBottom: '20px' }}>
-                                                <Typography
-                                                    component="h1"
-                                                    variant="h5"
-                                                    align="center"
-                                                    sx={{ marginBottom: '40px', fontWeight: 'bold' }}
-                                                >
-                                                    Products
-                                                </Typography>
-
-
 
                                                 {workExperience?.products && workExperience?.products.length > 0 ? (
-                                                    <NewProductTable
-                                                        products={workExperience.products}
-                                                        onView={(productId) => console.log('View', productId)} 
-                                                        onEdit={(productId) => console.log('Edit', productId)}
-                                                        onDelete={(productId) => console.log('Delete', productId)}
+                                                    <LatestProductTableForBooth
+                                                        products={workExperience?.products}
+                                                        selectedProducts={selectedProducts.map(p => (p._id || ''))}
+                                                        onProductSelect={(product: Product) =>
+                                                            handleProductSelect(product, setFieldValue)
+                                                        }
                                                     />
                                                 ) : (
                                                     <Typography>No products available</Typography>
                                                 )}
 
-
+                                                {errors?.products ? <span style={{color: 'red'}}>{errors?.products.toString() || ''}</span> : ''}
                                             </Box>
 
                                         </>

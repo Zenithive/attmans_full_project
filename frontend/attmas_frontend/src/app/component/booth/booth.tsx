@@ -14,11 +14,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Formik, FieldArray, Form } from "formik";
 import * as Yup from "yup";
 import { APIS } from "@/app/constants/api.constant";
-import LatestProductTableForBooth, { LatestProductForBooth } from "./LatestProductTableForBooth";
+import LatestProductTableForBooth from "./LatestProductTableForBooth";
 import axiosInstance from "@/app/services/axios.service";
-
-// Define your type for the selected products
-interface SelectedProduct extends LatestProductForBooth {}
+import { Product } from "../ProductTable";
 
 interface BoothDetailsModalProps {
   open: boolean;
@@ -34,8 +32,8 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   exhibitionId,
 }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
-  const [products, setProducts] = useState<LatestProductForBooth[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -57,7 +55,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
     title: "",
     description: "",
     videoUrl: "",
-    products: [] as SelectedProduct[], // Updated type
+    products: [] as Product[], // Updated type
     userId: userDetails._id,
     username: userDetails.username,
     exhibitionId: exhibitionId || "",
@@ -83,7 +81,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
     }
   };
 
-  const handleProductSelect = (product: LatestProductForBooth, setFieldValue: Function) => {
+  const handleProductSelect = (product: Product, setFieldValue: Function) => {
     setSelectedProducts((prevSelected) => {
       const isSelected = prevSelected.some(p => p._id === product._id);
       const updatedSelection = isSelected
@@ -198,8 +196,8 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                     <div>
                       <LatestProductTableForBooth
                         products={products}
-                        selectedProducts={selectedProducts.map(p => p._id)}
-                        onProductSelect={(product: LatestProductForBooth) =>
+                        selectedProducts={selectedProducts.map(p => (p?._id || ''))}
+                        onProductSelect={(product: Product) =>
                           handleProductSelect(product, setFieldValue)
                         }
                       />
