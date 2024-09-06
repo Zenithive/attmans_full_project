@@ -53,7 +53,7 @@ export class InterestedUserService {
 
     try {
       const exhibition = await this.exhibitionModel
-        .findById({ exhibitionId: exhibitionObjectId })
+        .findById(exhibitionObjectId)
         .exec();
 
       if (!exhibition) {

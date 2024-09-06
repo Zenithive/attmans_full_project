@@ -43,7 +43,8 @@ export class ExhibitionService {
   async createExibitionWithSendEmail(
     createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
-    createExhibitionDto.userId = new Types.ObjectId(createExhibitionDto.userId);
+    const userId = new Types.ObjectId(createExhibitionDto.userId);
+    createExhibitionDto.userId = userId;
     const createdExhibition = new this.exhibitionModel(createExhibitionDto);
     const savedExhibition = await createdExhibition.save();
     this.inviteAllInnovators(savedExhibition);
@@ -196,7 +197,7 @@ export class ExhibitionService {
   ): Promise<Exhibition[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
-  
+
     const allNativeFiltersArray = {
       title,
       industries,
@@ -205,7 +206,7 @@ export class ExhibitionService {
       dateTime,
       status,
     };
-  
+
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
@@ -222,7 +223,7 @@ export class ExhibitionService {
         }
       }
     }
-  
+
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -254,13 +255,25 @@ export class ExhibitionService {
               initialValue: { pending: 0, approved: 0, rejected: 0 },
               in: {
                 pending: {
-                  $cond: [{ $eq: ['$$this.status', 'Pending'] }, { $add: ['$$value.pending', 1] }, '$$value.pending'],
+                  $cond: [
+                    { $eq: ['$$this.status', 'Pending'] },
+                    { $add: ['$$value.pending', 1] },
+                    '$$value.pending',
+                  ],
                 },
                 approved: {
-                  $cond: [{ $eq: ['$$this.status', 'Approved'] }, { $add: ['$$value.approved', 1] }, '$$value.approved'],
+                  $cond: [
+                    { $eq: ['$$this.status', 'Approved'] },
+                    { $add: ['$$value.approved', 1] },
+                    '$$value.approved',
+                  ],
                 },
                 rejected: {
-                  $cond: [{ $eq: ['$$this.status', 'Rejected'] }, { $add: ['$$value.rejected', 1] }, '$$value.rejected'],
+                  $cond: [
+                    { $eq: ['$$this.status', 'Rejected'] },
+                    { $add: ['$$value.rejected', 1] },
+                    '$$value.rejected',
+                  ],
                 },
               },
             },
@@ -298,11 +311,9 @@ export class ExhibitionService {
         },
       },
     ];
-  
+
     return await this.exhibitionModel.aggregate(pipeline);
   }
-  
-  
 
   async update(
     id: string,
