@@ -42,9 +42,9 @@ interface Email {
   adminFirstName?: string;
   adminLastName?: string;
   applicationId?: string,
-  first?:string,
-  last?:string,
-
+  first?: string,
+  last?: string,
+  notifType: string;
 }
 
 function clearCookies() {
@@ -88,7 +88,7 @@ export default function MainNavBar() {
     if (userDetails.username) {
       fetchUserProfile();
     }
-  }, [userDetails.username,profilePhoto]);
+  }, [userDetails.username, profilePhoto]);
 
   React.useEffect(() => {
     const fetchNotifications = async () => {
@@ -131,15 +131,19 @@ export default function MainNavBar() {
     setNotificationAnchorEl(null);
   };
 
-  const handleNotificationClick = async (notificationId: string, exhibitionId: string) => {
+  const handleNotificationClick = async (notificationObj: Email) => {
     try {
-      await axiosInstance.post(`${APIS.MARK_AS_READ}`, { id: notificationId });
+      await axiosInstance.post(`${APIS.MARK_AS_READ}`, { id: notificationObj._id });
       setNotifications(prevNotifications => {
         return prevNotifications.map(notification =>
-          notification._id === notificationId ? { ...notification, read: true } : notification
+          notification._id === notificationObj._id ? { ...notification, read: true } : notification
         ).sort((a, b) => b.sentAt.getTime() - a.sentAt.getTime());
       });
-      window.open(`/view-exhibition?exhibitionId=${exhibitionId}`, '_blank');
+      if (notificationObj.exhibitionId) {
+        window.open(`/view-exhibition?exhibitionId=${notificationObj.exhibitionId}`, '_blank');
+      } else {
+        window.open(`/projects`);
+      }
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -167,14 +171,14 @@ export default function MainNavBar() {
     const baseUrl = 'http://localhost:4200/projects';
     const userName = `${userDetails.firstName} ${userDetails.lastName}`;
     const viewExhibitionUrl = `/view-exhibition?exhibitionId=${notification.exhibitionId}`;
-  
+
     if (notification.applicationId && notification.status3) {
       return `
         Dear ${userName},<br>
         Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a> for more details.
       `;
     }
-  
+
     if (notification.subject === 'New Project Created') {
       return `
         Dear ${userName},<br>
@@ -182,21 +186,21 @@ export default function MainNavBar() {
         <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
       `;
     }
-  
+
     if (notification.status) {
       return `
         Dear ${userName},<br>
         Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
       `;
     }
-  
+
     if (notification.boothUsername) {
       return `
         Dear ${userName},<br>
         You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to approve/reject.
       `;
     }
-  
+
     if (notification.status2) {
       return `
         Dear ${userName},<br>
@@ -204,13 +208,20 @@ export default function MainNavBar() {
         <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects.
       `;
     }
-  
+
+    if (notification.notifType === 'Apply Create') {
+      return `
+      Dear ${userName},<br>
+      You have been notified for new apllication submitted for the Project: ${notification.title}
+      `;
+    }
+
     return `
       Dear ${userName},<br>
       You have been invited to participate in the exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to participate.
     `;
   };
-  
+
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -265,7 +276,7 @@ export default function MainNavBar() {
       </MenuItem>
     </Menu>
   );
-  
+
   const notificationMenuId = 'primary-notification-menu';
 
   const renderNotificationMenu = (
@@ -294,7 +305,7 @@ export default function MainNavBar() {
             {notifications.filter(notification => !notification.read).map((notification, index) => (
               <React.Fragment key={notification._id}>
                 <MenuItem
-                  onClick={() => handleNotificationClick(notification._id, notification.exhibitionId)}
+                  onClick={() => handleNotificationClick(notification)}
                   sx={{
                     whiteSpace: 'normal',
                     display: 'flex',
@@ -319,7 +330,7 @@ export default function MainNavBar() {
             {notifications.filter(notification => notification.read).map((notification, index) => (
               <React.Fragment key={notification._id}>
                 <MenuItem
-                  onClick={() => handleNotificationClick(notification._id, notification.exhibitionId)}
+                  onClick={() => handleNotificationClick(notification)}
                   sx={{
                     whiteSpace: 'normal',
                     display: 'flex',
@@ -398,7 +409,7 @@ export default function MainNavBar() {
           left: 'auto',
           width: 'calc(100% - 240px)',
           boxShadow: 'none',
-          '@media (max-width: 767px)':{
+          '@media (max-width: 767px)': {
             width: '100%',
           }
         }}
