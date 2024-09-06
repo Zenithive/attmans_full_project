@@ -453,7 +453,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
-                    label="Description"
+                    label="Scope of Work"
                     value={viewingJob.description}
                     fullWidth
                     multiline
@@ -462,7 +462,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     sx={{ mb: 2 }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {viewingJob.SelectService[0] !== 'Innovative product' && <Grid item xs={12} sm={6}>
                   <TextField
                     label="Expertise Level"
                     value={viewingJob.Expertiselevel}
@@ -471,10 +471,10 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     aria-readonly
                     sx={{ mb: 2 }}
                   />
-                </Grid>
+                </Grid>}
                 {viewingJob.SelectService[0] === 'Innovative product' && (
                   <>
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12}>
                       <TextField
                         label="Details Of Innovation Challenge"
                         value={viewingJob.DetailsOfInnovationChallenge}
@@ -497,7 +497,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Area Of Product"
+                        label="Quantity"
                         value={viewingJob.Quantity}
                         fullWidth
                         color='secondary'
@@ -505,7 +505,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         sx={{ mb: 2 }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12}>
                       <TextField
                         label="Product Description"
                         value={viewingJob.ProductDescription}

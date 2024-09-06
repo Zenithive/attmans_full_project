@@ -1,5 +1,14 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Types } from 'mongoose';
+import { ProductDto } from 'src/booth/create-booth.dto';
 
 export class CreateApplyDto {
   @IsNotEmpty()
@@ -56,6 +65,11 @@ export class CreateApplyDto {
   @IsNotEmpty()
   @IsString()
   SolutionUSP: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductDto)
+  products: ProductDto[];
 
   @IsNotEmpty()
   @IsEnum(['innovatorsApply', 'FreelancerApply'])

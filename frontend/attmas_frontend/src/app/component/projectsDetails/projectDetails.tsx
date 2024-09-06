@@ -484,7 +484,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                <>
+                {userDetails.userType === 'Freelancer' && <>
                   <Grid item xs={12}>
                     <TextField
                       label="Other available solutions"
@@ -507,7 +507,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                       sx={{ mb: 2 }}
                     />
                   </Grid>
-                </>
+                </>}
                 {apply.rejectComment && (
                   <Grid item xs={12}>
                     <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
