@@ -223,7 +223,7 @@ const UserList: React.FC<UserListProps> = ({ apiUrl, title, endMessage }) => {
           next={fetchUsers}
           hasMore={hasMore}
           loader={<Typography>Loading...</Typography>}
-          endMessage={<Typography>{endMessage}</Typography>}
+          endMessage={<Typography sx={{margin:'15px'}}>{endMessage}</Typography>}
         >
           <Grid container spacing={2}>
             {rowData.map(user => (

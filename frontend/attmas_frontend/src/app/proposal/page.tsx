@@ -268,6 +268,7 @@ const proposal = () => {
     const handleViewJob = (job: Job, isOpenProjectModal?: boolean) => {
         console.log("Viewing Job:", job);
         isOpenProjectModal && setViewingJob(job);
+        // setViewingJob(job);
         setSelectedProject(job);
         setApplyOpen(false);
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
