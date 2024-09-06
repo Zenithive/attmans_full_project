@@ -34,6 +34,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddProductModal2, { Product } from '../all_Profile_component/AddProductModal2';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
+import UserDrawer from '../UserNameSeperate/UserDrawer';
 
 
 interface Booth {
@@ -44,6 +45,7 @@ interface Booth {
   userId: {
     firstName: string;
     lastName: string;
+    username?: string;
   };
   status: string;
   exhibitionId: string;
@@ -84,6 +86,9 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const handleViewProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -168,6 +173,16 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
     setSelectedVideoUrl(null);
   };
 
+  const handleUserClick = (username: string) => {
+    console.log("username", username)
+    setSelectedUser(username || '');
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedUser(null);
+  };
 
 
   return (
@@ -203,26 +218,21 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                 <Typography variant="body1" sx={{ '@media (max-width: 767px)': { fontSize: '1.25rem' } }} color="text.secondary">
                   Status: {booth.status}
                 </Typography>
-                <Box sx={{ position: 'relative', right: '45%', top: '15px' }}>
-                  {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {
-                        if (!userDetails._id) {
-                          openInterestedModals(); // Open modal if userId is not present
-                        } else {
-                          console.log('User details already present, modal will not open');
-                          openInterestedModals();
-                        }
-                      }}
-                      sx={{ position: 'absolute', right: '210px', bottom: '10px', background: '#CC4800', color: 'white', height: '32px', fontWeight: 'bold' }}
-                    >
-                      Interested
-                    </Button>
-                  )}
-                </Box>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    cursor: 'pointer',
+                    color: '#0000FF', 
+                    textDecoration: 'underline', 
+                  }}
+                  onClick={() => handleUserClick(booth?.userId?.username || "")}
+                >
+                  {booth.userId.firstName} {booth.userId.lastName}
+                </Typography>
+
+
               </Box>
+
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Typography variant="h5" component="div" sx={{ mb: 2, '@media (max-width: 767px)': { position: 'relative', top: '10px' } }}>
@@ -406,6 +416,13 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
           </Button>
         </DialogActions>
       </Dialog>
+      {selectedUser && (
+        <UserDrawer
+          open={drawerOpen}
+          onClose={handleDrawerClose}
+          username={selectedUser}
+        />
+      )}
     </>
   );
 };
