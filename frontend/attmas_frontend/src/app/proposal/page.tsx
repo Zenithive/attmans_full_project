@@ -23,6 +23,7 @@ import ConfirmationDialog from '../component/All_ConfirmationBox/ConfirmationDia
 import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '../services/axios.service';
 import { pubsub } from '../services/pubsub.service';
+import ProjectDrawer from '../component/projectDrwer/projectDrwer';
 
 export interface Proposal {
     _id: string;
@@ -56,15 +57,15 @@ export interface Proposal {
 }
 
 export interface ProposalStep2Values {
-  isPeerReviewed: string;
-  expectedOutcome: string;
-  detailedMethodology: string;
-  physicalAchievements: string;
-  budgetOutlay: BudgetOutlay[];
-  manpowerDetails: ManpowerDetail[];
-  pastCredentials: string;
-  briefProfile: string;
-  proposalOwnerCredentials: string;
+    isPeerReviewed: string;
+    expectedOutcome: string;
+    detailedMethodology: string;
+    physicalAchievements: string;
+    budgetOutlay: BudgetOutlay[];
+    manpowerDetails: ManpowerDetail[];
+    pastCredentials: string;
+    briefProfile: string;
+    proposalOwnerCredentials: string;
 }
 
 export interface BudgetOutlay {
@@ -73,23 +74,46 @@ export interface BudgetOutlay {
     secondYear: string;
     thirdYear: string;
     total: string;
-  }
-  
- export interface ManpowerDetail {
+}
+
+export interface ManpowerDetail {
     designation: string;
     monthlySalary: string;
     firstYear: string;
     secondYear: string;
     totalExpenditure: string;
-  }
-  
-  
+}
+
+
 
 interface JobDetails {
 
-    firstName: string;
-    lastName: string;
+    _id?: string;
+    title: string;
+    description: string;
+    Budget: number;
+    Expertiselevel: string;
+    TimeFrame: string | null;
+    Category: string[];
+    Subcategorys: string[];
+    appliesCount?: number;
+
+    // ******** op ******** //
+    DetailsOfInnovationChallenge: string;
+    Sector: string;
+    Quantity: number;
+    ProductDescription: string;
+    firstName: string,
+    lastName: string,
     username: string;
+    SelectService: string;
+    Objective: string;
+    Expectedoutcomes: string;
+    IPRownership: string;
+    currency: string;
+    // Status: string;
+    status: string;
+    rejectComment?: string;
 
 }
 
@@ -285,7 +309,7 @@ const proposal = () => {
             setHasSubmittedProposal(true);
             setStep(1);
             setFormValues({});
-            pubsub.publish('ProposalRefetch' ,{Message:'Proposal Refetched'});
+            pubsub.publish('ProposalRefetch', { Message: 'Proposal Refetched' });
         } catch (error) {
             console.error('Error submitting proposal:', error);
         }
@@ -464,7 +488,7 @@ const proposal = () => {
         setOpenDialog(false);
     };
 
-   
+
 
 
 
@@ -591,20 +615,10 @@ const proposal = () => {
                                         <CardContent>
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Typography variant="h6">{proposal.projectTitle}</Typography>
-                                                <Link
-                                                    component="button"
-                                                    // variant="contained"
-                                                    color="primary"
-                                                    onClick={() => handleViewProposal(proposal)}
-                                                    sx={{
-                                                        color: 'blue',
-                                                        textDecoration: 'underline',
-                                                        cursor: 'pointer'
-                                                    }} // Style to ensure link is blue with underline
-                                                >
-                                                    View Proposal
-                                                </Link>
+
                                             </Box>
+
+
                                             <Typography variant="body1">
                                                 <span style={{ fontWeight: 'bold' }} onClick={() => {
                                                     console.log('proposal?.jobDetails?.username', proposal?.jobDetails?.username);
@@ -627,6 +641,32 @@ const proposal = () => {
                                                     {` ${proposal.firstname} ${proposal.lastname}`}
                                                 </Typography>
                                             )}
+
+                                            <Link
+                                                component="button"
+                                                // variant="contained"
+                                                color="primary"
+                                                onClick={() => handleViewProposal(proposal)}
+                                                sx={{
+                                                    color: 'blue',
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer'
+                                                }} // Style to ensure link is blue with underline
+                                            >
+                                                View Proposal
+                                            </Link>
+
+                                            <a
+                                                onClick={() => handleViewJob(proposal.jobDetails)}
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    textDecoration: 'underline',
+                                                    color: 'blue',
+                                                    fontSize: 'medium',
+                                                }}
+                                            >
+                                                View Project
+                                            </a>
                                             <Box
                                                 sx={{
                                                     position: 'absolute',
@@ -768,7 +808,7 @@ const proposal = () => {
                                                     {application.currency} {application.Budget}
                                                 </Typography>
                                                 <Box sx={{ fontSize: 'small', fontWeight: 'bolder', display: 'flex', alignItems: 'center' }}>
-                                                {(!application.proposalsDetails || application.proposalsDetails.length === 0) && (
+                                                    {(!application.proposalsDetails || application.proposalsDetails.length === 0) && (
                                                         <Button
                                                             variant="contained"
                                                             size="small"
@@ -778,42 +818,42 @@ const proposal = () => {
                                                         </Button>
                                                     )}
                                                 </Box>
-                                          
-      
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <Button
-                                                    aria-controls="simple-menu"
-                                                    aria-haspopup="true"
-                                                    onClick={handleClick}
-                                                    sx={{ display: { xs: 'block', md: 'none' } }}
-                                                    endIcon={<MoreVertIcon />}
-                                                >
-                                                    More
-                                                </Button>
-                                                <Menu
-                                                    id="simple-menu"
-                                                    anchorEl={anchorEl}
-                                                    keepMounted
-                                                    open={Boolean(anchorEl)}
-                                                    onClose={handleClose}
-                                                    PaperProps={{
-                                                        sx: {
-                                                            border: '1px solid',
-                                                            boxShadow: 'none',
-                                                        },
-                                                    }}
-                                                >
-                                                </Menu>
-                                            </Box>
-                                        </CardContent>
-                                    </Card>
-                        )
+
+
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <Button
+                                                        aria-controls="simple-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={handleClick}
+                                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        endIcon={<MoreVertIcon />}
+                                                    >
+                                                        More
+                                                    </Button>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                border: '1px solid',
+                                                                boxShadow: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                    </Menu>
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
+                                    )
                                 ))}
-                    </Box>
-                ) : (
-                <Typography>No projects available</Typography>
+                            </Box>
+                        ) : (
+                            <Typography>No projects available</Typography>
                         )}
-            </>
+                    </>
                 )}
 
 
@@ -853,27 +893,27 @@ const proposal = () => {
                 <DialogContent>
 
 
-                    {step === 1 && <ProposalStep1 onNext={handleNextStep} 
-                    initialValues={selectedProposal || null}
-                    readOnly= {selectedProposal ? true : false}
+                    {step === 1 && <ProposalStep1 onNext={handleNextStep}
+                        initialValues={selectedProposal || null}
+                        readOnly={selectedProposal ? true : false}
                     />}
 
 
 
-                    {step === 2 && <ProposalStep2  
-                    initialValues={selectedProposal || null}
-                    readOnly= {selectedProposal ? true : false}
-                    onNext={handleNextStep} 
-                    onPrevious={handlePreviousStep} 
-                     />}
+                    {step === 2 && <ProposalStep2
+                        initialValues={selectedProposal || null}
+                        readOnly={selectedProposal ? true : false}
+                        onNext={handleNextStep}
+                        onPrevious={handlePreviousStep}
+                    />}
 
 
 
-                    {step === 3 && <ProposalStep3 
-                    initialValues={selectedProposal || null}
-                    readOnly= {selectedProposal ? true : false}
-                    onSubmit={handleSubmit} 
-                    onPrevious={handlePreviousStep} 
+                    {step === 3 && <ProposalStep3
+                        initialValues={selectedProposal || null}
+                        readOnly={selectedProposal ? true : false}
+                        onSubmit={handleSubmit}
+                        onPrevious={handlePreviousStep}
                     />}
 
 
@@ -882,6 +922,15 @@ const proposal = () => {
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
                 </DialogActions>
             </Dialog>
+
+            <ProjectDrawer
+                viewingJob={viewingJob}
+                setViewingJob={setViewingJob}
+                userType={userDetails.userType} handleApproveDialogOpen={function (job: Job): void {
+                    throw new Error('Function not implemented.');
+                }} handleRejectDialogOpen={function (job: Job): void {
+                    throw new Error('Function not implemented.');
+                }} />
         </Box>
 
 
