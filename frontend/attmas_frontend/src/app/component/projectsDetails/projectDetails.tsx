@@ -27,6 +27,9 @@ import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { PROPOSAL_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
+import { ProductForBooth } from '../ProductTableForBooth';
+import NewProductTable from '../all_Profile_component/NewProductTable';
+import { Product } from '../ProductTable';
 
 
 
@@ -74,6 +77,7 @@ interface Apply {
   availableSolution: string;
   SolutionUSP: string;
   userId?: UserSchema;
+  products: ProductForBooth[];
 }
 
 interface ProjectDetailsDialogProps {
@@ -102,6 +106,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [checkedProducts, setCheckedProducts] = useState<ProductForBooth[]>([]);
   const [commentsFetched, setCommentsFetched] = useState<boolean>(false);
   const [resubmitComment, setResubmitComment] = useState<string>('');
   const [isResubmitting, setIsResubmitting] = useState<boolean>(false);
@@ -109,11 +114,15 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
   useEffect(() => {
     console.log('apply', apply);
+    console.log('apply Products', apply?.products);
     if (apply?._id) {
       axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
         .then(response => {
           console.log("Fetched milestones:", response.data);
           setMilestones(response.data);
+          // console.log("response.data.products", response.data.products);
+
+          // setCheckedProducts(response.data.products)
         })
         .catch(error => console.error('Error fetching milestones:', error));
     }
@@ -289,20 +298,20 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   Date: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
                 </Typography>
                 {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1, ml: 2, textAlign: 'right', fontSize: 14 }}>
-                    <b>Applied User: &nbsp;</b>
-                    <a
-                      href="javascript:void(0);"
-                      onClick={(e) => {
-                        handleUserClick(apply?.userId?.username || "")
-                      }}
-                      style={{
-                        textDecoration: 'underline',
-                        color: '#1976d2',
-                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
-                      }}
-                    >{apply?.userId?.firstName} {apply?.userId?.lastName}
-                    </a>
-                  </Typography>}
+                  <b>Applied User: &nbsp;</b>
+                  <a
+                    href="javascript:void(0);"
+                    onClick={(e) => {
+                      handleUserClick(apply?.userId?.username || "")
+                    }}
+                    style={{
+                      textDecoration: 'underline',
+                      color: '#1976d2',
+                      fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                    }}
+                  >{apply?.userId?.firstName} {apply?.userId?.lastName}
+                  </a>
+                </Typography>}
               </Box>
               <Grid container spacing={2} flexDirection={'column'}>
                 <Grid item xs={12} sm={5}>
@@ -336,6 +345,19 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     sx={{ mb: 1 }}
                   />
                 </Grid>
+
+
+                <NewProductTable
+                  products={apply?.products}
+                  hideActions={true} // This will hide the edit and delete icons
+                  onEdit={() => {
+                    throw new Error('Function not implemented.');
+                  } }
+                  onDelete={() => {
+                    throw new Error('Function not implemented.');
+                  } } onView={function (product: Product): void {
+                    throw new Error('Function not implemented.');
+                  } }                />
                 <Grid item xs={12}>
                   {milestones.map((milestone, index) => (
                     <Card key={index} variant="outlined" sx={{ mb: 2 }}>
