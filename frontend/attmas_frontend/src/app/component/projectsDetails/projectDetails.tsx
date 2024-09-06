@@ -77,7 +77,7 @@ interface Apply {
   availableSolution: string;
   SolutionUSP: string;
   userId?: UserSchema;
-  products: ProductForBooth[];
+  products?: ProductForBooth[];
 }
 
 interface ProjectDetailsDialogProps {

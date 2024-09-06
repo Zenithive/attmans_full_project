@@ -8,7 +8,7 @@ import AddProductModal2 from './AddProductModal2'; // Import your AddProductModa
 import { Product } from '../ProductTable'; // Assuming Product interface includes productPrice and currency
 
 interface NewProductTableProps {
-    products: Product[];
+    products?: Product[];
     onView: (product: Product) => void;
     onEdit: (product: Product) => void;
     onDelete: (id: string) => void;
@@ -56,7 +56,7 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onEdit, onD
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map((product) => (
+                        {products?.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell>{product.productName}</TableCell>
                                 <TableCell>{`${getCurrencySymbol(product.currency)} ${product.productPrice}`}</TableCell>
