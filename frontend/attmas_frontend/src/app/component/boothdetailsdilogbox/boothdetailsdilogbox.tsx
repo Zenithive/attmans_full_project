@@ -198,7 +198,10 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
             <Box sx={{ position: 'relative' }}>
               <Box sx={{ position: 'absolute', top: 16, right: 16, '@media (max-width: 767px)': { position: 'relative', top: '-10px', left: '5px' } }}>
                 <Typography variant="body1" sx={{ '@media (max-width: 767px)': { fontSize: '1.25rem' } }} color="text.secondary">
-                  Status: {booth.status}, Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}
+                  Date: {dayjs(booth.createdAt).format(DATE_TIME_FORMAT)}
+                </Typography>
+                <Typography variant="body1" sx={{ '@media (max-width: 767px)': { fontSize: '1.25rem' } }} color="text.secondary">
+                  Status: {booth.status}
                 </Typography>
                 <Box sx={{ position: 'relative', right: '45%', top: '15px' }}>
                   {(!userDetails.userType || userDetails.userType === 'Visitors') && isBoothInterestedBtnVisible && (
