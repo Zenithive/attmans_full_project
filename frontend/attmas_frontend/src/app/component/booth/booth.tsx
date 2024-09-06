@@ -131,7 +131,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
           <CloseIcon />
         </IconButton>
         <Typography id="modal-title" variant="h6" component="h2">
-          Booth Details
+          Booth Detail
         </Typography>
 
         <Formik
