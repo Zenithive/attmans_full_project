@@ -14,7 +14,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
     const handleConfirm = () => {
         onConfirm(comment); // Pass the comment to the onConfirm function
         setComment(''); // Reset comment input after confirmation
-        window.location.reload();
     };
 
     const handleClose = () => {
