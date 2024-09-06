@@ -18,6 +18,7 @@ import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReduc
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { AxiosError } from 'axios';
 import axiosInstance from '@/app/services/axios.service';
+import { getRoleBasedAccess } from '@/app/services/user.access.service';
 
 interface SignInProps {
   toggleForm?: CallableFunction;
@@ -75,8 +76,27 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
 
         formik.setStatus({ success: 'Successfully signed in!' });
 
-        // Redirect to dashboard
-        router.push('/dashboard');
+
+
+        if (onSignInSuccess) {
+          onSignInSuccess();
+        } else {
+          const {
+            isAdmin,
+            isFreelancer,
+            isInnovator,
+            isProjectOwner,
+            isVisitor
+          } = getRoleBasedAccess(res.userType);
+          if (isVisitor) {
+            router.push("/exhibition");
+          } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
+            router.push("/dashboard");
+          } else {
+            router.push("/profile");
+          }
+        }
+     
 
       } catch (error) {
         if (error instanceof AxiosError) {
