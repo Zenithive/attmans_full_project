@@ -56,7 +56,7 @@ interface Milestone {
 
 interface Apply {
   _id?: string;
-  jobDetails:any;
+  jobDetails: any;
   title: string;
   description: string;
   Budget: number;
@@ -95,6 +95,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [selectedUser, setSelectedUser] = React.useState<string>('');
   const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
   const [applications, setApplications] = useState<Apply[]>([]);
+  const [applicationsBackup, setApplicationsBackup] = useState<Apply[]>([]);
   const [selectedApply, setSelectedApply] = useState<Apply | null>(null);
   const [approveDialogOpen, setApproveDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; apply: Apply | null }>({ open: false, apply: null });
@@ -123,7 +124,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
       const isProjectOwner = currentUserType === "Project Owner" && element?.status !== APPLY_STATUSES.pendingForApproval;
       const isAdmin = currentUserType === "Admin";
-      if (isFreelancer || isProjectOwner || isAdmin) {
+      const isFilterSet = filter != 'All' ? filter === element?.status : true;
+      if ((isFreelancer || isProjectOwner || isAdmin) && isFilterSet ) {
         tmpApplies.push(element);
       }
     }
@@ -137,6 +139,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
         const response = await axiosInstance.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
 
         setApplicationsBasedOnUser(response.data);
+        setApplicationsBackup(response.data);
         // getFilteredApplications(response.data);
       } catch (error) {
         console.error('Error fetching applications:', error);
@@ -179,25 +182,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     }
   };
 
-  // const getFilteredApplications = (receivedApplication: any[]) => {
-  //   const tmpFilteredApps = receivedApplication.filter(app => {
-  //     if (filter === 'All') return true;
-  //     return app.status === filter;
-  //   }).filter(app => {
-  //     if (userType === 'Project Owner') {
-  //       return (app.status === 'Approved' || app.status === 'Awarded') && currentUser === viewingJob?.username;
-  //     }
-  //     if (userType === 'Innovators' || userType === 'Freelancer') {
-  //       return app.username === currentUser;
-  //     }
-  //     return true;
+  useEffect(()=>{
+    updateFilteredApplicationse();
+  }, [filter]);
 
-  //   setFilteredApplications(tmpFilteredApps);
-  //   });
-  // }
-  // useEffect(() => {
-  //   getFilteredApplications(applications);
-  // }, [filter, applications, userType, currentUser, viewingJob]);
+  const updateFilteredApplicationse = () => {
+    setApplicationsBasedOnUser(applicationsBackup);
+  }
+
 
   const filteredApplicationse = applications.filter(app => {
     if (filter === 'All') return true;
@@ -323,6 +315,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     setIsDialogOpen(true);
     console.log('isDialogOpen:', isDialogOpen);
   };
+
+  const getFilterLists = (SelectService: string) => {
+    if (SelectService === 'Innovative product') {
+      return ["All", APPLY_STATUSES.pendingForApproval, APPLY_STATUSES.approvedPendingForProposalINNOVATORS, APPLY_STATUSES.rejected, APPLY_STATUSES.awarded, APPLY_STATUSES.notAwarded]
+    } else {
+      return ["All", APPLY_STATUSES.pendingForApproval, APPLY_STATUSES.approvedPendingForProposal, APPLY_STATUSES.proposalApprovalPending, APPLY_STATUSES.proposalUnderReview, APPLY_STATUSES.rejected ,APPLY_STATUSES.awarded, APPLY_STATUSES.notAwarded]
+    }
+  }
 
 
 
@@ -635,7 +635,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
               </Box>
 
-
               <Divider orientation="horizontal" flexItem />
 
               <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
@@ -653,7 +652,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         setFilter(newStatus);
                       }
                     }}
-                    options={["All", "Pending", "Approved", "Rejected", "Awarded", "Not Awarded"]}
+                    options={getFilterLists(viewingJob.SelectService[0])}
                   />
                 </Box>
               )}
@@ -710,7 +709,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             }}
                           />
                         </Box>
-                       {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                        {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                           <b>Applied User: </b>
                           <a
                             href="javascript:void(0);"
@@ -784,7 +783,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                   </Box>
                                 )}
 
-                              {app.status !== APPLY_STATUSES.proposalSubmitted && userType === 'Project Owner' && (
+                              {(app.status === APPLY_STATUSES.proposalUnderReview || app.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS) && userType === 'Project Owner' && (
                                 <Button variant="contained" color="primary" onClick={() => handleOpenConfirmationDialog(app._id!)} size='small'>
                                   Award
                                 </Button>

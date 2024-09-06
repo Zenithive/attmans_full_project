@@ -200,7 +200,7 @@ export class ApplyService {
     const applyId = application._id.toString();
     for (const admin of adminUsers) {
       if (user) {
-        await this.emailService2.sendApplicationStatusEmail(
+        this.emailService2.sendApplicationStatusEmail(
           user.username,
           'Application Approved',
           applyId,
@@ -232,7 +232,7 @@ export class ApplyService {
     const applyId = application._id.toString();
     for (const admin of adminUsers) {
       if (user) {
-        await this.emailService2.sendApplicationStatusEmail(
+        this.emailService2.sendApplicationStatusEmail(
           user.username,
           'Application Rejected',
           applyId,
@@ -361,6 +361,21 @@ export class ApplyService {
       .exec();
   }
 
+  async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {
+    try {
+      const updateQuery = {
+        jobId,
+        _id: { $ne: new Types.ObjectId(appId) },
+      };
+      const result = await this.ApplyModel.updateMany(updateQuery, {
+        status: APPLY_STATUSES.notAwarded,
+      });
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async rewardApplication(
     id: string,
     jobId: string,
@@ -390,6 +405,7 @@ export class ApplyService {
       comment ||
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
+    this.updateAlltheApplications(application.jobId, id);
     // console.log(`Application with ID: ${id} awarded.`);
     const proposals = await this.proposalModel
       .find({
