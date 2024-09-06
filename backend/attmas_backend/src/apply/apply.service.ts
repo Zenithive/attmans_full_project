@@ -78,26 +78,33 @@ export class ApplyService {
     const user = await this.userModel
       .findOne({ username: createApplyDto.username })
       .exec();
+    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+    if (!adminUsers || adminUsers.length === 0) {
+      throw new NotFoundException('No Admin users found');
+    }
+    for (const admin of adminUsers) {
+      if (admin) {
+        this.emailService2.sendEmailApplyCreate(
+          admin.username,
+          `New Application Created for Project: ${createApplyDto.title}`,
+          createApplyDto.jobId,
+          createApplyDto.title,
+          admin.firstName,
+          admin.lastName,
+          createApplyDto,
+        );
+      }
+    }
     if (user) {
-      const emailText = `
-      Hi ${user.firstName},
-
-      A new application has been created:
-      
-      Title: ${createApplyDto.title}
-      Description: ${createApplyDto.description}
-      Budget: ${createApplyDto.Budget}
-      Time Frame: ${createApplyDto.TimeFrame}
-
-      Best regards,
-      Your Team
-    `;
-      console.log(user.username);
-      await this.emailService.sendEmail({
-        to: user.username,
-        subject: 'New Application Created',
-        text: emailText,
-      });
+      this.emailService2.sendEmailApplyCreate(
+        user.username,
+        `New Application Created for Project: ${createApplyDto.title}`,
+        createApplyDto.jobId,
+        createApplyDto.title,
+        user.firstName,
+        user.lastName,
+        createApplyDto,
+      );
     }
   }
 

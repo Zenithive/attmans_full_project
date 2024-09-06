@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Email } from './Exebitionemail.schema';
 import { UsersService } from 'src/users/users.service'; // Adjust path as needed
+import { Apply } from 'src/apply/apply.schema';
 
 dotenv.config();
 
@@ -102,6 +103,63 @@ export class EmailService2 {
         to,
         subject,
         projectId,
+        read: false,
+        sentAt: new Date(),
+        title,
+        first,
+        last,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to ${to}:`, error);
+    }
+  }
+
+  async sendEmailApplyCreate(
+    to: string,
+    subject: string,
+    projectId: string,
+    title: string,
+    first: string,
+    last: string,
+    applyObj: Apply,
+  ) {
+    try {
+      // Fetch user details from UsersService
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`User with username ${to} not found`);
+      }
+
+      // Customize email message with user's first name and last name
+      const html = `
+        Hi ${user.firstName},
+  
+        A new application has been created:
+        
+        Title: ${applyObj.title}
+        Description: ${applyObj.description}
+        Budget: ${applyObj.Budget}
+        Time Frame: ${applyObj.TimeFrame}
+  
+        Best regards,
+        Your Team
+      `;
+
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject,
+        html,
+      });
+      console.log(`Email sent successfully to ${to}`);
+
+      // Save email details to the database
+      const email = new this.emailModel({
+        to,
+        subject,
+        projectId,
+        notifType: 'Apply Create',
         read: false,
         sentAt: new Date(),
         title,

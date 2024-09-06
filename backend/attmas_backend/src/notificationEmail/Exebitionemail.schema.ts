@@ -10,6 +10,9 @@ export class Email extends Document {
   @Prop({ required: true })
   subject: string;
 
+  @Prop({ required: false })
+  notifType: string;
+
   @Prop({ default: Date.now })
   sentAt: Date;
 

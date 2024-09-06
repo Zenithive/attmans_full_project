@@ -236,8 +236,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
           </Box>
           <Box sx={{marginBottom:'20px'}}>
           <TextField
-              label="Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile."
-              value={user.Headline}
+              label="Headline"
               multiline
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}

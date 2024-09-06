@@ -237,7 +237,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                     </Button>
                   )}
                 </Box>
-                <Typography
+                {userDetails.userType === 'Admin' && <Typography
                   variant="body2"
                   sx={{
                     cursor: 'pointer',
@@ -247,7 +247,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                   onClick={() => handleUserClick(booth?.userId?.username || "")}
                 >
                   {booth.userId.firstName} {booth.userId.lastName}
-                </Typography>
+                </Typography>}
 
 
               </Box>
