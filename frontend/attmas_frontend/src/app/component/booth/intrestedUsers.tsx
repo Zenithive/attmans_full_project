@@ -63,24 +63,25 @@ const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibi
     const handleSubmitInterest = async () => {
         if (user && user.token) {
             try {
+                // Adjust the interestedUser object based on interestType
                 const interestedUser = {
                     username: user.username,
                     userId: user._id,
                     userType: user.userType,
+                    interestType: interestType,
                     exhibitionId: exhibitionId || null,
-                    boothId: boothId || null,
+                    boothId: interestType === 'InterestedUserForExhibition' ? null : boothId || null,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     mobileNumber: user.mobileNumber,
-                    interestType: interestType,
                 };
-
+    
                 await axiosInstance.post(APIS.CHECKINTRESTEDUSER, interestedUser, {
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
                     },
                 });
-
+    
                 setMessage('Thank you for showing interest.');
                 pubsub.publish('VisitorUpdated', { message: 'Visitor list updated' });
                 setTimeout(() => {
@@ -92,6 +93,7 @@ const InterestedModal: React.FC<InterestedModalProps> = ({ open, onClose, exhibi
             }
         }
     };
+    
 
     return (
         <Modal open={modalOpen} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description">
