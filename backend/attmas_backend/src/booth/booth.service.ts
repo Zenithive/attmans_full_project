@@ -84,7 +84,7 @@ export class BoothService {
 
     if (exhibition) {
       const { username } = exhibition;
-      await this.emailService.sendEmailtoExhibition(
+      this.emailService.sendEmailtoExhibition(
         username,
         'New Booth Created',
         exhibitionId.toHexString(),
@@ -239,7 +239,7 @@ export class BoothService {
 
       const innovator = await this.userModel.findById(booth.userId);
       if (innovator) {
-        await this.emailService.sendBoothStatusEmail(
+        this.emailService.sendBoothStatusEmail(
           innovator.username,
           'Booth Approved',
           (exhibition._id as Types.ObjectId).toHexString(),
@@ -278,7 +278,7 @@ export class BoothService {
     if (exhibition) {
       const innovator = await this.userModel.findById(booth.userId);
       if (innovator) {
-        await this.emailService.sendBoothStatusEmail(
+        this.emailService.sendBoothStatusEmail(
           innovator.username,
           'Booth Rejected',
           (exhibition._id as Types.ObjectId).toHexString(),

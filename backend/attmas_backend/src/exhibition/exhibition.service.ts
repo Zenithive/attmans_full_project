@@ -60,7 +60,7 @@ export class ExhibitionService {
     const exhibitionId = savedExhibition._id.toString();
     const title = savedExhibition.title;
     for (const user of users) {
-      await this.emailService.sendEmail2(
+      this.emailService.sendEmail2(
         user.username,
         subject,
         exhibitionId,
