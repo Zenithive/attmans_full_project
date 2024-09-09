@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import ApplicationsForProject from '../applicationforproject/applicationforproject';
 import { APPLY_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
+import { pubsub } from '@/app/services/pubsub.service';
 
 export interface Job {
     _id?: string;
@@ -149,60 +150,57 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         }
     }, [viewingJob?._id]);
 
+
     useEffect(() => {
         if (applications.length > 0) {
+            const fetchMilestonesForApply = async (applyId: string) => {
+                try {
+                    const response = await axiosInstance.get(`${APIS.MILESTONES}/apply/${applyId}`);
+                    if (Array.isArray(response.data)) {
+                        const milestoneData = response.data.map((milestone: Milestone) => ({
+                            ...milestone,
+                            milstonSubmitcomments: milestone.milstonSubmitcomments || [],
+                        }));
+                        setMilestones(prevState => ({
+                            ...prevState,
+                            [applyId]: milestoneData,
+                        }));
+                    } else {
+                        console.error('Unexpected data format:', response.data);
+                    }
+                } catch (error) {
+                    console.error('Error fetching milestones:', error);
+                }
+            };
+    
+            const refetchMilestones = (message: { applyId: string }) => {
+                console.log('Received message for refetch:', message);
+                if (typeof message.applyId === 'string') {
+                    fetchMilestonesForApply(message.applyId);
+                } else {
+                    console.error('Invalid applyId:', message.applyId);
+                }
+            };
+    
+            console.log('Subscribing to MilestoneRefetch event');
+            pubsub.subscribe('MilestoneRefetch', refetchMilestones);
+    
             applications.forEach(app => {
-                if (app._id) {
-                    const fetchMilestonesForApply = async (applyId: string) => {
-                        try {
-                            const response = await axiosInstance.get(`${APIS.MILESTONES}/apply/${applyId}`);
-
-                            if (Array.isArray(response.data)) {
-                                const milestoneData = response.data.map((milestone: Milestone) => {
-                                    return {
-                                        ...milestone,
-                                        milstonSubmitcomments: milestone.milstonSubmitcomments || [],
-                                    };
-                                });
-
-                                setMilestones(prevState => ({
-                                    ...prevState,
-                                    [applyId]: milestoneData,
-                                }));
-                            } else {
-                                console.error('Unexpected data format:', response.data);
-                            }
-                        } catch (error) {
-                            console.error('Error fetching milestones:', error);
-                        }
-                    };
-
+                if (app._id && typeof app._id === 'string') {
                     fetchMilestonesForApply(app._id);
+                } else {
+                    console.error('Invalid application ID:', app._id);
                 }
             });
-
-            console.log("applications", applications)
-
-            // const tmpfilteredApplications = applications.filter(app => {
-            //     if (filter === 'All') return true;
-            //     return app.status === filter;
-            // }).filter(app => {
-            //     if (userType === 'Project Owner') {
-            //         return (app.status === 'Awarded') && currentUser === viewingJob?.username;
-            //     }
-            //     if (userType === 'Admin') {
-            //         return  (app.status === 'Awarded');
-            //     }
-            //     if (userType === 'Innovators' || userType === 'Freelancer') {
-            //         return app.username === currentUser;
-            //     }
-            //     return true;
-            // });
-
-            // setFilteredApplications(tmpfilteredApplications);
+    
+            return () => {
+                console.log('Unsubscribing from MilestoneRefetch event');
+                pubsub.unsubscribe('MilestoneRefetch', refetchMilestones);
+            };
         }
     }, [applications]);
-
+    
+    
 
     const filteredApplications = applications.filter(app => {
         if (filter === 'All') return true;
@@ -259,13 +257,12 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     [applyId]: milestoneList,
                 };
             });
+            pubsub.publish('MilestoneRefetch', { applyId });
 
             setMilestoneComments(prev => ({
                 ...prev,
                 [`${applyId}-${milestoneIndex}`]: '',
             }));
-
-            window.location.reload();
             forceUpdate();
 
         } catch (error) {
@@ -274,6 +271,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
             setIsSubmitting(false);
         }
     };
+
 
     const handleCommentChange = (applyId: string, index: number, value: string) => {
         setMilestoneComments(prev => ({
@@ -425,7 +423,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             />
 
                             <Box sx={{ position: 'relative' }}>
-                                {filteredApplications.map((app) => (
+                                {applications.map((app) => (
                                     <React.Fragment key={app._id}>
                                         <JobDetail
                                             key={jobDetailKey}
@@ -464,3 +462,5 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 };
 
 export default MyProjectDrawer;
+
+
