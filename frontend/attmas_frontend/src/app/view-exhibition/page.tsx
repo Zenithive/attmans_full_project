@@ -70,12 +70,12 @@ interface Booth {
   rejectComment?: string;
 }
 
-const ExhibitionClosedMessage = () => (
-  <Box sx={{ textAlign: 'center', padding: '20px' }}>
-    <Typography variant="h4">The exhibition is closed</Typography>
-    <Typography variant="body1">Sorry, but this exhibition is no longer available.</Typography>
-  </Box>
-);
+// const ExhibitionClosedMessage = () => (
+//   <Box sx={{ textAlign: 'center', padding: '20px' }}>
+//     <Typography variant="h4">The exhibition is closed</Typography>
+//     <Typography variant="body1">Sorry, but this exhibition is no longer available.</Typography>
+//   </Box>
+// );
 
 const ExhibitionsPage: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
@@ -414,8 +414,6 @@ const ExhibitionsPage: React.FC = () => {
       </Head>
       {selectedExhibition === null ? (
         <Typography>Loading exhibition...</Typography>
-      ) : isExhibitionClosed(selectedExhibition) ? (
-        <ExhibitionClosedMessage />
       ) : (
         <Box sx={{
           display: 'flex', flexDirection: 'column', overflowX: 'hidden', '@media (max-width: 767px)': {
@@ -553,22 +551,32 @@ const ExhibitionsPage: React.FC = () => {
                 top: '-10px',
               }
             }}>
-              <h1>Booth Details</h1>
 
-              <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
-                {userType !== 'Visitors' && (
-                  <ToggleButtonGroup
-                    value={view}
-                    exclusive
-                    onChange={handleViewChange}
-                    aria-label="view selection"
-                  >
-                    <ToggleButton value="boothDetails">Booth Details</ToggleButton>
-                    {userDetails && userType === 'Admin' ?
-                      <ToggleButton value="visitors">Visitors</ToggleButton> : ""}
-                  </ToggleButtonGroup>
-                )}
-              </Box>
+              {!isExhibitionClosed && (
+                <h1>Booth Details</h1>
+
+              )}
+              {!isExhibitionClosed && (
+
+
+                <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
+                  {userType !== 'Visitors' && (
+                    <ToggleButtonGroup
+                      value={view}
+                      exclusive
+                      onChange={handleViewChange}
+                      aria-label="view selection"
+                    >
+                      <ToggleButton value="boothDetails">Booth Details</ToggleButton>
+                      {userDetails && userType === 'Admin' ?
+                        <ToggleButton value="visitors">Visitors</ToggleButton> : ""}
+                    </ToggleButtonGroup>
+                  )}
+                </Box>
+
+              )}
+
+
 
               {view === 'visitors' && (
                 <Box sx={{ position: 'relative', marginBottom: '50px', left: '58%' }}>
@@ -587,12 +595,15 @@ const ExhibitionsPage: React.FC = () => {
 
             </Box>
 
-            <Box sx={{ position: 'relative', top: '50px', right: '20px', marginBottom: '20px' }}>
-              {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
-                <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} options={["All", "Pending", "Approved", "Rejected"]} />
-              )}
-            </Box>
+            {!isExhibitionClosed && (
 
+
+              <Box sx={{ position: 'relative', top: '50px', right: '20px', marginBottom: '20px' }}>
+                {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
+                  <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} options={["All", "Pending", "Approved", "Rejected"]} />
+                )}
+              </Box>
+            )}
 
             {view === 'boothDetails' && (
               <>
@@ -619,6 +630,7 @@ const ExhibitionsPage: React.FC = () => {
                               <h2>{booth.title}</h2>
                             </Typography>
                             {(userDetails && (userType === 'Admin' || userType === 'Innovators' || userType === 'Visitors' || !userType)) && (
+                            
                               <a
                                 href="#"
                                 onClick={(e) => {
@@ -660,7 +672,7 @@ const ExhibitionsPage: React.FC = () => {
                               </Box>
                             ))} */}
 
-                            
+
                             {userType === 'Admin' ? <Typography><a
                               href="javascript:void(0);"
                               onClick={(e) => {
@@ -732,6 +744,8 @@ const ExhibitionsPage: React.FC = () => {
                 </Box>
               </>
             )}
+
+
             {view === 'visitors' && (
               <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
                 {visitors.map(visitor => (
@@ -765,22 +779,36 @@ const ExhibitionsPage: React.FC = () => {
                 ))}
               </Grid>
             )}
-            <ApproveDialog
-              open={approveDialogOpen.open}
-              onClose={() => setApproveDialogOpen({ open: false, booth: null })}
-              onApprove={handleApprove}
-              booth={approveDialogOpen.booth}
-            />
-            <RemoveDialog
-              open={rejectDialogOpen.open}
-              onClose={() => setRejectDialogOpen({ open: false, booth: null })}
-              onRemove={async (boothId: string, comment: string) => {
-                if (rejectDialogOpen.booth) {
-                  await handleReject(boothId, comment, rejectDialogOpen.booth._id);
-                }
-              }}
-              booth={rejectDialogOpen.booth}
-            />
+
+
+            {!isExhibitionClosed && (
+
+
+              <ApproveDialog
+                open={approveDialogOpen.open}
+                onClose={() => setApproveDialogOpen({ open: false, booth: null })}
+                onApprove={handleApprove}
+                booth={approveDialogOpen.booth}
+              />
+
+            )}
+            {!isExhibitionClosed && (
+
+
+              <RemoveDialog
+                open={rejectDialogOpen.open}
+                onClose={() => setRejectDialogOpen({ open: false, booth: null })}
+                onRemove={async (boothId: string, comment: string) => {
+                  if (rejectDialogOpen.booth) {
+                    await handleReject(boothId, comment, rejectDialogOpen.booth._id);
+                  }
+                }}
+                booth={rejectDialogOpen.booth}
+              />
+            )}
+
+
+
             {selectedBooth && (
               <BoothDetailsDialog
                 open={dialogOpen}
