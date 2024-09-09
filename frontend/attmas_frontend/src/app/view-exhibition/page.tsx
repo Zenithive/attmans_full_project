@@ -552,11 +552,13 @@ const ExhibitionsPage: React.FC = () => {
               }
             }}>
 
-              {!isExhibitionClosed && (
+              {!isExhibitionClosed(selectedExhibition) && (
                 <h1>Booth Details</h1>
 
               )}
-              {!isExhibitionClosed && (
+
+
+              {!isExhibitionClosed(selectedExhibition) && (
 
 
                 <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
@@ -577,8 +579,7 @@ const ExhibitionsPage: React.FC = () => {
               )}
 
 
-
-              {view === 'visitors' && (
+              {!isExhibitionClosed(selectedExhibition) && view === 'visitors' && (
                 <Box sx={{ position: 'relative', marginBottom: '50px', left: '58%' }}>
                   <ToggleButtonGroup
                     value={interestType}
@@ -586,16 +587,16 @@ const ExhibitionsPage: React.FC = () => {
                     onChange={handleInterestTypeChange}
                     aria-label="interest type selection"
                   >
-
                     <ToggleButton value="InterestedUserForExhibition">Exhibition Visitors</ToggleButton>
                     <ToggleButton value="InterestedUserForBooth">Booth Visitors</ToggleButton>
                   </ToggleButtonGroup>
                 </Box>
               )}
 
+
             </Box>
 
-            {!isExhibitionClosed && (
+            {!isExhibitionClosed(selectedExhibition) && (
 
 
               <Box sx={{ position: 'relative', top: '50px', right: '20px', marginBottom: '20px' }}>
@@ -605,7 +606,9 @@ const ExhibitionsPage: React.FC = () => {
               </Box>
             )}
 
-            {view === 'boothDetails' && (
+
+
+            {!isExhibitionClosed(selectedExhibition) && view === 'boothDetails' && (
               <>
                 <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
                   {booths
@@ -630,7 +633,7 @@ const ExhibitionsPage: React.FC = () => {
                               <h2>{booth.title}</h2>
                             </Typography>
                             {(userDetails && (userType === 'Admin' || userType === 'Innovators' || userType === 'Visitors' || !userType)) && (
-                            
+
                               <a
                                 href="#"
                                 onClick={(e) => {
@@ -746,7 +749,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
 
 
-            {view === 'visitors' && (
+            {!isExhibitionClosed(selectedExhibition) && view === 'visitors' && (
               <Grid container spacing={2} sx={{ padding: '10px', position: 'relative', left: '10%', width: '80%' }}>
                 {visitors.map(visitor => (
                   <Grid item xs={12} sm={6} md={4} key={visitor._id}>
@@ -781,7 +784,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
 
 
-            {!isExhibitionClosed && (
+            {!isExhibitionClosed(selectedExhibition) && (
 
 
               <ApproveDialog
@@ -792,7 +795,8 @@ const ExhibitionsPage: React.FC = () => {
               />
 
             )}
-            {!isExhibitionClosed && (
+
+            {!isExhibitionClosed(selectedExhibition) && (
 
 
               <RemoveDialog
@@ -809,7 +813,7 @@ const ExhibitionsPage: React.FC = () => {
 
 
 
-            {selectedBooth && (
+            {!isExhibitionClosed(selectedExhibition) && selectedBooth && (
               <BoothDetailsDialog
                 open={dialogOpen}
                 onClose={() => setDialogOpen(false)}
@@ -819,7 +823,7 @@ const ExhibitionsPage: React.FC = () => {
             )}
           </div>
 
-          {selectedUser && (
+          {!isExhibitionClosed(selectedExhibition) && selectedUser && (
             <UserDrawer
               open={drawerOpen}
               onClose={handleDrawerClose}
