@@ -632,25 +632,30 @@ const ExhibitionsPage: React.FC = () => {
                             }}>
                               <h2>{booth.title}</h2>
                             </Typography>
-                            {(userDetails && (userType === 'Admin' || userType === 'Innovators' || userType === 'Visitors' || !userType)) && (
-
-                              <a
-                                href="#"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setSelectedBooth(booth);
-                                  setDialogOpen(true);
-                                }}
-                                style={{
-                                  textDecoration: 'underline',
-                                  color: '#1976d2',
-                                  fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
-                                  position: 'relative', float: 'right', bottom: '55px'
-                                }}
-                              >
-                                View Details
-                              </a>
+                            {userDetails && (
+                              (userType === 'Admin' ||
+                                (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
+                                  (userType === 'Innovators' || userType === 'Visitors' || !userType))) && (
+                                <a
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setSelectedBooth(booth);
+                                    setDialogOpen(true);
+                                  }}
+                                  style={{
+                                    textDecoration: 'underline',
+                                    color: '#1976d2',
+                                    fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
+                                    position: 'relative', float: 'right', bottom: '55px'
+                                  }}
+                                >
+                                  View Details
+                                </a>
+                              )
                             )}
+
+
                             {/* {exhibitions.map((exhibition) => (
                               <Box key={exhibition._id}>
                                 {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
