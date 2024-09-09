@@ -293,6 +293,16 @@ export class ApplyService {
             preserveNullAndEmptyArrays: true,
           },
         },
+        {
+          $lookup: {
+            from: 'jobs', // Name of the Jobs collection
+            localField: 'title', // Field from the Apply collection
+            foreignField: 'title', // Field from the Jobs collection to match
+            as: 'jobDetails', // Name of the output array field
+          },
+        },
+        // Optionally, unwind the jobDetails array to get a single document per match
+        { $unwind: { path: '$jobDetails', preserveNullAndEmptyArrays: true } },
         { $limit: 10 },
         {
           $project: {
@@ -317,7 +327,33 @@ export class ApplyService {
             TimeFrame: 1,
             proposalsDetails: {
               _id: 1,
+              industryProblem: 1,
+              impactProductOutput: 1,
+              natureOfProject: 1,
+              haveTechnology: 1,
+              patentPreference: 1,
+              projectObjective: 1,
+              projectOutline: 1,
+              marketNiche: 1,
+              isPeerReviewed: 1,
+              expectedOutcome: 1,
+              detailedMethodology: 1,
+              physicalAchievements: 1,
+              budgetOutlay: 1,
+              manpowerDetails: 1,
+              pastCredentials: 1,
+              briefProfile: 1,
+              proposalOwnerCredentials: 1,
+              otherCommitments: 1,
+              progressReportTemplate: 1,
+              milestones: 1,
+              totalDaysCompletion: 1,
+              labStrengths: 1,
+              externalEquipment: 1,
+              pilotProductionTesting: 1,
+              mentoringRequired: 1,
             },
+            jobDetails: 1,
           },
         },
       ]).exec();

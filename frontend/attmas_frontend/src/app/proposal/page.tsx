@@ -361,7 +361,7 @@ const proposal = () => {
                 status,
                 comment
             });
-          
+
             setProposals(prevProposals =>
                 prevProposals.map(proposal =>
                     proposal._id === selectedProposalId ? { ...proposal, Status: status } : proposal
@@ -752,63 +752,52 @@ const proposal = () => {
                                         <Card key={application._id} sx={{ mb: 2 }}>
                                             <CardContent>
                                                 <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <a
-                                                        href="#"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            setSelectedApply(application);
-                                                            setDialogOpen(true);
-                                                        }}
-                                                        style={{
-                                                            textDecoration: 'underline',
-                                                            color: '#1976d2',
-                                                            fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
-                                                        }}
+
+                                                    <Box
+
                                                     >
-                                                        {application.title}
-                                                    </a>
-                                                    <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                        {dayjs(application.TimeFrame).format(DATE_FORMAT)}
+                                                        {application.title},
+                                                        <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                            {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
+                                                            {dayjs(application.TimeFrame).format(DATE_FORMAT)}
+                                                        </span>
+
                                                     </Box>
-                                                </Typography>
-
-                                                <Chip
-                                                    label={application.status}
-                                                    size='small'
-                                                    variant="outlined"
-                                                    sx={{
-                                                        borderColor: application.status === APPLY_STATUSES.approvedPendingForProposal
-                                                            ? 'green'
-                                                            : application.status === APPLY_STATUSES.rejected
-                                                                ? 'red'
-                                                                : application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
-                                                                    ? 'green'
-                                                                    : application.status === APPLY_STATUSES.awarded
-                                                                        ? 'blue'
-                                                                        : application.status === APPLY_STATUSES.notAwarded
-                                                                            ? 'grey'
-                                                                            : 'default',
-                                                        color: application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
-                                                            ? 'green'
-                                                            : application.status === APPLY_STATUSES.rejected
-                                                                ? 'red'
+                                                    <Chip
+                                                        label={application.status}
+                                                        size='small'
+                                                        variant="outlined"
+                                                        sx={{
+                                                            borderColor: application.status === APPLY_STATUSES.approvedPendingForProposal
+                                                                ? 'green'
                                                                 : application.status === APPLY_STATUSES.rejected
-                                                                    ? 'green'
-                                                                    : application.status === APPLY_STATUSES.awarded
-                                                                        ? 'blue'
-                                                                        : application.status === APPLY_STATUSES.notAwarded
-                                                                            ? 'grey'
-                                                                            : 'default',
-                                                        borderRadius: '16px',
-                                                        px: 1,
-                                                        mb: 2,
-                                                    }}
-                                                />
-
-
-                                                <Typography variant="body1" sx={{ mt: 1 }}>
-                                                    {application.currency} {application.Budget}
+                                                                    ? 'red'
+                                                                    : application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                                        ? 'green'
+                                                                        : application.status === APPLY_STATUSES.awarded
+                                                                            ? 'blue'
+                                                                            : application.status === APPLY_STATUSES.notAwarded
+                                                                                ? 'grey'
+                                                                                : 'default',
+                                                            color: application.status === APPLY_STATUSES.approvedPendingForProposalINNOVATORS
+                                                                ? 'green'
+                                                                : application.status === APPLY_STATUSES.rejected
+                                                                    ? 'red'
+                                                                    : application.status === APPLY_STATUSES.rejected
+                                                                        ? 'green'
+                                                                        : application.status === APPLY_STATUSES.awarded
+                                                                            ? 'blue'
+                                                                            : application.status === APPLY_STATUSES.notAwarded
+                                                                                ? 'grey'
+                                                                                : 'default',
+                                                            borderRadius: '16px',
+                                                            px: 1,
+                                                            mb: 2,
+                                                        }}
+                                                    />
                                                 </Typography>
+
+                                                <Typography variant="body2">{application.currency === 'USD' ? '$' : '₹'}{application.Budget}</Typography>
                                                 <Box sx={{ fontSize: 'small', fontWeight: 'bolder', display: 'flex', alignItems: 'center' }}>
                                                     {(!application.proposalsDetails || application.proposalsDetails.length === 0) && (
                                                         <Button
@@ -820,33 +809,55 @@ const proposal = () => {
                                                         </Button>
                                                     )}
                                                 </Box>
+                                                <Link
+                                                    component="button"
+                                                    // variant="contained"
+                                                    color="primary"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setSelectedApply(application)
+                                                        setDialogOpen(true);
+                                                    }}
+                                                    sx={{
+                                                        color: 'blue',
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        mr: 2
+                                                    }}
+                                                >
+                                                    Apply Details
+                                                </Link>
 
+                                                <Link
+                                                    component="button"
+                                                    color="primary"
+                                                    onClick={() => handleViewProposal(application.proposalsDetails)}
+                                                    sx={{
+                                                        color: 'blue',
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        mr: 2
+                                                    }}
+                                                >
+                                                    View Proposal
+                                                </Link>
 
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Button
-                                                        aria-controls="simple-menu"
-                                                        aria-haspopup="true"
-                                                        onClick={handleClick}
-                                                        sx={{ display: { xs: 'block', md: 'none' } }}
-                                                        endIcon={<MoreVertIcon />}
-                                                    >
-                                                        More
-                                                    </Button>
-                                                    <Menu
-                                                        id="simple-menu"
-                                                        anchorEl={anchorEl}
-                                                        keepMounted
-                                                        open={Boolean(anchorEl)}
-                                                        onClose={handleClose}
-                                                        PaperProps={{
-                                                            sx: {
-                                                                border: '1px solid',
-                                                                boxShadow: 'none',
-                                                            },
-                                                        }}
-                                                    >
-                                                    </Menu>
-                                                </Box>
+                                                <Link
+                                                    component="button"
+                                                    color="primary"
+                                                    onClick={() => handleViewJob(application.jobDetails, true)}
+                                                    sx={{
+                                                        color: 'blue',
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        mr: 2
+                                                    }}
+                                                >
+                                                    View Project
+                                                </Link>
+
+       
+
                                             </CardContent>
                                         </Card>
                                     )

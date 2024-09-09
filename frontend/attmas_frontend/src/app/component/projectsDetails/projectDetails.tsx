@@ -346,10 +346,10 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-
+                { userDetails.userType === 'Innovators' &&(
                 <NewProductTable
                   products={apply?.products}
-                  hideActions={true} // This will hide the edit and delete icons
+                  hideActions={true}
                   onEdit={() => {
                     throw new Error('Function not implemented.');
                   } }
@@ -358,6 +358,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   } } onView={function (product: Product): void {
                     throw new Error('Function not implemented.');
                   } }                />
+                )}
                 <Grid item xs={12}>
                   {milestones.map((milestone, index) => (
                     <Card key={index} variant="outlined" sx={{ mb: 2 }}>

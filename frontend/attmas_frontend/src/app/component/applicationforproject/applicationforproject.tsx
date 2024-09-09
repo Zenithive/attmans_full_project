@@ -13,6 +13,7 @@ import BillingModal from '../billingmodel/billingmodel';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
+import { Message } from '@mui/icons-material';
 
 export interface Milestone {
     scopeOfWork: string;
@@ -195,12 +196,13 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
             });
 
             console.log('Payment added successfully:', response.data);
+            pubsub.publish('PaymentAdded',{Message:'Payment Done'});
             handleCloseModal();
-            window.location.reload();
         } catch (error) {
             console.error('Error adding payment:', error);
         }
     };
+
 
     const handleOpenApproveDialog = (milestoneGroup: Milestone, applyId: string, milestoneIndex: number) => {
         const milestone = milestoneGroup.milestones[milestoneIndex];
@@ -246,8 +248,6 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                     milestoneIndex: selectedMilestoneIndex,
                     comment
                 });
-
-
                 await fetchSubmittedMilestones();
                 pubsub.publish('MilestoneRefetch', { applyId: selectedApplyId });
                 handleCloseRejectDialog();

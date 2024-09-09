@@ -4,6 +4,7 @@ import { SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import axiosInstance from '@/app/services/axios.service';
+import { pubsub } from '@/app/services/pubsub.service';
 
 interface Billing {
     _id?: string;
@@ -62,7 +63,14 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
             }
         };
 
+        pubsub.subscribe('PaymentAdded', fetchBillingData);
+
         fetchBillingData();
+
+      
+        return () => {
+            pubsub.unsubscribe('PaymentAdded', fetchBillingData);
+        };
     }, [apply]);
 
     if (loading) return <Typography align="center">Loading...</Typography>;
