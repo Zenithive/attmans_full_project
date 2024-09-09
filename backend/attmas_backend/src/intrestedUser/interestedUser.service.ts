@@ -34,51 +34,60 @@ export class InterestedUserService {
       userType,
       interestType,
     } = createInterestedUserDto;
-  
+
     // Convert userId and exhibitionId to ObjectId
     const userObjectId = new Types.ObjectId(userId as string);
     const exhibitionObjectId = new Types.ObjectId(exhibitionId as string);
-    const newBoothId = new Types.ObjectId(boothId as string);
-  
-    // Check if the user already has an interest in the booth
-    const existingInterest = await this.interestedUserModel
-      .findOne({
-        userId: userObjectId,
-        boothId: newBoothId,
-        interestType: 'InterestedUserForBooth',
-      })
-      .exec();
-  
-    if (existingInterest) {
-      throw new Error('User has already shown interest in this booth');
+    let newBoothId: Types.ObjectId | null = null;
+
+    // Set boothId to null if interestType is 'InterestedUserForExhibition'
+    if (interestType === 'InterestedUserForExhibition') {
+      newBoothId = null;
+    } else if (boothId) {
+      newBoothId = new Types.ObjectId(boothId as string);
     }
-  
+
+    // Check if the user already has an interest in the booth
+    if (newBoothId) {
+      const existingInterest = await this.interestedUserModel
+        .findOne({
+          userId: userObjectId,
+          boothId: newBoothId,
+          interestType: 'InterestedUserForBooth',
+        })
+        .exec();
+
+      if (existingInterest) {
+        throw new Error('User has already shown interest in this booth');
+      }
+    }
+
     try {
       const exhibition = await this.exhibitionModel
         .findById(exhibitionObjectId)
         .exec();
-  
+
       if (!exhibition) {
         throw new Error('Exhibition not found');
       }
-  
+
       const adminEmail = exhibition.username;
       console.log('Exhibition Admin Email:', adminEmail);
-  
+
       let boothTitle: string | undefined;
-      if (boothId) {
+      if (newBoothId) {
         const booth = await this.boothModel
-          .findById(boothId)
+          .findById(newBoothId)
           .select('title')
           .exec();
         boothTitle = booth?.title;
       }
-  
+
       // Check if the user exists by username
       const existingUser = await this.userModel
         .findOne({ username: username })
         .exec();
-  
+
       if (existingUser) {
         // Create interested user entry with null or blank values
         const createdUser = new this.interestedUserModel({
@@ -94,16 +103,18 @@ export class InterestedUserService {
           interestType,
           adminEmail,
         });
-  
-        // Send email to the admin about the new booth interest
-        this.sendInterestNotificationEmail(adminEmail, boothTitle || '');
-  
+
+        // Send email to the admin about the new booth interest if applicable
+        if (interestType === 'InterestedUserForBooth') {
+          this.sendInterestNotificationEmail(adminEmail, boothTitle || '');
+        }
+
         return await createdUser.save();
       } else {
         // Send email to the user and welcome email
         this.sendUserInterestEmail(username, firstName);
         this.sendWelcomeEmail(username, firstName);
-  
+
         // Create interested user entry with provided values
         const createdUser = new this.interestedUserModel({
           username,
@@ -116,7 +127,7 @@ export class InterestedUserService {
           userType,
           adminEmail,
         });
-  
+
         return createdUser.save();
       }
     } catch (error) {
