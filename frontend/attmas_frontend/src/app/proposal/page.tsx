@@ -343,14 +343,15 @@ const proposal = () => {
         setConfirmationOpen(true);
         setCurrentAction('Approve');
         setSelectedProposalId(proposalId);
+        pubsub.publish('ProposalRefetchAfterAward');
 
     };
 
     const handleReject = (proposalId: string) => {
         setConfirmationOpen(true);
         setCurrentAction('Reject');
-
         setSelectedProposalId(proposalId);
+        pubsub.publish('ProposalRefetchAfterAward');
 
     };
 
@@ -360,7 +361,7 @@ const proposal = () => {
                 status,
                 comment
             });
-            // Refresh the proposals list after update
+          
             setProposals(prevProposals =>
                 prevProposals.map(proposal =>
                     proposal._id === selectedProposalId ? { ...proposal, Status: status } : proposal
@@ -368,6 +369,7 @@ const proposal = () => {
             );
 
             setConfirmationOpen(false);
+            pubsub.publish('ProposalRefetchAfterAward');
         } catch (error) {
             console.error('Error updating proposal status:', error);
         }

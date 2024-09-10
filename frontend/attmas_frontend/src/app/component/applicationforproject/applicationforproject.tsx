@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import BillingModal from '../billingmodel/billingmodel';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
+import { pubsub } from '@/app/services/pubsub.service';
 
 export interface Milestone {
     scopeOfWork: string;
@@ -135,7 +136,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     useEffect(() => {
         fetchSubmittedMilestones();
     }, [filteredApplications]);
-
+    
 
     const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newView: 'applications' | 'billing') => {
         if (newView !== null) {
@@ -218,7 +219,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     };
 
 
-    const milestoneLabel = "Approved Milestone";
+    
     const handleApproveMilestone = async (comment: string) => {
         if (selectedApplyId && selectedMilestoneIndex !== null) {
             try {
@@ -229,9 +230,8 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 });
 
                 await fetchSubmittedMilestones();
-
+                pubsub.publish('MilestoneRefetch', { applyId: selectedApplyId });
                 handleCloseApproveDialog();
-                window.location.reload();
             } catch (error) {
                 console.error('Error approving milestone:', error);
             }
@@ -249,8 +249,8 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
 
 
                 await fetchSubmittedMilestones();
+                pubsub.publish('MilestoneRefetch', { applyId: selectedApplyId });
                 handleCloseRejectDialog();
-                window.location.reload();
             } catch (error) {
                 console.error('Error rejecting milestone:', error);
             }

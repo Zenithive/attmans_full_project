@@ -32,7 +32,7 @@ export class ApplyService {
     private usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
-  ) {}
+  ) { }
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     // Convert jobId to ObjectId if it is not already
@@ -461,7 +461,7 @@ export class ApplyService {
     // Send notification emails
     const user = await this.userModel.findById(application.userId).exec();
     if (user) {
-      await this.emailService.sendAwardedEmail({
+      this.emailService.sendAwardedEmail({
         to: user.username,
         applicationTitle: application.title,
       });
@@ -470,7 +470,7 @@ export class ApplyService {
     for (const app of updatedApplications) {
       const otherUser = await this.userModel.findById(app.userId).exec();
       if (otherUser) {
-        await this.emailService.sendNotAwardedEmail({
+        this.emailService.sendNotAwardedEmail({
           to: otherUser.username,
           applicationTitle: application.title,
         });
