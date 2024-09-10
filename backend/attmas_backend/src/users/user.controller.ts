@@ -9,7 +9,9 @@ import {
   NotFoundException,
   Param,
   Put,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';  
 import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
 import { LocalGuard } from 'src/auth/guards/local.guard';
@@ -17,7 +19,7 @@ import { AuthenticateGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
@@ -90,4 +92,16 @@ export class UsersController {
     );
     return updatedUser;
   }
+
+
+  @Get('updateEmailStatus/:id')
+async updateEmailStatus(@Param('id') id: string, @Res() res: Response) {
+  const updatedUser = await this.usersService.updateEmailVerificationStatus(id);
+  if (!updatedUser) {
+    throw new NotFoundException(`User with ID ${id} not found`);
+  }
+  // Redirect to the front-end route with a success message
+  return res.redirect(`http://localhost:4200/?message=email_verified`);
+}
+
 }

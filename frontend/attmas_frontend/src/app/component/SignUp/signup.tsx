@@ -45,6 +45,7 @@ export const SignUp = ({ showLinks = true, onSignUpSuccess, userType = "non", is
       email: '',
       password: '',
       mobileNumber: '',
+      isEmailVerified: false,
     },
     validationSchema: Yup.object({
       firstName: Yup.string().required('First name is required'),
@@ -62,7 +63,8 @@ export const SignUp = ({ showLinks = true, onSignUpSuccess, userType = "non", is
           password: values.password,
           mobileNumber: values.mobileNumber,
           userType,
-          isAllProfileCompleted
+          isAllProfileCompleted,
+          isEmailVerified: values.isEmailVerified,
         });
         setStatus({ success: 'Successfully signed up!' });
         

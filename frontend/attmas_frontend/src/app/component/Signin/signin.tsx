@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -26,7 +26,7 @@ interface SignInProps {
   onSignInSuccess?: () => void;
   exhibitionId?: string | null;
   boothId?: string | null;
-  interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth'; 
+  interestType: 'InterestedUserForExhibition' | 'InterestedUserForBooth';
 }
 
 function Copyright(props: any) {
@@ -47,6 +47,21 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
   const dispatch = useAppDispatch();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+
+  const [emailVerifiedMessage, setEmailVerifiedMessage] = useState(false);
+
+
+  // Check if the URL has the message=email_verified and show a message for 3 seconds
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('message') === 'email_verified') {
+      setEmailVerifiedMessage(true);
+      setTimeout(() => {
+        setEmailVerifiedMessage(false);
+      }, 3000); // Hide the message after 3 seconds
+    }
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -61,6 +76,13 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
         const response = await axiosInstance.post(APIS.LOGIN, { username: values.email, password: values.password });
 
         const res = response.data.user;
+
+        if (!res.isEmailVerified) {
+          // Set an error status and return if email is not verified
+          formik.setStatus({ error: 'Please verify your email from the email sent to you.' });
+          return;
+        }
+
         const user = {
           token: response.data.access_token,
           username: values.email,
@@ -76,8 +98,6 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
 
         formik.setStatus({ success: 'Successfully signed in!' });
 
-
-
         if (onSignInSuccess) {
           onSignInSuccess();
         } else {
@@ -88,6 +108,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
             isProjectOwner,
             isVisitor
           } = getRoleBasedAccess(res.userType);
+
           if (isVisitor) {
             router.push("/exhibition");
           } else if (res.isAllProfileCompleted || isAdmin || isFreelancer || isInnovator || isProjectOwner) {
@@ -96,7 +117,6 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
             router.push("/profile");
           }
         }
-     
 
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -107,9 +127,9 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
               }
             }
           };
-          
+
           const errorMessage = (simulatedError).response?.data.message;
-      
+
           if (errorMessage === 'User has already shown interest in the exhibition') {
             formik.setStatus({ error: 'You have already shown interest for the exhibition.' });
           } else {
@@ -120,6 +140,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
         }
       }
     },
+
   });
 
   return (
@@ -137,6 +158,25 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
         <Typography component="h1" variant="h5" sx={{ mt: 2 }}>
           Sign in
         </Typography>
+
+          {/* Display email verification message */}
+        {emailVerifiedMessage && (
+          <Box
+            sx={{
+              backgroundColor: '#dff0d8',
+              color: '#3c763d',
+              border: '1px solid #d0e9c6',
+              borderRadius: '4px',
+              padding: '10px',
+              marginBottom: '15px',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+              Email verified successfully!
+            </Typography>
+          </Box>
+        )}
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"

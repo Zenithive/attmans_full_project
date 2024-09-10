@@ -72,6 +72,9 @@ export class User {
 
   @Prop()
   isAllProfileCompleted: boolean;
+  
+  @Prop()
+  isEmailVerified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
