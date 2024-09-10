@@ -101,7 +101,7 @@ async updateEmailStatus(@Param('id') id: string, @Res() res: Response) {
     throw new NotFoundException(`User with ID ${id} not found`);
   }
   // Redirect to the front-end route with a success message
-  return res.redirect(`http://localhost:4200/?message=email_verified`);
+  return res.redirect(`${process.env.BACKEND_BASR_URL}/?message=email_verified`);
 }
 
 }
