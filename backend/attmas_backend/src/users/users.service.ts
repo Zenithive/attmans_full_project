@@ -22,18 +22,24 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
     const isAlreadyExist = await this.findByUsername(rest.username);
+    
     if (isAlreadyExist && isAlreadyExist.username === rest.username) {
         throw new ConflictException(`User with this email already exists`);
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const createdUser = new this.userModel({
         ...rest,
         password: hashedPassword,
     });
+
     await createdUser.save();
 
-    // Send verification email with a button
-    const verificationLink = `http://localhost:3000/users/updateEmailStatus/${createdUser._id}`;
+    // Fetch verification link from environment variable
+    console.log('SERVER_URL_FOR_EMAIL_VERIFY:', process.env.SERVER_URL_FOR_EMAIL_VERIFY);
+    
+    const verificationLink = `${process.env.SERVER_URL_FOR_EMAIL_VERIFY}/users/updateEmailStatus/${createdUser._id}`;
+    
     const emailBody = `
         <p>Hello ${createdUser.firstName},</p>
         <p>Thank you for registering with Attmas!</p>
@@ -65,6 +71,7 @@ export class UsersService {
 
     return createdUser;
 }
+
 
 
   async findByUsername(username: string): Promise<User> {
