@@ -37,7 +37,8 @@ const ApproveMilestoneDialog: React.FC<ApproveMilestoneDialogProps> = ({
   open,
   onClose,
   onApprove,
-  milestone
+  milestone,
+  
 }) => {
   const formik = useFormik({
     initialValues: { comment: '' },

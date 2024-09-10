@@ -38,8 +38,19 @@ class MilestoneItemDto {
   submittedAt: Date;
 
   @IsNotEmpty()
-  @IsEnum(['Pending', 'Approved', 'Rejected'])
-  adminStatus: 'Pending' | 'Approved' | 'Rejected';
+  @IsEnum([
+    'Pending',
+    'Admin Approved',
+    'Admin Rejected',
+    'Project Owner Approved',
+    'Project Owner Rejected',
+  ])
+  adminStatus:
+    | 'Pending'
+    | 'Admin Approved'
+    | 'Admin Rejected'
+    | 'Project Owner Approved'
+    | 'Project Owner Rejected';
 
   @IsArray()
   @IsString({ each: true })

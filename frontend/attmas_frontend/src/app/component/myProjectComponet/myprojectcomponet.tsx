@@ -49,7 +49,12 @@ export interface Milestone {
         };
         status: string;
         submittedAt: string;
-        adminStatus: 'Pending' | 'Approved' | 'Rejected';
+        adminStatus:
+        | 'Pending'
+        | 'Admin Approved'
+        | 'Admin Rejected'
+        | 'Project Owner Approved'
+        | 'Project Owner Rejected';
         approvalComments: string[];
         rejectionComments: string[];
         resubmissionComments: string[];
@@ -76,7 +81,7 @@ export interface Apply {
     availableSolution: string;
     SolutionUSP: string;
     userId?: UserSchema;
-    userDetails:any;
+    userDetails: any;
 }
 
 export interface ProjectDrawerProps {
@@ -121,25 +126,23 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
     const setApplicationsBasedOnUser = (applies: Apply[]) => {
         const tmpApplies: Apply[] = [];
         for (let index = 0; index < applies.length; index++) {
-          const element = applies[index];
-          const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
-          const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
-          const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-          if (isFreelancer || isProjectOwner || isAdmin) {
-            tmpApplies.push(element);
-          }
+            const element = applies[index];
+            const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
+            const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
+            const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
+            if (isFreelancer || isProjectOwner || isAdmin) {
+                tmpApplies.push(element);
+            }
         }
-    
+
         setApplications(tmpApplies);
-      }
+    }
 
     useEffect(() => {
         if (viewingJob?._id) {
-            console.log('Fetching applications for job ID:', viewingJob._id);
             const fetchApplications = async () => {
                 try {
                     const response = await axiosInstance.get(`${APIS.APPLY}/jobId/${viewingJob._id}`);
-                    console.log('Applications fetched:', response.data);
                     setApplicationsBasedOnUser(response.data);
                 } catch (error) {
                     console.error('Error fetching applications:', error);
@@ -172,19 +175,17 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     console.error('Error fetching milestones:', error);
                 }
             };
-    
+
             const refetchMilestones = (message: { applyId: string }) => {
-                console.log('Received message for refetch:', message);
                 if (typeof message.applyId === 'string') {
                     fetchMilestonesForApply(message.applyId);
                 } else {
                     console.error('Invalid applyId:', message.applyId);
                 }
             };
-    
-            console.log('Subscribing to MilestoneRefetch event');
+
             pubsub.subscribe('MilestoneRefetch', refetchMilestones);
-    
+
             applications.forEach(app => {
                 if (app._id && typeof app._id === 'string') {
                     fetchMilestonesForApply(app._id);
@@ -192,15 +193,14 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     console.error('Invalid application ID:', app._id);
                 }
             });
-    
+
             return () => {
-                console.log('Unsubscribing from MilestoneRefetch event');
                 pubsub.unsubscribe('MilestoneRefetch', refetchMilestones);
             };
         }
     }, [applications]);
-    
-    
+
+
 
     const filteredApplications = applications.filter(app => {
         if (filter === 'All') return true;
@@ -298,7 +298,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
     const fetchCommentsForJob = async (jobId: string) => {
         try {
             const response = await axiosInstance.get(`${APIS.GET_COMMENT}/jobId/${jobId}`);
-            console.log('Comments fetched:', response.data);
+
         } catch (error) {
             console.error('Error fetching comments:', error);
         }

@@ -99,7 +99,7 @@ export class MilestonesService {
       .aggregate([
         { $match: { applyId } },
         { $unwind: '$milestones' },
-        { $match: { 'milestones.adminStatus': 'Approved' } },
+        { $match: { 'milestones.adminStatus': 'Project Owner Approved' } },
         {
           $project: {
             _id: 0,
@@ -114,15 +114,8 @@ export class MilestonesService {
       ])
       .exec();
 
-    console.log('Raw Aggregation Result:', submittedMilestones);
-
     const allSubmittedMilestones = submittedMilestones.map(
       (doc) => doc.milestones,
-    );
-
-    console.log(
-      `Submitted Milestones for applyId ${applyId}:`,
-      allSubmittedMilestones,
     );
 
     return allSubmittedMilestones;
@@ -132,19 +125,44 @@ export class MilestonesService {
     applyId: string,
     milestoneIndex: number,
     comment: string,
+    userId: string,
   ): Promise<void> {
     const milestone = await this.milestoneModel.findOne({ applyId });
     if (!milestone) {
       throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
     }
 
-    if (milestone.milestones[milestoneIndex]) {
-      milestone.milestones[milestoneIndex].adminStatus = 'Approved';
-      milestone.milestones[milestoneIndex].approvalComments.push(comment);
-    } else {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const { userType } = user;
+
+    const selectedMilestone = milestone.milestones[milestoneIndex];
+    if (!selectedMilestone) {
       throw new BadRequestException(
         `Milestone index ${milestoneIndex} is out of bounds`,
       );
+    }
+
+    if (selectedMilestone.adminStatus === 'Admin Rejected') {
+      throw new BadRequestException(
+        'This milestone was rejected by the admin and cannot be approved.',
+      );
+    }
+
+    if (userType === 'Admin') {
+      selectedMilestone.adminStatus = 'Admin Approved';
+      selectedMilestone.approvalComments.push(comment);
+    } else if (userType === 'Project Owner') {
+      if (selectedMilestone.adminStatus !== 'Admin Approved') {
+        throw new BadRequestException(
+          'Admin has not approved this milestone yet.',
+        );
+      }
+      selectedMilestone.adminStatus = 'Project Owner Approved';
+      selectedMilestone.approvalComments.push(comment);
     }
 
     await milestone.save();
@@ -154,19 +172,45 @@ export class MilestonesService {
     applyId: string,
     milestoneIndex: number,
     comment: string,
+    userId: string,
   ): Promise<void> {
     const milestone = await this.milestoneModel.findOne({ applyId });
     if (!milestone) {
       throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
     }
 
-    if (milestone.milestones[milestoneIndex]) {
-      milestone.milestones[milestoneIndex].adminStatus = 'Rejected';
-      milestone.milestones[milestoneIndex].rejectionComments.push(comment);
-    } else {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const { userType } = user;
+
+    const selectedMilestone = milestone.milestones[milestoneIndex];
+    if (!selectedMilestone) {
       throw new BadRequestException(
         `Milestone index ${milestoneIndex} is out of bounds`,
       );
+    }
+
+    if (userType === 'Admin') {
+      if (selectedMilestone.adminStatus === 'Admin Approved') {
+        throw new BadRequestException(
+          'This milestone was already approved by the admin and cannot be rejected.',
+        );
+      }
+
+      selectedMilestone.adminStatus = 'Admin Rejected';
+      selectedMilestone.rejectionComments.push(comment);
+    } else if (userType === 'Project Owner') {
+      if (selectedMilestone.adminStatus !== 'Admin Approved') {
+        throw new BadRequestException(
+          'The admin has not approved this milestone yet.',
+        );
+      }
+
+      selectedMilestone.adminStatus = 'Project Owner Rejected';
+      selectedMilestone.rejectionComments.push(comment);
     }
 
     await milestone.save();
@@ -184,6 +228,7 @@ export class MilestonesService {
 
     if (milestone.milestones[milestoneIndex]) {
       milestone.milestones[milestoneIndex].adminStatus = 'Pending';
+      // milestone.milestones[milestoneIndex].projectOwnerStatus = 'Pending';
       milestone.milestones[milestoneIndex].resubmissionComments.push(
         resubmitComment,
       );

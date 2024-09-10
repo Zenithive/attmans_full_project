@@ -46,7 +46,6 @@ export class BillingService {
     const milestoneData = milestone.milestones.find(
       (m) => m.name.text === milestoneText && m.status === 'Submitted',
     );
-
     if (!milestoneData) {
       throw new Error('Milestone is not submitted or text does not match');
     }

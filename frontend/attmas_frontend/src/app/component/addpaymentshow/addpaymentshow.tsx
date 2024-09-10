@@ -5,6 +5,8 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
+import dayjs from 'dayjs';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 interface Billing {
     _id?: string;
@@ -53,7 +55,6 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
                     return;
                 }
                 const response = await axiosInstance.get<Billing[]>(`/billing/by-apply/${apply._id}`);
-                console.log('response.data', response.data);
                 setBillingData(response.data);
             } catch (error) {
                 setError('Error fetching billing data');
@@ -106,7 +107,7 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
                                     <TableCell>{payment.milestoneText}</TableCell>
                                     <TableCell>{payment.amount}</TableCell>
                                     <TableCell>{payment.currency}</TableCell>
-                                    <TableCell>{new Date(payment.paymentDate).toLocaleDateString()}</TableCell>
+                                    <TableCell>  {dayjs(payment.paymentDate).format(DATE_FORMAT)}</TableCell>
                                     <TableCell>{payment.category}</TableCell>
                                 </TableRow>
                             ))
