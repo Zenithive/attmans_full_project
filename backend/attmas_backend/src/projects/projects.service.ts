@@ -210,6 +210,7 @@ export class JobsService {
     createdAt?: string,
     TimeFrame?: string,
     ProjectOwner?: string,
+    appstatus?: string,
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
@@ -334,7 +335,8 @@ export class JobsService {
           createdAt: 1,
           status: 1,
           userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
-          appliesCount: 1, // Include appliesCount in the projection
+          appliesCount: 1, // Include appliesCount in the projection,
+          applies: { _id: 1, status: 1 },
         },
       },
     ];

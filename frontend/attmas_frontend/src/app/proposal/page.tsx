@@ -919,7 +919,7 @@ const proposal = () => {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={() => setOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
 

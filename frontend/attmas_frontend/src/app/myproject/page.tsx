@@ -18,7 +18,7 @@ import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 import axiosInstance from '../services/axios.service';
-import { APPLY_STATUSES } from '../constants/status.constant';
+import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
 
 
 const myproject = () => {
@@ -29,29 +29,20 @@ const myproject = () => {
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
-    const [filterOpen, setFilterOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [filterType, setFilterType] = useState("all");
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
     const [appliedJobsForAdmin, setAppliedJobsForAdmin] = useState<string[]>([]);
-    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
     const [isShowingApplies, setIsShowingApplies] = useState(false);
-    const [showingMyApplies, setShowingMyApplies] = useState(false);
     const [applies, setApplies] = useState<Apply[]>([]);
-    const [selectedServices, setSelectedServices] = useState<string[]>([]);
-    const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
-    const [apply, setApply] = useState<Apply | null>(null);
     const [applications, setApplications] = useState<Apply[]>([]);
 
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
 
     const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
-
-
-
 
     const [projects, setProjects] = useState<Apply[]>([]);
     const [projectsForAdmin, setProjectsForAdmin] = useState<Apply[]>([]);
@@ -84,21 +75,15 @@ const myproject = () => {
         fetchApplications();
     };
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
+    const fetchJobs = useCallback(async (page: number) => {
         try {
-            console.log('Fetch Jobs Params:', { page, CategoryesFilter, SubcategorysFilter, ExpertiselevelFilter, statusFilter, filterType, selectedServices });
 
             const response = await axiosInstance.get(APIS.JOBS, {
                 params: {
                     page,
                     limit: 10,
-                    Category: CategoryesFilter.join(','),
-                    Subcategorys: SubcategorysFilter.join(','),
-                    Expertiselevel: ExpertiselevelFilter.join(','),
-                    status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
                     userId: userDetails._id,
-                    SelectService: selectedServices.join(','),
-
+                    appstatus: APPLY_STATUSES.awarded
                 }
             })
 
@@ -116,31 +101,7 @@ const myproject = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, filterType, userType, selectedServices]);
-
-
-
-
-
-    // const fetchAllProjects = useCallback(async () => {
-    //     try {
-    //         const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
-    //             params: {
-    //                 userId: userDetails._id, // Include userId in the request
-    //             },
-    //         });
-    //         console.log('Fetched Projects:', response.data); // Log the response data
-    //         setProjects(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching projects:', error);
-    //     }
-    // }, [userDetails._id]);
-
-
-    // useEffect(() => {
-    //     fetchAllProjects();
-    //     // Fetch all projects on component mount
-    // }, [fetchAllProjects]);
+    }, [userId, userType]);
 
 
     const refetch = useCallback(async () => {
@@ -148,37 +109,22 @@ const myproject = () => {
             setPage(1);
             setJobs([]);
             setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
+            await fetchJobs(1);
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus, filterType, selectedServices]);
+    }, [fetchJobs]);
 
     useEffect(() => {
         refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
+    }, []);
 
     useEffect(() => {
         if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
+            fetchJobs(page);
         }
     }, [page]);
 
-    // useEffect(() => {
-    //     const fetchAppliedJobs = async () => {
-    //         try {
-    //             const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-    //             console.log('respons page', response.data);
-    //             const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-    //             console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-    //             setAppliedJobs(fetchedAppliedJobs);
-    //             setProjects(fetchedAppliedJobs);
-    //         } catch (error) {
-    //             console.error('Error fetching applied jobs:', error);
-    //         }
-    //     };
-    //     fetchAppliedJobs();
-    // }, [userId]);
 
     const currentUser = userDetails.username;
     const currentUserType = userDetails.userType;
@@ -187,66 +133,50 @@ const myproject = () => {
     const setApplicationsBasedOnUser = (applies: Apply[]) => {
         const tmpApplies: Apply[] = [];
         for (let index = 0; index < applies.length; index++) {
-          const element = applies[index];
-          console.log('element?.userId?._id === currentUserId ',element?.userDetails._id === currentUserId );
-          console.log('element?.userId?._id',element?.userDetails._id);
-          console.log('currentUserId',currentUserId);
-          const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-          console.log("isFreelancer",isFreelancer);
-          const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
-          console.log('isProjectOwner',isProjectOwner)
-          const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-          console.log('isAdmin',isAdmin);
-          if (isFreelancer || isProjectOwner || isAdmin) {
-            tmpApplies.push(element);
-          }
+            const element = applies[index];
+            console.log('element?.userId?._id === currentUserId ', element?.userDetails._id === currentUserId);
+            console.log('element?.userId?._id', element?.userDetails._id);
+            console.log('currentUserId', currentUserId);
+            const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
+            console.log("isFreelancer", isFreelancer);
+            const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
+            console.log('isProjectOwner', isProjectOwner)
+            const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
+            console.log('isAdmin', isAdmin);
+            if (isFreelancer || isProjectOwner || isAdmin) {
+                tmpApplies.push(element);
+            }
         }
-    
+
         setProjectsForAdmin(tmpApplies);
-      }
+    }
 
 
-    
+
     useEffect(() => {
         // Function to fetch applied jobs for admin
         const fetchAppliedJobsForAdmin = async () => {
-          try {
-            const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-            console.log("ggg", response.data)
-            setApplicationsBasedOnUser(response.data);
-    
-            console.log('response page', response.data);
-            // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
-            const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
+            try {
+                const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
+                console.log("ggg", response.data)
+                setApplicationsBasedOnUser(response.data);
 
-            console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
-            setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
-          } catch (error) {
-            console.error('Error fetching applied jobs:', error);
-          }
+                console.log('response page', response.data);
+                // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
+                const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
+
+                console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
+                setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
+            } catch (error) {
+                console.error('Error fetching applied jobs:', error);
+            }
         };
-    
+
         // Check if the user type is 'Admin' before fetching
-        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators'){
-          fetchAppliedJobsForAdmin();
+        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') {
+            fetchAppliedJobsForAdmin();
         }
-      }, [userDetails]);
-      
-
-
-    const handleFilterTypeChange = (event: any, newFilterType: string) => {
-        if (newFilterType !== null) {
-            setFilterType(newFilterType);
-            refetch();
-        }
-    }
-
-    const handleServiceChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newServices: string[],
-    ) => {
-        setSelectedServices(newServices);
-    };
+    }, [userDetails]);
 
 
     // Function to handle viewing job details
@@ -258,17 +188,12 @@ const myproject = () => {
 
     const filteredJobs = useMemo(() => {
         return jobs.filter(job => {
-            if (userType === 'Admin' && selectedStatus) {
-                return job.status === selectedStatus;
-            }
             return userType === 'Admin' || job.status === 'Approved';
         });
-    }, [jobs, userType, selectedStatus]);
+    }, [jobs, userType]);
 
 
     const handleOpenConfirmationDialog = (projectId: string) => {
-        console.log("projectId", projectId);
-
         setCurrentApplicationId(projectId);
         setConfirmationDialogOpen(true);
     };
@@ -340,153 +265,15 @@ const myproject = () => {
                 }}
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>My Projects</Typography>
-
             </Box>
-
-
-            <Box sx={{
-                position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
-                    position: 'relative',
-                    top: '8px',
-                    left: '-5px',
-                    marginBottom: '15px'
-                }
-            }}>
-                <Tooltip title="Filter" arrow>
-                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                        <FilterAltIcon />
-                    </IconButton>
-                </Tooltip>
-            </Box>
-
-            {filterOpen && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        marginBottom: '20px',
-                        gap: 3,
-                        alignItems: 'center',
-                        '@media (max-width: 767px)': {
-                            flexDirection: 'column',
-                            alignItems: 'stretch',
-                            gap: 2,
-                            width: '100%'
-                        },
-                    }}
-                >
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Expertiselevel}
-                        value={selectedExpertis}
-                        onChange={(event, value) => setSelectedExpertis(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Category()}
-                        value={selectedCategory}
-                        onChange={(event, value) => setSelectedCategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Category" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={getSubcategorys(Subcategorys())}
-                        value={selectedSubcategory}
-                        onChange={(event, value) => setSelectedSubcategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Subcategory" color="secondary" />
-                        )}
-                    />
-
-                </Box>
-            )}
-
-
-            {(userType === 'Project Owner' || userType === 'Admin') && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        marginTop: '-15px',
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px'
-                        },
-                    }}
-                >
-                    <ToggleButtonGroup
-                        value={filterType}
-                        exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter exhibitions"
-                        sx={{ height: "30px" }}
-                    >
-
-
-                    </ToggleButtonGroup>
-                </Box>
-            )}
-
-            {(userType === 'Project Owner' || userType === 'Admin') && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        position: 'relative',
-                        left: '20%',
-                        bottom: '30px',
-
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px',
-                        },
-                    }}
-                >
-
-                    <ToggleButtonGroup
-                        value={selectedServices}
-                        onChange={handleServiceChange}
-                        aria-label="Select Service"
-                        sx={{ height: "50px", right: '26px', position: 'relative' }}
-                    >
-                        <ToggleButton value="Outsource Research and Development ">
-                            Outsource Research and Development
-                        </ToggleButton>
-                        <ToggleButton value="Innovative product">
-                            Innovative Product
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-            )}
-
 
             {isProjectOwnerOrAdmin && (
-            <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 2 }}>
                     <>
                         {isShowingApplies ? (
                             <Box>
                                 {applies.map((apply) => (
-                            
+
                                     <Card key={apply._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -516,7 +303,7 @@ const myproject = () => {
                                 loader={<Typography>Loading...</Typography>}
                                 endMessage={<Typography>No more Projects</Typography>}
                             >
-                           
+
                                 <Box sx={{ mt: 2 }}>
                                     {filteredJobs.map((job) => (
                                         <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
@@ -564,7 +351,7 @@ const myproject = () => {
                                                             bottom: 0,
                                                             right: 0,
                                                             margin: 1,
-                                                            width:'8%',
+                                                            width: '8%',
                                                             minWidth: 'auto',
                                                             padding: 1,
                                                             display: 'flex',
@@ -576,7 +363,7 @@ const myproject = () => {
                                                                 backgroundColor: '#cc4800',
                                                             },
                                                             '@media (max-width: 767px)': {
-                                                                width:'20%',
+                                                                width: '20%',
                                                             }
                                                         }}
                                                     >
@@ -585,10 +372,10 @@ const myproject = () => {
                                                 </Box>
                                             </CardContent>
                                         </Card>
-                                    
+
                                     ))}
                                 </Box>
-                     
+
                             </InfiniteScroll>
                         )}
                         <MyProjectDrawer
@@ -602,9 +389,9 @@ const myproject = () => {
                         />
 
                     </>
-            </Box>
-                )}
-            
+                </Box>
+            )}
+
 
             <Box sx={{ mt: 2, position: 'relative' }}>
                 {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
@@ -621,22 +408,22 @@ const myproject = () => {
                                                 >
                                                     {project.jobDetails.title}
                                                 </Box>
-                                               
-                                                <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2,position:'relative',left:'25%' }}>
-                                                            <CustomChip
-                                                                label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                                color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
-                                                            />
-                                                        </Box>
 
-                                                        <Box sx={{ flexShrink: 0, mr: 2,position:'relative',left:'12%'}}>
-                                                            <Chip
-                                                                label={project.jobDetails.SelectService}
-                                                                variant="outlined"
-                                                                color='secondary'
-                                                            />
-                                                        </Box>
-                                              
+                                                <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2, position: 'relative', left: '25%' }}>
+                                                    <CustomChip
+                                                        label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                        color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                    />
+                                                </Box>
+
+                                                <Box sx={{ flexShrink: 0, mr: 2, position: 'relative', left: '12%' }}>
+                                                    <Chip
+                                                        label={project.jobDetails.SelectService}
+                                                        variant="outlined"
+                                                        color='secondary'
+                                                    />
+                                                </Box>
+
                                                 <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
                                                     {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                                 </Box>
@@ -653,8 +440,8 @@ const myproject = () => {
                                             <Typography variant="body2" sx={{ mt: 1 }}>
                                                 {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
                                             </Typography>
-        
-                                
+
+
 
                                             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
                                                 <Box sx={{
@@ -788,7 +575,7 @@ const myproject = () => {
                                                     />
 
 
-                                                    
+
                                                 </Box>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <Button
