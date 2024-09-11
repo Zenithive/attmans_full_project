@@ -204,18 +204,18 @@ export class JobsService {
     projId?: string,
     Subcategorys?: string[],
     Expertiselevel?: string[],
-    status?: string,
+    status?: string, // Job status (e.g., 'Approved')
     SelectService?: string[],
     title?: string,
     createdAt?: string,
     TimeFrame?: string,
     ProjectOwner?: string,
-    appstatus?: string,
+    appstatus?: string, // Application status (e.g., 'Awarded')
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
     const filterQuery: any = {};
-
+  
     const allNativeFiltersArray = {
       title,
       status,
@@ -225,7 +225,7 @@ export class JobsService {
       createdAt,
       TimeFrame,
     };
-
+  
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
@@ -240,31 +240,23 @@ export class JobsService {
         }
       }
     }
-
+  
     if (ProjectOwner) {
       filter.ProjectOwner = new RegExp(ProjectOwner, 'i');
     }
-
+  
     if (Category && Category.length > 0) {
       filter.Category = { $in: Category };
     }
-
+  
     if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
-
+  
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
     }
-
-    if (status) {
-      filter.status = status;
-    }
-
-    if (SelectService && SelectService.length > 0) {
-      filter.SelectService = { $in: SelectService };
-    }
-
+  
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -296,6 +288,7 @@ export class JobsService {
       {
         $match: {
           ...filterQuery,
+          ...(status && { status }), // Match job status dynamically
           ...(userId && {
             'userId._id': new Types.ObjectId(userId),
           }),
@@ -308,6 +301,26 @@ export class JobsService {
               { 'userId.lastName': filter.ProjectOwner },
             ],
           }),
+        },
+      },
+      {
+        $addFields: {
+          awardedApplies: {
+            $filter: {
+              input: '$applies',
+              as: 'apply',
+              cond: {
+                $and: [
+                  appstatus ? { $eq: ['$$apply.status', appstatus] } : {}, // Match applies status dynamically
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          ...(appstatus && { awardedApplies: { $ne: [] } }), // Ensure at least one apply with the desired appstatus
         },
       },
       { $sort: { createdAt: -1 } },
@@ -336,11 +349,12 @@ export class JobsService {
           status: 1,
           userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
           appliesCount: 1, // Include appliesCount in the projection,
-          applies: { _id: 1, status: 1 },
+          applies: { _id: 1, status: 1, userId: 1 },
+          awardedApplies: 1, // Include awarded applies in the projection
         },
       },
     ];
-
+  
     return await this.jobsModel.aggregate(pipeline);
   }
 

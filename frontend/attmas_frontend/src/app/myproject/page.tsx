@@ -19,9 +19,12 @@ import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 import axiosInstance from '../services/axios.service';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
+import Filters, { FilterColumn } from '../component/filter/filter.component';
 
 
 const myproject = () => {
+
+
     const [jobs, setJobs] = useState<Job[]>([]);
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
@@ -46,10 +49,70 @@ const myproject = () => {
 
     const [projects, setProjects] = useState<Apply[]>([]);
     const [projectsForAdmin, setProjectsForAdmin] = useState<Apply[]>([]);
+    const [filter, setFilter] = useState('');
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
+
+    const column: Array<FilterColumn> = [
+        {
+            name: "Project Name",
+            value: '',
+            type: "Texbox",
+            key: 'title',
+            isVisible: true,
+        },
+        {
+            name: "Project Owner",
+            value: '',
+            type: "Texbox",
+            key: 'ProjectOwner',
+            isVisible: userType === "Admin",
+        },
+        {
+            name: "Created Date",
+            value: '',
+            type: "Date",
+            key: 'createdAt',
+            isVisible: true,
+        },
+        {
+            name: "Deadline",
+            value: '',
+            type: "Date",
+            key: 'TimeFrame',
+            isVisible: true,
+        },
+        {
+            name: "Status",
+            value: '',
+            type: "Texbox",
+            key: 'status',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
+        },
+        {
+            name: "Service",
+            value: '',
+            type: "Service",
+            key: 'SelectService',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
+        },
+        {
+            name: "Category",
+            value: '',
+            type: "Category",
+            key: 'Category',
+            isVisible: true,
+        },
+        {
+            name: "Subject Matter Expertise",
+            value: '',
+            type: "SubCategory",
+            key: 'Subcategorys',
+            isVisible: true,
+        }
+    ];
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -77,15 +140,18 @@ const myproject = () => {
 
     const fetchJobs = useCallback(async (page: number) => {
         try {
+            const params: any = {
+                page,
+                limit: 10,
+                appstatus: APPLY_STATUSES.awarded,
+            };
 
-            const response = await axiosInstance.get(APIS.JOBS, {
-                params: {
-                    page,
-                    limit: 10,
-                    userId: userDetails._id,
-                    appstatus: APPLY_STATUSES.awarded
-                }
-            })
+            // If the user is not an Admin, include userId in the parameters
+            if (userType !== 'Admin') {
+                params.userId = userId;
+            }
+
+            const response = await axiosInstance.get(APIS.JOBS, { params });
 
             if (response.data.length === 0) {
                 setHasMore(false);
@@ -104,61 +170,12 @@ const myproject = () => {
     }, [userId, userType]);
 
 
-    const refetch = useCallback(async () => {
-        try {
-            setPage(1);
-            setJobs([]);
-            setHasMore(true);
-            await fetchJobs(1);
-        } catch (error) {
-            console.error('Error refetching jobs:', error);
-        }
-    }, [fetchJobs]);
-
-    useEffect(() => {
-        refetch();
-    }, []);
-
-    useEffect(() => {
-        if (page > 1) {
-            fetchJobs(page);
-        }
-    }, [page]);
-
-
-    const currentUser = userDetails.username;
-    const currentUserType = userDetails.userType;
-    const currentUserId = userDetails._id;
-
-    const setApplicationsBasedOnUser = (applies: Apply[]) => {
-        const tmpApplies: Apply[] = [];
-        for (let index = 0; index < applies.length; index++) {
-            const element = applies[index];
-            console.log('element?.userId?._id === currentUserId ', element?.userDetails._id === currentUserId);
-            console.log('element?.userId?._id', element?.userDetails._id);
-            console.log('currentUserId', currentUserId);
-            const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-            console.log("isFreelancer", isFreelancer);
-            const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
-            console.log('isProjectOwner', isProjectOwner)
-            const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-            console.log('isAdmin', isAdmin);
-            if (isFreelancer || isProjectOwner || isAdmin) {
-                tmpApplies.push(element);
-            }
-        }
-
-        setProjectsForAdmin(tmpApplies);
-    }
-
-
-
     useEffect(() => {
         // Function to fetch applied jobs for admin
         const fetchAppliedJobsForAdmin = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-                console.log("ggg", response.data)
+                console.log("fetchAppliedJobsForAdmin", response.data)
                 setApplicationsBasedOnUser(response.data);
 
                 console.log('response page', response.data);
@@ -177,6 +194,46 @@ const myproject = () => {
             fetchAppliedJobsForAdmin();
         }
     }, [userDetails]);
+
+
+
+    const refetch = useCallback(async () => {
+        try {
+            setPage(1);
+            setJobs([]);
+            setHasMore(true);
+            await fetchJobs(1);
+        } catch (error) {
+            console.error('Error refetching jobs:', error);
+        }
+    }, [fetchJobs]);
+
+    useEffect(() => {
+        refetch();
+    }, []);
+
+    useEffect(() => {
+        if (page > 1) fetchJobs(page);
+    }, [page, fetchJobs]);
+
+
+    const currentUser = userDetails.username;
+    const currentUserType = userDetails.userType;
+    const currentUserId = userDetails._id;
+
+    const setApplicationsBasedOnUser = (applies: Apply[]) => {
+        const tmpApplies: Apply[] = applies.filter(element => {
+            return (
+                (userDetails.userType === "Freelancer" && element?.userDetails._id === userId && element?.status === APPLY_STATUSES.awarded) ||
+                (userDetails.userType === "Project Owner" && element.status === APPLY_STATUSES.awarded) ||
+                (userDetails.userType === "Admin" && element?.status === APPLY_STATUSES.awarded)
+            );
+        });
+        setProjectsForAdmin(tmpApplies);
+    };
+
+
+
 
 
     // Function to handle viewing job details
@@ -239,6 +296,14 @@ const myproject = () => {
 
     const isProjectOwnerOrAdmin = userDetails.userType === 'Project Owner';
 
+    const changeFilterOrPage = (paramStr: string) => {
+        if (paramStr && paramStr.length) {
+            setFilter(paramStr);
+        } else {
+            setFilter('');
+        }
+        setPage(1);
+    }
 
     return (
         <Box
@@ -265,6 +330,11 @@ const myproject = () => {
                 }}
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>My Projects</Typography>
+                <Filters
+                    column={column}
+                    onFilter={changeFilterOrPage}                // onFilter={changeFilterOrPage}
+                ></Filters>
+
             </Box>
 
             {isProjectOwnerOrAdmin && (
