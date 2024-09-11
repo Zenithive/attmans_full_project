@@ -593,20 +593,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
 
 
-                {/* Added sentences at the end of the form */}
-                <Typography
-                    variant="body2"
-                    align="center"
-                    mt={4}
-                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
-                >
-                    Please Note: <br />
-                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
-                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
-                </Typography>
-
-
-
 
                 {fetchError && (
                     <Typography color="error" align="center" mt={2}>
