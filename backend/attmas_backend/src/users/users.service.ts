@@ -22,57 +22,58 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
     const isAlreadyExist = await this.findByUsername(rest.username);
-    
+
     if (isAlreadyExist && isAlreadyExist.username === rest.username) {
-        throw new ConflictException(`User with this email already exists`);
+      throw new ConflictException(`User with this email already exists`);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const createdUser = new this.userModel({
-        ...rest,
-        password: hashedPassword,
+      ...rest,
+      password: hashedPassword,
     });
 
     await createdUser.save();
 
     // Fetch verification link from environment variable
-    console.log('SERVER_URL_FOR_EMAIL_VERIFY:', process.env.SERVER_URL_FOR_EMAIL_VERIFY);
-    
+    console.log(
+      'SERVER_URL_FOR_EMAIL_VERIFY:',
+      process.env.SERVER_URL_FOR_EMAIL_VERIFY,
+    );
+
     const verificationLink = `${process.env.SERVER_URL_FOR_EMAIL_VERIFY}/users/updateEmailStatus/${createdUser._id}`;
-    
+
     const emailBody = `
         <p>Hello ${createdUser.firstName},</p>
-        <p>Thank you for registering with Attmas!</p>
+        <p>Thank you for registering with Attmans!</p>
         <p>Please verify your email by clicking the button below:</p>
         <a href="${verificationLink}" style="display:inline-block;padding:10px 20px;background-color:#28a745;color:white;text-decoration:none;border-radius:5px;">Verify Email</a>
-        <p>Best regards,<br>Attmas Team</p>
+        <p>Best regards,<br>Attmans Team</p>
     `;
 
     await this.mailerService.sendEmail(
-        createdUser.username,
-        'Verify Email',
-        emailBody,
-        // true // Indicating it's an HTML email
+      createdUser.username,
+      'Verify Email',
+      emailBody,
+      // true // Indicating it's an HTML email
     );
 
     // Send a welcome email
     const welcomeEmailBody = `
         <p>Hello ${createdUser.firstName},</p>
-        <p>Thank you for registering with Attmas!</p>
-        <p>Best regards,<br>Attmas Team</p>
+        <p>Thank you for registering with Attmans!</p>
+        <p>Best regards,<br>Attmans Team</p>
     `;
 
     await this.mailerService.sendEmail(
-        createdUser.username,
-        'Welcome to Attmas Service',
-        welcomeEmailBody,
-        // true // Also HTML formatted email
+      createdUser.username,
+      'Welcome to Attmans Service',
+      welcomeEmailBody,
+      // true // Also HTML formatted email
     );
 
     return createdUser;
-}
-
-
+  }
 
   async findByUsername(username: string): Promise<User> {
     const user = await this.userModel.findOne({ username }).exec();
