@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button, Link } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
@@ -19,6 +19,7 @@ import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 import axiosInstance from '../services/axios.service';
 import { APPLY_STATUSES } from '../constants/status.constant';
+import { DATE_FORMAT } from '../constants/common.constants';
 
 
 const myproject = () => {
@@ -86,7 +87,6 @@ const myproject = () => {
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
         try {
-            console.log('Fetch Jobs Params:', { page, CategoryesFilter, SubcategorysFilter, ExpertiselevelFilter, statusFilter, filterType, selectedServices });
 
             const response = await axiosInstance.get(APIS.JOBS, {
                 params: {
@@ -121,28 +121,6 @@ const myproject = () => {
 
 
 
-
-    // const fetchAllProjects = useCallback(async () => {
-    //     try {
-    //         const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
-    //             params: {
-    //                 userId: userDetails._id, // Include userId in the request
-    //             },
-    //         });
-    //         console.log('Fetched Projects:', response.data); // Log the response data
-    //         setProjects(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching projects:', error);
-    //     }
-    // }, [userDetails._id]);
-
-
-    // useEffect(() => {
-    //     fetchAllProjects();
-    //     // Fetch all projects on component mount
-    // }, [fetchAllProjects]);
-
-
     const refetch = useCallback(async () => {
         try {
             setPage(1);
@@ -164,21 +142,7 @@ const myproject = () => {
         }
     }, [page]);
 
-    // useEffect(() => {
-    //     const fetchAppliedJobs = async () => {
-    //         try {
-    //             const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-    //             console.log('respons page', response.data);
-    //             const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-    //             console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-    //             setAppliedJobs(fetchedAppliedJobs);
-    //             setProjects(fetchedAppliedJobs);
-    //         } catch (error) {
-    //             console.error('Error fetching applied jobs:', error);
-    //         }
-    //     };
-    //     fetchAppliedJobs();
-    // }, [userId]);
+
 
     const currentUser = userDetails.username;
     const currentUserType = userDetails.userType;
@@ -187,51 +151,42 @@ const myproject = () => {
     const setApplicationsBasedOnUser = (applies: Apply[]) => {
         const tmpApplies: Apply[] = [];
         for (let index = 0; index < applies.length; index++) {
-          const element = applies[index];
-          console.log('element?.userId?._id === currentUserId ',element?.userDetails._id === currentUserId );
-          console.log('element?.userId?._id',element?.userDetails._id);
-          console.log('currentUserId',currentUserId);
-          const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-          console.log("isFreelancer",isFreelancer);
-          const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
-          console.log('isProjectOwner',isProjectOwner)
-          const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-          console.log('isAdmin',isAdmin);
-          if (isFreelancer || isProjectOwner || isAdmin) {
-            tmpApplies.push(element);
-          }
+            const element = applies[index];
+            const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
+            const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
+            const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
+            if (isFreelancer || isProjectOwner || isAdmin) {
+                tmpApplies.push(element);
+            }
         }
-    
+
         setProjectsForAdmin(tmpApplies);
-      }
+    }
 
 
-    
+
     useEffect(() => {
         // Function to fetch applied jobs for admin
         const fetchAppliedJobsForAdmin = async () => {
-          try {
-            const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-            console.log("ggg", response.data)
-            setApplicationsBasedOnUser(response.data);
-    
-            console.log('response page', response.data);
-            // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
-            const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
+            try {
+                const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
+                setApplicationsBasedOnUser(response.data);
 
-            console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
-            setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
-          } catch (error) {
-            console.error('Error fetching applied jobs:', error);
-          }
+                // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
+                const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
+
+                setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
+            } catch (error) {
+                console.error('Error fetching applied jobs:', error);
+            }
         };
-    
+
         // Check if the user type is 'Admin' before fetching
-        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators'){
-          fetchAppliedJobsForAdmin();
+        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') {
+            fetchAppliedJobsForAdmin();
         }
-      }, [userDetails]);
-      
+    }, [userDetails]);
+
 
 
     const handleFilterTypeChange = (event: any, newFilterType: string) => {
@@ -267,8 +222,6 @@ const myproject = () => {
 
 
     const handleOpenConfirmationDialog = (projectId: string) => {
-        console.log("projectId", projectId);
-
         setCurrentApplicationId(projectId);
         setConfirmationDialogOpen(true);
     };
@@ -281,8 +234,6 @@ const myproject = () => {
 
     const handleConfirm = async (comment: string) => {
         if (currentApplicationId) {
-
-            console.log(`Cancel application with ID: ${currentApplicationId}`);
             handleCancel(currentApplicationId, comment)
             // Close the dialog after confirming
             handleCloseConfirmationDialog();
@@ -481,12 +432,12 @@ const myproject = () => {
 
 
             {isProjectOwnerOrAdmin && (
-            <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 2 }}>
                     <>
                         {isShowingApplies ? (
                             <Box>
                                 {applies.map((apply) => (
-                            
+
                                     <Card key={apply._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -516,7 +467,7 @@ const myproject = () => {
                                 loader={<Typography>Loading...</Typography>}
                                 endMessage={<Typography>No more Projects</Typography>}
                             >
-                           
+
                                 <Box sx={{ mt: 2 }}>
                                     {filteredJobs.map((job) => (
                                         <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
@@ -524,13 +475,17 @@ const myproject = () => {
                                                 <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
 
                                                     <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
-                                                        <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
-                                                            {job.title},
-                                                        </a>
+
+                                                        {job.title},
+
+
+
                                                         <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                            ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                            {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
+                                                            {dayjs(job.TimeFrame).format(DATE_FORMAT)}
                                                         </span>
                                                     </Box>
+
 
                                                     <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                         <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
@@ -547,10 +502,6 @@ const myproject = () => {
                                                                 color='secondary'
                                                             />
                                                         </Box>
-
-                                                        <Box sx={{ flexShrink: 0, fontSize: 'small', fontWeight: 'bolder' }}>
-                                                            {job.Expertiselevel}
-                                                        </Box>
                                                     </Box>
 
                                                 </Typography>
@@ -564,7 +515,7 @@ const myproject = () => {
                                                             bottom: 0,
                                                             right: 0,
                                                             margin: 1,
-                                                            width:'8%',
+                                                            width: '8%',
                                                             minWidth: 'auto',
                                                             padding: 1,
                                                             display: 'flex',
@@ -576,19 +527,33 @@ const myproject = () => {
                                                                 backgroundColor: '#cc4800',
                                                             },
                                                             '@media (max-width: 767px)': {
-                                                                width:'20%',
+                                                                width: '20%',
                                                             }
                                                         }}
                                                     >
                                                         Close
                                                     </Button>
                                                 </Box>
+                                                <Link
+                                                    component="button"
+                                                    // variant="contained"
+                                                    color="primary"
+                                                    onClick={() => handleViewJob(job)}
+                                                    sx={{
+                                                        color: 'blue',
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        mr: 2
+                                                    }} // Style to ensure link is blue with underline
+                                                >
+                                                    View Project
+                                                </Link>
                                             </CardContent>
                                         </Card>
-                                    
+
                                     ))}
                                 </Box>
-                     
+
                             </InfiniteScroll>
                         )}
                         <MyProjectDrawer
@@ -602,9 +567,9 @@ const myproject = () => {
                         />
 
                     </>
-            </Box>
-                )}
-            
+                </Box>
+            )}
+
 
             <Box sx={{ mt: 2, position: 'relative' }}>
                 {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
@@ -614,112 +579,57 @@ const myproject = () => {
                                 {projectsForAdmin.map((project) => project.jobDetails && (
                                     <Card key={project._id} sx={{ mb: 2 }}>
                                         <CardContent>
-                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box
-                                                    onClick={() => handleViewJob(project.jobDetails)}
-                                                    sx={{ cursor: 'pointer' }}
-                                                >
-                                                    {project.jobDetails.title}
-                                                </Box>
-                                               
-                                                <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2,position:'relative',left:'25%' }}>
-                                                            <CustomChip
-                                                                label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                                color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
-                                                            />
-                                                        </Box>
+                                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
 
-                                                        <Box sx={{ flexShrink: 0, mr: 2,position:'relative',left:'12%'}}>
-                                                            <Chip
-                                                                label={project.jobDetails.SelectService}
-                                                                variant="outlined"
-                                                                color='secondary'
-                                                            />
-                                                        </Box>
-                                              
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
+
+                                                    {project.jobDetails.title},
+
+
+
+                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                        {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
+                                                        {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
+                                                    </span>
                                                 </Box>
+
+
+                                                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
+                                                        <CustomChip
+                                                            label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                            color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                        />
+                                                    </Box>
+
+                                                    <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                        <Chip
+                                                            label={project.jobDetails.SelectService}
+                                                            variant="outlined"
+                                                            color='secondary'
+                                                        />
+                                                    </Box>
+                                                </Box>
+
                                             </Typography>
-
-
-
-                                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                                {project.jobDetails.currency} {project.jobDetails.Budget}
-                                            </Typography>
-
-
-
-                                            <Typography variant="body2" sx={{ mt: 1 }}>
-                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
-                                            </Typography>
-        
-                                
-
-                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box sx={{
-                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
-                                                }}>
-                                                    {/* <Chip
-                                                        label={project.jobDetails.status}
-                                                        color={
-                                                            project.jobDetails.status === 'Approved'
-                                                                ? 'success'
-                                                                : project.jobDetails.status === 'Rejected'
-                                                                    ? 'error'
-                                                                    : 'default'
-                                                        }
-                                                    /> */}
-
-
-                                                    <Button
-                                                        onClick={() => handleOpenConfirmationDialog(project.jobDetails._id)}
-                                                        sx={{
-                                                            position: 'absolute',
-                                                            bottom: 0,
-                                                            right: 0,
-                                                            margin: 1,
-                                                            minWidth: 'auto',
-                                                            padding: 1,
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            borderRadius: '22px',
-                                                            backgroundColor: 'grey',
-                                                            color: 'white',
-                                                            '&:hover': {
-                                                                backgroundColor: '#cc4800',
-                                                            },
-                                                        }}
-                                                    >
-                                                        Close
-                                                    </Button>
-                                                </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Button
-                                                        aria-controls="simple-menu"
-                                                        aria-haspopup="true"
-                                                        onClick={handleClick}
-                                                        sx={{ display: { xs: 'block', md: 'none' } }}
-                                                        endIcon={<MoreVertIcon />}
-                                                    >
-                                                        More
-                                                    </Button>
-                                                    <Menu
-                                                        id="simple-menu"
-                                                        anchorEl={anchorEl}
-                                                        keepMounted
-                                                        open={Boolean(anchorEl)}
-                                                        onClose={handleClose}
-                                                        PaperProps={{
-                                                            sx: {
-                                                                border: '1px solid',
-                                                                boxShadow: 'none',
-                                                            },
-                                                        }}
-                                                    >
-                                                    </Menu>
-                                                </Box>
+                                            <Box sx={{ marginTop: '10px' }}>
+                                                <Typography variant="body2">{project.jobDetails.currency === 'USD' ? '$' : '₹'}{project.jobDetails.Budget}</Typography>
+                                                <Typography variant="caption">{project.jobDetails.Category.join(', ')}, {project.jobDetails.Subcategorys.join(', ')}</Typography>
                                             </Box>
+                                            <Link
+                                                component="button"
+                                                // variant="contained"
+                                                color="primary"
+                                                onClick={() => handleViewJob(project.jobDetails)}
+                                                sx={{
+                                                    color: 'blue',
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer',
+                                                    mr: 2
+                                                }} // Style to ensure link is blue with underline
+                                            >
+                                                View Project
+                                            </Link>
                                         </CardContent>
                                     </Card>
                                 ))}
@@ -750,72 +660,54 @@ const myproject = () => {
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                                 <Box
-                                                    onClick={() => handleViewJob(project.jobDetails)}
-                                                    sx={{ cursor: 'pointer' }}
+
                                                 >
-                                                    {project.jobDetails.title}
+                                                    {project.jobDetails.title},
+                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                        {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
+                                                        {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
+                                                    </span>
+
                                                 </Box>
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
+                                                        <CustomChip
+                                                            label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                            color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                        />
+                                                    </Box>
+
+                                                    <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                        <Chip
+                                                            label={project.jobDetails.SelectService}
+                                                            variant="outlined"
+                                                            color='secondary'
+                                                        />
+                                                    </Box>
                                                 </Box>
+
                                             </Typography>
 
-
-
-                                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                                {project.jobDetails.currency} {project.jobDetails.Budget}
-                                            </Typography>
-
-
-
-                                            <Typography variant="body2" sx={{ mt: 1 }}>
-                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
-                                            </Typography>
-
-                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box sx={{
-                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
-                                                }}>
-                                                    <Chip
-                                                        label={project.jobDetails.status}
-                                                        color={
-                                                            project.jobDetails.status === 'Approved'
-                                                                ? 'success'
-                                                                : project.jobDetails.status === 'Rejected'
-                                                                    ? 'error'
-                                                                    : 'default'
-                                                        }
-                                                    />
-
-
-                                                    
-                                                </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Button
-                                                        aria-controls="simple-menu"
-                                                        aria-haspopup="true"
-                                                        onClick={handleClick}
-                                                        sx={{ display: { xs: 'block', md: 'none' } }}
-                                                        endIcon={<MoreVertIcon />}
-                                                    >
-                                                        More
-                                                    </Button>
-                                                    <Menu
-                                                        id="simple-menu"
-                                                        anchorEl={anchorEl}
-                                                        keepMounted
-                                                        open={Boolean(anchorEl)}
-                                                        onClose={handleClose}
-                                                        PaperProps={{
-                                                            sx: {
-                                                                border: '1px solid',
-                                                                boxShadow: 'none',
-                                                            },
-                                                        }}
-                                                    >
-                                                    </Menu>
-                                                </Box>
+                                            <Box sx={{ marginTop: '10px' }}>
+                                                <Typography variant="body2">{project.jobDetails.currency === 'USD' ? '$' : '₹'}{project.jobDetails.Budget}</Typography>
+                                                <Typography variant="caption">{project.jobDetails.Category.join(', ')}, {project.jobDetails.Subcategorys.join(', ')}</Typography>
                                             </Box>
+
+
+                                            <Link
+                                                component="button"
+                                                // variant="contained"
+                                                color="primary"
+                                                onClick={() => handleViewJob(project.jobDetails)}
+                                                sx={{
+                                                    color: 'blue',
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer',
+                                                    mr: 2
+                                                }}
+                                            >
+                                                View Project
+                                            </Link>
                                         </CardContent>
                                     </Card>
                                 ))}

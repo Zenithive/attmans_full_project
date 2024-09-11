@@ -158,7 +158,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     return (
         <>
             {userDetails.userType === 'Project Owner' && (
-                <Button sx={{ ml: 3, width: 180, pt: 0 }} onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'>{editingJobs ? 'Edit Project' : 'Create Project'}</Button>
+                <Button sx={{ ml: 3, minWidth: 150, pt: 0,minHeight:'40px' }} onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained'>{editingJobs ? 'Edit Project' : 'Create Project'}</Button>
             )}
             <Drawer sx={{
                 '& .MuiDrawer-paper': {

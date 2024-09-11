@@ -8,6 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { DATE_FORMAT } from '@/app/constants/common.constants';
 
 
 export interface Milestone {
@@ -20,7 +21,12 @@ export interface Milestone {
         };
         status: string;
         submittedAt: string;
-        adminStatus: 'Pending' | 'Approved' | 'Rejected';
+        adminStatus:
+        | 'Pending'
+        | 'Admin Approved'
+        | 'Admin Rejected'
+        | 'Project Owner Approved'
+        | 'Project Owner Rejected';
         approvalComments: string[];
         rejectionComments: string[];
         resubmissionComments: string[];
@@ -130,6 +136,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateTimePicker
                         label="Payment Date"
+                        format={DATE_FORMAT}
                         sx={{ marginBottom: '15px' }}
                         value={paymentDetails.paymentDate}
                         onChange={onDateChange}

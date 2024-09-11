@@ -254,12 +254,15 @@ const Exhibition = () => {
           Exhibitions
         </Typography>
 
-        <Box sx={{
-          mr: 2, display: "flex"
-        }}>
-          <Filters column={column} onFilter={changeFilterOrPage}></Filters>
-          <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+        <Box sx={{ mr: 2, display: "flex", gap: 2 }}> 
+          <Box sx={{ flex: '0 1 auto' }}> 
+            <Filters column={column} onFilter={changeFilterOrPage} />
+          </Box>
+          <Box sx={{ flex: '0 1 auto' }}>
+            <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+          </Box>
         </Box>
+
 
       </Box>
       {userType === "Admin" && <Box

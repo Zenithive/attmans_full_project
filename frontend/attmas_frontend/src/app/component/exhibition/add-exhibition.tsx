@@ -149,7 +149,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
             {userType === "Admin" && (
                 <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
                     ml: 3, minWidth: 150, py: 0,
-                    borderRadius: 3, backgroundColor: '#CC4800', color: "white", '@media (max-width: 767px)': {
+                    borderRadius: 3, backgroundColor: '#CC4800',minHeight:'40px', color: "white", '@media (max-width: 767px)': {
                         position: 'relative', width: '157%'
                     }
                 }}>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>

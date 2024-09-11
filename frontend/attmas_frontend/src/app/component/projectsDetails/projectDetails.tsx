@@ -30,6 +30,7 @@ import axiosInstance from '@/app/services/axios.service';
 import { ProductForBooth } from '../ProductTableForBooth';
 import NewProductTable from '../all_Profile_component/NewProductTable';
 import { Product } from '../ProductTable';
+import { pubsub } from '@/app/services/pubsub.service';
 
 
 
@@ -43,7 +44,12 @@ export interface Milestone {
     };
     status: string;
     submittedAt: string;
-    adminStatus: 'Pending' | 'Approved' | 'Rejected';
+    adminStatus:
+    | 'Pending'
+    | 'Admin Approved'
+    | 'Admin Rejected'
+    | 'Project Owner Approved'
+    | 'Project Owner Rejected';
     adminComments: string[];
     resubmissionComments: string[];
   }[];
@@ -113,20 +119,24 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [proposals, setProposals] = useState<Proposal[]>([]);
 
   useEffect(() => {
-    console.log('apply', apply);
-    console.log('apply Products', apply?.products);
-    if (apply?._id) {
-      axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
-        .then(response => {
-          console.log("Fetched milestones:", response.data);
-          setMilestones(response.data);
-          // console.log("response.data.products", response.data.products);
+    const fetchMilestones = () => {
+        if (apply?._id) {
+            axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
+                .then(response => {
+                    setMilestones(response.data);
+                })
+                .catch(error => console.error('Error fetching milestones:', error));
+        }
+    };
+    fetchMilestones();
 
-          // setCheckedProducts(response.data.products)
-        })
-        .catch(error => console.error('Error fetching milestones:', error));
-    }
-  }, [apply]);
+    pubsub.subscribe('MilstonRefetched', fetchMilestones);
+
+    return () => {
+        pubsub.unsubscribe('MilstonRefetched', fetchMilestones);
+    };
+}, [apply]);
+
 
 
   const getStatusColor = (status: string) => {
@@ -144,7 +154,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
     if (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') {
       try {
         const response = await axiosInstance.get(APIS.GET_ALL_PROPOSALS);
-        console.log('Fetched Proposals:', response.data);
         setProposals(response.data);
       } catch (error) {
         console.error('Error fetching proposals:', error);
@@ -160,7 +169,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const handleReward = async (applicationId: string, Comment: string) => {
     try {
       if (!applicationId) return;
-      console.log("applicationId", applicationId);
 
       await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
         jobId, // Include jobId in the payload
@@ -194,7 +202,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   };
 
   const handleOpenConfirmationDialog = (applicationId: string) => {
-    console.log("applicationId", applicationId);
 
     setCurrentApplicationId(applicationId);
     setConfirmationDialogOpen(true);
@@ -208,7 +215,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const handleConfirm = (comment: string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
-      console.log(`Awarding application with ID: ${currentApplicationId}`);
       handleReward(currentApplicationId, comment)
       // Close the dialog after confirming
       handleCloseConfirmationDialog();
@@ -229,13 +235,12 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const handleResubmitMilestone = async (applyId: string, milestoneIndex: number, comment: string) => {
     try {
       setIsResubmitting(true);
-      console.log(`Resubmitting milestone ${milestoneIndex} for applyId ${applyId} with comment: ${comment}`);
       await axiosInstance.post(`${APIS.MILESTONES}/resubmit`, {
         applyId,
         milestoneIndex,
         resubmitComment: comment
       });
-      window.location.reload();
+      pubsub.publish('MilstonRefetched', { Message: 'Milestone Resubmitted' });
     } catch (error) {
       console.error('Error resubmitting milestone:', error);
     } finally {
@@ -346,10 +351,10 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-
+                { userDetails.userType === 'Innovators' &&(
                 <NewProductTable
                   products={apply?.products}
-                  hideActions={true} // This will hide the edit and delete icons
+                  hideActions={true}
                   onEdit={() => {
                     throw new Error('Function not implemented.');
                   } }
@@ -358,6 +363,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   } } onView={function (product: Product): void {
                     throw new Error('Function not implemented.');
                   } }                />
+                )}
                 <Grid item xs={12}>
                   {milestones.map((milestone, index) => (
                     <Card key={index} variant="outlined" sx={{ mb: 2 }}>
@@ -458,7 +464,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                             />
                                           </Grid>
                                         )}
-                                        {userDetails.userType === 'Freelancer' && m.adminStatus === 'Rejected' && (
+                                        {userDetails.userType === 'Freelancer' && (m.adminStatus === 'Admin Rejected' || m.adminStatus === 'Project Owner Rejected')  && (
                                           <>
                                             <Grid item xs={12}>
                                               <TextField
