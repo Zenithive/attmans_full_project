@@ -459,11 +459,14 @@ const Jobs = () => {
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
 
-                <Box sx={{
-                    mr: 2, display: "flex"
-                }}>
-                    <Filters column={column} onFilter={changeFilterOrPage}></Filters>
-                    <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+
+                <Box sx={{ mr: 2, display: "flex", gap: 2 }}>
+                    <Box sx={{ flex: '0 1 auto' }}>
+                        <Filters column={column} onFilter={changeFilterOrPage}></Filters>
+                    </Box>
+                    <Box sx={{ flex: '0 1 auto' }}>
+                        <AddProjects editingJobs={editingJob} onCancelEdit={handleCancelEdit} />
+                    </Box>
                 </Box>
             </Box>
 

@@ -87,7 +87,6 @@ const myproject = () => {
 
     const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
         try {
-            console.log('Fetch Jobs Params:', { page, CategoryesFilter, SubcategorysFilter, ExpertiselevelFilter, statusFilter, filterType, selectedServices });
 
             const response = await axiosInstance.get(APIS.JOBS, {
                 params: {
@@ -122,28 +121,6 @@ const myproject = () => {
 
 
 
-
-    // const fetchAllProjects = useCallback(async () => {
-    //     try {
-    //         const response = await axiosInstance.get(APIS.GET_APPLIES_FOR_MYPROJECT, {
-    //             params: {
-    //                 userId: userDetails._id, // Include userId in the request
-    //             },
-    //         });
-    //         console.log('Fetched Projects:', response.data); // Log the response data
-    //         setProjects(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching projects:', error);
-    //     }
-    // }, [userDetails._id]);
-
-
-    // useEffect(() => {
-    //     fetchAllProjects();
-    //     // Fetch all projects on component mount
-    // }, [fetchAllProjects]);
-
-
     const refetch = useCallback(async () => {
         try {
             setPage(1);
@@ -165,21 +142,7 @@ const myproject = () => {
         }
     }, [page]);
 
-    // useEffect(() => {
-    //     const fetchAppliedJobs = async () => {
-    //         try {
-    //             const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-    //             console.log('respons page', response.data);
-    //             const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-    //             console.log('fetchedAppliedJobs', fetchedAppliedJobs);
-    //             setAppliedJobs(fetchedAppliedJobs);
-    //             setProjects(fetchedAppliedJobs);
-    //         } catch (error) {
-    //             console.error('Error fetching applied jobs:', error);
-    //         }
-    //     };
-    //     fetchAppliedJobs();
-    // }, [userId]);
+
 
     const currentUser = userDetails.username;
     const currentUserType = userDetails.userType;
@@ -189,15 +152,9 @@ const myproject = () => {
         const tmpApplies: Apply[] = [];
         for (let index = 0; index < applies.length; index++) {
             const element = applies[index];
-            console.log('element?.userId?._id === currentUserId ', element?.userDetails._id === currentUserId);
-            console.log('element?.userId?._id', element?.userDetails._id);
-            console.log('currentUserId', currentUserId);
             const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-            console.log("isFreelancer", isFreelancer);
             const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
-            console.log('isProjectOwner', isProjectOwner)
             const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-            console.log('isAdmin', isAdmin);
             if (isFreelancer || isProjectOwner || isAdmin) {
                 tmpApplies.push(element);
             }
@@ -213,14 +170,11 @@ const myproject = () => {
         const fetchAppliedJobsForAdmin = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-                console.log("ggg", response.data)
                 setApplicationsBasedOnUser(response.data);
 
-                console.log('response page', response.data);
                 // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
                 const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
 
-                console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
                 setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);
@@ -268,8 +222,6 @@ const myproject = () => {
 
 
     const handleOpenConfirmationDialog = (projectId: string) => {
-        console.log("projectId", projectId);
-
         setCurrentApplicationId(projectId);
         setConfirmationDialogOpen(true);
     };
@@ -282,8 +234,6 @@ const myproject = () => {
 
     const handleConfirm = async (comment: string) => {
         if (currentApplicationId) {
-
-            console.log(`Cancel application with ID: ${currentApplicationId}`);
             handleCancel(currentApplicationId, comment)
             // Close the dialog after confirming
             handleCloseConfirmationDialog();
