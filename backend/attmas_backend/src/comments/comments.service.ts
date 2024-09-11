@@ -54,7 +54,7 @@ export class CommentsService {
 
     if (
       (user.userType === 'Admin' ||
-        user.userType === 'Innovators' ||
+        user.userType === 'Innovator' ||
         user.userType === 'Freelancer' ||
         user.userType === 'Project Owner') &&
       (apply.status === 'Approved' || apply.status === 'Awarded')

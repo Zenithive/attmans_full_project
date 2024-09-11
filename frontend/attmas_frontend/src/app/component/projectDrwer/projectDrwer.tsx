@@ -122,7 +122,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     for (let index = 0; index < applies.length; index++) {
       const element = applies[index];
       const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
-      const isInnovators = currentUserType === "Innovators" && element?.userId?._id === currentUserId;
+      const isInnovators = currentUserType === "Innovator" && element?.userId?._id === currentUserId;
       const isProjectOwner = currentUserType === "Project Owner" && element?.status !== APPLY_STATUSES.pendingForApproval;
       const isAdmin = currentUserType === "Admin";
       const isFilterSet = filter != 'All' ? filter === element?.status : true;
@@ -200,7 +200,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       return (app.status === APPLY_STATUSES.approvedPendingForProposal || app.status === APPLY_STATUSES.awarded)
         && currentUser === viewingJob?.username;
     }
-    if (userType === 'Innovators' || userType === 'Freelancer') {
+    if (userType === 'Innovator' || userType === 'Freelancer') {
       return app.username === currentUser;
     }
     return true;
@@ -218,7 +218,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
   const canAddComment = userType === 'Project Owner' && viewingJob?.username === currentUser ||
     userType === 'Admin' ||
-    (userType === 'Innovators' || userType === 'Freelancer')
+    (userType === 'Innovator' || userType === 'Freelancer')
     && filteredApplicationse.some(app => app.username === currentUser && app.status === APPLY_STATUSES.approvedPendingForProposal || app.status === APPLY_STATUSES.awarded);
 
   const handleReward = async (applicationId: string, Comment: string) => {
@@ -738,7 +738,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         {userDetails && (
                           (userType === 'Admin' ||
                             userType === 'Project Owner' ||
-                            (userType === 'Innovators' || userType === 'Freelancer') &&
+                            (userType === 'Innovator' || userType === 'Freelancer') &&
                             applications.some((filteredApp) => filteredApp.username === currentUser && filteredApp._id === app._id))
                         ) && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>

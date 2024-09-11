@@ -1,5 +1,5 @@
 export const innovatorTerms = `
-Terms and Conditions for Innovators
+Terms and Conditions for Innovator
 Welcome! Thank you for your interest in our platform. These Terms and Conditions
 ("Terms") govern your use of our platform as an innovator offering innovative and
 patented products ("Products") and research collaboration services ("Services"). By

@@ -47,7 +47,7 @@ const EditProfile2: React.FC = () => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const [isFreelancer, setIsFreelancer] = useState(userDetails.userType === 'Freelancer' || false);
 
-    const [isInnovator, setIsInnovator] = useState(userDetails.userType === 'Innovators' || false);
+    const [isInnovator, setIsInnovator] = useState(userDetails.userType === 'Innovator' || false);
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
@@ -122,7 +122,7 @@ const EditProfile2: React.FC = () => {
 
                 });
 
-                setIsFreelancer(userData.userType === 'Innovators');
+                setIsFreelancer(userData.userType === 'Innovator');
                 setShowProductDetails(userData.productToMarket === 'Yes');
             } catch (error) {
                 console.error('Error fetching user profile:', error);
@@ -157,9 +157,9 @@ const EditProfile2: React.FC = () => {
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        setIsInnovator(value === 'Innovators');
+        setIsInnovator(value === 'Innovator');
 
-        if (value !== 'Innovators') {
+        if (value !== 'Innovator') {
             setShowProductDetails(false);
             formik.setFieldValue('productToMarket', 'No');
             formik.setFieldValue('hasPatent', 'No');
@@ -474,7 +474,7 @@ const EditProfile2: React.FC = () => {
                                 >
                                     <MenuItem value="Freelancer">Freelancer</MenuItem>
                                     <MenuItem value="Project Owner">Project Owner</MenuItem>
-                                    <MenuItem value="Innovators">Innovators</MenuItem>
+                                    <MenuItem value="Innovator">Innovator</MenuItem>
                                 </TextField>
                             </Grid>
 

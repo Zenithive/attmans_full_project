@@ -128,7 +128,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         for (let index = 0; index < applies.length; index++) {
             const element = applies[index];
             const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
-            const isInnovators = currentUserType === "Innovators" && element?.userId?._id === currentUserId;
+            const isInnovators = currentUserType === "Innovator" && element?.userId?._id === currentUserId;
             const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
             const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
             if (isFreelancer || isProjectOwner || isAdmin || isInnovators) {
@@ -213,7 +213,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         if (userType === 'Admin') {
             return (app.status === 'Awarded');
         }
-        if (userType === 'Innovators' || userType === 'Freelancer') {
+        if (userType === 'Innovator' || userType === 'Freelancer') {
             return app.username === currentUser;
         }
         return true;
@@ -376,7 +376,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                         sx={{ mb: 2 }}
                                     />
                                 </Grid>
-                                {!(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                                {!(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator') && (
                                     <Grid item xs={12} sm={6}>
                                         <TextField
                                             label="Owner Name"
@@ -389,7 +389,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 )}
                                 {userDetails && (
                                     userType === 'Project Owner' ||
-                                    (userType === 'Innovators' || userType === 'Freelancer' || userType === 'Admin')
+                                    (userType === 'Innovator' || userType === 'Freelancer' || userType === 'Admin')
                                 ) && (
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, position: 'relative', left: '20%' }}>
                                             <a

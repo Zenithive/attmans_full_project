@@ -123,9 +123,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        setIsInnovator(value === 'Innovators');
+        setIsInnovator(value === 'Innovator');
 
-        if (value !== 'Innovators') {
+        if (value !== 'Innovator') {
             setShowProductDetails(false);
             formik.setFieldValue('productToMarket', 'No');
             formik.setFieldValue('hasPatent', 'No');
@@ -438,7 +438,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 >
                                     <MenuItem value="Freelancer">Freelancer</MenuItem>
                                     <MenuItem value="Project Owner">Project Owner</MenuItem>
-                                    <MenuItem value="Innovators">Innovators</MenuItem>
+                                    <MenuItem value="Innovator">Innovator</MenuItem>
                                 </TextField>
                             </Grid>
 

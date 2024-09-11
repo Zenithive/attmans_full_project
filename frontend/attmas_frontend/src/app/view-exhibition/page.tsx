@@ -432,7 +432,7 @@ const ExhibitionsPage: React.FC = () => {
             }}>
 
 
-              {(userDetails && userType === 'Innovators' && isParticipateButtonVisible) && (
+              {(userDetails && userType === 'Innovator' && isParticipateButtonVisible) && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -600,7 +600,7 @@ const ExhibitionsPage: React.FC = () => {
 
 
               <Box sx={{ position: 'relative', top: '50px', right: '20px', marginBottom: '20px' }}>
-                {(userDetails && (userType === 'Admin' || userType === 'Innovators') && view === 'boothDetails') && (
+                {(userDetails && (userType === 'Admin' || userType === 'Innovator') && view === 'boothDetails') && (
                   <StatusFilter value={statusFilter} onChange={handleStatusFilterChange} options={["All", "Pending", "Approved", "Rejected"]} />
                 )}
               </Box>
@@ -620,7 +620,7 @@ const ExhibitionsPage: React.FC = () => {
                         return booth.status === statusFilter;
                       }
                     })
-                    .filter(booth => ((userType === 'Innovators' || userType === 'Visitors' || !userType) && booth.status === 'Approved') || userType === 'Admin')
+                    .filter(booth => ((userType === 'Innovator' || userType === 'Visitors' || !userType) && booth.status === 'Approved') || userType === 'Admin')
                     .map(booth => (
                       <Grid item xs={12} sm={6} md={4} key={booth._id}>
                         <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
@@ -635,7 +635,7 @@ const ExhibitionsPage: React.FC = () => {
                             {userDetails && (
                               (userType === 'Admin' ||
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
-                                  (userType === 'Innovators' || userType === 'Visitors' || !userType))) && (
+                                  (userType === 'Innovator' || userType === 'Visitors' || !userType))) && (
                                 <a
                                   href="#"
                                   onClick={(e) => {
@@ -658,7 +658,7 @@ const ExhibitionsPage: React.FC = () => {
 
                             {/* {exhibitions.map((exhibition) => (
                               <Box key={exhibition._id}>
-                                {!(userDetails && (userType === 'Admin' || userType === 'Innovators')) &&
+                                {!(userDetails && (userType === 'Admin' || userType === 'Innovator')) &&
                                   dayjs(exhibition.dateTime).isSame(dayjs(exhibition.serverDate), 'day') && (
                                     <a
                                       href="#"
@@ -699,7 +699,7 @@ const ExhibitionsPage: React.FC = () => {
                                 position: 'relative', top: '-65px', left: '71%'
                               }
                             }}>
-                              {(userDetails && (userType === 'Admin' || userType === 'Innovators')) && (
+                              {(userDetails && (userType === 'Admin' || userType === 'Innovator')) && (
                                 <Chip
                                   label={
                                     booth.status === 'Approved' ? 'Approved' :

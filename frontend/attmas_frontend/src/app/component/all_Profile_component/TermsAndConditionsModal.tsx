@@ -16,7 +16,7 @@ const TermsAndConditionsModal: React.FC<TermsAndConditionsModalProps> = ({ open,
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   // Determine which terms to show based on the user type
-  const termsToShow = userDetails.userType === 'Innovators'
+  const termsToShow = userDetails.userType === 'Innovator'
     ? innovatorTerms
     : userDetails.userType === 'Freelancer'
     ? freelancerTerms
