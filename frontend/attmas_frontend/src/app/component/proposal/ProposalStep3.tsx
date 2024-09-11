@@ -122,7 +122,7 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
             />
 
             {/* Statement of Agreement */}
-            <Box sx={{ mt: 4, borderTop: '1px solid #ccc', pt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {!readOnly && <Box sx={{ mt: 4, borderTop: '1px solid #ccc', pt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="h6" gutterBottom align="center">
                 STATEMENT OF AGREEMENT
               </Typography>
@@ -158,7 +158,7 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
 
               {/* Checkbox for Agreement */}
 
-            </Box>
+            </Box>}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
               <Button variant="outlined" onClick={onPrevious}>Back</Button>
