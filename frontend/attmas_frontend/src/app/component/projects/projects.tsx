@@ -331,7 +331,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                             label="Expertise Level"
                                         >
                                             <MenuItem value="Beginner">Beginner </MenuItem>
-                                            <MenuItem value="Intermidiate">Intermidiate</MenuItem>
+                                            <MenuItem value="Intermediate">Intermediate</MenuItem>
                                             <MenuItem value="Expert">Expert</MenuItem>
                                             <MenuItem value="Phd">Phd</MenuItem>
                                         </Select>

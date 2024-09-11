@@ -55,9 +55,9 @@ export interface Apply {
 
 export const Expertiselevel = [
     "Beginner",
-    "Intermidiate",
+    "Intermediate",
     "Expert",
-    "Phd"
+    "PhD"
 ];
 
 
