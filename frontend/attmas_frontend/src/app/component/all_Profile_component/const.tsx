@@ -134,7 +134,6 @@ Ahmedabad shall have the sole jurisdiction in this regard.
 
 
 export const projectOwnerTerms = `
-    Terms and Conditions for Companies/Demand side user
 Welcome! These Terms and Conditions ("Terms") govern your access to and use of
 our platform (the "Platform") where you can connect with PhD scholars for research
 collaboration and purchase innovative products from independent innovators
