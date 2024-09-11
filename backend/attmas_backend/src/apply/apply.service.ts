@@ -32,7 +32,7 @@ export class ApplyService {
     private usersService: UsersService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
-  ) { }
+  ) {}
 
   async create(createApplyDto: CreateApplyDto): Promise<Apply> {
     // Convert jobId to ObjectId if it is not already
@@ -448,6 +448,7 @@ export class ApplyService {
       comment ||
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
+    console.log('application', application);
     this.updateAlltheApplications(application.jobId, id);
     // console.log(`Application with ID: ${id} awarded.`);
     const proposals = await this.proposalModel
@@ -490,7 +491,7 @@ export class ApplyService {
       userId: app.userId as Types.ObjectId,
       username: app.username.toString(),
     }));
-
+    console.log('updatedApplications', updatedApplications);
     // console.log('Applications to be updated:', updatedApplications);
 
     await this.updateStatuses({ applications: updatedApplications });

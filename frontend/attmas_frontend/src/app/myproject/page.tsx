@@ -153,9 +153,10 @@ const myproject = () => {
         for (let index = 0; index < applies.length; index++) {
             const element = applies[index];
             const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
+            const isInnovators = currentUserType === "Innovators" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
             const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
             const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-            if (isFreelancer || isProjectOwner || isAdmin) {
+            if (isFreelancer || isProjectOwner || isAdmin || isInnovators) {
                 tmpApplies.push(element);
             }
         }

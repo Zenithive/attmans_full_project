@@ -519,9 +519,6 @@ const Jobs = () => {
                                                 </span>
 
 
-
-
-
                                             </Box>
                                             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                 <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>

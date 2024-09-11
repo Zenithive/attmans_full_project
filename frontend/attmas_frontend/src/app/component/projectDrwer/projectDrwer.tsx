@@ -122,10 +122,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     for (let index = 0; index < applies.length; index++) {
       const element = applies[index];
       const isFreelancer = currentUserType === "Freelancer" && element?.userId?._id === currentUserId;
+      const isInnovators = currentUserType === "Innovators" && element?.userId?._id === currentUserId;
       const isProjectOwner = currentUserType === "Project Owner" && element?.status !== APPLY_STATUSES.pendingForApproval;
       const isAdmin = currentUserType === "Admin";
       const isFilterSet = filter != 'All' ? filter === element?.status : true;
-      if ((isFreelancer || isProjectOwner || isAdmin) && isFilterSet ) {
+      if ((isFreelancer || isProjectOwner || isAdmin) && isFilterSet || isInnovators) {
         tmpApplies.push(element);
       }
     }
@@ -199,7 +200,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       return (app.status === APPLY_STATUSES.approvedPendingForProposal || app.status === APPLY_STATUSES.awarded)
         && currentUser === viewingJob?.username;
     }
-    if (userDetails.userType === 'Innovators' || userType === 'Freelancer') {
+    if (userType === 'Innovators' || userType === 'Freelancer') {
       return app.username === currentUser;
     }
     return true;
