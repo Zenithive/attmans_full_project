@@ -212,7 +212,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={<ErrorMessage name="title" />}
                                 />
                                 <TextField
-                                    label="Scope of Work"
+                                    label="Description"
                                     name="description"
                                     color='secondary'
                                     variant="outlined"

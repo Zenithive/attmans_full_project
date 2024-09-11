@@ -454,7 +454,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
-                    label="Scope of Work"
+                    label="Description"
                     value={viewingJob.description}
                     fullWidth
                     multiline
