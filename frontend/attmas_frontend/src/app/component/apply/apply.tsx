@@ -239,7 +239,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                     value={values.TimeFrame}
                     slotProps={{
                       textField: {
-                        color: 'secondary'
+                        color: 'secondary',
+                        placeholder: DATE_FORMAT
                       },
                     }}
                     onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
@@ -315,6 +316,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                                         slotProps={{
                                           textField: {
                                             color: 'secondary',
+                                            placeholder: DATE_FORMAT
                                           },
                                         }}
                                       />

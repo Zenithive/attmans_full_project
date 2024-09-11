@@ -296,7 +296,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                             value={values.TimeFrame}
                                             slotProps={{
                                                 textField: {
-                                                    color: 'secondary'
+                                                    color: 'secondary',
+                                                    placeholder: DATE_FORMAT
                                                 },
                                             }}
                                             onChange={(newValue) => setFieldValue('TimeFrame', newValue)}

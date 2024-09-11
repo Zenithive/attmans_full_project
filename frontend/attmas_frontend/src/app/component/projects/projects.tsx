@@ -473,7 +473,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                                         slotProps={{
                                             textField: {
-                                                color: 'secondary'
+                                                color: 'secondary',
+                                                placeholder: DATE_FORMAT
                                             },
                                         }}
                                     />
