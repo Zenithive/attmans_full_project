@@ -4,6 +4,8 @@ export const SERVER_URL = process.env.SERVER_URL;
 export const APIS = {
     LOGIN: `/auth/login`,
     SIGNUP: `/users`,
+    FORGOT_PASSOWRD: `/users/forgot-password`,
+    RESET_PASSOWRD: `/users/reset-password`,
     LOGOUT: `/auth/logout`,
     JOBS: `/jobs`,
     APPLY: `/apply`,
