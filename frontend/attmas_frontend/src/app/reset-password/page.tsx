@@ -3,7 +3,7 @@ import { Box, Button, CircularProgress, Container, CssBaseline, Grid, Link, Text
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import React from 'react';
+import React, { Suspense } from 'react';
 import axiosInstance from '../services/axios.service';
 import { APIS } from '../constants/api.constant';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -146,4 +146,12 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+const SuspenseResetPasswordPage: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Page />
+    </Suspense>
+  );
+};
+
+export default SuspenseResetPasswordPage;
