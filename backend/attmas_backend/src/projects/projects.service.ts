@@ -27,7 +27,7 @@ export class JobsService {
     private readonly emailService: EmailService2,
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
-  ) {}
+  ) { }
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
     if (createJobsDto.SelectService.includes('Innovative product')) {
@@ -202,9 +202,10 @@ export class JobsService {
     Category: string[],
     userId?: string,
     projId?: string,
+    appUserId?: string,
     Subcategorys?: string[],
     Expertiselevel?: string[],
-    status?: string, // Job status (e.g., 'Approved')
+    status?: string,
     SelectService?: string[],
     title?: string,
     createdAt?: string,
@@ -215,7 +216,7 @@ export class JobsService {
     const skip = (page - 1) * limit;
     const filter: any = {};
     const filterQuery: any = {};
-  
+
     const allNativeFiltersArray = {
       title,
       status,
@@ -225,7 +226,7 @@ export class JobsService {
       createdAt,
       TimeFrame,
     };
-  
+
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
@@ -240,23 +241,23 @@ export class JobsService {
         }
       }
     }
-  
+
     if (ProjectOwner) {
       filter.ProjectOwner = new RegExp(ProjectOwner, 'i');
     }
-  
+
     if (Category && Category.length > 0) {
       filter.Category = { $in: Category };
     }
-  
+
     if (Subcategorys && Subcategorys.length > 0) {
       filter.Subcategorys = { $in: Subcategorys };
     }
-  
+
     if (Expertiselevel && Expertiselevel.length > 0) {
       filter.Expertiselevel = { $in: Expertiselevel };
     }
-  
+
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -286,9 +287,13 @@ export class JobsService {
         },
       },
       {
+        // ******** working for Project Owner not for freelancer
         $match: {
           ...filterQuery,
           ...(status && { status }), // Match job status dynamically
+          ...(appstatus && { 'applies.status': new RegExp(appstatus, 'i') }), // Ensure at least one apply with the desired appstatus
+          ...(appUserId && { 'applies.userId': new Types.ObjectId(appUserId) }),
+
           ...(userId && {
             'userId._id': new Types.ObjectId(userId),
           }),
@@ -318,11 +323,7 @@ export class JobsService {
           },
         },
       },
-      {
-        $match: {
-          ...(appstatus && { awardedApplies: { $ne: [] } }), // Ensure at least one apply with the desired appstatus
-        },
-      },
+
       { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
@@ -354,7 +355,7 @@ export class JobsService {
         },
       },
     ];
-  
+
     return await this.jobsModel.aggregate(pipeline);
   }
 
