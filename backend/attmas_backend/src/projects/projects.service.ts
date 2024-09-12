@@ -400,18 +400,11 @@ export class JobsService {
       if (
         project.SelectService.includes('Outsource Research and Development')
       ) {
-        console.log(
-          'freelancer Out',
-          project.SelectService.includes('Outsource Research and Development'),
-        );
         const freelancers =
           await this.usersService.findUsersByUserType1('Freelancer');
-        console.log('freelancers', freelancers);
         if (freelancers.length === 0) {
-          console.log('No freelancers found for the project');
         }
         for (const freelancer of freelancers) {
-          console.log(`Sending email to freelancer: ${freelancer.username}`);
           await this.emailService.sendEmailToFreelancer(
             freelancer.username,
             project._id.toString(),
@@ -423,10 +416,8 @@ export class JobsService {
         const innovators =
           await this.usersService.findUsersByUserType1('Innovators');
         if (innovators.length === 0) {
-          console.log('No innovators found for the project');
         }
         for (const innovator of innovators) {
-          console.log(`Sending email to innovator: ${innovator.username}`);
           await this.emailService.sendEmailToInnovator(
             innovator.username,
             project._id.toString(),

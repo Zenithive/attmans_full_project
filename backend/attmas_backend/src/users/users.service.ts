@@ -36,10 +36,6 @@ export class UsersService {
     await createdUser.save();
 
     // Fetch verification link from environment variable
-    console.log(
-      'SERVER_URL_FOR_EMAIL_VERIFY:',
-      process.env.SERVER_URL_FOR_EMAIL_VERIFY,
-    );
 
     const verificationLink = `${process.env.SERVER_URL_FOR_EMAIL_VERIFY}/users/updateEmailStatus/${createdUser._id}`;
 
@@ -248,8 +244,6 @@ export class UsersService {
     //     categoryData.map((cat) => cat.username),
     //   );
 
-    //   console.log('filteredUsernames', filteredUsernames);
-
     //   return users.filter((user) => filteredUsernames.has(user.username));
     // }
 
@@ -284,18 +278,13 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    console.log('updateUserDto:', updateUserDto);
-    console.log('Current user email:', user.username);
-
     if (updateUserDto.email && updateUserDto.email !== user.username) {
-      console.log('Updating email...');
       const existingUser = await this.userModel
         .findOne({ username: updateUserDto.email })
         .exec();
       if (existingUser && existingUser._id.toString() !== id) {
         throw new ConflictException('Email is already in use');
       }
-      console.log('existingUser', existingUser);
       user.username = updateUserDto.email;
     }
 
@@ -306,7 +295,6 @@ export class UsersService {
 
     Object.assign(user, updateUserDto, { username: user.username });
     await user.save();
-    console.log('Updated user:', user);
     return user;
   }
 

@@ -216,7 +216,7 @@ export default function MainNavBar() {
       You have been notified for new apllication submitted for the Project: ${notification.title}
       `;
     }
-    console.log('freelancer', notification.userType === 'Freelancer');
+    
     if(notification.userType === 'Freelancer') {
         return `
         Dear Freelancers,<br>
@@ -224,7 +224,7 @@ export default function MainNavBar() {
         Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
       `;
     }
-    console.log('Innovator', notification.userType === 'Innovators');
+
     if(notification.userType === 'Innovators'){
       return `
         Dear Innovators,<br>

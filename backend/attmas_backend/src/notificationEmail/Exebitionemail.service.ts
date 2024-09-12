@@ -51,7 +51,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
       const email = new this.emailModel({
@@ -96,7 +95,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
       const email = new this.emailModel({
@@ -152,7 +150,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
       const email = new this.emailModel({
@@ -202,7 +199,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       const email = new this.emailModel({
         to,
@@ -388,8 +384,6 @@ export class EmailService2 {
         html,
       });
 
-      console.log(`Email sent successfully to freelancer ${to}`);
-
       const email = new this.emailModel({
         to,
         subject: `Project Approved: ${title}`,
@@ -429,8 +423,6 @@ export class EmailService2 {
         subject: `Project Approved: ${title}`,
         html,
       });
-
-      console.log(`Email sent successfully to innovator ${to}`);
 
       const email = new this.emailModel({
         to,
