@@ -260,7 +260,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescript
                           Scope of Work
                         </Typography>
 
-                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
+                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'medium' }}>
                           Add Specific activities, deliverables, timelines, and/or quality guidelines to ensure successful execution of the project.
                         </Typography>
                         <TextField
@@ -278,7 +278,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescript
                           helperText={<ErrorMessage name={`milestones[${index}].scopeOfWork`} />}
                         />
 
-                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'small' }}>
+                        <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'medium' }}>
                           Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client.
                         </Typography>
                         <FieldArray
@@ -357,7 +357,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescript
 
 
 
-              <Typography variant="h6" sx={{ fontSize: 'small' }}>
+              <Typography variant="h6" sx={{ fontSize: 'medium' }}>
                 What have been the flaws in current solution?*
               </Typography >
               <TextField
