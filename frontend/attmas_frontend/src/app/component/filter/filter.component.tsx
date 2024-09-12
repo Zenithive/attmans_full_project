@@ -88,7 +88,8 @@ const Filters = ({ column, onFilter }: FiltersProps) => {
           slotProps={{
             textField: {
               color: 'secondary',
-              size: 'small'
+              size: 'small',
+              placeholder: DATE_FORMAT
             },
           }}
         />

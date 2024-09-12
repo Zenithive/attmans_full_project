@@ -92,7 +92,7 @@ async getAllProfiles(): Promise<PersonalProfile[]> {
   }
 
 
-  //******** Get Request from categories  for Freelancers and Innovators ********//
+  //******** Get Request from categories  for Freelancers and Innovator ********//
   @Get('categories')
   async getAllCategories(): Promise<Categories[]> {
     return this.profileService.getAllCategories();

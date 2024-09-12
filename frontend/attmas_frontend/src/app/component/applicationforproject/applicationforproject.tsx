@@ -432,7 +432,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
 
                                                                                         {milestone.isCommentSubmitted ? (
                                                                                             <>
-                                                                                                {(userType === 'Project Owner' || userType === 'Innovators' || userType === 'Freelancer' || userType === 'Admin') && (
+                                                                                                {(userType === 'Project Owner' || userType === 'Innovator' || userType === 'Freelancer' || userType === 'Admin') && (
                                                                                                     <>
                                                                                                         <TextField
                                                                                                             label="Submitted Milestone"

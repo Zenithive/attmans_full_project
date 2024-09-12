@@ -230,7 +230,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           {showLinks && (
             <Grid container>
               <Grid item xs>
-                <Link href="#" color='secondary'>
+                <Link href="/forgot-password" color='secondary'>
                   Forgot password?
                 </Link>
               </Grid>

@@ -351,7 +351,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-                { userDetails.userType === 'Innovators' &&(
+                { userDetails.userType === 'Innovator' &&(
                 <NewProductTable
                   products={apply?.products}
                   hideActions={true}
@@ -509,7 +509,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                {userDetails.userType !== 'Innovators' && <>
+                {userDetails.userType !== 'Innovator' && <>
                   <Grid item xs={12}>
                     <TextField
                       label="Other available solutions"

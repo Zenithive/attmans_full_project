@@ -246,7 +246,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               rows={5}
             />
           </Box>
-          {user.userType === 'Innovators' && (
+          {user.userType === 'Innovator' && (
             <ProductTable
               products={productArray}
               onRemove={(index) => {
