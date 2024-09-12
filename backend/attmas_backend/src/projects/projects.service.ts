@@ -30,8 +30,16 @@ export class JobsService {
   ) {}
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
-    if (createJobsDto.SelectService.includes('Innovative product')) {
-      // Ensure Expertiselevel is not set for 'Innovative product'
+    for (const key in createJobsDto) {
+      if (typeof createJobsDto[key] === 'string') {
+        createJobsDto[key] = createJobsDto[key].trim();
+      }
+    }
+
+    if (
+      createJobsDto.SelectService &&
+      createJobsDto.SelectService.includes('Innovative Product')
+    ) {
       createJobsDto.Expertiselevel = undefined;
     }
 
@@ -381,7 +389,6 @@ export class JobsService {
 
   async approveProject(id: string): Promise<Jobs> {
     try {
-      console.log(`Approving project with ID: ${id}`);
       const project = await this.jobsModel.findById(id);
       if (!project) {
         throw new NotFoundException('Job not found');
@@ -389,6 +396,45 @@ export class JobsService {
       project.status = 'Approved';
       project.buttonsHidden = true;
       await project.save();
+
+      if (
+        project.SelectService.includes('Outsource Research and Development')
+      ) {
+        console.log(
+          'freelancer Out',
+          project.SelectService.includes('Outsource Research and Development'),
+        );
+        const freelancers =
+          await this.usersService.findUsersByUserType1('Freelancer');
+        console.log('freelancers', freelancers);
+        if (freelancers.length === 0) {
+          console.log('No freelancers found for the project');
+        }
+        for (const freelancer of freelancers) {
+          console.log(`Sending email to freelancer: ${freelancer.username}`);
+          await this.emailService.sendEmailToFreelancer(
+            freelancer.username,
+            project._id.toString(),
+            project.title,
+            freelancer.userType,
+          );
+        }
+      } else if (project.SelectService.includes('Innovative product')) {
+        const innovators =
+          await this.usersService.findUsersByUserType1('Innovators');
+        if (innovators.length === 0) {
+          console.log('No innovators found for the project');
+        }
+        for (const innovator of innovators) {
+          console.log(`Sending email to innovator: ${innovator.username}`);
+          await this.emailService.sendEmailToInnovator(
+            innovator.username,
+            project._id.toString(),
+            project.title,
+            innovator.userType,
+          );
+        }
+      }
 
       this.sendEmailToProjectOwnerAfterProjectApprove(project);
 
@@ -407,11 +453,9 @@ export class JobsService {
 
     const jobId = project._id.toString();
     const title = project.title;
-    console.log('title of Project', title);
 
     for (const admin of adminUsers) {
       if (project) {
-        console.log('project', project);
         await this.emailService.sendProjectStatusEmail(
           project.username,
           'Project Approved',
@@ -427,7 +471,6 @@ export class JobsService {
 
   async rejectProject(id: string, comment: string): Promise<Jobs> {
     try {
-      console.log(`Rejecting project with ID: ${id}`);
       const project = await this.jobsModel.findById(id);
       if (!project) {
         throw new NotFoundException('Job not found');
@@ -523,7 +566,6 @@ export class JobsService {
     // Find the job by ID
     const job = await this.jobsModel.findById(id);
     if (!job) {
-      console.log(`Job with ID ${id} not found`);
       throw new NotFoundException(`Job with id ${id} not found`);
     }
 
@@ -533,7 +575,6 @@ export class JobsService {
 
     // Save the updated job back to the database
     const updatedJob = await job.save();
-    console.log('Job updated successfully by admin:', updatedJob);
 
     return updatedJob;
   }

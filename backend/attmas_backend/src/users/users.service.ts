@@ -22,24 +22,27 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
     const isAlreadyExist = await this.findByUsername(rest.username);
-    
+
     if (isAlreadyExist && isAlreadyExist.username === rest.username) {
-        throw new ConflictException(`User with this email already exists`);
+      throw new ConflictException(`User with this email already exists`);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const createdUser = new this.userModel({
-        ...rest,
-        password: hashedPassword,
+      ...rest,
+      password: hashedPassword,
     });
 
     await createdUser.save();
 
     // Fetch verification link from environment variable
-    console.log('SERVER_URL_FOR_EMAIL_VERIFY:', process.env.SERVER_URL_FOR_EMAIL_VERIFY);
-    
+    console.log(
+      'SERVER_URL_FOR_EMAIL_VERIFY:',
+      process.env.SERVER_URL_FOR_EMAIL_VERIFY,
+    );
+
     const verificationLink = `${process.env.SERVER_URL_FOR_EMAIL_VERIFY}/users/updateEmailStatus/${createdUser._id}`;
-    
+
     const emailBody = `
         <p>Hello ${createdUser.firstName},</p>
         <p>Thank you for registering with Attmas!</p>
@@ -49,10 +52,10 @@ export class UsersService {
     `;
 
     await this.mailerService.sendEmail(
-        createdUser.username,
-        'Verify Email',
-        emailBody,
-        // true // Indicating it's an HTML email
+      createdUser.username,
+      'Verify Email',
+      emailBody,
+      // true // Indicating it's an HTML email
     );
 
     // Send a welcome email
@@ -63,16 +66,14 @@ export class UsersService {
     `;
 
     await this.mailerService.sendEmail(
-        createdUser.username,
-        'Welcome to Attmas Service',
-        welcomeEmailBody,
-        // true // Also HTML formatted email
+      createdUser.username,
+      'Welcome to Attmas Service',
+      welcomeEmailBody,
+      // true // Also HTML formatted email
     );
 
     return createdUser;
-}
-
-
+  }
 
   async findByUsername(username: string): Promise<User> {
     const user = await this.userModel.findOne({ username }).exec();
@@ -255,15 +256,21 @@ export class UsersService {
     return users;
   }
 
-  async findUsersByUserType1(
-    userType: string,
-  ): Promise<{ firstName: string; lastName: string; username: string }[]> {
+  async findUsersByUserType1(userType: string): Promise<
+    {
+      firstName: string;
+      lastName: string;
+      username: string;
+      userType: string;
+    }[]
+  > {
     const filterQuery: any = { userType };
     const users = await this.userModel.find(filterQuery).exec();
     const userDetails = users.map((user) => ({
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
+      userType: user.userType,
     }));
     return userDetails;
   }

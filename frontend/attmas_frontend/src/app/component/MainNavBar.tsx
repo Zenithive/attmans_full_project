@@ -45,6 +45,7 @@ interface Email {
   first?: string,
   last?: string,
   notifType: string;
+  userType: string;
 }
 
 function clearCookies() {
@@ -213,6 +214,22 @@ export default function MainNavBar() {
       return `
       Dear ${userName},<br>
       You have been notified for new apllication submitted for the Project: ${notification.title}
+      `;
+    }
+    console.log('freelancer', notification.userType === 'Freelancer');
+    if(notification.userType === 'Freelancer') {
+        return `
+        Dear Freelancers,<br>
+        A project "${notification.title}" has been created for you.<br>
+        Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
+      `;
+    }
+    console.log('Innovator', notification.userType === 'Innovators');
+    if(notification.userType === 'Innovators'){
+      return `
+        Dear Innovators,<br>
+        A project "${notification.title}" has been created for you.<br>
+        Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
       `;
     }
 
