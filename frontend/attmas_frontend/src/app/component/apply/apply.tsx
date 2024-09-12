@@ -23,6 +23,7 @@ interface AddApplyProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   jobTitle: string;
+  jobDescription: string;
   jobId: string;
   onCancel?: () => void;
 }
@@ -76,13 +77,13 @@ const validationSchema = Yup.object().shape({
 });
 
 
-export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
+export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescription}: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const [fetchError, setFetchError] = React.useState<string | null>(null);
 
   const initialValues = {
     title: jobTitle,
-    description: '',
+    description: jobDescription,
     Budget: 0,
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
@@ -195,6 +196,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyP
                 onBlur={handleBlur}
                 multiline
                 rows={4}
+                disabled
                 fullWidth
                 error={!!(errors.description && touched.description)}
                 helperText={<ErrorMessage name="description" />}
