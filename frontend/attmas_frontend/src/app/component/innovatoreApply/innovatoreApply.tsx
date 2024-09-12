@@ -103,7 +103,6 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription,
             const fetchWorkExperience = async () => {
                 try {
                     const response = await axiosInstance.get(`/profile/profileByUsername2?username=${userDetails.username}`);
-                    console.log('test@example.you', response.data);
                     setWorkExperience(response.data);
                 } catch (error) {
                     console.error('Error fetching Work Experience:', error);
@@ -122,7 +121,6 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription,
                 try {
                     const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
                     const userData = response.data;
-                    console.log('userDataMy', userData);
                     setCategories(userData.categories || []);
                     setSelectedValues(userData.subcategories || []);
                 } catch (error) {

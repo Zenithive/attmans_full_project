@@ -99,7 +99,7 @@ const Jobs = () => {
     const [applyOpenForInnovators, setApplyOpenForInnovators] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
-    const [jobDescription ,setJobDescription] = useState<string>('');
+    const [jobDescription, setJobDescription] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
@@ -171,7 +171,7 @@ const Jobs = () => {
 
     const fetchJobs = useCallback(async (page: number) => {
         try {
-            console.log('Fetch Jobs Params:', filter);
+
             const paramString = getParamForJobs(page);
             const response = await axiosInstance.get(`${APIS.JOBS}${paramString}`)
 
@@ -193,9 +193,9 @@ const Jobs = () => {
 
     const fetchApplies = useCallback(async () => {
         try {
-            console.log('Fetching applies...');
+
             const response = await axiosInstance.get(`${APIS.APPLIED_APPLICATION}`);
-            console.log('Applies fetched:', response.data);
+
             setApplies(response.data);
             setIsShowingApplies(true);
             setShowingMyApplies(false);
@@ -311,9 +311,9 @@ const Jobs = () => {
         const fetchAppliedJobs = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-                console.log('respons page', response.data);
+
                 const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-                console.log('fetchedAppliedJobs', fetchedAppliedJobs);
+
                 setAppliedJobs(fetchedAppliedJobs);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);
@@ -322,7 +322,7 @@ const Jobs = () => {
         fetchAppliedJobs();
     }, [userId]);
 
-    const handleApplyClick = useCallback(async (title: string, description:string, job: Job ) => {
+    const handleApplyClick = useCallback(async (title: string, description: string, job: Job) => {
         try {
             setApplyOpen(true);
             setJobTitle(title);
@@ -331,7 +331,7 @@ const Jobs = () => {
 
             setAppliedJobs(prev => [...prev, job._id || '']);
 
-            await axiosInstance.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title ,description:description});
+            await axiosInstance.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title, description: description });
 
             setApplyOpen(false);
         } catch (error) {
@@ -339,7 +339,7 @@ const Jobs = () => {
         }
     }, [userId]);
 
-    const handleApplyClickForInnovators = useCallback(async (title: string,description:string, job: Job) => {
+    const handleApplyClickForInnovators = useCallback(async (title: string, description: string, job: Job) => {
         try {
             setApplyOpenForInnovators(true);
             setJobTitle(title);
@@ -348,7 +348,7 @@ const Jobs = () => {
 
             setAppliedJobs(prev => [...prev, job._id || '']);
 
-            await axiosInstance.post(`${APIS.APPLY}`, { userId, jobId: job._id, title ,description:description});
+            await axiosInstance.post(`${APIS.APPLY}`, { userId, jobId: job._id, title, description: description });
 
             setApplyOpenForInnovators(false);
         } catch (error) {
@@ -398,7 +398,6 @@ const Jobs = () => {
             return;
         }
         try {
-            console.log('Rejecting job with comment:', comment);
             await axiosInstance.post(`${APIS.REJECT_PROJECT}/${job._id}`, { comment });
             setJobs(prevJobs =>
                 prevJobs.map(prevJob =>
@@ -608,7 +607,7 @@ const Jobs = () => {
                                                         },
                                                     }}
                                                 >
-                                                    <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title,job.description,job); handleClose(); }}>Apply</MenuItem>
+                                                    <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job.description, job); handleClose(); }}>Apply</MenuItem>
                                                     {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (
                                                         <>
                                                             <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
@@ -633,7 +632,7 @@ const Jobs = () => {
                                                     <Button
                                                         variant="contained"
                                                         color="primary"
-                                                        onClick={() => handleApplyClick(job.title,job.description, job)}
+                                                        onClick={() => handleApplyClick(job.title, job.description, job)}
                                                         sx={{ float: 'right' }}
                                                     >
                                                         Apply
@@ -643,7 +642,7 @@ const Jobs = () => {
                                                     <Button
                                                         variant="contained"
                                                         color="secondary"
-                                                        onClick={() => handleApplyClickForInnovators(job.title,job.description, job)}
+                                                        onClick={() => handleApplyClickForInnovators(job.title, job.description, job)}
                                                         sx={{ float: 'right', marginRight: '10px' }}
                                                     >
                                                         Apply
