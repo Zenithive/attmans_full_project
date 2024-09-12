@@ -27,6 +27,7 @@ const myproject = () => {
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
+    const [jobDescription ,setJobDescription] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
@@ -734,6 +735,7 @@ const myproject = () => {
                 setOpen={setApplyOpen}
                 jobTitle={jobTitle}
                 jobId={selectedJobId}
+                jobDescription={jobDescription}
             />
 
             <MyProjectDrawer

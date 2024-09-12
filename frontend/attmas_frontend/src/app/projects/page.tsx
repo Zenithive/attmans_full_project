@@ -28,6 +28,7 @@ import { PROJECT_STATUSES } from '../constants/status.constant';
 import axiosInstance from '../services/axios.service';
 
 
+
 const Jobs = () => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -98,6 +99,7 @@ const Jobs = () => {
     const [applyOpenForInnovators, setApplyOpenForInnovators] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
+    const [jobDescription ,setJobDescription] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
@@ -320,15 +322,16 @@ const Jobs = () => {
         fetchAppliedJobs();
     }, [userId]);
 
-    const handleApplyClick = useCallback(async (title: string, job: Job) => {
+    const handleApplyClick = useCallback(async (title: string, description:string, job: Job ) => {
         try {
             setApplyOpen(true);
             setJobTitle(title);
+            setJobDescription(description);
             setSelectedJobId(job._id || '');
 
             setAppliedJobs(prev => [...prev, job._id || '']);
 
-            await axiosInstance.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title });
+            await axiosInstance.post(`${APIS.APPLY}`, { userId: userId, jobId: job._id, title: title ,description:description});
 
             setApplyOpen(false);
         } catch (error) {
@@ -336,15 +339,16 @@ const Jobs = () => {
         }
     }, [userId]);
 
-    const handleApplyClickForInnovators = useCallback(async (title: string, job: Job) => {
+    const handleApplyClickForInnovators = useCallback(async (title: string,description:string, job: Job) => {
         try {
             setApplyOpenForInnovators(true);
             setJobTitle(title);
+            setJobDescription(description);
             setSelectedJobId(job._id || '');
 
             setAppliedJobs(prev => [...prev, job._id || '']);
 
-            await axiosInstance.post(`${APIS.APPLY}`, { userId, jobId: job._id, title });
+            await axiosInstance.post(`${APIS.APPLY}`, { userId, jobId: job._id, title ,description:description});
 
             setApplyOpenForInnovators(false);
         } catch (error) {
@@ -604,7 +608,7 @@ const Jobs = () => {
                                                         },
                                                     }}
                                                 >
-                                                    <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title, job); handleClose(); }}>Apply</MenuItem>
+                                                    <MenuItem sx={{ background: '#cc4800', color: 'white', borderRadius: '10px', position: 'relative', bottom: '8px', height: '55px' }} onClick={() => { handleApplyClick(job.title,job.description,job); handleClose(); }}>Apply</MenuItem>
                                                     {userDetails.userType === 'Project Owner' && job.username === userDetails.username && (
                                                         <>
                                                             <MenuItem onClick={() => { handleEditJob(job); handleClose(); }}>
@@ -629,7 +633,7 @@ const Jobs = () => {
                                                     <Button
                                                         variant="contained"
                                                         color="primary"
-                                                        onClick={() => handleApplyClick(job.title, job)}
+                                                        onClick={() => handleApplyClick(job.title,job.description, job)}
                                                         sx={{ float: 'right' }}
                                                     >
                                                         Apply
@@ -639,7 +643,7 @@ const Jobs = () => {
                                                     <Button
                                                         variant="contained"
                                                         color="secondary"
-                                                        onClick={() => handleApplyClickForInnovators(job.title, job)}
+                                                        onClick={() => handleApplyClickForInnovators(job.title,job.description, job)}
                                                         sx={{ float: 'right', marginRight: '10px' }}
                                                     >
                                                         Apply
@@ -662,6 +666,7 @@ const Jobs = () => {
                 setOpen={setApplyOpen}
                 jobTitle={jobTitle}
                 jobId={selectedJobId}
+                jobDescription={jobDescription}
                 onCancel={() => handleCancelApply(selectedJobId)}
             />
 
@@ -670,6 +675,7 @@ const Jobs = () => {
                 setOpen={setApplyOpenForInnovators}
                 jobTitle={jobTitle}
                 jobId={selectedJobId}
+                jobDescription={jobDescription}
                 onCancel={() => handleCancelApply(selectedJobId)} />
 
             <DeleteConfirmationDialog

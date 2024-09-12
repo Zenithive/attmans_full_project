@@ -41,6 +41,7 @@ interface AddApplyProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     jobTitle: string;
+    jobDescription: string;
     jobId: string;
     onCancel?: () => void;
 }
@@ -73,7 +74,7 @@ const validationSchema = Yup.object().shape({
     products: Yup.array().min(1).max(1).required("Only One product is acceptable")
 });
 
-export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
+export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription, jobId, onCancel }: AddApplyProps) => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const [fetchError, setFetchError] = React.useState<string | null>(null);
     const [workExperience, setWorkExperience] = React.useState<WorkExprience | null>(null);
@@ -85,7 +86,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
 
     const initialValues = {
         title: jobTitle,
-        description: '',
+        description: jobDescription,
         Budget: 0,
         currency: 'INR',
         TimeFrame: null as Dayjs | null,
@@ -283,6 +284,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         onBlur={handleBlur}
                                         multiline
                                         fullWidth
+                                        disabled
                                         error={!!(errors.description && touched.description)}
                                         helperText={<ErrorMessage name="description" />}
                                     />
