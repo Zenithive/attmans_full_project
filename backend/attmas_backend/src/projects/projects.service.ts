@@ -295,10 +295,10 @@ export class JobsService {
         },
       },
       {
-        // ******** working for Project Owner not for freelancer
+        
         $match: {
           ...filterQuery,
-          ...(status && { status }), // Match job status dynamically
+          // ...(status && { status }), // Match job status dynamically
           ...(appstatus && { 'applies.status': new RegExp(appstatus, 'i') }), // Ensure at least one apply with the desired appstatus
           ...(appUserId && { 'applies.userId': new Types.ObjectId(appUserId) }),
 
