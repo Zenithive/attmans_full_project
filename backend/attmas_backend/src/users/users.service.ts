@@ -247,23 +247,27 @@ export class UsersService {
     //     categoryData.map((cat) => cat.username),
     //   );
 
-    //   console.log('filteredUsernames', filteredUsernames);
-
     //   return users.filter((user) => filteredUsernames.has(user.username));
     // }
 
     return users;
   }
 
-  async findUsersByUserType1(
-    userType: string,
-  ): Promise<{ firstName: string; lastName: string; username: string }[]> {
+  async findUsersByUserType1(userType: string): Promise<
+    {
+      firstName: string;
+      lastName: string;
+      username: string;
+      userType: string;
+    }[]
+  > {
     const filterQuery: any = { userType };
     const users = await this.userModel.find(filterQuery).exec();
     const userDetails = users.map((user) => ({
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
+      userType: user.userType,
     }));
     return userDetails;
   }
@@ -277,18 +281,13 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    console.log('updateUserDto:', updateUserDto);
-    console.log('Current user email:', user.username);
-
     if (updateUserDto.email && updateUserDto.email !== user.username) {
-      console.log('Updating email...');
       const existingUser = await this.userModel
         .findOne({ username: updateUserDto.email })
         .exec();
       if (existingUser && existingUser._id.toString() !== id) {
         throw new ConflictException('Email is already in use');
       }
-      console.log('existingUser', existingUser);
       user.username = updateUserDto.email;
     }
 
@@ -299,7 +298,6 @@ export class UsersService {
 
     Object.assign(user, updateUserDto, { username: user.username });
     await user.save();
-    console.log('Updated user:', user);
     return user;
   }
 

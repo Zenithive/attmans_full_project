@@ -51,7 +51,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
       const email = new this.emailModel({
@@ -96,7 +95,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
       const email = new this.emailModel({
@@ -152,7 +150,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       // Save email details to the database
       const email = new this.emailModel({
@@ -202,7 +199,6 @@ export class EmailService2 {
         subject,
         html,
       });
-      console.log(`Email sent successfully to ${to}`);
 
       const email = new this.emailModel({
         to,
@@ -363,6 +359,85 @@ export class EmailService2 {
     }
   }
 
+  async sendEmailToFreelancer(
+    to: string,
+    projectId: string,
+    title: string,
+    userType: string,
+  ) {
+    try {
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`Freelancer with username ${to} not found`);
+      }
+
+      const html = `
+        Dear ${user.firstName} ${user.lastName},<br>
+        A project "${title}" has been created for you.<br>
+        Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>
+      `;
+
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject: `Project Approved: ${title}`,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to,
+        subject: `Project Approved: ${title}`,
+        projectId,
+        sentAt: new Date(),
+        read: false,
+        title,
+        userType,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to freelancer ${to}:`, error);
+    }
+  }
+
+  async sendEmailToInnovator(
+    to: string,
+    projectId: string,
+    title: string,
+    userType: string,
+  ) {
+    try {
+      const user = await this.usersService.findByUsername(to);
+      if (!user) {
+        throw new Error(`Innovator with username ${to} not found`);
+      }
+
+      const html = `
+        Dear ${user.firstName} ${user.lastName},<br>
+        A project "${title}" has been created for you.<br>
+        Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>
+      `;
+
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject: `Project Approved: ${title}`,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to,
+        subject: `Project Approved: ${title}`,
+        projectId,
+        sentAt: new Date(),
+        read: false,
+        title,
+        userType,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to innovator ${to}:`, error);
+    }
+  }
   // email.service2.ts
   async markAsRead(id: string): Promise<void> {
     await this.emailModel.findByIdAndUpdate(id, { read: true }).exec();
