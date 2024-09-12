@@ -13,22 +13,33 @@ import BillingModal from '../billingmodel/billingmodel';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
+import { Message } from '@mui/icons-material';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 
+export interface childMilestone {
+
+    isCommentSubmitted: boolean;
+    name: {
+        text: string;
+        timeFrame: string | null;
+    };
+    status: string;
+    submittedAt: string;
+    adminStatus:
+    | 'Pending'
+    | 'Admin Approved'
+    | 'Admin Rejected'
+    | 'Project Owner Approved'
+    | 'Project Owner Rejected';
+    approvalComments: string[];
+    rejectionComments: string[];
+    resubmissionComments: string[];
+
+}
 export interface Milestone {
     scopeOfWork: string;
-    milestones: {
-        isCommentSubmitted: boolean;
-        name: {
-            text: string;
-            timeFrame: string | null;
-        };
-        status: string;
-        submittedAt: string;
-        adminStatus: 'Pending' | 'Approved' | 'Rejected';
-        approvalComments: string[];
-        rejectionComments: string[];
-        resubmissionComments: string[];
-    }[];
+    milestones: childMilestone[];
     isCommentSubmitted?: boolean;
     status?: string;
     milstonSubmitcomments: string[];
@@ -86,9 +97,9 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     isSubmitting,
 }) => {
 
-    console.log("filteredApplications", filteredApplications)
     const [view, setView] = useState<'applications' | 'billing'>('applications');
     const [submittedMilestones, setSubmittedMilestones] = useState<Milestone[]>([]);
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
     const [openModal, setOpenModal] = useState(false);
     const [paymentDetails, setPaymentDetails] = useState({
         milestoneText: '',
@@ -120,13 +131,11 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
             const submittedMilestonesData = await Promise.all(
                 filteredApplications.map(async (app) => {
                     const response = await axiosInstance.get(`/milestones/submitted/${app._id}`);
-                    console.log("Mistlon Fetch With ApplyId", response.data)
                     return response.data;
                 })
             );
 
             const allSubmittedMilestones = submittedMilestonesData.flat();
-            console.log('All Submitted Milestones:', allSubmittedMilestones);
             setSubmittedMilestones(allSubmittedMilestones);
         } catch (error) {
             console.error('Error fetching submitted milestones:', error);
@@ -136,7 +145,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     useEffect(() => {
         fetchSubmittedMilestones();
     }, [filteredApplications]);
-    
+
 
     const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newView: 'applications' | 'billing') => {
         if (newView !== null) {
@@ -194,13 +203,13 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 category: paymentDetails.category
             });
 
-            console.log('Payment added successfully:', response.data);
+            pubsub.publish('PaymentAdded', { Message: 'Payment Done' });
             handleCloseModal();
-            window.location.reload();
         } catch (error) {
             console.error('Error adding payment:', error);
         }
     };
+
 
     const handleOpenApproveDialog = (milestoneGroup: Milestone, applyId: string, milestoneIndex: number) => {
         const milestone = milestoneGroup.milestones[milestoneIndex];
@@ -219,14 +228,14 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     };
 
 
-    
     const handleApproveMilestone = async (comment: string) => {
         if (selectedApplyId && selectedMilestoneIndex !== null) {
             try {
                 await axiosInstance.post(`/milestones/approve`, {
                     applyId: selectedApplyId,
                     milestoneIndex: selectedMilestoneIndex,
-                    comment
+                    comment,
+                    userId: userDetails._id,
                 });
 
                 await fetchSubmittedMilestones();
@@ -244,9 +253,9 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 await axiosInstance.post(`/milestones/reject`, {
                     applyId: selectedApplyId,
                     milestoneIndex: selectedMilestoneIndex,
-                    comment
+                    comment,
+                    userId: userDetails._id,
                 });
-
 
                 await fetchSubmittedMilestones();
                 pubsub.publish('MilestoneRefetch', { applyId: selectedApplyId });
@@ -256,6 +265,31 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
             }
         }
     };
+
+    // const getChip = (milestone: childMilestone) => {
+    //     return (
+    //         <Chip
+    //             label={
+    //                 milestone.adminStatus === 'Admin Approved' || milestone.adminStatus === 'Project Owner Approved'
+    //                     ? 'Approved'
+    //                     : milestone.adminStatus === 'Admin Rejected' || milestone.adminStatus === 'Project Owner Rejected'
+    //                         ? 'Rejected'
+    //                         : 'Default'
+    //             }
+    //             variant="outlined"
+    //             color={
+    //                 milestone.adminStatus === 'Approved' || milestone.adminStatus === 'Approved'
+    //                     ? 'success'
+    //                     : milestone.adminStatus === 'Rejected' || milestone.adminStatus === 'Rejected'
+    //                         ? 'error'
+    //                         : 'default'
+    //             }
+    //             sx={{ ml: 2 }}
+    //         />
+    //     )
+    // }
+
+
 
     const handleCloseApproveDialog = () => {
         setApproveDialogOpen(false);
@@ -332,7 +366,9 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                             <Grid container spacing={2} key={groupIndex}>
                                                                 {milestoneGroup.milestones.length > 0 ? (
                                                                     milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                                                        (userType === 'Project Owner' ? milestone.adminStatus === 'Approved' : true) && (
+                                                                        (userType === 'Project Owner' ? milestone.adminStatus === 'Admin Approved' ||
+                                                                            milestone.adminStatus === 'Project Owner Approved' ||
+                                                                            milestone.adminStatus === 'Project Owner Rejected' : true) && (
                                                                             <Grid item xs={12} key={milestoneIndex}>
                                                                                 <Card variant="outlined" sx={{ mb: 1 }}>
                                                                                     <CardContent>
@@ -365,12 +401,21 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                                                                     }}
                                                                                                 />
                                                                                             )}
+
                                                                                             <Chip
                                                                                                 label={milestone.adminStatus}
                                                                                                 variant="outlined"
-                                                                                                color={milestone.adminStatus === 'Approved' ? 'success' : milestone.adminStatus === 'Rejected' ? 'error' : 'default'}
+                                                                                                color={
+                                                                                                    milestone.adminStatus === 'Admin Approved' || milestone.adminStatus === 'Project Owner Approved'
+                                                                                                        ? 'success'
+                                                                                                        : milestone.adminStatus === 'Admin Rejected' || milestone.adminStatus === 'Project Owner Rejected'
+                                                                                                            ? 'error'
+                                                                                                            : 'default'
+                                                                                                }
                                                                                                 sx={{ ml: 2 }}
                                                                                             />
+
+
 
                                                                                         </Typography>
 
@@ -486,8 +531,29 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                                                                         </Button>
                                                                                                     </>
                                                                                                 )}
+
                                                                                             </Box>
                                                                                         )}
+                                                                                        {userType === 'Project Owner' && milestone.adminStatus === 'Admin Approved' && (
+                                                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                                                <Button
+                                                                                                    variant="contained"
+                                                                                                    color="success"
+                                                                                                    onClick={() => handleOpenApproveDialog(milestoneGroup, app._id!, milestoneIndex)}
+                                                                                                    sx={{ marginRight: '10px' }}
+                                                                                                >
+                                                                                                    Approve
+                                                                                                </Button>
+                                                                                                <Button
+                                                                                                    variant="contained"
+                                                                                                    color="error"
+                                                                                                    onClick={() => handleOpenRejectDialog(milestoneGroup, app._id!, milestoneIndex)}
+                                                                                                >
+                                                                                                    Reject
+                                                                                                </Button>
+                                                                                            </Box>
+                                                                                        )}
+
 
                                                                                     </CardContent>
                                                                                 </Card>
@@ -553,12 +619,14 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 onClose={handleCloseApproveDialog}
                 onApprove={handleApproveMilestone}
                 milestone={selectedMilestone}
+
             />
             <RejectMilestoneDialog
                 open={rejectDialogOpen}
                 onClose={handleCloseRejectDialog}
                 onReject={handleRejectMilestone}
                 milestone={selectedMilestone}
+
             />
         </Box>
     );

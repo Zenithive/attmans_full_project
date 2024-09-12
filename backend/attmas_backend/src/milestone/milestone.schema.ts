@@ -20,7 +20,13 @@ export class Milestone {
         submittedAt: { type: Date },
         adminStatus: {
           type: String,
-          enum: ['Pending', 'Approved', 'Rejected'],
+          enum: [
+            'Pending',
+            'Admin Approved',
+            'Admin Rejected',
+            'Project Owner Approved',
+            'Project Owner Rejected',
+          ],
           default: 'Pending',
         },
         approvalComments: { type: [String], default: [] },
@@ -38,7 +44,12 @@ export class Milestone {
     isCommentSubmitted: boolean;
     status: string;
     submittedAt?: Date;
-    adminStatus: 'Pending' | 'Approved' | 'Rejected';
+    adminStatus:
+      | 'Pending'
+      | 'Admin Approved'
+      | 'Admin Rejected'
+      | 'Project Owner Approved'
+      | 'Project Owner Rejected';
     approvalComments: string[];
     rejectionComments: string[];
     resubmissionComments: string[];

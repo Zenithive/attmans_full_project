@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button } from '@mui/material';
+import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button, Link } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { APIS } from '@/app/constants/api.constant';
 import dayjs from 'dayjs';
@@ -27,6 +27,7 @@ const myproject = () => {
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
+    const [jobDescription ,setJobDescription] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
@@ -279,8 +280,8 @@ const myproject = () => {
 
     const handleConfirm = async (comment: string) => {
         if (currentApplicationId) {
-            console.log(`Cancel application with ID: ${currentApplicationId}`);
-            handleCancel(currentApplicationId, comment);
+            handleCancel(currentApplicationId, comment)
+            // Close the dialog after confirming
             handleCloseConfirmationDialog();
         }
     };
@@ -505,6 +506,25 @@ const myproject = () => {
                                                 <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
                                                     {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                                 </Box>
+
+
+                                                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
+                                                        <CustomChip
+                                                            label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                            color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                        />
+                                                    </Box>
+
+                                                    <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                        <Chip
+                                                            label={project.jobDetails.SelectService}
+                                                            variant="outlined"
+                                                            color='secondary'
+                                                        />
+                                                    </Box>
+                                                </Box>
+
                                             </Typography>
 
 
@@ -576,6 +596,20 @@ const myproject = () => {
                                                     </Menu>
                                                 </Box>
                                             </Box>
+                                            <Link
+                                                component="button"
+                                                // variant="contained"
+                                                color="primary"
+                                                onClick={() => handleViewJob(project.jobDetails)}
+                                                sx={{
+                                                    color: 'blue',
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer',
+                                                    mr: 2
+                                                }} // Style to ensure link is blue with underline
+                                            >
+                                                View Project
+                                            </Link>
                                         </CardContent>
                                     </Card>
                                 ))}
@@ -604,14 +638,31 @@ const myproject = () => {
                                         <CardContent>
                                             <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                                 <Box
-                                                    onClick={() => handleViewJob(project.jobDetails)}
-                                                    sx={{ cursor: 'pointer' }}
+
                                                 >
-                                                    {project.jobDetails.title}
+                                                    {project.jobDetails.title},
+                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                        {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
+                                                    </span>
+
                                                 </Box>
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
+                                                        <CustomChip
+                                                            label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                            color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                        />
+                                                    </Box>
+
+                                                    <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                        <Chip
+                                                            label={project.jobDetails.SelectService}
+                                                            variant="outlined"
+                                                            color='secondary'
+                                                        />
+                                                    </Box>
                                                 </Box>
+
                                             </Typography>
 
 
@@ -670,6 +721,22 @@ const myproject = () => {
                                                     </Menu>
                                                 </Box>
                                             </Box>
+
+
+                                            <Link
+                                                component="button"
+                                                // variant="contained"
+                                                color="primary"
+                                                onClick={() => handleViewJob(project.jobDetails)}
+                                                sx={{
+                                                    color: 'blue',
+                                                    textDecoration: 'underline',
+                                                    cursor: 'pointer',
+                                                    mr: 2
+                                                }}
+                                            >
+                                                View Project
+                                            </Link>
                                         </CardContent>
                                     </Card>
                                 ))}
@@ -693,6 +760,7 @@ const myproject = () => {
                 setOpen={setApplyOpen}
                 jobTitle={jobTitle}
                 jobId={selectedJobId}
+                jobDescription={jobDescription}
             />
 
             <MyProjectDrawer

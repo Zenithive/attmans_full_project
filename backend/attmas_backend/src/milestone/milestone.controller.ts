@@ -18,7 +18,6 @@ export class MilestonesController {
   async getMilestonesByApplyId(
     @Param('applyId') applyId: string,
   ): Promise<Milestone[]> {
-    console.log('Fetching milestones for applyId:', applyId);
     return this.milestonesService.getMilestonesByApplyId(applyId);
   }
 
@@ -48,7 +47,6 @@ export class MilestonesController {
   ): Promise<Milestone[]> {
     const submittedMilestones =
       await this.milestonesService.findSubmittedMilestones(applyId);
-    console.log('submittedMilestones', submittedMilestones);
     return submittedMilestones;
   }
 
@@ -57,11 +55,13 @@ export class MilestonesController {
     @Body('applyId') applyId: string,
     @Body('milestoneIndex') milestoneIndex: number,
     @Body('comment') comment: string,
+    @Body('userId') userId: string,
   ): Promise<void> {
     return this.milestonesService.approveMilestone(
       applyId,
       milestoneIndex,
       comment,
+      userId,
     );
   }
 
@@ -70,11 +70,13 @@ export class MilestonesController {
     @Body('applyId') applyId: string,
     @Body('milestoneIndex') milestoneIndex: number,
     @Body('comment') comment: string,
+    @Body('userId') userId: string,
   ): Promise<void> {
     return this.milestonesService.rejectMilestone(
       applyId,
       milestoneIndex,
       comment,
+      userId,
     );
   }
 

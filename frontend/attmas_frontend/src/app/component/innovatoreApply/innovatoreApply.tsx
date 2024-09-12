@@ -41,6 +41,7 @@ interface AddApplyProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     jobTitle: string;
+    jobDescription: string;
     jobId: string;
     onCancel?: () => void;
 }
@@ -73,7 +74,7 @@ const validationSchema = Yup.object().shape({
     products: Yup.array().min(1).max(1).required("Only One product is acceptable")
 });
 
-export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCancel }: AddApplyProps) => {
+export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription, jobId, onCancel }: AddApplyProps) => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const [fetchError, setFetchError] = React.useState<string | null>(null);
     const [workExperience, setWorkExperience] = React.useState<WorkExprience | null>(null);
@@ -85,7 +86,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
 
     const initialValues = {
         title: jobTitle,
-        description: '',
+        description: jobDescription,
         Budget: 0,
         currency: 'INR',
         TimeFrame: null as Dayjs | null,
@@ -102,7 +103,6 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
             const fetchWorkExperience = async () => {
                 try {
                     const response = await axiosInstance.get(`/profile/profileByUsername2?username=${userDetails.username}`);
-                    console.log('test@example.you', response.data);
                     setWorkExperience(response.data);
                 } catch (error) {
                     console.error('Error fetching Work Experience:', error);
@@ -121,7 +121,6 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                 try {
                     const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
                     const userData = response.data;
-                    console.log('userDataMy', userData);
                     setCategories(userData.categories || []);
                     setSelectedValues(userData.subcategories || []);
                 } catch (error) {
@@ -283,6 +282,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobId, onCance
                                         onBlur={handleBlur}
                                         multiline
                                         fullWidth
+                                        disabled
                                         error={!!(errors.description && touched.description)}
                                         helperText={<ErrorMessage name="description" />}
                                     />

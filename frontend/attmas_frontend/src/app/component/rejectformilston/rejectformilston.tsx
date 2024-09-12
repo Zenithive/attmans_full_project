@@ -37,7 +37,7 @@ const RejectMilestoneDialog: React.FC<RejectMilestoneDialogProps> = ({
   open,
   onClose,
   onReject,
-  milestone
+  milestone,
 }) => {
   const formik = useFormik({
     initialValues: { comment: '' },
