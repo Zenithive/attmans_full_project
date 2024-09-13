@@ -50,15 +50,6 @@ interface ProposalStep2Props {
   readOnly?: boolean;
 }
 
-const readOnlyRows = [
-  'Capital Equipment',
-  'Consumable Stores',
-  'Duty on Import',
-  'Manpower',
-  'Travel & Training',
-  'Contingencies',
-  'Overheads',
-];
 
 const ProposalStep2: React.FC<ProposalStep2Props> = ({
   onNext,
