@@ -53,6 +53,15 @@ export interface Proposal {
     externalEquipment: string;
     pilotProductionTesting: string;
     mentoringRequired: string;
+    isPeerReviewed: string;
+    expectedOutcome: string;
+    detailedMethodology: string;
+    physicalAchievements: string;
+    budgetOutlay: BudgetOutlay[];
+    manpowerDetails: ManpowerDetail[];
+    pastCredentials: string;
+    briefProfile: string;
+    proposalOwnerCredentials: string;
 
 }
 
@@ -164,7 +173,11 @@ const proposal = () => {
 
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(1);
+
+    
+
     const [formValues, setFormValues] = useState({});
+    console.log("formValues", formValues);
 
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -277,7 +290,15 @@ const proposal = () => {
     };
 
     const handlePreviousStep = () => {
-        setStep((prevStep) => prevStep - 1);
+        setStep((prevStep) => {
+            // Repopulate the form fields with the existing form values
+            const previousValues = formValues;
+            if (prevStep > 1) {
+                // Populate the previous step form with the values
+                setFormValues(previousValues);
+            }
+            return prevStep - 1;
+        });
     };
 
     const handleSubmit = async (values: any) => {
@@ -321,7 +342,7 @@ const proposal = () => {
     //             applyId: selectedApply?._id, 
     //           },
     //         });
-   
+
     //         setHasSubmittedProposal(response.data !== null);
     //       } catch (error) {
     //         console.error('Error checking proposal status:', error);
@@ -428,7 +449,7 @@ const proposal = () => {
     const [showCommentSection, setShowCommentSection] = useState(false);
 
     const showProposalModal = (application: Apply) => {
-       
+
         handleViewJob(application.jobDetails); // Call handleViewJob with the relevant job details
         setSelectedApply(application);
         setOpen(true); // Open the proposal dialog
@@ -606,7 +627,7 @@ const proposal = () => {
 
                                             <Typography variant="body1">
                                                 <span style={{ fontWeight: 'bold' }} onClick={() => {
-                                                  
+
                                                     handleUserClick(proposal?.jobDetails?.username);
                                                 }}>
                                                     Project Owner Name:
@@ -617,7 +638,7 @@ const proposal = () => {
                                                 <Typography variant="body1">
                                                     <span style={{ fontWeight: 'bold' }}
                                                         onClick={() => {
-                                                    
+
                                                             handleUserClick(proposal?.userName);
                                                         }}
                                                     >
@@ -897,14 +918,16 @@ const proposal = () => {
 
 
                     {step === 1 && <ProposalStep1 onNext={handleNextStep}
-                        initialValues={selectedProposal || null}
+                        initialValues={selectedProposal || formValues || null}
                         readOnly={selectedProposal ? true : false}
                     />}
 
 
 
                     {step === 2 && <ProposalStep2
-                        initialValues={selectedProposal || null}
+                        // initialValues={selectedProposal || null}
+                        initialValues={selectedProposal || formValues || null}
+
                         readOnly={selectedProposal ? true : false}
                         onNext={handleNextStep}
                         onPrevious={handlePreviousStep}
@@ -921,8 +944,19 @@ const proposal = () => {
 
 
                 </DialogContent>
-                <DialogActions>
+                {/* <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
+                </DialogActions> */}
+
+                <DialogActions>
+                    <Button
+                        onClick={() => {
+                            setFormValues({}); // Reset form values
+                            setOpen(false); // Close the dialog
+                        }}
+                    >
+                        Cancel
+                    </Button>
                 </DialogActions>
             </Dialog>
 

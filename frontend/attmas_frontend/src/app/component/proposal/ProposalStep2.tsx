@@ -12,8 +12,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { Formik, Form, Field, FieldArray, FormikValues } from 'formik';
-import { Proposal } from '@/app/proposal/page';
+import { Formik, Form, Field, FieldArray } from 'formik';
 
 export interface BudgetOutlay {
   head: string;
@@ -44,35 +43,28 @@ export interface ProposalStep2Values {
 }
 
 interface ProposalStep2Props {
-  initialValues?: Proposal | null;
+  initialValues?: ProposalStep2Values | null;
   onNext: (values: ProposalStep2Values) => void;
   onPrevious: () => void;
-  readOnly?: boolean; // Added prop for read-only mode
+  readOnly?: boolean;
 }
 
-const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initialValues, readOnly = false }) => {
+const ProposalStep2: React.FC<ProposalStep2Props> = ({
+  onNext,
+  onPrevious,
+  initialValues,
+  readOnly = false,
+}) => {
   // Default initial values to match ProposalStep2Values
-  const defaultValues: ProposalStep2Values = {
-    isPeerReviewed: '',
-    expectedOutcome: '',
-    detailedMethodology: '',
-    physicalAchievements: '',
-    budgetOutlay: [{ head: '', firstYear: '', secondYear: '', thirdYear: '', total: '' }],
-    manpowerDetails: [{ designation: '', monthlySalary: '', firstYear: '', secondYear: '', totalExpenditure: '' }],
-    pastCredentials: '',
-    briefProfile: '',
-    proposalOwnerCredentials: '',
-    ...initialValues,
-  };
 
   return (
     <Formik
-      initialValues={(initialValues || {
-        isPeerReviewed: '',
-        expectedOutcome: '',
-        detailedMethodology: '',
-        physicalAchievements: '',
-        budgetOutlay: [
+      initialValues={{
+        isPeerReviewed: initialValues?.isPeerReviewed || '',
+        expectedOutcome: initialValues?.expectedOutcome || '',
+        detailedMethodology: initialValues?.detailedMethodology || '',
+        physicalAchievements: initialValues?.physicalAchievements || '',
+        budgetOutlay: initialValues?.budgetOutlay || [
           { head: 'Capital Equipment', firstYear: '', secondYear: '', thirdYear: '', total: '' },
           { head: 'Consumable Stores', firstYear: '', secondYear: '', thirdYear: '', total: '' },
           { head: 'Duty on Import', firstYear: '', secondYear: '', thirdYear: '', total: '' },
@@ -81,13 +73,13 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
           { head: 'Contingencies', firstYear: '', secondYear: '', thirdYear: '', total: '' },
           { head: 'Overheads', firstYear: '', secondYear: '', thirdYear: '', total: '' },
         ],
-        manpowerDetails: [
+        manpowerDetails: initialValues?.manpowerDetails || [
           { designation: '', monthlySalary: '', firstYear: '', secondYear: '', totalExpenditure: '' },
         ],
-        pastCredentials: '',
-        briefProfile: '',
-        proposalOwnerCredentials: '',
-      }) as FormikValues}
+        pastCredentials: initialValues?.pastCredentials || '',
+        briefProfile: initialValues?.briefProfile || '',
+        proposalOwnerCredentials: initialValues?.proposalOwnerCredentials || '',
+      }}
       onSubmit={(values) => onNext(values as ProposalStep2Values)}
     >
       {({ values, handleSubmit }) => (
@@ -176,7 +168,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                 </TableBody>
               </Table>
             </TableContainer>
-
+            
             {/* Manpower Details Table */}
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               Manpower Details
@@ -197,7 +189,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                     name="manpowerDetails"
                     render={arrayHelpers => (
                       <>
-                        {values.manpowerDetails.map((row: any, index: React.Key | null | undefined) => (
+                        {Array.isArray(values.manpowerDetails) && values.manpowerDetails.map((row: ManpowerDetail, index: React.Key | null | undefined) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Field name={`manpowerDetails[${index}].designation`} as={TextField} disabled={readOnly} />
@@ -237,7 +229,6 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                 </TableBody>
               </Table>
             </TableContainer>
-
             <Field
               color='secondary'
               rows={4}
