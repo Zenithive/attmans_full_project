@@ -13,6 +13,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Formik, Form, Field, FieldArray } from 'formik';
+import { formValues } from './ProposalStep1';
 
 export interface BudgetOutlay {
   head: string;
@@ -43,11 +44,21 @@ export interface ProposalStep2Values {
 }
 
 interface ProposalStep2Props {
-  initialValues?: ProposalStep2Values | null;
+  initialValues?: ProposalStep2Values | formValues | null;
   onNext: (values: ProposalStep2Values) => void;
   onPrevious: () => void;
   readOnly?: boolean;
 }
+
+const readOnlyRows = [
+  'Capital Equipment',
+  'Consumable Stores',
+  'Duty on Import',
+  'Manpower',
+  'Travel & Training',
+  'Contingencies',
+  'Overheads',
+];
 
 const ProposalStep2: React.FC<ProposalStep2Props> = ({
   onNext,
@@ -127,48 +138,65 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
               disabled={readOnly} // Apply readOnly
             />
 
-            {/* Budget Outlay Table */}
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Budget Outlay
-            </Typography>
+            
+
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold' }}>Head</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>1st Year </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>2nd Year </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>3rd Year </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Total </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>1st Year</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>2nd Year</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>3rd Year</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <FieldArray
                     name="budgetOutlay"
-                    render={() => (
-                      values.budgetOutlay.map((row: { head: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }, index: React.Key | null | undefined) => (
-                        <TableRow key={index}>
-                          <TableCell>{row.head}</TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].firstYear`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].secondYear`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].thirdYear`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].total`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                        </TableRow>
-                      ))
+                    render={arrayHelpers => (
+                      <>
+                        {Array.isArray(values.budgetOutlay) && values.budgetOutlay.map((row: BudgetOutlay, index: React.Key | null | undefined) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].head`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].firstYear`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].secondYear`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].thirdYear`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].total`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {!readOnly && (
+                          <Button
+                            onClick={() =>
+                              arrayHelpers.push({
+                                head: '',
+                                firstYear: '',
+                                secondYear: '',
+                                thirdYear: '',
+                                total: ''
+                              })
+                            }
+                          >
+                            Add Row
+                          </Button>
+                        )}
+                      </>
                     )}
                   />
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
             {/* Manpower Details Table */}
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               Manpower Details
