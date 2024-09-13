@@ -59,6 +59,17 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
 }) => {
   // Default initial values to match ProposalStep2Values
 
+
+  const readOnlyHeads = [
+    'Capital Equipment',
+    'Consumable Stores',
+    'Duty on Import',
+    'Manpower',
+    'Travel & Training',
+    'Contingencies',
+    'Overheads',
+  ];
+
   return (
     <Formik
       initialValues={{
@@ -153,7 +164,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                         {Array.isArray(values.budgetOutlay) && values.budgetOutlay.map((row: BudgetOutlay, index: React.Key | null | undefined) => (
                           <TableRow key={index}>
                             <TableCell>
-                              <Field name={`budgetOutlay[${index}].head`} as={TextField} disabled={readOnly} />
+                              <Field name={`budgetOutlay[${index}].head`} as={TextField} disabled={true} />
                             </TableCell>
                             <TableCell>
                               <Field name={`budgetOutlay[${index}].firstYear`} as={TextField} disabled={readOnly} />
