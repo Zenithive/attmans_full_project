@@ -32,6 +32,7 @@ export class JobsController {
     @Query('limit') limit: string = '10',
     @Query('Category') Category: string[] = [],
     @Query('userId') userId?: string,
+    @Query('appUserId') appUserId?: string,
     @Query('projId') projId?: string,
     @Query('Subcategorys') Subcategorys: string[] = [],
     @Query('Expertiselevel') Expertiselevel: string[] = [],
@@ -41,6 +42,7 @@ export class JobsController {
     @Query('SelectService') SelectService: string[] = [],
     @Query('TimeFrame') TimeFrame?: string,
     @Query('ProjectOwner') ProjectOwner?: string,
+    @Query('appstatus') appstatus?: string,
   ): Promise<Jobs[]> {
     return this.jobsService.filterJobs(
       page,
@@ -48,6 +50,7 @@ export class JobsController {
       Category,
       userId,
       projId,
+      appUserId,
       Subcategorys,
       Expertiselevel,
       status,
@@ -56,6 +59,7 @@ export class JobsController {
       createdAt,
       TimeFrame,
       ProjectOwner,
+      appstatus,
     );
   }
 

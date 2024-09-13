@@ -27,7 +27,7 @@ export class JobsService {
     private readonly emailService: EmailService2,
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
-  ) {}
+  ) { }
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
     for (const key in createJobsDto) {
@@ -210,6 +210,7 @@ export class JobsService {
     Category: string[],
     userId?: string,
     projId?: string,
+    appUserId?: string,
     Subcategorys?: string[],
     Expertiselevel?: string[],
     status?: string,
@@ -218,6 +219,7 @@ export class JobsService {
     createdAt?: string,
     TimeFrame?: string,
     ProjectOwner?: string,
+    appstatus?: string, // Application status (e.g., 'Awarded')
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
@@ -264,14 +266,6 @@ export class JobsService {
       filter.Expertiselevel = { $in: Expertiselevel };
     }
 
-    if (status) {
-      filter.status = status;
-    }
-
-    if (SelectService && SelectService.length > 0) {
-      filter.SelectService = { $in: SelectService };
-    }
-
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -301,8 +295,13 @@ export class JobsService {
         },
       },
       {
+        
         $match: {
           ...filterQuery,
+          // ...(status && { status }), // Match job status dynamically
+          ...(appstatus && { 'applies.status': new RegExp(appstatus, 'i') }), // Ensure at least one apply with the desired appstatus
+          ...(appUserId && { 'applies.userId': new Types.ObjectId(appUserId) }),
+
           ...(userId && {
             'userId._id': new Types.ObjectId(userId),
           }),
@@ -317,6 +316,22 @@ export class JobsService {
           }),
         },
       },
+      {
+        $addFields: {
+          awardedApplies: {
+            $filter: {
+              input: '$applies',
+              as: 'apply',
+              cond: {
+                $and: [
+                  appstatus ? { $eq: ['$$apply.status', appstatus] } : {}, // Match applies status dynamically
+                ],
+              },
+            },
+          },
+        },
+      },
+
       { $sort: { createdAt: -1 } },
       { $skip: skip },
       { $limit: limit },
@@ -342,7 +357,9 @@ export class JobsService {
           createdAt: 1,
           status: 1,
           userId: { _id: 1, firstName: 1, lastName: 1, username: 1 },
-          appliesCount: 1, // Include appliesCount in the projection
+          appliesCount: 1, // Include appliesCount in the projection,
+          applies: { _id: 1, status: 1, userId: 1 },
+          awardedApplies: 1, // Include awarded applies in the projection
         },
       },
     ];

@@ -488,28 +488,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         </TextField>
                                     </Grid> : ""}
 
-                                    {formik.values.hasPatent === "Yes" && (
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                fullWidth
-                                                multiline
-                                                rows={4}
-                                                id="patentDetails"
-                                                color='secondary'
-                                                label={label}
-                                                name="patentDetails"
-                                                onChange={formik.handleChange}
-                                                onBlur={(e) => {
-                                                    formik.handleBlur(e);
-                                                    handleBlur();
-                                                }}
-                                                onFocus={handleFocus}
-                                                value={formik.values.patentDetails}
-                                                error={formik.touched.patentDetails && Boolean(formik.errors.patentDetails)}
-                                                helperText={formik.touched.patentDetails && formik.errors.patentDetails}
-                                            />
-                                        </Grid>
-                                    )}
                                 </>
                             ) : ""}
 

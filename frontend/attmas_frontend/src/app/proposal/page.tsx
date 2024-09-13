@@ -944,19 +944,8 @@ const proposal = () => {
 
 
                 </DialogContent>
-                {/* <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
-                </DialogActions> */}
-
                 <DialogActions>
-                    <Button
-                        onClick={() => {
-                            setFormValues({}); // Reset form values
-                            setOpen(false); // Close the dialog
-                        }}
-                    >
-                        Cancel
-                    </Button>
+                    <Button onClick={() => setOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
 
