@@ -72,9 +72,12 @@ export class User {
 
   @Prop()
   isAllProfileCompleted: boolean;
-  
+
   @Prop()
   isEmailVerified: boolean;
+
+  @Prop()
+  resetPassword: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

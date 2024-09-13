@@ -16,7 +16,7 @@ interface SendInnovatorsProps {
 
 const validationSchema = Yup.object().shape({
   message: Yup.string().required('Message is required'),
-  innovators: Yup.array().min(1, 'At least one innovator must be selected').required('Innovators are required'),
+  innovators: Yup.array().min(1, 'At least one innovator must be selected').required('Innovator are required'),
 });
 
 export const SendInnovators = ({ onCancel }: SendInnovatorsProps) => {

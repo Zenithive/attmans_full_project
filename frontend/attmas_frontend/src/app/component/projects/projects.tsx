@@ -212,7 +212,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={<ErrorMessage name="title" />}
                                 />
                                 <TextField
-                                    label="Scope of Work"
+                                    label="Description"
                                     name="description"
                                     color='secondary'
                                     variant="outlined"
@@ -331,7 +331,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                             label="Expertise Level"
                                         >
                                             <MenuItem value="Beginner">Beginner </MenuItem>
-                                            <MenuItem value="Intermidiate">Intermidiate</MenuItem>
+                                            <MenuItem value="Intermediate">Intermediate</MenuItem>
                                             <MenuItem value="Expert">Expert</MenuItem>
                                             <MenuItem value="Phd">Phd</MenuItem>
                                         </Select>
@@ -473,7 +473,8 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
                                         slotProps={{
                                             textField: {
-                                                color: 'secondary'
+                                                color: 'secondary',
+                                                placeholder: DATE_FORMAT
                                             },
                                         }}
                                     />

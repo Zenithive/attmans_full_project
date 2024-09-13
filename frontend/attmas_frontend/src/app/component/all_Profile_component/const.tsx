@@ -1,5 +1,5 @@
 export const innovatorTerms = `
-Terms and Conditions for Innovators
+Terms and Conditions for Innovator
 Welcome! Thank you for your interest in our platform. These Terms and Conditions
 ("Terms") govern your use of our platform as an innovator offering innovative and
 patented products ("Products") and research collaboration services ("Services"). By
@@ -134,7 +134,6 @@ Ahmedabad shall have the sole jurisdiction in this regard.
 
 
 export const projectOwnerTerms = `
-    Terms and Conditions for Companies/Demand side user
 Welcome! These Terms and Conditions ("Terms") govern your access to and use of
 our platform (the "Platform") where you can connect with PhD scholars for research
 collaboration and purchase innovative products from independent innovators

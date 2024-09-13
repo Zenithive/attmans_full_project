@@ -118,6 +118,12 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [isResubmitting, setIsResubmitting] = useState<boolean>(false);
   const [proposals, setProposals] = useState<Proposal[]>([]);
 
+  const adminStatuses =[
+     'Admin Approved'
+    , 'Admin Rejected'
+    , 'Project Owner Approved'
+    , 'Project Owner Rejected'];
+
   useEffect(() => {
     const fetchMilestones = () => {
         if (apply?._id) {
@@ -351,7 +357,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-                { userDetails.userType === 'Innovators' &&(
+                { userDetails.userType === 'Innovator' &&(
                 <NewProductTable
                   products={apply?.products}
                   hideActions={true}
@@ -414,6 +420,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 sx={{ mb: 2 }}
                                               />
                                             </Grid>
+                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator' || userDetails.userType === 'Project Owner') && m.status === 'Submitted' &&(
                                             <Grid item xs={12} sm={5}>
                                               <TextField
                                                 label="Admin Status"
@@ -424,7 +431,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 sx={{ mb: 2 }}
                                               />
                                             </Grid>
-                                            {userDetails.userType === 'Admin' && (
+                                            )}
+                                            {userDetails.userType === 'Admin' && m.status === 'Submitted' && (
                                               <>
                                                 <Grid item xs={12} sm={5}>
                                                   <TextField
@@ -451,7 +459,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                           </Grid>
                                         </Grid>
 
-                                        {userDetails.userType === 'Admin' && (
+                                        {userDetails.userType === 'Admin' && m.status === 'Submitted' && (
                                           <Grid item xs={12}>
                                             <TextField
                                               label="Comment"
@@ -509,7 +517,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                {userDetails.userType !== 'Innovators' && <>
+                {userDetails.userType !== 'Innovator' && (<>
                   <Grid item xs={12}>
                     <TextField
                       label="Other available solutions"
@@ -532,7 +540,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                       sx={{ mb: 2 }}
                     />
                   </Grid>
-                </>}
+                </>)}
                 {apply.rejectComment && (
                   <Grid item xs={12}>
                     <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>

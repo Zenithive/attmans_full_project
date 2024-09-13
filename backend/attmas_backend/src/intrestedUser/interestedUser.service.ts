@@ -20,8 +20,6 @@ export class InterestedUserService {
     private readonly boothModel: Model<Booth>,
   ) {}
 
-  
-
   async create(createInterestedUserDto: any): Promise<InterestedUser> {
     const {
       username,
@@ -137,25 +135,23 @@ export class InterestedUserService {
   }
 
   // Define methods for sending different types of emails
-async sendInterestNotificationEmail(adminEmail: string, boothTitle: string) {
-  const subject = 'New Booth Interest';
-  const body = `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmas`;
-  await this.mailerService.sendEmail(adminEmail, subject, body);
-}
+  async sendInterestNotificationEmail(adminEmail: string, boothTitle: string) {
+    const subject = 'New Booth Interest';
+    const body = `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmans`;
+    await this.mailerService.sendEmail(adminEmail, subject, body);
+  }
 
-async sendUserInterestEmail(username: string, firstName: string) {
-  const subject = 'New User Interest in Attmas';
-  const body = `Hello ${firstName},\n\nThank you for showing interest in our Attmas service!\n\nBest regards,\nTeam Attmas`;
-  await this.mailerService.sendEmail(username, subject, body);
-}
+  async sendUserInterestEmail(username: string, firstName: string) {
+    const subject = 'New User Interest in Attmans';
+    const body = `Hello ${firstName},\n\nThank you for showing interest in our Attmans service!\n\nBest regards,\nTeam Attmans`;
+    await this.mailerService.sendEmail(username, subject, body);
+  }
 
-async sendWelcomeEmail(username: string, firstName: string) {
-  const subject = 'Welcome to Attmas!';
-  const body = `Hello ${firstName},\n\nWelcome to Attmas! We're excited to have you on board.\n\nBest regards,\nTeam Attmas`;
-  await this.mailerService.sendEmail(username, subject, body);
-}
-
-  
+  async sendWelcomeEmail(username: string, firstName: string) {
+    const subject = 'Welcome to Attmans!';
+    const body = `Hello ${firstName},\n\nWelcome to Attmans! We're excited to have you on board.\n\nBest regards,\nTeam Attmans`;
+    await this.mailerService.sendEmail(username, subject, body);
+  }
 
   async findExhibitionsByUser(userId: string): Promise<InterestedUser[]> {
     return this.interestedUserModel.find({ userId }).exec();

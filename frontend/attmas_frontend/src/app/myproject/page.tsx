@@ -218,7 +218,8 @@ const myproject = () => {
             }
         };
 
-        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') {
+        // Check if the user type is 'Admin' before fetching
+        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator') {
             fetchAppliedJobsForAdmin();
         }
     }, [userDetails]);
