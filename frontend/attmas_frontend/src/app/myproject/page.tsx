@@ -154,7 +154,7 @@ const myproject = () => {
         for (let index = 0; index < applies.length; index++) {
             const element = applies[index];
             const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-            const isInnovators = currentUserType === "Innovators" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
+            const isInnovators = currentUserType === "Innovator" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
             const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
             const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
             if (isFreelancer || isProjectOwner || isAdmin || isInnovators) {
@@ -184,7 +184,7 @@ const myproject = () => {
         };
 
         // Check if the user type is 'Admin' before fetching
-        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') {
+        if (userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator') {
             fetchAppliedJobsForAdmin();
         }
     }, [userDetails]);
@@ -574,7 +574,7 @@ const myproject = () => {
 
 
             <Box sx={{ mt: 2, position: 'relative' }}>
-                {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
+                {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator') && (
                     <>
                         {projectsForAdmin.length > 0 ? (
                             <Box>

@@ -31,7 +31,7 @@ export class ExhibitionService {
 
   private async fetchUsernamesByUserType1() {
     try {
-      const userType = 'Innovators'; // Set your desired userType here
+      const userType = 'Innovator'; // Set your desired userType here
       const users = await this.usersService.findUsersByUserType1(userType);
       this.cachedUsernames = users.map((user) => user.username);
       console.log('Cached Usernames:', this.cachedUsernames);
@@ -52,8 +52,8 @@ export class ExhibitionService {
   }
 
   async inviteAllInnovators(savedExhibition) {
-    // Get all users with userType 'Innovators' using UsersService
-    const users = await this.usersService.findUsersByUserType1('Innovators');
+    // Get all users with userType 'Innovator' using UsersService
+    const users = await this.usersService.findUsersByUserType1('Innovator');
 
     // Send emails to all users
     const subject = 'New Exhibition Created';

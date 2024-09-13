@@ -11,7 +11,7 @@ import {
   Put,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';  
+import { Response } from 'express';
 import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
 import { LocalGuard } from 'src/auth/guards/local.guard';
@@ -19,7 +19,7 @@ import { AuthenticateGuard } from 'src/auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) { }
+  constructor(private usersService: UsersService) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
@@ -93,15 +93,46 @@ export class UsersController {
     return updatedUser;
   }
 
-
   @Get('updateEmailStatus/:id')
-async updateEmailStatus(@Param('id') id: string, @Res() res: Response) {
-  const updatedUser = await this.usersService.updateEmailVerificationStatus(id);
-  if (!updatedUser) {
-    throw new NotFoundException(`User with ID ${id} not found`);
+  async updateEmailStatus(@Param('id') id: string, @Res() res: Response) {
+    const updatedUser =
+      await this.usersService.updateEmailVerificationStatus(id);
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    // Redirect to the front-end route with a success message
+    return res.redirect(
+      `${process.env.BACKEND_BASR_URL}/?message=email_verified`,
+    );
   }
-  // Redirect to the front-end route with a success message
-  return res.redirect(`${process.env.BACKEND_BASR_URL}/?message=email_verified`);
-}
 
+  @Post('forgot-password')
+  async setForgotPassword(
+    @Body('username') username: string,
+    @Res() res: Response,
+  ) {
+    const updatedUser = await this.usersService.setResetPasswordFlag(username);
+    if (!updatedUser) {
+      throw new NotFoundException(`User with Email: ${username} not found`);
+    }
+    // Redirect to the front-end route with a success message
+    return res.json({ message: 'Check your email to reset password.' });
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body('resetPasswordId') resetPasswordId: string,
+    @Body('password') password: string,
+    @Res() res: Response,
+  ) {
+    const updatedUser = await this.usersService.resetUserPassword(
+      resetPasswordId,
+      password,
+    );
+    if (!updatedUser) {
+      throw new NotFoundException(`This link is not valid`);
+    }
+    // Redirect to the front-end route with a success message
+    return res.json({ message: 'Password is successfully changed.' });
+  }
 }

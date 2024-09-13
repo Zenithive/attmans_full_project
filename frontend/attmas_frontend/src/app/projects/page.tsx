@@ -161,7 +161,7 @@ const Jobs = () => {
             return `?page=${page}&userId=${userDetails._id}&${filter}`;
         } else if (userType === 'Freelancer') {
             return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Outsource Research and Development&${filter}`;
-        } else if (userType === 'Innovators') {
+        } else if (userType === 'Innovator') {
             return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Innovative product&${filter}`;
         } else {
             return `?page=${page}&${filter}`;
@@ -638,7 +638,7 @@ const Jobs = () => {
                                                         Apply
                                                     </Button>
                                                 )}
-                                                {(userType === 'Innovators') && !appliedJobs.includes(job._id || '') && (
+                                                {(userType === 'Innovator') && !appliedJobs.includes(job._id || '') && (
                                                     <Button
                                                         variant="contained"
                                                         color="secondary"

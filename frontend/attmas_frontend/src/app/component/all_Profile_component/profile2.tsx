@@ -123,9 +123,9 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const handleUserTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         formik.handleChange(event);
-        setIsInnovator(value === 'Innovators');
+        setIsInnovator(value === 'Innovator');
 
-        if (value !== 'Innovators') {
+        if (value !== 'Innovator') {
             setShowProductDetails(false);
             formik.setFieldValue('productToMarket', 'No');
             formik.setFieldValue('hasPatent', 'No');
@@ -438,7 +438,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 >
                                     <MenuItem value="Freelancer">Freelancer</MenuItem>
                                     <MenuItem value="Project Owner">Project Owner</MenuItem>
-                                    <MenuItem value="Innovators">Innovators</MenuItem>
+                                    <MenuItem value="Innovator">Innovator</MenuItem>
                                 </TextField>
                             </Grid>
 
@@ -590,20 +590,6 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                         </Grid>
                     </Box>
                 </FormikProvider>
-
-
-
-                {/* Added sentences at the end of the form */}
-                <Typography
-                    variant="body2"
-                    align="center"
-                    mt={4}
-                    sx={{ color: 'red', fontStyle: 'italic', fontWeight: 'bold' }}
-                >
-                    Please Note: <br />
-                    If you have a granted patent or publish patent application, please give a link in the "Share Solution" section above. <br />
-                    Please provide ONLY NON-CONFIDENTIAL information. Do NOT provide ANYTHING that is PROPRIETARY and CONFIDENTIAL.
-                </Typography>
 
 
 

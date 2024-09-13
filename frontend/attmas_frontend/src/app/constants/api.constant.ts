@@ -4,6 +4,8 @@ export const SERVER_URL = process.env.SERVER_URL;
 export const APIS = {
     LOGIN: `/auth/login`,
     SIGNUP: `/users`,
+    FORGOT_PASSOWRD: `/users/forgot-password`,
+    RESET_PASSOWRD: `/users/reset-password`,
     LOGOUT: `/auth/logout`,
     JOBS: `/jobs`,
     APPLY: `/apply`,
@@ -74,10 +76,10 @@ export const APIS = {
 
 
 
-    //****** FreeLancers and Innovators API url ******//
+    //****** FreeLancers and Innovator API url ******//
     FREELANCERS: `/users/filters?userType=Freelancer`,
-    INNOVATORS: `/users/filters?userType=Innovators`,
-    INNOVATORSFOREXIBITION: `/users/by-type1?userType=Innovators`,
+    INNOVATORS: `/users/filters?userType=Innovator`,
+    INNOVATORSFOREXIBITION: `/users/by-type1?userType=Innovator`,
     PROJECTOWNERS: `/users/filters?userType=Project Owner`,
 
     CATEGORIES: `/profile/categories`,
@@ -85,7 +87,7 @@ export const APIS = {
 
 
 
-    GET_INNOVATORS: `/users/filters?userType=Innovators`,
+    GET_INNOVATORS: `/users/filters?userType=Innovator`,
     GET_VISITORS:  `/interested-users`,
     GET_VISITORS2: '/interested-users/filter-visitors',
     ADD_VISITOR: `/interested-users`,

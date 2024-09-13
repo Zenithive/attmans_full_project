@@ -10,6 +10,11 @@ import { User, UserDocument } from './user.schema';
 import { CreateUserDto, UpdateUserDto } from './create-user.dto';
 import { Categories } from 'src/profile/schemas/category.schema';
 import { MailerService } from 'src/common/service/UserEmailSend';
+import {
+  decryptWithCrypto,
+  encryptWithCrypto,
+  getMinutesElapsed,
+} from 'src/common/service/crypto.service';
 
 @Injectable()
 export class UsersService {
@@ -35,19 +40,17 @@ export class UsersService {
 
     await createdUser.save();
 
-    // Fetch verification link from environment variable
-
     const verificationLink = `${process.env.SERVER_URL_FOR_EMAIL_VERIFY}/users/updateEmailStatus/${createdUser._id}`;
 
     const emailBody = `
         <p>Hello ${createdUser.firstName},</p>
-        <p>Thank you for registering with Attmas!</p>
+        <p>Thank you for registering with Attmans!</p>
         <p>Please verify your email by clicking the button below:</p>
         <a href="${verificationLink}" style="display:inline-block;padding:10px 20px;background-color:#28a745;color:white;text-decoration:none;border-radius:5px;">Verify Email</a>
-        <p>Best regards,<br>Attmas Team</p>
+        <p>Best regards,<br>Attmans Team</p>
     `;
 
-    await this.mailerService.sendEmail(
+    this.mailerService.sendEmail(
       createdUser.username,
       'Verify Email',
       emailBody,
@@ -57,13 +60,13 @@ export class UsersService {
     // Send a welcome email
     const welcomeEmailBody = `
         <p>Hello ${createdUser.firstName},</p>
-        <p>Thank you for registering with Attmas!</p>
-        <p>Best regards,<br>Attmas Team</p>
+        <p>Thank you for registering with Attmans!</p>
+        <p>Best regards,<br>Attmans Team</p>
     `;
 
-    await this.mailerService.sendEmail(
+    this.mailerService.sendEmail(
       createdUser.username,
-      'Welcome to Attmas Service',
+      'Welcome to Attmans Service',
       welcomeEmailBody,
       // true // Also HTML formatted email
     );
@@ -307,5 +310,69 @@ export class UsersService {
     user.isEmailVerified = true;
     await user.save();
     return user;
+  }
+
+  async setResetPasswordFlag(username: string): Promise<User> {
+    const user = await this.userModel
+      .findOneAndUpdate({ username }, { $set: { resetPassword: true } })
+      .exec();
+    if (!user) {
+      throw new NotFoundException(`User with email: ${username} not found`);
+    }
+
+    this.sendResetPasswordMail(user);
+    return user;
+  }
+
+  async resetUserPassword(
+    resetPasswordId: string,
+    password: string,
+  ): Promise<User> {
+    if (resetPasswordId) {
+      const { id, expirationTime } = decryptWithCrypto(resetPasswordId);
+      console.log('expirationTime', expirationTime);
+      const isTimeExpired = getMinutesElapsed(expirationTime);
+      if (-15 < isTimeExpired && isTimeExpired < 0) {
+        console.log('isTimeExpired', isTimeExpired);
+        console.log('id', id);
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await this.userModel
+          .findOneAndUpdate(
+            { _id: id, resetPassword: true },
+            { $set: { resetPassword: false, password: hashedPassword } },
+          )
+          .exec();
+
+        console.log('user', user);
+        if (!user) {
+          throw new NotFoundException(`This link is not valid for any user.`);
+        }
+        return user;
+      } else {
+        throw new NotFoundException(`This link is expired`);
+      }
+    } else {
+      throw new NotFoundException(`This link is not valid or expired`);
+    }
+  }
+
+  sendResetPasswordMail(user) {
+    const encryptUserId = encryptWithCrypto(user._id);
+    console.log('encryptUserId', encryptUserId);
+    const verificationLink = `${process.env.BACKEND_BASR_URL}/reset-password?id=${encryptUserId}`;
+
+    const emailBody = `
+        <p>Hello ${user.firstName},</p>
+        <p>We received a request to reset your password for your Attmans account. If you made this request, click the link below to reset your password!</p>
+        <a href="${verificationLink}" style="display:inline-block;padding:10px 20px;background-color:#28a745;color:white;text-decoration:none;border-radius:5px;">Verify Email</a>
+        <p>Best regards,<br>Attmans Team</p>
+    `;
+
+    this.mailerService.sendEmail(
+      user.username,
+      'Reset Your Password for Attmans',
+      emailBody,
+      // true // Indicating it's an HTML email
+    );
   }
 }
