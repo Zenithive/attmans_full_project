@@ -145,7 +145,7 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
           display: block;
           position: absolute;
           background-color: #ffffff;
-          min-width: 100%;
+          min-width: 350px;
           max-height: 300px;
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
           padding: 12px 16px;

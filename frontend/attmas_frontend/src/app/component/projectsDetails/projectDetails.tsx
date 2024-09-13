@@ -357,7 +357,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-                { userDetails.userType === 'Innovators' &&(
+                { userDetails.userType === 'Innovator' &&(
                 <NewProductTable
                   products={apply?.products}
                   hideActions={true}
@@ -420,7 +420,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 sx={{ mb: 2 }}
                                               />
                                             </Grid>
-                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators' || userDetails.userType === 'Project Owner') && m.status === 'Submitted' &&(
+                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator' || userDetails.userType === 'Project Owner') && m.status === 'Submitted' &&(
                                             <Grid item xs={12} sm={5}>
                                               <TextField
                                                 label="Admin Status"
@@ -517,7 +517,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                {(userDetails.userType !== 'Innovators') && (<>
+                {userDetails.userType !== 'Innovator' && (<>
                   <Grid item xs={12}>
                     <TextField
                       label="Other available solutions"
