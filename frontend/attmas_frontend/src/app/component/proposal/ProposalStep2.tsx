@@ -138,8 +138,10 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
               disabled={readOnly} // Apply readOnly
             />
 
-            
 
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Budget Outlay
+            </Typography>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -152,6 +154,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
+
                   <FieldArray
                     name="budgetOutlay"
                     render={arrayHelpers => (
