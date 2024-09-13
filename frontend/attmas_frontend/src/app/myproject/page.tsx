@@ -18,8 +18,8 @@ import { CustomChip } from '../projects/projectinterface';
 import MyProjectDrawer from '../component/myProjectComponet/myprojectcomponet';
 import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 import axiosInstance from '../services/axios.service';
-import { APPLY_STATUSES } from '../constants/status.constant';
-import { DATE_FORMAT } from '../constants/common.constants';
+import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
+import Filters, { FilterColumn } from '../component/filter/filter.component';
 
 
 const myproject = () => {
@@ -31,36 +31,85 @@ const myproject = () => {
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
-    const [filterOpen, setFilterOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [filterType, setFilterType] = useState("all");
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
     const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
     const [appliedJobsForAdmin, setAppliedJobsForAdmin] = useState<string[]>([]);
-    const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
     const [isShowingApplies, setIsShowingApplies] = useState(false);
-    const [showingMyApplies, setShowingMyApplies] = useState(false);
     const [applies, setApplies] = useState<Apply[]>([]);
-    const [selectedServices, setSelectedServices] = useState<string[]>([]);
-    const [selectedFilter, setSelectedFilter] = useState<'all' | 'my'>();
-    const [apply, setApply] = useState<Apply | null>(null);
     const [applications, setApplications] = useState<Apply[]>([]);
-
     const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-
     const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
-
-
-
-
     const [projects, setProjects] = useState<Apply[]>([]);
     const [projectsForAdmin, setProjectsForAdmin] = useState<Apply[]>([]);
+    //   const [filter, setFilter] = useState('');
+    const [filter, setFilter] = useState<string>('');
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
+
+    const column: Array<FilterColumn> = [
+        {
+            name: "Project Name",
+            value: '',
+            type: "Texbox",
+            key: 'title',
+            isVisible: true,
+        },
+        {
+            name: "Project Owner",
+            value: '',
+            type: "Texbox",
+            key: 'ProjectOwner',
+            isVisible: userType === "Admin",
+        },
+        {
+            name: "Created Date",
+            value: '',
+            type: "Date",
+            key: 'createdAt',
+            isVisible: true,
+        },
+        {
+            name: "Deadline",
+            value: '',
+            type: "Date",
+            key: 'TimeFrame',
+            isVisible: true,
+        },
+        {
+            name: "Status",
+            value: '',
+            type: "Texbox",
+            key: 'status',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
+        },
+        {
+            name: "Service",
+            value: '',
+            type: "Service",
+            key: 'SelectService',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
+        },
+        {
+            name: "Category",
+            value: '',
+            type: "Category",
+            key: 'Category',
+            isVisible: true,
+        },
+        {
+            name: "Subject Matter Expertise",
+            value: '',
+            type: "SubCategory",
+            key: 'Subcategorys',
+            isVisible: true,
+        }
+    ];
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -69,7 +118,6 @@ const myproject = () => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
 
     const fetchApplications = useCallback(async () => {
         if (viewingJob?._id) {
@@ -82,101 +130,88 @@ const myproject = () => {
         }
     }, [viewingJob]);
 
+
     const handleCommentSubmitted = () => {
         fetchApplications();
     };
 
-    const fetchJobs = useCallback(async (page: number, CategoryesFilter: string[], SubcategorysFilter: string[], ExpertiselevelFilter: string[], statusFilter: string | null, selectedServices: string[]) => {
+    const getParamsForJobs = (page: number, filter: Record<string, any>, userId: string, userType: string) => {
+        const params: Record<string, any> = {
+          page,
+          limit: 10,
+          appstatus: APPLY_STATUSES.awarded,
+          ...filter, // Directly spread the filter object here
+        };
+      
+        if (userType !== 'Admin') {
+          if (userType === 'Freelancer') {
+            params.appUserId = userId;
+          } else {
+            params.userId = userId;
+          }
+        }
+      
+        return params;
+      };
+      
+      
+
+
+      const fetchJobs = useCallback(async (page: number) => {
         try {
-
-            const response = await axiosInstance.get(APIS.JOBS, {
-                params: {
-                    page,
-                    limit: 10,
-                    Category: CategoryesFilter.join(','),
-                    Subcategorys: SubcategorysFilter.join(','),
-                    Expertiselevel: ExpertiselevelFilter.join(','),
-                    status: statusFilter ? statusFilter : userType === 'Admin' ? undefined : 'Approved',
-                    userId: userDetails._id,
-                    SelectService: selectedServices.join(','),
-
-                }
-            })
-
-            if (response.data.length === 0) {
-                setHasMore(false);
+          // Construct params including filter
+          const params = getParamsForJobs(page, {}, userId, userType);
+      
+          // Create URLSearchParams instance
+          const searchParams = new URLSearchParams();
+      
+          // Append basic parameters
+          Object.keys(params).forEach(key => {
+            const value = params[key];
+            if (Array.isArray(value)) {
+              value.forEach(v => searchParams.append(key, v));
             } else {
-                setJobs(prev => {
-                    const newJobs = response.data.filter((newJobs: Job) => !prev.some((existingJobs) => existingJobs._id === newJobs._id));
-                    return [...prev, ...newJobs];
-                });
-                if (response.data.length < 10) {
-                    setHasMore(false);
-                }
+              searchParams.append(key, value);
             }
-        } catch (error) {
-            console.error('Error fetching jobs:', error);
-        }
-    }, [userId, filterType, userType, selectedServices]);
-
-
-
-
-    const refetch = useCallback(async () => {
-        try {
-            setPage(1);
-            setJobs([]);
-            setHasMore(true);
-            await fetchJobs(1, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
-        } catch (error) {
-            console.error('Error refetching jobs:', error);
-        }
-    }, [fetchJobs, selectedCategory, selectedExpertis, selectedSubcategory, selectedStatus, filterType, selectedServices]);
-
-    useEffect(() => {
-        refetch();
-    }, [selectedCategory, selectedSubcategory, selectedExpertis, filterType, selectedServices]);
-
-    useEffect(() => {
-        if (page > 1) {
-            fetchJobs(page, selectedCategory, selectedSubcategory, selectedExpertis, selectedStatus, selectedServices);
-        }
-    }, [page]);
-
-
-
-    const currentUser = userDetails.username;
-    const currentUserType = userDetails.userType;
-    const currentUserId = userDetails._id;
-
-    const setApplicationsBasedOnUser = (applies: Apply[]) => {
-        const tmpApplies: Apply[] = [];
-        for (let index = 0; index < applies.length; index++) {
-            const element = applies[index];
-            const isFreelancer = currentUserType === "Freelancer" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-            const isInnovators = currentUserType === "Innovator" && element?.userDetails._id === currentUserId && element?.status === APPLY_STATUSES.awarded;
-            const isProjectOwner = currentUserType === "Project Owner" && element.status === APPLY_STATUSES.awarded;
-            const isAdmin = currentUserType === "Admin" && element?.status === APPLY_STATUSES.awarded;
-            if (isFreelancer || isProjectOwner || isAdmin || isInnovators) {
-                tmpApplies.push(element);
+          });
+      
+          // Convert URLSearchParams to string
+          const queryString = searchParams.toString() + '&'+ filter;
+          console.log('Query String:', queryString); // Debugging line to inspect the query string
+      
+          const response = await axiosInstance.get(`${APIS.JOBS}?${queryString}`);
+      
+          if (response.data.length === 0) {
+            setHasMore(false);
+          } else {
+            setJobs(prev => {
+              const newJobs = response.data.filter((newJob: Job) => !prev.some(existingJob => existingJob._id === newJob._id));
+              return [...prev, ...newJobs];
+            });
+            if (response.data.length < 10) {
+              setHasMore(false);
             }
+          }
+        } catch (error) {
+          console.error('Error fetching jobs:', error);
         }
+      }, [userId, userType, filter]);
+      
+      
+      
+      
 
-        setProjectsForAdmin(tmpApplies);
-    }
 
 
 
     useEffect(() => {
-        // Function to fetch applied jobs for admin
         const fetchAppliedJobsForAdmin = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
+                console.log("fetchAppliedJobsForAdmin", response.data);
                 setApplicationsBasedOnUser(response.data);
-
-                // const fetchedAppliedJobsForAdmin = response.data.map((application) => application.jobId);
                 const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
-
+                console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
                 setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);
@@ -189,45 +224,55 @@ const myproject = () => {
         }
     }, [userDetails]);
 
-
-
-    const handleFilterTypeChange = (event: any, newFilterType: string) => {
-        if (newFilterType !== null) {
-            setFilterType(newFilterType);
-            refetch();
+    const refetch = useCallback(async () => {
+        try {
+            setPage(1);
+            setJobs([]);
+            setHasMore(true);
+            await fetchJobs(1);
+        } catch (error) {
+            console.error('Error refetching jobs:', error);
         }
-    }
+    }, [fetchJobs]);
 
-    const handleServiceChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newServices: string[],
-    ) => {
-        setSelectedServices(newServices);
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
+
+    useEffect(() => {
+        if (page > 1) fetchJobs(page);
+    }, [page, fetchJobs]);
+
+    const currentUser = userDetails.username;
+    const currentUserType = userDetails.userType;
+    const currentUserId = userDetails._id;
+
+    const setApplicationsBasedOnUser = (applies: Apply[]) => {
+        const tmpApplies: Apply[] = applies.filter(element => {
+            return (
+                (userDetails.userType === "Freelancer" && element?.userDetails._id === userId && element?.status === APPLY_STATUSES.awarded) ||
+                (userDetails.userType === "Project Owner" && element.status === APPLY_STATUSES.awarded) ||
+                (userDetails.userType === "Admin" && element?.status === APPLY_STATUSES.awarded)
+            );
+        });
+        setProjectsForAdmin(tmpApplies);
     };
 
-
-    // Function to handle viewing job details
     const handleViewJob = (job: Job) => {
         setViewingJob(job);
         setApplyOpen(false);
-        // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
 
     const filteredJobs = useMemo(() => {
         return jobs.filter(job => {
-            if (userType === 'Admin' && selectedStatus) {
-                return job.status === selectedStatus;
-            }
             return userType === 'Admin' || job.status === 'Approved';
         });
-    }, [jobs, userType, selectedStatus]);
-
+    }, [jobs, userType]);
 
     const handleOpenConfirmationDialog = (projectId: string) => {
         setCurrentApplicationId(projectId);
         setConfirmationDialogOpen(true);
     };
-
 
     const handleCloseConfirmationDialog = () => {
         setConfirmationDialogOpen(false);
@@ -239,7 +284,6 @@ const myproject = () => {
             handleCancel(currentApplicationId, comment)
             // Close the dialog after confirming
             handleCloseConfirmationDialog();
-
         }
     };
 
@@ -247,25 +291,28 @@ const myproject = () => {
         try {
             if (!projectId) return;
 
-            // Ensure status is always "Closed"
-            const status = 'Project Finished and close ';
-
-            // Use a default comment if none is provided
-            const defaultComment = 'No comment provided When Project is closed ';
+            const status = 'Project Finished and close';
+            const defaultComment = 'No comment provided When Project is closed';
             const finalComment = comment || defaultComment;
 
-            // Make a POST request to update the project with the provided status and comment
             await axiosInstance.post(`${APIS.CLOSED_PROJECT}/${projectId}`, {
                 status,
                 comment: finalComment,
             });
-
         } catch (error) {
             console.error('Error updating project:', error);
         }
     };
 
     const isProjectOwnerOrAdmin = userDetails.userType === 'Project Owner';
+
+    const changeFilterOrPage = (newFilter: string) => {
+        setFilter(newFilter); 
+        setPage(1);
+        setJobs([]); 
+        setHasMore(true);
+    };
+
 
 
     return (
@@ -293,306 +340,172 @@ const myproject = () => {
                 }}
             >
                 <Typography component="h2" sx={{ marginY: 0 }}>My Projects</Typography>
+                <Filters
+                    column={column}
+                    onFilter={changeFilterOrPage}                // onFilter={changeFilterOrPage}
+                ></Filters>
 
             </Box>
 
+            {/* {isProjectOwnerOrAdmin && ( */}
+            <Box sx={{ mt: 2 }}>
+                <>
+                    {isShowingApplies ? (
+                        <Box>
+                            {applies.map((apply) => (
 
-            <Box sx={{
-                position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
-                    position: 'relative',
-                    top: '8px',
-                    left: '-5px',
-                    marginBottom: '15px'
-                }
-            }}>
-                <Tooltip title="Filter" arrow>
-                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                        <FilterAltIcon />
-                    </IconButton>
-                </Tooltip>
-            </Box>
+                                <Card key={apply._id} sx={{ mb: 2, position: 'relative' }}>
+                                    <CardContent>
+                                        <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Box>
+                                                {apply.title}
+                                            </Box>
+                                            <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+                                            </Box>
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ mt: 1 }}>
+                                            {apply.currency} {apply.Budget}
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            User Name: {apply.firstName} {apply.lastName}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </Box>
+                    ) : (
+                        <InfiniteScroll
+                            key={appliedJobs.join(',')}
+                            dataLength={jobs.length}
+                            next={() => setPage(prev => prev + 1)}
+                            hasMore={hasMore}
+                            loader={<Typography>Loading...</Typography>}
+                            endMessage={<Typography>No more Projects</Typography>}
+                        >
 
-            {filterOpen && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        marginBottom: '20px',
-                        gap: 3,
-                        alignItems: 'center',
-                        '@media (max-width: 767px)': {
-                            flexDirection: 'column',
-                            alignItems: 'stretch',
-                            gap: 2,
-                            width: '100%'
-                        },
-                    }}
-                >
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Expertiselevel}
-                        value={selectedExpertis}
-                        onChange={(event, value) => setSelectedExpertis(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Category()}
-                        value={selectedCategory}
-                        onChange={(event, value) => setSelectedCategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Category" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={getSubcategorys(Subcategorys())}
-                        value={selectedSubcategory}
-                        onChange={(event, value) => setSelectedSubcategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Subcategory" color="secondary" />
-                        )}
-                    />
-
-                </Box>
-            )}
-
-
-            {(userType === 'Project Owner' || userType === 'Admin') && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        marginTop: '-15px',
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px'
-                        },
-                    }}
-                >
-                    <ToggleButtonGroup
-                        value={filterType}
-                        exclusive
-                        onChange={handleFilterTypeChange}
-                        aria-label="filter exhibitions"
-                        sx={{ height: "30px" }}
-                    >
-
-
-                    </ToggleButtonGroup>
-                </Box>
-            )}
-
-            {(userType === 'Project Owner' || userType === 'Admin') && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        position: 'relative',
-                        left: '20%',
-                        bottom: '30px',
-
-                        '@media (max-width: 767px)': {
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            mt: 4,
-                            position: 'relative',
-                            left: '28px',
-                        },
-                    }}
-                >
-
-                    <ToggleButtonGroup
-                        value={selectedServices}
-                        onChange={handleServiceChange}
-                        aria-label="Select Service"
-                        sx={{ height: "50px", right: '26px', position: 'relative' }}
-                    >
-                        <ToggleButton value="Outsource Research and Development ">
-                            Outsource Research and Development
-                        </ToggleButton>
-                        <ToggleButton value="Innovative product">
-                            Innovative Product
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-            )}
-
-
-            {isProjectOwnerOrAdmin && (
-                <Box sx={{ mt: 2 }}>
-                    <>
-                        {isShowingApplies ? (
-                            <Box>
-                                {applies.map((apply) => (
-
-                                    <Card key={apply._id} sx={{ mb: 2, position: 'relative' }}>
+                            <Box sx={{ mt: 2 }}>
+                                {filteredJobs.map((job) => (
+                                    <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>
-                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box>
-                                                    {apply.title}
+                                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+
+                                                <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
+                                                    <a onClick={() => handleViewJob(job)} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+                                                        {job.title},
+                                                    </a>
+                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
+                                                        ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')})
+                                                    </span>
                                                 </Box>
-                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
-                                                    {dayjs(apply.TimeFrame).format('MMMM D, YYYY h:mm A')}
+
+                                                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
+                                                        <CustomChip
+                                                            label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                            color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+                                                        />
+                                                    </Box>
+
+                                                    <Box sx={{ flexShrink: 0, mr: 2 }}>
+                                                        <Chip
+                                                            label={job.SelectService}
+                                                            variant="outlined"
+                                                            color='secondary'
+                                                        />
+                                                    </Box>
+
+                                                    <Box sx={{ flexShrink: 0, fontSize: 'small', fontWeight: 'bolder' }}>
+                                                        {job.Expertiselevel}
+                                                    </Box>
                                                 </Box>
+
                                             </Typography>
-                                            <Typography variant="body1" sx={{ mt: 1 }}>
-                                                {apply.currency} {apply.Budget}
-                                            </Typography>
-                                            <Typography variant="body1">
-                                                User Name: {apply.firstName} {apply.lastName}
-                                            </Typography>
+                                            <Box sx={{ marginTop: '10px' }}>
+                                                <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
+                                                <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
+                                                <Button
+                                                    onClick={() => handleOpenConfirmationDialog(job._id as string)}
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        bottom: 0,
+                                                        right: 0,
+                                                        margin: 1,
+                                                        width: '8%',
+                                                        minWidth: 'auto',
+                                                        padding: 1,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        borderRadius: '22px',
+                                                        backgroundColor: 'grey',
+                                                        color: 'white',
+                                                        '&:hover': {
+                                                            backgroundColor: '#cc4800',
+                                                        },
+                                                        '@media (max-width: 767px)': {
+                                                            width: '20%',
+                                                        }
+                                                    }}
+                                                >
+                                                    Close
+                                                </Button>
+                                            </Box>
                                         </CardContent>
                                     </Card>
+
                                 ))}
                             </Box>
-                        ) : (
-                            <InfiniteScroll
-                                key={appliedJobs.join(',')}
-                                dataLength={jobs.length}
-                                next={() => setPage(prev => prev + 1)}
-                                hasMore={hasMore}
-                                loader={<Typography>Loading...</Typography>}
-                                endMessage={<Typography>No more Projects</Typography>}
-                            >
 
-                                <Box sx={{ mt: 2 }}>
-                                    {filteredJobs.map((job) => (
-                                        <Card key={job._id} sx={{ mb: 2, position: 'relative' }}>
-                                            <CardContent>
-                                                <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                        </InfiniteScroll>
+                    )}
+                    <MyProjectDrawer
+                        viewingJob={viewingJob}
+                        setViewingJob={setViewingJob}
+                        userType={userType}
+                        handleApproveDialogOpen={() => {/* Handle approve dialog */ }}
+                        handleRejectDialogOpen={() => {/* Handle reject dialog */ }}
+                        onCommentSubmitted={handleCommentSubmitted}
 
-                                                    <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
+                    />
 
-                                                        {job.title},
+                </>
+            </Box>
+            {/* )} */}
 
-
-
-                                                        <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                            {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
-                                                            {dayjs(job.TimeFrame).format(DATE_FORMAT)}
-                                                        </span>
-                                                    </Box>
-
-
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                                                        <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
-                                                            <CustomChip
-                                                                label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
-                                                                color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-                                                            />
-                                                        </Box>
-
-                                                        <Box sx={{ flexShrink: 0, mr: 2 }}>
-                                                            <Chip
-                                                                label={job.SelectService}
-                                                                variant="outlined"
-                                                                color='secondary'
-                                                            />
-                                                        </Box>
-                                                    </Box>
-
-                                                </Typography>
-                                                <Box sx={{ marginTop: '10px' }}>
-                                                    <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
-                                                    <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                                    <Button
-                                                        onClick={() => handleOpenConfirmationDialog(job._id as string)}
-                                                        sx={{
-                                                            position: 'absolute',
-                                                            bottom: 0,
-                                                            right: 0,
-                                                            margin: 1,
-                                                            width: '8%',
-                                                            minWidth: 'auto',
-                                                            padding: 1,
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            borderRadius: '22px',
-                                                            backgroundColor: 'grey',
-                                                            color: 'white',
-                                                            '&:hover': {
-                                                                backgroundColor: '#cc4800',
-                                                            },
-                                                            '@media (max-width: 767px)': {
-                                                                width: '20%',
-                                                            }
-                                                        }}
-                                                    >
-                                                        Close
-                                                    </Button>
-                                                </Box>
-                                                <Link
-                                                    component="button"
-                                                    // variant="contained"
-                                                    color="primary"
-                                                    onClick={() => handleViewJob(job)}
-                                                    sx={{
-                                                        color: 'blue',
-                                                        textDecoration: 'underline',
-                                                        cursor: 'pointer',
-                                                        mr: 2
-                                                    }} // Style to ensure link is blue with underline
-                                                >
-                                                    View Project
-                                                </Link>
-                                            </CardContent>
-                                        </Card>
-
-                                    ))}
-                                </Box>
-
-                            </InfiniteScroll>
-                        )}
-                        <MyProjectDrawer
-                            viewingJob={viewingJob}
-                            setViewingJob={setViewingJob}
-                            userType={userType}
-                            handleApproveDialogOpen={() => {/* Handle approve dialog */ }}
-                            handleRejectDialogOpen={() => {/* Handle reject dialog */ }}
-                            onCommentSubmitted={handleCommentSubmitted}
-
-                        />
-
-                    </>
-                </Box>
-            )}
-
-
-            <Box sx={{ mt: 2, position: 'relative' }}>
-                {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator') && (
+            {/* ///// ********** different box for freelancer  */}
+            {/* <Box sx={{ mt: 2, position: 'relative' }}>
+                {userDetails && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovators') && (
                     <>
                         {projectsForAdmin.length > 0 ? (
                             <Box>
                                 {projectsForAdmin.map((project) => project.jobDetails && (
                                     <Card key={project._id} sx={{ mb: 2 }}>
                                         <CardContent>
-                                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                            <Typography variant="h5" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box
+                                                    onClick={() => handleViewJob(project.jobDetails)}
+                                                    sx={{ cursor: 'pointer' }}
+                                                >
+                                                    {project.jobDetails.title}
+                                                </Box>
 
-                                                <Box sx={{ width: '50%', '@media (max-width: 767px)': { width: '100%' } }}>
+                                                <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2, position: 'relative', left: '25%' }}>
+                                                    <CustomChip
+                                                        label={project.jobDetails.status === 'Approved' ? 'Approved' : project.jobDetails.status === 'Rejected' ? 'Rejected' : 'Pending'}
+                                                        color={project.jobDetails.status === 'Approved' ? 'success' : project.jobDetails.status === 'Rejected' ? 'error' : 'default'}
+                                                    />
+                                                </Box>
 
-                                                    {project.jobDetails.title},
+                                                <Box sx={{ flexShrink: 0, mr: 2, position: 'relative', left: '12%' }}>
+                                                    <Chip
+                                                        label={project.jobDetails.SelectService}
+                                                        variant="outlined"
+                                                        color='secondary'
+                                                    />
+                                                </Box>
 
-
-
-                                                    <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                        {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
-                                                        {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
-                                                    </span>
+                                                <Box sx={{ fontSize: 'small', color: 'text.secondary' }}>
+                                                    {dayjs(project.jobDetails.TimeFrame).format('MMMM D, YYYY h:mm A')}
                                                 </Box>
 
 
@@ -614,9 +527,75 @@ const myproject = () => {
                                                 </Box>
 
                                             </Typography>
-                                            <Box sx={{ marginTop: '10px' }}>
-                                                <Typography variant="body2">{project.jobDetails.currency === 'USD' ? '$' : '₹'}{project.jobDetails.Budget}</Typography>
-                                                <Typography variant="caption">{project.jobDetails.Category.join(', ')}, {project.jobDetails.Subcategorys.join(', ')}</Typography>
+
+
+
+                                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                                {project.jobDetails.currency} {project.jobDetails.Budget}
+                                            </Typography>
+
+
+
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
+                                            </Typography>
+
+
+
+                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box sx={{
+                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
+                                                }}>
+                                                    
+
+
+                                                    <Button
+                                                        onClick={() => handleOpenConfirmationDialog(project.jobDetails._id)}
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            bottom: 0,
+                                                            right: 0,
+                                                            margin: 1,
+                                                            minWidth: 'auto',
+                                                            padding: 1,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            borderRadius: '22px',
+                                                            backgroundColor: 'grey',
+                                                            color: 'white',
+                                                            '&:hover': {
+                                                                backgroundColor: '#cc4800',
+                                                            },
+                                                        }}
+                                                    >
+                                                        Close
+                                                    </Button>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <Button
+                                                        aria-controls="simple-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={handleClick}
+                                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        endIcon={<MoreVertIcon />}
+                                                    >
+                                                        More
+                                                    </Button>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                border: '1px solid',
+                                                                boxShadow: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                    </Menu>
+                                                </Box>
                                             </Box>
                                             <Link
                                                 component="button"
@@ -641,18 +620,16 @@ const myproject = () => {
                         )}
                     </>
                 )}
-                {/* Close Button */}
 
-                {/* Confirmation Dialog */}
                 <ConfirmationCancelDialog
                     open={confirmationDialogOpen}
                     onClose={handleCloseConfirmationDialog}
                     onConfirm={handleConfirm}
                     message="Are you sure you want to close this application?"
                 />
-            </Box>
+            </Box> */}
 
-            <Box sx={{ mt: 2, position: 'relative' }}>
+            {/* <Box sx={{ mt: 2, position: 'relative' }}>
                 {(userDetails.userType === 'Admin') && (
                     <>
                         {projectsForAdmin.length > 0 ? (
@@ -666,7 +643,6 @@ const myproject = () => {
                                                 >
                                                     {project.jobDetails.title},
                                                     <span style={{ fontSize: 'small', color: "#616161" }}>
-                                                        {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
                                                         {dayjs(project.jobDetails.TimeFrame).format(DATE_FORMAT)}
                                                     </span>
 
@@ -690,9 +666,61 @@ const myproject = () => {
 
                                             </Typography>
 
-                                            <Box sx={{ marginTop: '10px' }}>
-                                                <Typography variant="body2">{project.jobDetails.currency === 'USD' ? '$' : '₹'}{project.jobDetails.Budget}</Typography>
-                                                <Typography variant="caption">{project.jobDetails.Category.join(', ')}, {project.jobDetails.Subcategorys.join(', ')}</Typography>
+
+
+                                            <Typography variant="body1" sx={{ mt: 1 }}>
+                                                {project.jobDetails.currency} {project.jobDetails.Budget}
+                                            </Typography>
+
+
+
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                {project.jobDetails.Category.join(', ')}{project.jobDetails.Subcategorys.length > 0 ? `, ${project.jobDetails.Subcategorys.join(', ')}` : ''}
+                                            </Typography>
+
+                                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                                <Box sx={{
+                                                    fontSize: 'small', fontWeight: "bolder", display: 'flex', alignItems: 'center'
+                                                }}>
+                                                    <Chip
+                                                        label={project.jobDetails.status}
+                                                        color={
+                                                            project.jobDetails.status === 'Approved'
+                                                                ? 'success'
+                                                                : project.jobDetails.status === 'Rejected'
+                                                                    ? 'error'
+                                                                    : 'default'
+                                                        }
+                                                    />
+
+
+
+                                                </Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                    <Button
+                                                        aria-controls="simple-menu"
+                                                        aria-haspopup="true"
+                                                        onClick={handleClick}
+                                                        sx={{ display: { xs: 'block', md: 'none' } }}
+                                                        endIcon={<MoreVertIcon />}
+                                                    >
+                                                        More
+                                                    </Button>
+                                                    <Menu
+                                                        id="simple-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        PaperProps={{
+                                                            sx: {
+                                                                border: '1px solid',
+                                                                boxShadow: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                    </Menu>
+                                                </Box>
                                             </Box>
 
 
@@ -719,16 +747,14 @@ const myproject = () => {
                         )}
                     </>
                 )}
-                {/* Close Button */}
 
-                {/* Confirmation Dialog */}
                 <ConfirmationCancelDialog
                     open={confirmationDialogOpen}
                     onClose={handleCloseConfirmationDialog}
                     onConfirm={handleConfirm}
                     message="Are you sure you want to close this application?"
                 />
-            </Box>
+            </Box> */}
 
             <AddApply
                 open={applyOpen}
