@@ -7,6 +7,7 @@ import ProductTable, { Product } from '../ProductTable';
 import { ProductForBooth } from '../ProductTableForBooth';
 import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import axiosInstance from '@/app/services/axios.service';
+import NewProductTable from '../all_Profile_component/NewProductTable';
 
 interface User {
   _id: string;
@@ -39,26 +40,26 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
   const convertToProductForBooth = (product: Product): ProductForBooth => {
     return {
-      id: product.id, // Ensure id is handled correctly
+      id: product.id,
       productName: product.productName,
       productDescription: product.productDescription,
-      productPrice: 0,
+      productPrice: product.productPrice ?? 0, // Use productPrice if available, otherwise default to 0
       currency: product.currency,
       videourlForproduct: product.videourlForproduct,
-      productQuantity: 0, // Provide a default value or handle this appropriately
-      targetaudience: '',
-      problemaddressed: '',
-      technologyused: '',
-      stageofdevelopmentdropdown: '',
-      intellectualpropertyconsiderations: '',
-      CompetitiveAdvantages: '',
-      feasibilityofthesolution: '',
-      howdoesthesolutionwork: '',
-      potentialbenefits: '',
-      challengesorrisks: '',
-      productType: '' // Provide a default value or handle this appropriately
+      productQuantity: product.productQuantity ?? 0, // Use productQuantity if available, otherwise default to 0
+      targetaudience: product.targetaudience??'',
+      problemaddressed: product.problemaddressed??'',
+      technologyused: product.technologyused??'',
+      stageofdevelopmentdropdown: product.stageofdevelopmentdropdown ?? '', // Use value if available
+      intellectualpropertyconsiderations: product.intellectualpropertyconsiderations?? '',
+      CompetitiveAdvantages: product.CompetitiveAdvantages?? '',
+      feasibilityofthesolution: product.feasibilityofthesolution??'',
+      howdoesthesolutionwork: product.howdoesthesolutionwork??'',
+      potentialbenefits: product.potentialbenefits??'',
+      challengesorrisks: product.challengesorrisks??'',
     };
   };
+  
 
   useEffect(() => {
     fetchProductDetailsForUser();
@@ -247,24 +248,16 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
           </Box>
           {user.userType === 'Innovator' && (
-            <ProductTable
-              products={productArray}
-              onRemove={(index) => {
-                const updatedProducts = productArray.filter((_, i) => i !== index);
-                setProductDetails(
-                  updatedProducts.map(product => convertToProductForBooth(product))
-                );
-              }}
-              onChange={(index, updatedProduct) => {
-                const updatedProducts = productArray.map((product, i) =>
-                  i === index ? updatedProduct : product
-                );
-                setProductDetails(
-                  updatedProducts.map(product => convertToProductForBooth(product))
-                );
-              }}
-              showActions={false}
-              readOnly={true}
+            <NewProductTable
+              products={productArray} onView={function (product: Product): void {
+                throw new Error('Function not implemented.');
+              } } onEdit={function (product: Product): void {
+                throw new Error('Function not implemented.');
+              } } onDelete={function (id: string): void {
+                throw new Error('Function not implemented.');
+              } }    
+              hideActions={true}          
+              
             />
           )}
         </>

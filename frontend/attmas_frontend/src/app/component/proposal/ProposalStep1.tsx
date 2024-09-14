@@ -4,8 +4,20 @@ import { Formik, Form, Field, ErrorMessage, FormikValues } from 'formik';
 import * as Yup from 'yup';
 import { Proposal } from '@/app/proposal/page';
 
+export interface formValues {
+    isPeerReviewed?: string;
+    expectedOutcome?: string;
+    detailedMethodology?: string;
+    manpowerDetails?: string;
+    pastCredentials?: string;
+    briefProfile?: string;
+    proposalOwnerCredentials?: string;
+    physicalAchievements?: string;
+    budgetOutlay?: string;
+}
+
 interface ProposalStep1Props {
-    initialValues?: Proposal | null;
+    initialValues?: Proposal |formValues |  null;
     onNext: (values: any) => void;
     readOnly?: boolean; // Add readOnly prop
 }
