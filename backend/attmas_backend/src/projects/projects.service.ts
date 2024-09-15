@@ -27,7 +27,7 @@ export class JobsService {
     private readonly emailService: EmailService2,
     @InjectModel(Exhibition.name)
     private exhibitionModel: Model<ExhibitionDocument>,
-  ) { }
+  ) {}
 
   async create(createJobsDto: CreateJobsDto): Promise<Jobs> {
     for (const key in createJobsDto) {
@@ -220,10 +220,13 @@ export class JobsService {
     TimeFrame?: string,
     ProjectOwner?: string,
     appstatus?: string, // Application status (e.g., 'Awarded')
+    applicationId?: string,
   ): Promise<Jobs[]> {
     const skip = (page - 1) * limit;
     const filter: any = {};
     const filterQuery: any = {};
+
+    console.log('applicationId', applicationId);
 
     const allNativeFiltersArray = {
       title,
@@ -238,13 +241,14 @@ export class JobsService {
     for (const key in allNativeFiltersArray) {
       if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
         const element = allNativeFiltersArray[key];
+        const elementValue = Array.isArray(element) ? element.length : element;
         if ((key === 'createdAt' || key === 'TimeFrame') && element) {
           const sameDateISOs = getSameDateISOs(element);
           filterQuery[key] = {
             $gte: sameDateISOs.startOfDay,
             $lte: sameDateISOs.endOfDay,
           };
-        } else if (element) {
+        } else if (elementValue) {
           filterQuery[key] = new RegExp(element, 'i');
         }
       }
@@ -295,7 +299,6 @@ export class JobsService {
         },
       },
       {
-        
         $match: {
           ...filterQuery,
           // ...(status && { status }), // Match job status dynamically
@@ -313,6 +316,9 @@ export class JobsService {
               { 'userId.firstName': filter.ProjectOwner },
               { 'userId.lastName': filter.ProjectOwner },
             ],
+          }),
+          ...(applicationId && {
+            'applies._id': new Types.ObjectId(applicationId),
           }),
         },
       },
@@ -364,7 +370,10 @@ export class JobsService {
       },
     ];
 
-    return await this.jobsModel.aggregate(pipeline);
+    console.log('pipeline', JSON.stringify(pipeline));
+    const data = await this.jobsModel.aggregate(pipeline);
+    console.log('data', data);
+    return data;
   }
 
   async findJobWithUser(id: string): Promise<Jobs> {
@@ -422,7 +431,7 @@ export class JobsService {
         if (freelancers.length === 0) {
         }
         for (const freelancer of freelancers) {
-          await this.emailService.sendEmailToFreelancer(
+          this.emailService.sendEmailToFreelancer(
             freelancer.username,
             project._id.toString(),
             project.title,
@@ -435,7 +444,7 @@ export class JobsService {
         if (innovators.length === 0) {
         }
         for (const innovator of innovators) {
-          await this.emailService.sendEmailToInnovator(
+          this.emailService.sendEmailToInnovator(
             innovator.username,
             project._id.toString(),
             project.title,

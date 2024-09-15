@@ -43,6 +43,7 @@ export class JobsController {
     @Query('TimeFrame') TimeFrame?: string,
     @Query('ProjectOwner') ProjectOwner?: string,
     @Query('appstatus') appstatus?: string,
+    @Query('applicationId') applicationId?: string,
   ): Promise<Jobs[]> {
     return this.jobsService.filterJobs(
       page,
@@ -60,6 +61,7 @@ export class JobsController {
       TimeFrame,
       ProjectOwner,
       appstatus,
+      applicationId,
     );
   }
 
