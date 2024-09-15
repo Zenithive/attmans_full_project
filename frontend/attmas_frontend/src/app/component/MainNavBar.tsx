@@ -169,10 +169,10 @@ export default function MainNavBar() {
 
   const openProjectTab = (notificationObj: Email) => {
     console.log(notificationObj)
-    if(notificationObj.applicationId){
+    if (notificationObj.applicationId) {
       router.push(`/projects?applicationId=${notificationObj.applicationId}`);
-    }else if(notificationObj.projectId){
-      router.push(`/projects?projectId=${notificationObj.projectId}`);
+    } else if (notificationObj.projectId || notificationObj.jobId) {
+      router.push(`/projects?projectId=${notificationObj.projectId || notificationObj.jobId}`);
     }
   }
 
@@ -190,7 +190,7 @@ export default function MainNavBar() {
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            Your application "{notification.title}" has been {notification.status3} by "{notification.adminFirstName} {notification.adminLastName}". Click <a href="#" onClick={()=> openProjectTab(notification)}>here</a> for more details.
+            Your application "{notification.title}" has been {notification.status3} by "{notification.adminFirstName} {notification.adminLastName}". Click <a href="#" onClick={() => openProjectTab(notification)}>here</a> for more details.
           </Typography >
         </>
       );
@@ -202,7 +202,7 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             You have been notified that "{notification.first} {notification.last}" has created a project.
-            <a href="#" onClick={()=> openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects "{notification.title}".
+            <a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects "{notification.title}".
           </Typography >
         </>
       );
@@ -213,7 +213,7 @@ export default function MainNavBar() {
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            Your booth "{notification.title}" request for exhibition is {notification.status} by "{notification.exhibitionUserFirstName} {notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+            Your booth "{notification.title}" request for exhibition is {notification.status} by "{notification.exhibitionUserFirstName} {notification.exhibitionUserLastName}". Click <a href={viewExhibitionUrl} target="_blank">here</a> for more details.
           </Typography >
         </>
       );
@@ -236,7 +236,7 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             Your project "{notification.title}" has been {notification.status2} by {notification.adminFirstName} {notification.adminLastName}.
-            <a href="https://attmans.netlify.app/projects" style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects.
+            <a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects.
           </Typography >
         </>
       );
@@ -259,7 +259,7 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear Freelancers,<br />
             A project "{notification.title}" has been created for you.<br />
-            Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
+            Please check the details and proceed with the next steps.Click <a href="#" onClick={() => openProjectTab(notification)}>here</a>.
           </Typography>
         </>
       );
@@ -271,7 +271,7 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear Innovators,<br />
             A project "{notification.title}" has been created for you. <br />
-            Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>
+            Please check the details and proceed with the next steps.Click <a href="#" onClick={() => openProjectTab(notification)}>here</a>
           </Typography>
         </>
       );

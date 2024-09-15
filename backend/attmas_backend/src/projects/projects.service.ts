@@ -431,7 +431,7 @@ export class JobsService {
         if (freelancers.length === 0) {
         }
         for (const freelancer of freelancers) {
-          await this.emailService.sendEmailToFreelancer(
+          this.emailService.sendEmailToFreelancer(
             freelancer.username,
             project._id.toString(),
             project.title,
@@ -444,7 +444,7 @@ export class JobsService {
         if (innovators.length === 0) {
         }
         for (const innovator of innovators) {
-          await this.emailService.sendEmailToInnovator(
+          this.emailService.sendEmailToInnovator(
             innovator.username,
             project._id.toString(),
             project.title,
