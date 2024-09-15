@@ -12,8 +12,8 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { Formik, Form, Field, FieldArray, FormikValues } from 'formik';
-import { Proposal } from '@/app/proposal/page';
+import { Formik, Form, Field, FieldArray } from 'formik';
+import { formValues } from './ProposalStep1';
 
 export interface BudgetOutlay {
   head: string;
@@ -44,35 +44,40 @@ export interface ProposalStep2Values {
 }
 
 interface ProposalStep2Props {
-  initialValues?: Proposal | null;
+  initialValues?: ProposalStep2Values | formValues | null;
   onNext: (values: ProposalStep2Values) => void;
   onPrevious: () => void;
-  readOnly?: boolean; // Added prop for read-only mode
+  readOnly?: boolean;
 }
 
-const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initialValues, readOnly = false }) => {
+
+const ProposalStep2: React.FC<ProposalStep2Props> = ({
+  onNext,
+  onPrevious,
+  initialValues,
+  readOnly = false,
+}) => {
   // Default initial values to match ProposalStep2Values
-  const defaultValues: ProposalStep2Values = {
-    isPeerReviewed: '',
-    expectedOutcome: '',
-    detailedMethodology: '',
-    physicalAchievements: '',
-    budgetOutlay: [{ head: '', firstYear: '', secondYear: '', thirdYear: '', total: '' }],
-    manpowerDetails: [{ designation: '', monthlySalary: '', firstYear: '', secondYear: '', totalExpenditure: '' }],
-    pastCredentials: '',
-    briefProfile: '',
-    proposalOwnerCredentials: '',
-    ...initialValues,
-  };
+
+
+  const readOnlyHeads = [
+    'Capital Equipment',
+    'Consumable Stores',
+    'Duty on Import',
+    'Manpower',
+    'Travel & Training',
+    'Contingencies',
+    'Overheads',
+  ];
 
   return (
     <Formik
-      initialValues={(initialValues || {
-        isPeerReviewed: '',
-        expectedOutcome: '',
-        detailedMethodology: '',
-        physicalAchievements: '',
-        budgetOutlay: [
+      initialValues={{
+        isPeerReviewed: initialValues?.isPeerReviewed || '',
+        expectedOutcome: initialValues?.expectedOutcome || '',
+        detailedMethodology: initialValues?.detailedMethodology || '',
+        physicalAchievements: initialValues?.physicalAchievements || '',
+        budgetOutlay: initialValues?.budgetOutlay || [
           { head: 'Capital Equipment', firstYear: '', secondYear: '', thirdYear: '', total: '' },
           { head: 'Consumable Stores', firstYear: '', secondYear: '', thirdYear: '', total: '' },
           { head: 'Duty on Import', firstYear: '', secondYear: '', thirdYear: '', total: '' },
@@ -81,13 +86,13 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
           { head: 'Contingencies', firstYear: '', secondYear: '', thirdYear: '', total: '' },
           { head: 'Overheads', firstYear: '', secondYear: '', thirdYear: '', total: '' },
         ],
-        manpowerDetails: [
+        manpowerDetails: initialValues?.manpowerDetails || [
           { designation: '', monthlySalary: '', firstYear: '', secondYear: '', totalExpenditure: '' },
         ],
-        pastCredentials: '',
-        briefProfile: '',
-        proposalOwnerCredentials: '',
-      }) as FormikValues}
+        pastCredentials: initialValues?.pastCredentials || '',
+        briefProfile: initialValues?.briefProfile || '',
+        proposalOwnerCredentials: initialValues?.proposalOwnerCredentials || '',
+      }}
       onSubmit={(values) => onNext(values as ProposalStep2Values)}
     >
       {({ values, handleSubmit }) => (
@@ -135,7 +140,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
               disabled={readOnly} // Apply readOnly
             />
 
-            {/* Budget Outlay Table */}
+
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               Budget Outlay
             </Typography>
@@ -144,33 +149,53 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold' }}>Head</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>1st Year </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>2nd Year </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>3rd Year </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Total </TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>1st Year</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>2nd Year</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>3rd Year</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>Total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
+
                   <FieldArray
                     name="budgetOutlay"
-                    render={() => (
-                      values.budgetOutlay.map((row: { head: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }, index: React.Key | null | undefined) => (
-                        <TableRow key={index}>
-                          <TableCell>{row.head}</TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].firstYear`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].secondYear`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].thirdYear`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                          <TableCell>
-                            <Field name={`budgetOutlay[${index}].total`} as={TextField} disabled={readOnly} />
-                          </TableCell>
-                        </TableRow>
-                      ))
+                    render={arrayHelpers => (
+                      <>
+                        {Array.isArray(values.budgetOutlay) && values.budgetOutlay.map((row: BudgetOutlay, index: React.Key | null | undefined) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].head`} as={TextField} disabled={true} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].firstYear`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].secondYear`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].thirdYear`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                            <TableCell>
+                              <Field name={`budgetOutlay[${index}].total`} as={TextField} disabled={readOnly} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {!readOnly && (
+                          <Button
+                            onClick={() =>
+                              arrayHelpers.push({
+                                head: '',
+                                firstYear: '',
+                                secondYear: '',
+                                thirdYear: '',
+                                total: ''
+                              })
+                            }
+                          >
+                            Add Row
+                          </Button>
+                        )}
+                      </>
                     )}
                   />
                 </TableBody>
@@ -197,7 +222,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                     name="manpowerDetails"
                     render={arrayHelpers => (
                       <>
-                        {values.manpowerDetails.map((row: any, index: React.Key | null | undefined) => (
+                        {Array.isArray(values.manpowerDetails) && values.manpowerDetails.map((row: ManpowerDetail, index: React.Key | null | undefined) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Field name={`manpowerDetails[${index}].designation`} as={TextField} disabled={readOnly} />
@@ -237,7 +262,6 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({ onNext, onPrevious, initi
                 </TableBody>
               </Table>
             </TableContainer>
-
             <Field
               color='secondary'
               rows={4}
