@@ -10,18 +10,17 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
-import { Divider, MenuItem, Typography } from '@mui/material';
+import { Divider, MenuItem, Tab, Typography } from '@mui/material';
 import { UserSchema, selectUserSession, updateProfilePhoto } from '../reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { Avatar } from '@mui/material';
 import { APIS, SERVER_URL } from '../constants/api.constant';
 import { removeUser } from '../reducers/userReducer';
-import DOMPurify from 'dompurify';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CircleIcon from '@mui/icons-material/Circle';
-import Jobs from '../projects/page';
 import { CommonAvatar } from './common-ui/avatar.component';
 import axiosInstance from '../services/axios.service';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 
 interface Email {
   _id: string;
@@ -73,6 +72,12 @@ export default function MainNavBar() {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isNotificationMenuOpen = Boolean(notificationAnchorEl);
+
+  const [value, setValue] = React.useState('1');
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
 
   React.useEffect(() => {
     const fetchUserProfile = async () => {
@@ -126,6 +131,7 @@ export default function MainNavBar() {
 
   const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setNotificationAnchorEl(event.currentTarget);
+    setValue('1');
   };
 
   const handleNotificationMenuClose = () => {
@@ -142,8 +148,6 @@ export default function MainNavBar() {
       });
       if (notificationObj.exhibitionId) {
         window.open(`/view-exhibition?exhibitionId=${notificationObj.exhibitionId}`, '_blank');
-      } else {
-        window.open(`/projects`);
       }
     } catch (error) {
       console.error("Error marking notification as read:", error);
@@ -163,80 +167,124 @@ export default function MainNavBar() {
     }
   };
 
+  const openProjectTab = (notificationObj: Email) => {
+    console.log(notificationObj)
+    if(notificationObj.applicationId){
+      router.push(`/projects?applicationId=${notificationObj.applicationId}`);
+    }else if(notificationObj.projectId){
+      router.push(`/projects?projectId=${notificationObj.projectId}`);
+    }
+  }
+
   const handleProfileRedirect = () => {
     handleMenuClose();
     router.push('/editprofile');
   };
 
   const generateNotificationHtml = (notification: Email) => {
-    const baseUrl = 'http://localhost:4200/projects';
     const userName = `${userDetails.firstName} ${userDetails.lastName}`;
     const viewExhibitionUrl = `/view-exhibition?exhibitionId=${notification.exhibitionId}`;
 
     if (notification.applicationId && notification.status3) {
-      return `
-        Dear ${userName},<br>
-        Your application "${notification.title}" has been ${notification.status3} by "${notification.adminFirstName} ${notification.adminLastName}". Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a> for more details.
-      `;
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            Your application "{notification.title}" has been {notification.status3} by "{notification.adminFirstName} {notification.adminLastName}". Click <a href="#" onClick={()=> openProjectTab(notification)}>here</a> for more details.
+          </Typography >
+        </>
+      );
     }
 
     if (notification.subject === 'New Project Created') {
-      return `
-        Dear ${userName},<br>
-        You have been notified that "${notification.first} ${notification.last}" has created a project. 
-        <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects "${notification.title}".
-      `;
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that "{notification.first} {notification.last}" has created a project.
+            <a href="#" onClick={()=> openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects "{notification.title}".
+          </Typography >
+        </>
+      );
     }
 
     if (notification.status) {
-      return `
-        Dear ${userName},<br>
-        Your booth "${notification.title}" request for exhibition is ${notification.status} by "${notification.exhibitionUserFirstName} ${notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
-      `;
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            Your booth "{notification.title}" request for exhibition is {notification.status} by "{notification.exhibitionUserFirstName} {notification.exhibitionUserLastName}". Click <a href="https://attmans.netlify.app${viewExhibitionUrl}" target="_blank">here</a> for more details.
+          </Typography >
+        </>
+      );
     }
 
     if (notification.boothUsername) {
-      return `
-        Dear ${userName},<br>
-        You have been notified that ${notification.boothUsername} has requested to participate in the Exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to approve/reject.
-      `;
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.boothUsername} has requested to participate in the Exhibition "{notification.title}". Click <a href={viewExhibitionUrl} target="_blank">here</a> to approve/reject.
+          </Typography >
+        </>
+      );
     }
 
     if (notification.status2) {
-      return `
-        Dear ${userName},<br>
-        Your project "${notification.title}" has been ${notification.status2} by ${notification.adminFirstName} ${notification.adminLastName}. 
-        <a href="https://attmans.netlify.app/projects" style="color:blue; cursor:pointer;">Click here</a> to view projects.
-      `;
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            Your project "{notification.title}" has been {notification.status2} by {notification.adminFirstName} {notification.adminLastName}.
+            <a href="https://attmans.netlify.app/projects" style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects.
+          </Typography >
+        </>
+      );
     }
 
     if (notification.notifType === 'Apply Create') {
-      return `
-      Dear ${userName},<br>
-      You have been notified for new apllication submitted for the Project: ${notification.title}
-      `;
-    }
-    
-    if(notification.userType === 'Freelancer') {
-        return `
-        Dear Freelancers,<br>
-        A project "${notification.title}" has been created for you.<br>
-        Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
-      `;
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified for new apllication submitted for the Project: {notification.title}
+          </Typography>
+        </>
+      );
     }
 
-    if(notification.userType === 'Innovators'){
-      return `
-        Dear Innovators,<br>
-        A project "${notification.title}" has been created for you.<br>
-        Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
-      `;
+    if (notification.userType === 'Freelancer') {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear Freelancers,<br />
+            A project "{notification.title}" has been created for you.<br />
+            Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>.
+          </Typography>
+        </>
+      );
     }
 
-    return `
-      Dear ${userName},<br>
-      You have been invited to participate in the exhibition "${notification.title}". Click <a href="${viewExhibitionUrl}" target="_blank">here</a> to participate.
-    `;
+    if (notification.userType === 'Innovator') {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear Innovators,<br />
+            A project "{notification.title}" has been created for you. <br />
+            Please check the details and proceed with the next steps.Click <a href="https://attmans.netlify.app/projects" target="_blank">here</a>
+          </Typography>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+          Dear {userName},<br />
+          You have been invited to participate in the exhibition "{notification.title}". Click <a href={viewExhibitionUrl} target="_blank">here</a> to participate.
+        </Typography>
+      </>
+    );
   };
 
 
@@ -317,54 +365,71 @@ export default function MainNavBar() {
           Notifications
         </Typography>
 
-        {notifications.filter(notification => !notification.read).length > 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-            {notifications.filter(notification => !notification.read).map((notification, index) => (
-              <React.Fragment key={notification._id}>
-                <MenuItem
-                  onClick={() => handleNotificationClick(notification)}
-                  sx={{
-                    whiteSpace: 'normal',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    backgroundColor: 'grey.200',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
-                  <IconButton size="small" color="inherit">
-                    <CircleIcon fontSize="inherit" sx={{ fontSize: '0.6rem' }} />
-                  </IconButton>
-                </MenuItem>
-                {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
+        <TabContext value={value}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <TabList onChange={handleChange} aria-label="lab API tabs example" indicatorColor='secondary' textColor='secondary'>
+              <Tab label="Read" value="1" sx={{ fontSize: 12 }} />
+              <Tab label="Unread" value="2" sx={{ fontSize: 12 }} />
+            </TabList>
           </Box>
-        )}
+          <TabPanel value="1">
+            {notifications.filter(notification => !notification.read).length > 0 && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+                {notifications.filter(notification => !notification.read).map((notification, index) => (
+                  <React.Fragment key={notification._id}>
+                    <MenuItem
+                      onClick={() => handleNotificationClick(notification)}
+                      sx={{
+                        whiteSpace: 'normal',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        backgroundColor: 'grey.200',
+                      }}
+                    >
+                      {/* <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize() }} /> */}
+                      {generateNotificationHtml(notification)}
+                      <IconButton size="small" color="inherit">
+                        <CircleIcon fontSize="inherit" sx={{ fontSize: '0.6rem' }} />
+                      </IconButton>
+                    </MenuItem>
+                    {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
+                  </React.Fragment>
+                ))}
+              </Box>
+            )}
+          </TabPanel>
+          <TabPanel value="2">
 
-        {notifications.filter(notification => notification.read).length > 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-            {notifications.filter(notification => notification.read).map((notification, index) => (
-              <React.Fragment key={notification._id}>
-                <MenuItem
-                  onClick={() => handleNotificationClick(notification)}
-                  sx={{
-                    whiteSpace: 'normal',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} />
-                  <IconButton size="small" color="inherit">
-                    <DoneAllIcon fontSize="small" />
-                  </IconButton>
-                </MenuItem>
-                {index < notifications.filter(notification => notification.read).length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </Box>
-        )}
+            {notifications.filter(notification => notification.read).length > 0 && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
+                {notifications.filter(notification => notification.read).map((notification, index) => (
+                  <React.Fragment key={notification._id}>
+                    <MenuItem
+                      onClick={() => handleNotificationClick(notification)}
+                      sx={{
+                        whiteSpace: 'normal',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      {/* <Typography variant="body2" sx={{ fontSize: '0.875rem' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateNotificationHtml(notification)) }} /> */}
+                      {generateNotificationHtml(notification)}
+                      <IconButton size="small" color="inherit">
+                        <DoneAllIcon fontSize="small" />
+                      </IconButton>
+                    </MenuItem>
+                    {index < notifications.filter(notification => notification.read).length - 1 && <Divider />}
+                  </React.Fragment>
+                ))}
+              </Box>
+            )}
+          </TabPanel>
+        </TabContext>
+
+
+
 
         {notifications.length === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>

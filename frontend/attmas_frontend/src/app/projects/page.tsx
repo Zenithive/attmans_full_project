@@ -26,10 +26,14 @@ import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { DATE_FORMAT } from '../constants/common.constants';
 import { PROJECT_STATUSES } from '../constants/status.constant';
 import axiosInstance from '../services/axios.service';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 
 const Jobs = () => {
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
@@ -157,27 +161,44 @@ const Jobs = () => {
     };
 
     const getParamForJobs = (page: number) => {
+        const applicationId = searchParams.get('applicationId');
+        const projectId = searchParams.get('projectId');
+        const appParam = applicationId ? `&applicationId=${applicationId}` : '';
+        const projectIdParam = projectId ? `&projId=${projectId}` : '';
         if (userType === 'Project Owner') {
-            return `?page=${page}&userId=${userDetails._id}&${filter}`;
+            return `?page=${page}&userId=${userDetails._id}${appParam}${projectIdParam}&${filter}`;
         } else if (userType === 'Freelancer') {
-            return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Outsource Research and Development&${filter}`;
+            return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Outsource Research and Development${appParam}${projectIdParam}&${filter}`;
         } else if (userType === 'Innovator') {
-            return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Innovative product&${filter}`;
+            return `?page=${page}&status=${PROJECT_STATUSES.approved}&SelectService=Innovative product${appParam}${projectIdParam}&${filter}`;
         } else {
-            return `?page=${page}&${filter}`;
+            return `?page=${page}${appParam}${projectIdParam}&${filter}`;
+        }
+    }
+
+    const showProjectModal = (resJob: Array<Job>) => {
+        const applicationId = searchParams.get('applicationId');
+        const projectId = searchParams.get('projectId');
+        if (applicationId) {
+            const currentProjectObj = resJob.find(a => a.applies?.find(b => b._id === applicationId))
+            currentProjectObj && handleViewJob(currentProjectObj);
+        }else if(projectId){
+            const currentProjectObj = resJob.find(a => a._id === projectId);
+            console.log("currentProjectObj", currentProjectObj)
+            currentProjectObj && handleViewJob(currentProjectObj);
         }
     }
 
 
     const fetchJobs = useCallback(async (page: number) => {
         try {
-
             const paramString = getParamForJobs(page);
             const response = await axiosInstance.get(`${APIS.JOBS}${paramString}`)
 
             if (response.data.length === 0) {
                 setHasMore(false);
             } else {
+                showProjectModal(response.data);
                 setJobs(prev => {
                     const newJobs = response.data.filter((newJobs: Job) => !prev.some((existingJobs) => existingJobs._id === newJobs._id));
                     return [...prev, ...newJobs];
@@ -189,7 +210,7 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, filterType, userType, filter]);
+    }, [userId, filterType, userType, filter, searchParams]);
 
     const fetchApplies = useCallback(async () => {
         try {
@@ -248,11 +269,11 @@ const Jobs = () => {
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs, filter]);
+    }, [fetchJobs, filter, searchParams]);
 
     useEffect(() => {
         refetch();
-    }, [filter, userId]);
+    }, [filter, userId, searchParams]);
 
     useEffect(() => {
         if (page > 1) {
@@ -392,6 +413,12 @@ const Jobs = () => {
             console.error('Error approving job:', error);
         }
     }, [refetch, viewingJob]);
+
+    useEffect(() => {
+        if (!viewingJob) {
+            router.replace('/projects');
+        }
+    }, [viewingJob]);
 
     const handleReject = useCallback(async (jobId: string, comment: string, job: Job | null) => {
         if (!job) {

@@ -1,6 +1,12 @@
 import { Chip, styled } from "@mui/material";
 import { UserSchema } from "../reducers/userReducer";
 
+interface ProjApplies {
+    status: string;
+    userId: string;
+    _id: string;
+}
+
 export interface Job {
     _id?: string;
     title: string;
@@ -17,8 +23,8 @@ export interface Job {
     Sector: string;
     Quantity: number;
     ProductDescription: string;
-    firstName:string,
-    lastName:string,
+    firstName: string,
+    lastName: string,
     username: string;
     SelectService: string;
     Objective: string;
@@ -28,12 +34,13 @@ export interface Job {
     // Status: string;
     status: string;
     rejectComment?: string;
+    applies?: ProjApplies[];
 }
 
 
 
 export interface Apply {
-    jobDetails:any;
+    jobDetails: any;
     _id?: string;
     title: string;
     description: string;
@@ -41,7 +48,7 @@ export interface Apply {
     currency: string;
     TimeFrame: string | null;
     rejectComment: string;
-    proposalsDetails:any;
+    proposalsDetails: any;
     status: string;
     firstName: string;
     lastName: string;
@@ -50,8 +57,8 @@ export interface Apply {
     userId?: UserSchema;
     availableSolution: string;
     SolutionUSP: string;
-    userDetails:any;
-  }
+    userDetails: any;
+}
 
 export const Expertiselevel = [
     "Beginner",
