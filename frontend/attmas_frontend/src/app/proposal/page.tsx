@@ -24,6 +24,7 @@ import { APPLY_STATUSES, PROJECT_STATUSES, PROPOSAL_STATUSES } from '@/app/const
 import axiosInstance from '../services/axios.service';
 import { pubsub } from '../services/pubsub.service';
 import ProjectDrawer from '../component/projectDrwer/projectDrwer';
+import Filters, { FilterColumn } from '../component/filter/filter.component';
 
 export interface Proposal {
     _id: string;
@@ -123,23 +124,58 @@ interface JobDetails {
     // Status: string;
     status: string;
     rejectComment?: string;
-
 }
 
-
-
 const proposal = () => {
-    const [jobs, setJobs] = useState<Job[]>([]);
+
+    const { userType } = useAppSelector(selectUserSession);;
+
+    const column: Array<FilterColumn> = [
+        {
+            name: "Project Name",
+            value: '',
+            type: "Texbox",
+            key: 'projTitle',
+            isVisible: true,
+        },
+        {
+            name: "Project Owner",
+            value: '',
+            type: "Texbox",
+            key: 'ProjectOwner',
+            isVisible: userType === "Admin",
+        },
+        {
+            name: "Status",
+            value: '',
+            type: "Texbox",
+            key: 'Status',
+            isVisible: (userType === "Admin" || userType === "Project Owner"),
+        },
+        {
+            name: "Category",
+            value: '',
+            type: "Category",
+            key: 'Category',
+            isVisible: true,
+        },
+        {
+            name: "Subject Matter Expertise",
+            value: '',
+            type: "SubCategory",
+            key: 'Subcategorys',
+            isVisible: true,
+        }
+    ];
+
+    const [filter, setFilter] = useState('');
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
-    const [filterOpen, setFilterOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [filterType, setFilterType] = useState("all");
-    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-    const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
     const [viewingJob, setViewingJob] = useState<Job | null>(null);
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -174,20 +210,7 @@ const proposal = () => {
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(1);
 
-    
-
     const [formValues, setFormValues] = useState({});
-    console.log("formValues", formValues);
-
-
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
 
     const handleUserClick = (username: string) => {
         setSelectedUser(username);
@@ -215,13 +238,13 @@ const proposal = () => {
     const fetchAllProposals = useCallback(async () => {
         if (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') {
             try {
-                const response = await axiosInstance.get(APIS.GET_ALL_PROPOSALS);
+                const response = await axiosInstance.get(`${APIS.GET_ALL_PROPOSALS}?${filter}`);
                 setProposals(response.data);
             } catch (error) {
                 console.error('Error fetching proposals:', error);
             }
         }
-    }, [userDetails.userType]);
+    }, [userDetails.userType, filter]);
 
 
     useEffect(() => {
@@ -232,13 +255,12 @@ const proposal = () => {
     useEffect(() => {
         fetchAllProposals();
         // Fetch proposals if user is Admin
-    }, [fetchAllProposals]);
+    }, [fetchAllProposals, filter]);
 
 
     const refetch = useCallback(async () => {
         try {
             setPage(1);
-            setJobs([]);
             setHasMore(true);
         } catch (error) {
             console.error('Error refetching jobs:', error);
@@ -252,9 +274,8 @@ const proposal = () => {
 
     const fetchAppliedJobs = async () => {
         try {
-            const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}`);
-            const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
-            setAppliedJobs(fetchedAppliedJobs);
+            const response = await axiosInstance.get(`${APIS.APPLIED_JOBS}/${userId}?${filter}`);
+            //const fetchedAppliedJobs = response.data.map((application: Apply) => application.jobId);
             setApplications(response.data);
         } catch (error) {
             console.error('Error fetching applied jobs:', error);
@@ -263,7 +284,7 @@ const proposal = () => {
 
     useEffect(() => {
         fetchAppliedJobs();
-    }, [userId]);
+    }, [userId, filter]);
 
     useEffect(() => {
         pubsub.subscribe('ProposalRefetch', fetchAppliedJobs);
@@ -332,27 +353,6 @@ const proposal = () => {
     };
 
 
-
-    // useEffect(() => {
-    //     const checkProposalStatus = async () => {
-    //       try {
-    //         const response = await axiosInstance.get(`${SERVER_URL}/proposals/check`, {
-    //           params: {
-    //             userID: userId,
-    //             applyId: selectedApply?._id, 
-    //           },
-    //         });
-
-    //         setHasSubmittedProposal(response.data !== null);
-    //       } catch (error) {
-    //         console.error('Error checking proposal status:', error);
-    //       }
-    //     };
-
-    //     checkProposalStatus();
-    //   }, [selectedApply?._id, userId]);
-
-
     const handleApprove = (proposalId: string) => {
         setConfirmationOpen(true);
         setCurrentAction('Approve');
@@ -393,12 +393,6 @@ const proposal = () => {
         try {
             if (!applicationId) return;
 
-            // First, award the selected application
-            // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`);
-            // await axios.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
-            //   jobId, // Include jobId in the payload
-            // });
-
             await axiosInstance.post(`${APIS.APPLYFORREWARD}/reward/${applicationId}`, {
                 jobId: viewingJob?._id, // Include jobId in the payload
                 Comment
@@ -410,9 +404,6 @@ const proposal = () => {
                     ? { ...app, status: 'Awarded' }
                     : { ...app, status: 'Not Awarded' }
             );
-
-            // Make an API call to update all applications' statuses on the server
-            // await axios.post(`${APIS.NOTAWARED}/updateStatuses`, { applications: updatedApplications });
 
             // Update the local state with the new statuses
             setApplications(updatedApplications);
@@ -469,20 +460,6 @@ const proposal = () => {
         }
     }, [userDetails.userType]);
 
-    // useEffect(() => {
-    //     const fetchProposalStatus = async () => {
-    //       try {
-    //      
-    //         const response = await axiosInstance.get(`${APIS.CHECK_PROPOSAL_SUBMISSION}/${userDetails._id}/${selectedApply?._id}`);
-    //    
-    //         setHasSubmittedProposal(response.data.hasSubmittedProposal);
-    //       } catch (error) {
-    //         console.error('Error fetching proposal status:', error);
-    //       }
-    //     };
-
-    //     fetchProposalStatus();
-    //   }, [userDetails._id, selectedApply?._id]);
     const handleViewProposal = (proposal: Proposal) => {
         setSelectedProposal(proposal); // Set the selected proposal in state
         setCurrentStep(1); // Set to the first step
@@ -494,10 +471,14 @@ const proposal = () => {
         setOpenDialog(false);
     };
 
-
-
-
-
+    const changeFilterOrPage = (paramStr: string) => {
+        if (paramStr && paramStr.length) {
+            setFilter(paramStr);
+        } else {
+            setFilter('');
+        }
+        setPage(1);
+    }
 
     return (
         <Box
@@ -538,77 +519,10 @@ const proposal = () => {
                     </Typography>
                 )}
 
-            </Box>
-
-
-            <Box sx={{
-                position: 'relative', left: '87%', width: '3%', bottom: '26px', '@media (max-width: 767px)': {
-                    position: 'relative',
-                    top: '8px',
-                    left: '-5px',
-                    marginBottom: '15px'
-                }
-            }}>
-                <Tooltip title="Filter" arrow>
-                    <IconButton onClick={() => setFilterOpen(prev => !prev)}>
-                        <FilterAltIcon />
-                    </IconButton>
-                </Tooltip>
-            </Box>
-
-            {filterOpen && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        marginBottom: '20px',
-                        gap: 3,
-                        alignItems: 'center',
-                        '@media (max-width: 767px)': {
-                            flexDirection: 'column',
-                            alignItems: 'stretch',
-                            gap: 2,
-                            width: '100%'
-                        },
-                    }}
-                >
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Expertiselevel}
-                        value={selectedExpertis}
-                        onChange={(event, value) => setSelectedExpertis(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Expertise-Level" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={Category()}
-                        value={selectedCategory}
-                        onChange={(event, value) => setSelectedCategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Category" color="secondary" />
-                        )}
-                    />
-
-                    <Autocomplete
-                        sx={{ flex: 1, width: { xs: '100%', md: 'auto' } }}
-                        multiple
-                        size="small"
-                        options={getSubcategorys(Subcategorys())}
-                        value={selectedSubcategory}
-                        onChange={(event, value) => setSelectedSubcategory(value)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Filter by Subcategory" color="secondary" />
-                        )}
-                    />
-
+                <Box sx={{ flex: '0 1 auto', mr: 3 }}>
+                    <Filters column={column} onFilter={changeFilterOrPage}></Filters>
                 </Box>
-            )}
+            </Box>
 
             <Box sx={{ mt: 2, position: 'relative' }}>
                 {(userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (
@@ -648,7 +562,7 @@ const proposal = () => {
                                                 </Typography>
                                             )}
 
-                                            <Link
+                                            {(proposal.Status === PROPOSAL_STATUSES.notAwarded || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded || proposal.Status === PROPOSAL_STATUSES.pending || proposal.Status === PROPOSAL_STATUSES.proposalUnderReview)  && <Link
                                                 component="button"
                                                 // variant="contained"
                                                 color="primary"
@@ -661,7 +575,7 @@ const proposal = () => {
                                                 }} // Style to ensure link is blue with underline
                                             >
                                                 View Proposal
-                                            </Link>
+                                            </Link>}
 
                                             <Link
                                                 component="button"
@@ -765,7 +679,7 @@ const proposal = () => {
                                                     <Box
 
                                                     >
-                                                        {application.title},
+                                                        {application.title} &nbsp;
                                                         <span style={{ fontSize: 'small', color: "#616161" }}>
                                                             {/* ({dayjs(job.TimeFrame).format('MMMM D, YYYY h:mm A')}) */}
                                                             {dayjs(application.TimeFrame).format(DATE_FORMAT)}
@@ -828,7 +742,7 @@ const proposal = () => {
                                                 </Link>
 
 
-                                                <Link
+                                                {(application.status === APPLY_STATUSES.notAwarded || application.status === APPLY_STATUSES.awarded || application.status === APPLY_STATUSES.proposalApprovalPending || application.status === APPLY_STATUSES.proposalUnderReview) && <Link
                                                     component="button"
                                                     color="primary"
                                                     onClick={() => handleViewProposal(application.proposalsDetails)}
@@ -840,7 +754,7 @@ const proposal = () => {
                                                     }}
                                                 >
                                                     View Proposal
-                                                </Link>
+                                                </Link>}
 
 
                                                 <Link

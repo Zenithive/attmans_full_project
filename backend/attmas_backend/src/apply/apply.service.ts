@@ -21,6 +21,7 @@ import {
   APPLY_STATUSES,
   PROPOSAL_STATUSES,
 } from 'src/common/constant/status.constant';
+import { getSameDateISOs } from 'src/services/util.services';
 
 @Injectable()
 export class ApplyService {
@@ -271,14 +272,37 @@ export class ApplyService {
     return this.ApplyModel.find({ userId }).exec();
   }
 
-  async findAppliedJobs(userId: string): Promise<any[]> {
+  async findAppliedJobs(
+    userId?: string,
+    projTitle?: string,
+    Category?: string,
+    Subcategorys?: string,
+    jobId?: string,
+  ): Promise<any[]> {
     try {
+      const filterQuery: any = {};
+
+      const allNativeFiltersArray = {};
+
+      for (const key in allNativeFiltersArray) {
+        if (Object.prototype.hasOwnProperty.call(allNativeFiltersArray, key)) {
+          const element = allNativeFiltersArray[key];
+          const elementValue = Array.isArray(element)
+            ? element.length
+            : element;
+          if ((key === 'createdAt' || key === 'TimeFrame') && element) {
+            const sameDateISOs = getSameDateISOs(element);
+            filterQuery[key] = {
+              $gte: sameDateISOs.startOfDay,
+              $lte: sameDateISOs.endOfDay,
+            };
+          } else if (elementValue) {
+            filterQuery[key] = new RegExp(element, 'i');
+          }
+        }
+      }
+
       const results = await this.ApplyModel.aggregate([
-        {
-          $match: {
-            userId: new Types.ObjectId(userId),
-          },
-        },
         {
           $lookup: {
             from: 'proposals',
@@ -303,6 +327,24 @@ export class ApplyService {
         },
         // Optionally, unwind the jobDetails array to get a single document per match
         { $unwind: { path: '$jobDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $match: {
+            ...(userId && { userId: new Types.ObjectId(userId) }),
+            ...(projTitle && {
+              'jobDetails.title': new RegExp(projTitle, 'i'),
+            }),
+            ...(Category && {
+              'jobDetails.Category': new RegExp(Category, 'i'),
+            }),
+            ...(Subcategorys && {
+              'jobDetails.Subcategorys': new RegExp(Subcategorys, 'i'),
+            }),
+            ...(jobId && {
+              'jobDetails._id': new Types.ObjectId(jobId),
+            }),
+          },
+        },
+        { $sort: { createdAt: -1 } },
         { $limit: 10 },
         {
           $project: {
@@ -399,9 +441,10 @@ export class ApplyService {
   }
 
   async findJobDetails(jobId: string): Promise<Apply[]> {
-    return this.ApplyModel.find({ jobId })
-      .populate('userId', 'firstName lastName username')
-      .exec();
+    // return this.ApplyModel.find({ jobId })
+    //   .populate('userId', 'firstName lastName username')
+    //   .exec();
+    return this.findAppliedJobs(null, null, null, null, jobId);
   }
 
   async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {

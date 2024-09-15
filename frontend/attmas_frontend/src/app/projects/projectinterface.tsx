@@ -17,6 +17,7 @@ export interface Job {
     Category: string[];
     Subcategorys: string[];
     appliesCount?: number;
+    jobDetails?: Job;
 
     // ******** op ******** //
     DetailsOfInnovationChallenge: string;

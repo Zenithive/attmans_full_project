@@ -100,8 +100,18 @@ export class ApplyController {
   }
 
   @Get('appliedJobs/:userId')
-  async getAppliedJobs(@Param('userId') userId: string) {
-    return this.applyService.findAppliedJobs(userId);
+  async getAppliedJobs(
+    @Param('userId') userId: string,
+    @Query('projTitle') projTitle: string,
+    @Query('Category') Category: string,
+    @Query('Subcategorys') Subcategorys: string,
+  ) {
+    return this.applyService.findAppliedJobs(
+      userId,
+      projTitle,
+      Category,
+      Subcategorys,
+    );
   }
 
   @Get('appliedJobsForAdmin/status/:status')

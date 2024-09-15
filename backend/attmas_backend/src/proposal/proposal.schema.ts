@@ -65,6 +65,7 @@ export const ProposalSchema = new Schema({
   firstname: { type: String, required: false },
   lastname: { type: String, required: false },
   comment: { type: String, required: false },
+  createdAt: { type: Date, default: Date.now() },
 });
 
 export interface Proposal extends Document {
@@ -122,6 +123,7 @@ export interface Proposal extends Document {
   firstname: string;
   lastname: string;
   comment: string;
+  createdAt: Date;
 }
 
 ProposalSchema.post('save', async function (doc: Proposal) {
