@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Button, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { AddProjects } from '../component/projects/projects';
@@ -736,4 +736,12 @@ const Jobs = () => {
     );
 };
 
-export default Jobs;
+const SuspenseJobPage: React.FC = () => {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <Jobs />
+      </Suspense>
+    );
+  };
+
+export default SuspenseJobPage;
