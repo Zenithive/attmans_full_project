@@ -12,6 +12,13 @@ import {
 } from 'src/common/constant/status.constant';
 import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 
+interface ProposalFilter {
+  projTitle: string;
+  Category: string;
+  Subcategorys: string;
+  Status: string;
+}
+
 @Injectable()
 export class ProposalService {
   constructor(
@@ -59,7 +66,12 @@ export class ProposalService {
   //   return !!proposal;
   // }
 
-  async findAllProposal(): Promise<Proposal[]> {
+  async findAllProposal({
+    projTitle,
+    Category,
+    Subcategorys,
+    Status,
+  }: ProposalFilter): Promise<Proposal[]> {
     try {
       const results = await this.proposalModel
         .aggregate([
@@ -91,7 +103,46 @@ export class ProposalService {
               preserveNullAndEmptyArrays: true,
             },
           },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'jobDetails.userId',
+              foreignField: '_id',
+              as: 'jobUserId',
+            },
+          },
+          {
+            $unwind: {
+              path: '$jobUserId',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $match: {
+              ...(Status && {
+                Status: new RegExp(Status, 'i'),
+              }),
+              ...(projTitle && {
+                'jobDetails.title': new RegExp(projTitle, 'i'),
+              }),
+              ...(Category && {
+                'jobDetails.Category': new RegExp(Category, 'i'),
+              }),
+              ...(Subcategorys && {
+                'jobDetails.Subcategorys': new RegExp(Subcategorys, 'i'),
+              }),
+            },
+          },
+          {
+            // Step 5: Add a field from 'vendorData' while keeping the other booth fields unchanged
+            $addFields: {
+              'jobDetails.userId.firstName': '$jobUserId.firstName', // Add/update only 'vendorName' in 'booths'
+              'jobDetails.userId.lastName': '$jobUserId.lastName', // Add/update only 'vendorName' in 'booths'
+              'jobDetails.userId._id': '$jobUserId._id', // Add/update only 'vendorName' in 'booths'
+            },
+          },
           { $limit: 10 },
+          { $sort: { createdAt: -1 } },
           {
             $project: {
               jobDetails: 1, // Optionally exclude jobDetails if not needed

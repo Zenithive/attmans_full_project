@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ProposalService } from './proposal.service';
 
@@ -19,8 +20,18 @@ export class ProposalController {
   }
 
   @Get()
-  async findAll() {
-    return this.proposalService.findAllProposal();
+  async findAll(
+    @Query('projTitle') projTitle: string,
+    @Query('Category') Category: string,
+    @Query('Subcategorys') Subcategorys: string,
+    @Query('Status') Status: string,
+  ) {
+    return this.proposalService.findAllProposal({
+      projTitle,
+      Category,
+      Subcategorys,
+      Status,
+    });
   }
 
   @Get(':id')
