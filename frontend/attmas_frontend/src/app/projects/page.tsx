@@ -487,7 +487,7 @@ const Jobs = () => {
                     },
                 }}
             >
-                <Typography component="h2" sx={{ marginY: 0 }}>Post Projects</Typography>
+                <Typography component="h2" sx={{ marginY: 0 }}>Projects</Typography>
 
 
                 <Box sx={{ mr: 2, display: "flex", gap: 2 }}>

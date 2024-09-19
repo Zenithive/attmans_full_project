@@ -333,7 +333,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                             <MenuItem value="Beginner">Beginner </MenuItem>
                                             <MenuItem value="Intermediate">Intermediate</MenuItem>
                                             <MenuItem value="Expert">Expert</MenuItem>
-                                            <MenuItem value="Phd">Phd</MenuItem>
+                                            <MenuItem value="PhD">PhD</MenuItem>
                                         </Select>
                                     </FormControl>
                                 )}

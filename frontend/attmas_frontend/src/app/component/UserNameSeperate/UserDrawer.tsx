@@ -239,6 +239,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
           <TextField
               label="Headline"
               multiline
+              value={user?.Headline}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
               variant="outlined"
