@@ -53,22 +53,17 @@ export class ProposalController {
   async updateStatus(
     @Param('id') id: string,
     @Body()
-    { status, comment }: { status: 'Approved' | 'Rejected'; comment: string },
+    {
+      status,
+      comment,
+      userId,
+    }: { status: 'Approved' | 'Rejected'; comment: string; userId: string },
   ) {
-    return this.proposalService.updateStatusProposal(id, status, comment);
+    return this.proposalService.updateStatusProposal(
+      id,
+      status,
+      comment,
+      userId,
+    );
   }
-
-  // @Get('check-submission/:userID/:applyId')
-  // async checkSubmission(
-  //   @Param('userID') userID: string,
-  //   @Param('applyId') applyId: string,
-  // ): Promise<{ hasSubmittedProposal: boolean }> {
-  //   const hasSubmittedProposal =
-  //     await this.proposalService.hasSubmittedProposal(
-  //       userID as unknown as Types.ObjectId,
-  //       applyId as unknown as Types.ObjectId,
-  //     );
-  //   console.log('hasSubmittedProposal', hasSubmittedProposal);
-  //   return { hasSubmittedProposal };
-  // }
 }

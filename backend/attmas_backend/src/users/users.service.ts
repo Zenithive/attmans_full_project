@@ -8,7 +8,6 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './user.schema';
 import { CreateUserDto, UpdateUserDto } from './create-user.dto';
-import { Categories } from 'src/profile/schemas/category.schema';
 import { MailerService } from 'src/common/service/UserEmailSend';
 import {
   decryptWithCrypto,
@@ -20,7 +19,6 @@ import {
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Categories.name) private categoriesModel: Model<Categories>,
     private mailerService: MailerService, // Inject MailerService
   ) {}
 

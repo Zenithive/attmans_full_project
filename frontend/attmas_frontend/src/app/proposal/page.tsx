@@ -373,7 +373,8 @@ const proposal = () => {
         try {
             await axiosInstance.put(`/proposals/${selectedProposalId}/status`, {
                 status,
-                comment
+                comment,
+                userId
             });
 
             setProposals(prevProposals =>
@@ -529,7 +530,7 @@ const proposal = () => {
                     <Box>
                         {proposals.length > 0 ? (
                             proposals
-                                .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && (proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded)))
+                                .filter(proposal => userDetails.userType === 'Admin' || (userDetails.userType === 'Project Owner' && (proposal.Status === PROPOSAL_STATUSES.proposalUnderReview || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded || proposal.Status === PROPOSAL_STATUSES.notAwarded)))
                                 .map((proposal) => (
                                     <Card key={proposal._id} sx={{ mb: 2, position: 'relative' }}>
                                         <CardContent>

@@ -52,7 +52,7 @@ interface AddJobsProps {
 
 const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Scope of work is required'),
+    description: Yup.string().required('Description is required'),
     // SelectService: Yup.array().of(Yup.string()).required('Select Service is required'),
     DetailsOfInnovationChallenge: Yup.string(),
     ProductDescription: Yup.string(),
@@ -434,7 +434,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={<ErrorMessage name="Objective" />}
                                 />
                                 <TextField
-                                    label="Expected out comes"
+                                    label="Expected outcomes"
                                     name="Expectedoutcomes"
                                     color='secondary'
                                     variant="outlined"

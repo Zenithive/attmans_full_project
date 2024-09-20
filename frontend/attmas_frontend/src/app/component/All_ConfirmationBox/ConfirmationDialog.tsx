@@ -31,7 +31,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, 
                     margin="dense"
                     color='secondary'
                     id="comment"
-                    label="Add a comment (optional)"
+                    label="Add a comment"
                     type="text"
                     fullWidth
                     variant="outlined"

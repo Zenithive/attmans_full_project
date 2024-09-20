@@ -4,12 +4,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as nodemailer from 'nodemailer';
 import { Model } from 'mongoose';
 import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 import { Jobs, JobsDocument } from 'src/projects/projects.schema';
 import { User, UserDocument } from 'src/users/user.schema';
 import { CreateMilestoneDto } from './create-milestone.dto';
 import { Milestone, MilestoneDocument } from './milestone.schema';
+import { UsersService } from 'src/users/users.service';
+import { Email } from 'src/notificationEmail/Exebitionemail.schema';
 
 @Injectable()
 export class MilestonesService {
@@ -18,9 +21,22 @@ export class MilestonesService {
     private readonly milestoneModel: Model<MilestoneDocument>,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel(Jobs.name) private readonly jobsModel: Model<JobsDocument>,
+    @InjectModel(Email.name)
+    private emailModel: Model<Email>,
+    private usersService: UsersService,
     @InjectModel(Apply.name)
     private readonly appliesModel: Model<ApplyDocument>,
-  ) {}
+  ) {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail', // or any other service
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
+
+  private transporter: nodemailer.Transporter;
 
   async create(createMilestoneDto: CreateMilestoneDto): Promise<Milestone> {
     const {
@@ -74,7 +90,36 @@ export class MilestonesService {
     // Update comments array if needed
     milestone.milstonSubmitcomments[milestoneIndex] = comment;
 
+    this.sendMilestoneResubmitNotifications(milestone, milestoneIndex);
+
     await milestone.save();
+  }
+
+  async sendMilestonesubmitNotifications(milestone, milestoneIndex) {
+    const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
+
+    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+    if (!adminUsers || adminUsers.length === 0) {
+      throw new NotFoundException('No Admin users found');
+    }
+
+    const title = milestone.milestones[milestoneIndex].name.text;
+    for (const admin of adminUsers) {
+      const message = `
+      Dear ${admin.firstName} ${admin.lastName},<br>
+      Your Milestone "${title}" has been submitted by ${user.firstName} ${user.lastName}.
+    `;
+      this.sendEmailNotificationToUserMilestoneActivity({
+        user: admin,
+        subject: 'Milestone submitted',
+        adminFirstName: admin.firstName,
+        adminLastName: admin.lastName,
+        applicationId: milestone.applyId,
+        message,
+        status: 'Submitted',
+        title,
+      });
+    }
   }
 
   async getSubmittedComments(applyId: string): Promise<string[]> {
@@ -165,7 +210,41 @@ export class MilestonesService {
       selectedMilestone.approvalComments.push(comment);
     }
 
+    this.sendApproveMilestoneByNotifications(
+      selectedMilestone,
+      milestoneIndex,
+      user,
+    );
+
     await milestone.save();
+  }
+
+  async sendApproveMilestoneByNotifications(
+    milestone,
+    milestoneIndex,
+    approvedByuser,
+  ) {
+    const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
+
+    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+    if (!adminUsers || adminUsers.length === 0) {
+      throw new NotFoundException('No Admin users found');
+    }
+    const title = milestone.milestones[milestoneIndex].name.text;
+    const message = `
+      Dear ${user.firstName} ${user.lastName},<br>
+      Your Milestone "${title}" has been approved by ${approvedByuser.firstName} ${approvedByuser.lastName}(${approvedByuser.userType}).
+    `;
+    this.sendEmailNotificationToUserMilestoneActivity({
+      user,
+      subject: 'Milestone Approved',
+      adminFirstName: approvedByuser.firstName,
+      adminLastName: approvedByuser.lastName,
+      applicationId: milestone.applyId,
+      message,
+      status: 'Approved',
+      title,
+    });
   }
 
   async rejectMilestone(
@@ -213,7 +292,41 @@ export class MilestonesService {
       selectedMilestone.rejectionComments.push(comment);
     }
 
+    this.sendRejectMilestoneByNotifications(
+      selectedMilestone,
+      milestoneIndex,
+      user,
+    );
+
     await milestone.save();
+  }
+
+  async sendRejectMilestoneByNotifications(
+    milestone,
+    milestoneIndex,
+    rejectedByuser,
+  ) {
+    const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
+
+    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+    if (!adminUsers || adminUsers.length === 0) {
+      throw new NotFoundException('No Admin users found');
+    }
+    const title = milestone.milestones[milestoneIndex].name.text;
+    const message = `
+      Dear ${user.firstName} ${user.lastName},<br>
+      Your Milestone "${title}" has been rejected by ${rejectedByuser.firstName} ${rejectedByuser.lastName}(${rejectedByuser.userType}).
+    `;
+    this.sendEmailNotificationToUserMilestoneActivity({
+      user,
+      subject: 'Milestone Rejected',
+      adminFirstName: rejectedByuser.firstName,
+      adminLastName: rejectedByuser.lastName,
+      applicationId: milestone.applyId,
+      message,
+      status: 'Rejected',
+      title,
+    });
   }
 
   async resubmitMilestone(
@@ -222,8 +335,15 @@ export class MilestonesService {
     resubmitComment: string,
   ): Promise<void> {
     const milestone = await this.milestoneModel.findOne({ applyId });
+    const application = await this.appliesModel.findOne({ _id: applyId });
     if (!milestone) {
       throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
+    }
+
+    if (!application) {
+      throw new NotFoundException(
+        `Application not found for applyId ${applyId}`,
+      );
     }
 
     if (milestone.milestones[milestoneIndex]) {
@@ -238,6 +358,73 @@ export class MilestonesService {
       );
     }
 
+    this.sendMilestoneResubmitNotifications(milestone, milestoneIndex);
+
     await milestone.save();
+  }
+
+  async sendMilestoneResubmitNotifications(milestone, milestoneIndex) {
+    const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
+
+    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+    if (!adminUsers || adminUsers.length === 0) {
+      throw new NotFoundException('No Admin users found');
+    }
+
+    const title = milestone.milestones[milestoneIndex].name.text;
+    for (const admin of adminUsers) {
+      const message = `
+      Dear ${admin.firstName} ${admin.lastName},<br>
+      Your Milestone "${title}" has been Resubmitted by ${user.firstName} ${user.lastName}.
+    `;
+      this.sendEmailNotificationToUserMilestoneActivity({
+        user: admin,
+        subject: 'Milestone resubmitted',
+        adminFirstName: admin.firstName,
+        adminLastName: admin.lastName,
+        applicationId: milestone.applyId,
+        message,
+        status: 'Resubmitted',
+        title,
+      });
+    }
+  }
+
+  async sendEmailNotificationToUserMilestoneActivity({
+    user,
+    subject,
+    applicationId,
+    title,
+    status,
+    message,
+    adminFirstName,
+    adminLastName,
+  }) {
+    try {
+      const html = `${message}`;
+      this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: user.username,
+        subject,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to: user.username,
+        subject,
+        sentAt: new Date(),
+        read: false,
+        applicationId,
+        title,
+        first: user.firstName,
+        last: user.lastName,
+        status,
+        adminFirstName,
+        adminLastName,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to ${user.username}:`, error);
+    }
   }
 }
