@@ -13,7 +13,7 @@ interface JobDetailProps {
 
 const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitted }) => {
   const [job, setJob] = useState<any>(null);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const fetchJobDetails = async () => {
     try {

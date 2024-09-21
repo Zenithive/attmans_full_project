@@ -84,6 +84,7 @@ interface Apply {
   SolutionUSP: string;
   userId?: UserSchema;
   products?: ProductForBooth[];
+  applyType?: "FreelancerApply" | "InnovatorsApply";
 }
 
 interface ProjectDetailsDialogProps {
@@ -517,7 +518,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Card>
                   ))}
                 </Grid>
-                {userDetails.userType !== 'Innovator' && (<>
+                {apply.applyType === 'FreelancerApply' && (<>
                   <Grid item xs={12}>
                     <TextField
                       label="Other available solutions"

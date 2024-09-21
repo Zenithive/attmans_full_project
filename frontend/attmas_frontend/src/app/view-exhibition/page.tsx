@@ -173,7 +173,7 @@ const ExhibitionsPage: React.FC = () => {
     const filerBoothBasedOnRoles = (tmpBooths: Booth[]) => {
 
       setBooths(tmpBooths);
-
+      
       const userHasBooth = tmpBooths.some((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
       setHasUserBooth(userHasBooth);
       setParticipateButtonVisible(!userHasBooth);
@@ -620,7 +620,7 @@ const ExhibitionsPage: React.FC = () => {
                         return booth.status === statusFilter;
                       }
                     })
-                    .filter(booth => ((userType === 'Innovator' || userType === 'Visitors' || !userType) && booth.status === 'Approved') || userType === 'Admin')
+                    .filter(booth => ((userType === 'Innovator' || userType === 'Visitors' || !userType) && (booth.status === 'Approved' || booth.userId?._id === userDetails._id)) || userType === 'Admin')
                     .map(booth => (
                       <Grid item xs={12} sm={6} md={4} key={booth._id}>
                         <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
@@ -633,7 +633,7 @@ const ExhibitionsPage: React.FC = () => {
                               <h2>{booth.title}</h2>
                             </Typography>
                             {userDetails && (
-                              (userType === 'Admin' ||
+                              (userType === 'Admin' || booth.userId?._id === userDetails._id || 
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
                                   (userType === 'Innovator' || userType === 'Visitors' || !userType))) && (
                                 <a

@@ -18,11 +18,27 @@ export const getPageParams = (page) => {
 
 export const getSameDateISOs = (targetDateStr) => {
   // Create the start and end of the target date
-  const startOfDay = moment.utc(targetDateStr, 'DD/MMM/YYYY').toDate();
-  startOfDay.setUTCHours(0, 0, 0, 0);
+  const tmpDate = moment(targetDateStr, 'DD/MMM/YYYY');
+  const offset = tmpDate.utcOffset();
+  const startOfDay = tmpDate
+    .utcOffset(offset)
+    .set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    })
+    .toDate();
 
-  const endOfDay = moment.utc(targetDateStr, 'DD/MMM/YYYY').toDate();
-  endOfDay.setUTCHours(23, 59, 59, 999);
+  const endOfDay = tmpDate
+    .utcOffset(offset)
+    .set({
+      hour: 23,
+      minute: 59,
+      second: 59,
+      millisecond: 999,
+    })
+    .toDate();
 
   return {
     startOfDay,

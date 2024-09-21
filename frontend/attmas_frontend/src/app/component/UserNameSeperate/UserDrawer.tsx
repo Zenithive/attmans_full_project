@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Typography, TextField, IconButton, Drawer
+  Box, Typography, TextField, IconButton, Drawer,
+  Grid,
+  MenuItem
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ProductTable, { Product } from '../ProductTable';
@@ -22,6 +24,9 @@ interface User {
   subcategories: string[];
   sector: string;
   organization: string;
+  productToMarket?: string;
+  hasPatent?: string;
+  patentDetails?: string;
 }
 
 
@@ -47,19 +52,19 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
       currency: product.currency,
       videourlForproduct: product.videourlForproduct,
       productQuantity: product.productQuantity ?? 0, // Use productQuantity if available, otherwise default to 0
-      targetaudience: product.targetaudience??'',
-      problemaddressed: product.problemaddressed??'',
-      technologyused: product.technologyused??'',
+      targetaudience: product.targetaudience ?? '',
+      problemaddressed: product.problemaddressed ?? '',
+      technologyused: product.technologyused ?? '',
       stageofdevelopmentdropdown: product.stageofdevelopmentdropdown ?? '', // Use value if available
-      intellectualpropertyconsiderations: product.intellectualpropertyconsiderations?? '',
-      CompetitiveAdvantages: product.CompetitiveAdvantages?? '',
-      feasibilityofthesolution: product.feasibilityofthesolution??'',
-      howdoesthesolutionwork: product.howdoesthesolutionwork??'',
-      potentialbenefits: product.potentialbenefits??'',
-      challengesorrisks: product.challengesorrisks??'',
+      intellectualpropertyconsiderations: product.intellectualpropertyconsiderations ?? '',
+      CompetitiveAdvantages: product.CompetitiveAdvantages ?? '',
+      feasibilityofthesolution: product.feasibilityofthesolution ?? '',
+      howdoesthesolutionwork: product.howdoesthesolutionwork ?? '',
+      potentialbenefits: product.potentialbenefits ?? '',
+      challengesorrisks: product.challengesorrisks ?? '',
     };
   };
-  
+
 
   useEffect(() => {
     fetchProductDetailsForUser();
@@ -87,7 +92,6 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
       const response = await axiosInstance.get<User[]>(
         `/users/filters?&page=1&limit=20&username=${username}`
       );
-      console.log('profile for',response.data)
       setUser(response.data[0] || []);
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -179,7 +183,6 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               variant="outlined"
               color="secondary"
               fullWidth
-
               sx={{ width: "50%" }}
             />
           </Box>
@@ -233,10 +236,10 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               fullWidth
               multiline
             />
-          
+
           </Box>
-          <Box sx={{marginBottom:'20px'}}>
-          <TextField
+          <Box sx={{ marginBottom: '20px' }}>
+            <TextField
               label="Headline"
               multiline
               value={user?.Headline}
@@ -248,17 +251,63 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               rows={5}
             />
           </Box>
+          {user.userType === 'Innovator' ? (
+            <>
+              <Grid item xs={12} sm={6} sx={{ marginBottom: '20px' }}>
+                <TextField
+                  fullWidth
+                  style={{ background: "white", borderRadius: "25px" }}
+                  id="productToMarket"
+                  color='secondary'
+                  label="Product to Market"
+                  name="productToMarket"
+                  InputProps={{ readOnly: true }}
+                  InputLabelProps={{ shrink: true }}
+                  value={user.productToMarket}
+                ></TextField>
+              </Grid>
+            </>
+          ) : ""}
+
+          {(user.productToMarket == "Yes" || user.userType === 'Freelancer') ? <Grid item xs={12} sm={6} sx={{ marginBottom: '20px' }}>
+            <TextField
+              fullWidth
+              style={{ background: "white", borderRadius: "25px" }}
+              id="hasPatent"
+              color='secondary'
+              label="Do you have a patent?"
+              name="hasPatent"
+              value={user.hasPatent}
+              InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}>
+            </TextField>
+          </Grid> : ""}
+
+          {user.hasPatent === 'Yes' &&
+            <Grid item xs={12} sm={12} sx={{ marginBottom: '20px' }}>
+              <TextField
+                fullWidth
+                multiline
+                color='secondary'
+                name="patentDetails"
+                rows={4}
+                label={user.userType === 'Freelancer' ? "Provide details about the research product or solution that you intend to commercialize" : "Patent Details"}
+                value={user.patentDetails}
+                variant="outlined"
+              />
+            </Grid>
+          }
           {user.userType === 'Innovator' && (
             <NewProductTable
               products={productArray} onView={function (product: Product): void {
                 throw new Error('Function not implemented.');
-              } } onEdit={function (product: Product): void {
+              }} onEdit={function (product: Product): void {
                 throw new Error('Function not implemented.');
-              } } onDelete={function (id: string): void {
+              }} onDelete={function (id: string): void {
                 throw new Error('Function not implemented.');
-              } }    
-              hideActions={true}          
-              
+              }}
+              hideActions={true}
+
             />
           )}
         </>

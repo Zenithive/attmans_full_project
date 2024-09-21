@@ -64,7 +64,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("Title is required"),
     description: Yup.string().required("Description is required"),
-    videoUrl: Yup.string().url("Invalid URL").required("Video URL is required"),
+    products: Yup.array().min(1).required("Atleast One product is requied to select.")
   });
 
   const handleSubmit = async (values: typeof initialValues, { resetForm }: any) => {
@@ -75,6 +75,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
       await createBooth(payload);
       console.log("Booth created successfully");
       resetForm();
+      setSelectedProducts([] as Product[]);
       onClose();
     } catch (error) {
       console.error("Error creating booth:", error); // To capture and log errors
@@ -96,7 +97,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={()=>{onClose();setSelectedProducts([] as Product[]);}}
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
     >
@@ -148,8 +149,6 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
             isSubmitting,
             setFieldValue,
           }) => {
-            console.log("Form Errors:", errors); // Debugging form errors
-            console.log("Form Values:", values); // Debugging current form values
 
             return (
               <Form>
@@ -178,18 +177,6 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                   error={Boolean(touched.description && errors.description)}
                   helperText={touched.description && errors.description}
                 />
-                <TextField
-                  fullWidth
-                  label="Video URL"
-                  name="videoUrl"
-                  color="secondary"
-                  value={values.videoUrl}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  margin="normal"
-                  error={Boolean(touched.videoUrl && errors.videoUrl)}
-                  helperText={touched.videoUrl && errors.videoUrl}
-                />
                 <FieldArray
                   name="products"
                   render={() => (
@@ -204,6 +191,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                     </div>
                   )}
                 />
+                {(touched?.products && errors?.products) ? <span style={{ color: 'red' }}>{errors?.products.toString() || ''}</span> : ''}
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
                   <Button
                     variant="contained"
@@ -218,9 +206,10 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
                   </Button>
                 </Box>
               </Form>
-            )}}
+            )
+          }}
         </Formik>
-        
+
       </Box>
     </Modal>
   );

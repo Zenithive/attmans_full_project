@@ -221,6 +221,9 @@ export class UsersService {
             sector: '$workexpriencesData.sector',
             organization: '$workexpriencesData.organization',
             Headline: '$workexpriencesData.Headline',
+            hasPatent: '$workexpriencesData.hasPatent',
+            patentDetails: '$workexpriencesData.patentDetails',
+            productToMarket: '$workexpriencesData.productToMarket',
           },
         },
       ])

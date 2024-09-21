@@ -297,7 +297,7 @@ const proposal = () => {
     }, [fetchAppliedJobs]);
     // Function to handle viewing job details
     const handleViewJob = (job: Job, isOpenProjectModal?: boolean) => {
-        isOpenProjectModal && setViewingJob(job);
+        isOpenProjectModal && setViewingJob({...job, userId: {...job.userId, username: job.username}});
         // setViewingJob(job);
         setSelectedProject(job);
         setApplyOpen(false);
