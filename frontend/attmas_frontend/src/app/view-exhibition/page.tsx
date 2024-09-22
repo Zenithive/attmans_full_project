@@ -173,7 +173,7 @@ const ExhibitionsPage: React.FC = () => {
     const filerBoothBasedOnRoles = (tmpBooths: Booth[]) => {
 
       setBooths(tmpBooths);
-      
+
       const userHasBooth = tmpBooths.some((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
       setHasUserBooth(userHasBooth);
       setParticipateButtonVisible(!userHasBooth);
@@ -392,7 +392,9 @@ const ExhibitionsPage: React.FC = () => {
     return exhibitionDate.isSame(currentDate);
   };
 
-  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === EXHIBITION_STATUSES.close;
+  const isExhibitionClosed = (exhibition: Exhibition) => { 
+    return exhibition.status === EXHIBITION_STATUSES.close && userType !== "Admin"; 
+  }
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
@@ -633,7 +635,7 @@ const ExhibitionsPage: React.FC = () => {
                               <h2>{booth.title}</h2>
                             </Typography>
                             {userDetails && (
-                              (userType === 'Admin' || booth.userId?._id === userDetails._id || 
+                              (userType === 'Admin' || booth.userId?._id === userDetails._id ||
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
                                   (userType === 'Innovator' || userType === 'Visitors' || !userType))) && (
                                 <a
