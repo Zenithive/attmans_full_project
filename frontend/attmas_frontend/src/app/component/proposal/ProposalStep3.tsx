@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Checkbox, FormControlLabel } from '@mui/material';
+import { Box, TextField, Button, Typography, Checkbox, FormControlLabel, FormHelperText } from '@mui/material';
 import { Formik, Form, Field, FormikValues } from 'formik';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import dayjs from 'dayjs';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { pubsub } from '@/app/services/pubsub.service';
-import { Message } from '@mui/icons-material';
+import * as Yup from 'yup';
 import { Proposal } from '@/app/proposal/page';
 
 interface ProposalStep3Props {
@@ -35,91 +35,148 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
         pilotProductionTesting: '',
         mentoringRequired: '',
       }) as FormikValues}
+      validationSchema={Yup.object({
+        otherCommitments: Yup.string().required('Other Commitments is required'),
+        progressReportTemplate: Yup.string().required('Progress Report Template is required'),
+        milestones: Yup.string().required('Milestones is required'),
+        totalDaysCompletion: Yup.string().required('Expected Total Number of Days is required'),
+        labStrengths: Yup.string().required('Strengths of the Lab, Equipment, and Infrastructure is required'),
+        externalEquipment: Yup.string().required('External Equipment Needed is required'),
+        pilotProductionTesting: Yup.string().required('Pilot Production and Testing is required'),
+        mentoringRequired: Yup.string().required('Specific Mentoring is required'),
+      })}
       onSubmit={(values) => onSubmit(values)}
     >
-      {({ handleSubmit }) => (
+      {({ handleSubmit, touched, errors }) => (
         <Form onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 1 }}>
-            <Field
-              name="otherCommitments"
-              color='secondary'
-              rows={4}
-              as={TextField}
-              label="Other Commitments of the Proposal Owner and Time Share on the Project"
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              color='secondary'
-              rows={4}
-              name="progressReportTemplate"
-              as={TextField}
-              label="Progress Report Template and Periodicity"
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              name="milestones"
-              as={TextField}
-              label="Milestones"
-              color='secondary'
-              rows={4}
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              name="totalDaysCompletion"
-              color='secondary'
-              rows={4}
-              as={TextField}
-              multiline
-              label="Expected Total Number of Days for R&D Project Completion"
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              name="labStrengths"
-              color='secondary'
-              rows={4}
-              as={TextField}
-              label="Strengths of the Lab, Equipment, and Infrastructure (Equipment Number/ID)"
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              name="externalEquipment"
-              color='secondary'
-              rows={4}
-              as={TextField}
-              label="External Equipment Needed from Other Institutes or National Facilities"
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              name="pilotProductionTesting"
-              color='secondary'
-              rows={4}
-              as={TextField}
-              label="Pilot Production and Testing - Facilities Available or Support Needed"
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
-            <Field
-              name="mentoringRequired"
-              color='secondary'
-              rows={4}
-              as={TextField}
-              label="Specific Mentoring by Industry Partner Required?"
-              multiline
-              fullWidth
-              disabled={readOnly}
-            />
+            <Box>
+              <Field
+                name="otherCommitments"
+                color='secondary'
+                rows={4}
+                as={TextField}
+                label="Other Commitments of the Proposal Owner and Time Share on the Project"
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.otherCommitments && Boolean(errors.otherCommitments)} sx={{ color: 'red' }}>
+                {errors.otherCommitments?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                color='secondary'
+                rows={4}
+                name="progressReportTemplate"
+                as={TextField}
+                label="Progress Report Template and Periodicity"
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.progressReportTemplate && Boolean(errors.progressReportTemplate)} sx={{ color: 'red' }}>
+                {errors.progressReportTemplate?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                name="milestones"
+                as={TextField}
+                label="Milestones"
+                color='secondary'
+                rows={4}
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.milestones && Boolean(errors.milestones)} sx={{ color: 'red' }}>
+                {errors.milestones?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                name="totalDaysCompletion"
+                color='secondary'
+                rows={4}
+                as={TextField}
+                multiline
+                label="Expected Total Number of Days for R&D Project Completion"
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.totalDaysCompletion && Boolean(errors.totalDaysCompletion)} sx={{ color: 'red' }}>
+                {errors.totalDaysCompletion?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                name="labStrengths"
+                color='secondary'
+                rows={4}
+                as={TextField}
+                label="Strengths of the Lab, Equipment, and Infrastructure (Equipment Number/ID)"
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.labStrengths && Boolean(errors.labStrengths)} sx={{ color: 'red' }}>
+                {errors.labStrengths?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                name="externalEquipment"
+                color='secondary'
+                rows={4}
+                as={TextField}
+                label="External Equipment Needed from Other Institutes or National Facilities"
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.externalEquipment && Boolean(errors.externalEquipment)} sx={{ color: 'red' }}>
+                {errors.externalEquipment?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                name="pilotProductionTesting"
+                color='secondary'
+                rows={4}
+                as={TextField}
+                label="Pilot Production and Testing - Facilities Available or Support Needed"
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.pilotProductionTesting && Boolean(errors.pilotProductionTesting)} sx={{ color: 'red' }}>
+                {errors.pilotProductionTesting?.toString()}
+              </FormHelperText>
+            </Box>
+
+            <Box>
+              <Field
+                name="mentoringRequired"
+                color='secondary'
+                rows={4}
+                as={TextField}
+                label="Specific Mentoring by Industry Partner Required?"
+                multiline
+                fullWidth
+                disabled={readOnly}
+              />
+              <FormHelperText error={touched.mentoringRequired && Boolean(errors.mentoringRequired)} sx={{ color: 'red' }}>
+                {errors.mentoringRequired?.toString()}
+              </FormHelperText>
+            </Box>
 
             {/* Statement of Agreement */}
             {!readOnly && <Box sx={{ mt: 4, borderTop: '1px solid #ccc', pt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

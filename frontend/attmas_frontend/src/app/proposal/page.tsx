@@ -481,6 +481,11 @@ const proposal = () => {
         setPage(1);
     }
 
+    const OnCloseProposalDialog = () => {
+        setOpen(false);
+        setStep(1);
+    }
+
     return (
         <Box
             sx={{
@@ -827,7 +832,7 @@ const proposal = () => {
             />
 
 
-            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="lg" fullWidth>
+            <Dialog open={open} onClose={() => OnCloseProposalDialog()} maxWidth="lg" fullWidth>
                 <DialogTitle>Submit Proposal</DialogTitle>
                 <DialogContent>
 
@@ -860,7 +865,7 @@ const proposal = () => {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Close</Button>
+                    <Button onClick={() => OnCloseProposalDialog()}>Close</Button>
                 </DialogActions>
             </Dialog>
 
