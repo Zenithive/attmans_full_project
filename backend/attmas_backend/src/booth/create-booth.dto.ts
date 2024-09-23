@@ -74,7 +74,6 @@ export class CreateBoothDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
   @IsString()
   videoUrl: string;
 

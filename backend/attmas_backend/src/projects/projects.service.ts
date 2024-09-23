@@ -226,8 +226,6 @@ export class JobsService {
     const filter: any = {};
     const filterQuery: any = {};
 
-    console.log('applicationId', applicationId);
-
     const allNativeFiltersArray = {
       title,
       status,
@@ -370,9 +368,7 @@ export class JobsService {
       },
     ];
 
-    console.log('pipeline', JSON.stringify(pipeline));
     const data = await this.jobsModel.aggregate(pipeline);
-    console.log('data', data);
     return data;
   }
 

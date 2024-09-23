@@ -36,6 +36,7 @@ export interface Job {
     status: string;
     rejectComment?: string;
     applies?: ProjApplies[];
+    userId?: any;
 }
 
 

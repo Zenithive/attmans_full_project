@@ -68,7 +68,7 @@ export class Booth {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   videoUrl: string;
 
   @Prop({ required: false })

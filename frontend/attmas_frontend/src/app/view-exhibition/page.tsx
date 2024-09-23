@@ -392,7 +392,9 @@ const ExhibitionsPage: React.FC = () => {
     return exhibitionDate.isSame(currentDate);
   };
 
-  const isExhibitionClosed = (exhibition: Exhibition) => exhibition.status === EXHIBITION_STATUSES.close;
+  const isExhibitionClosed = (exhibition: Exhibition) => { 
+    return exhibition.status === EXHIBITION_STATUSES.close && userType !== "Admin"; 
+  }
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
@@ -620,7 +622,7 @@ const ExhibitionsPage: React.FC = () => {
                         return booth.status === statusFilter;
                       }
                     })
-                    .filter(booth => ((userType === 'Innovator' || userType === 'Visitors' || !userType) && booth.status === 'Approved') || userType === 'Admin')
+                    .filter(booth => ((userType === 'Innovator' || userType === 'Visitors' || !userType) && (booth.status === 'Approved' || booth.userId?._id === userDetails._id)) || userType === 'Admin')
                     .map(booth => (
                       <Grid item xs={12} sm={6} md={4} key={booth._id}>
                         <Card sx={{ boxSizing: 'border-box', marginBottom: '10px', height: '100%' }}>
@@ -633,7 +635,7 @@ const ExhibitionsPage: React.FC = () => {
                               <h2>{booth.title}</h2>
                             </Typography>
                             {userDetails && (
-                              (userType === 'Admin' ||
+                              (userType === 'Admin' || booth.userId?._id === userDetails._id ||
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
                                   (userType === 'Innovator' || userType === 'Visitors' || !userType))) && (
                                 <a

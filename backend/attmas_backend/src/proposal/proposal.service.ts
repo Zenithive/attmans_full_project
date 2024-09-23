@@ -6,11 +6,15 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Proposal } from './proposal.schema';
+import * as nodemailer from 'nodemailer';
 import {
   APPLY_STATUSES,
   PROPOSAL_STATUSES,
 } from 'src/common/constant/status.constant';
 import { Apply, ApplyDocument } from 'src/apply/apply.schema';
+import { Email } from 'src/notificationEmail/Exebitionemail.schema';
+import { User, UserDocument } from 'src/users/user.schema';
+import { UsersService } from 'src/users/users.service';
 
 interface ProposalFilter {
   projTitle: string;
@@ -22,9 +26,23 @@ interface ProposalFilter {
 @Injectable()
 export class ProposalService {
   constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @InjectModel('Proposal') private readonly proposalModel: Model<Proposal>,
+    @InjectModel(Email.name)
+    private emailModel: Model<Email>,
+    private usersService: UsersService,
     @InjectModel(Apply.name) private applyModel: Model<ApplyDocument>,
-  ) {}
+  ) {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail', // or any other service
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
+
+  private transporter: nodemailer.Transporter;
 
   async createProposal(createProposalDto: any): Promise<Proposal> {
     const existingProposalFromUser = await this.proposalModel
@@ -33,38 +51,47 @@ export class ProposalService {
         applyId: createProposalDto.applyId,
       })
       .exec();
-    console.log('existingProposalFromUser', existingProposalFromUser);
     if (existingProposalFromUser) {
       throw new Error('You have already created a proposal for this project.');
     }
 
-    // const existingProposalForProject = await this.proposalModel
-    //   .findOne({
-    //     projectId: createProposalDto.projectId,
-    //   })
-    //   .exec();
-
-    // if (existingProposalForProject) {
-    //   throw new Error(
-    //     'A proposal has already been created for this project by another user.',
-    //   );
-    // }
     createProposalDto.Status = PROPOSAL_STATUSES.pending;
 
     const createdProposal = new this.proposalModel(createProposalDto);
 
+    this.sendProposalSubmitNotifications(createdProposal);
+
     return createdProposal.save();
   }
-  // async hasSubmittedProposal(
-  //   userID: Types.ObjectId,
-  //   applyId: Types.ObjectId,
-  // ): Promise<boolean> {
-  //   const proposal = await this.proposalModel
-  //     .findOne({ userID, applyId })
-  //     .exec();
-  //   console.log('proposal', proposal);
-  //   return !!proposal;
-  // }
+
+  async sendProposalSubmitNotifications(proposal) {
+    const user = await this.userModel
+      .findOne({ _id: proposal.userID.toString() })
+      .exec();
+
+    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+    if (!adminUsers || adminUsers.length === 0) {
+      throw new NotFoundException('No Admin users found');
+    }
+
+    const title = proposal.projectTitle;
+    for (const admin of adminUsers) {
+      const message = `
+      Dear ${admin.firstName} ${admin.lastName},<br>
+      Your Proposal for project:"${title}" has been submitted by ${user.firstName} ${user.lastName}.
+    `;
+      this.sendEmailNotificationToUserProposalActivity({
+        user: admin,
+        subject: 'Proposal submitted',
+        adminFirstName: admin.firstName,
+        adminLastName: admin.lastName,
+        applicationId: proposal.applyId,
+        message,
+        status: 'submitted',
+        title,
+      });
+    }
+  }
 
   async findAllProposal({
     projTitle,
@@ -141,7 +168,7 @@ export class ProposalService {
               'jobDetails.userId._id': '$jobUserId._id', // Add/update only 'vendorName' in 'booths'
             },
           },
-          { $limit: 10 },
+          { $limit: 100 },
           { $sort: { createdAt: -1 } },
           {
             $project: {
@@ -215,6 +242,7 @@ export class ProposalService {
     id: string,
     status: 'Approved' | 'Rejected',
     comment: string,
+    userId: string,
   ): Promise<Proposal> {
     const proposal = await this.proposalModel.findById(id).exec();
     if (!proposal) {
@@ -265,6 +293,73 @@ export class ProposalService {
       console.error('Error updating ApplyModel:', error);
     }
 
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    this.sendProposalApproveRejecNotifications(updatedProposal, user);
+
     return updatedProposal;
+  }
+
+  async sendProposalApproveRejecNotifications(proposal, appUser) {
+    const user = await this.userModel
+      .findOne({ _id: proposal.userID.toString() })
+      .exec();
+
+    const title = proposal.projectTitle;
+    const message = `
+    Dear ${user.firstName} ${user.lastName},<br>
+    Your Proposal for project:"${title}" has been ${proposal.Status} by ${appUser.firstName} ${appUser.lastName}(${appUser.userType}).
+  `;
+    this.sendEmailNotificationToUserProposalActivity({
+      user,
+      subject: `Proposal ${proposal.Status}`,
+      adminFirstName: appUser.firstName,
+      adminLastName: appUser.lastName,
+      applicationId: proposal.applyId,
+      message,
+      status: proposal.Status,
+      title,
+    });
+  }
+
+  async sendEmailNotificationToUserProposalActivity({
+    user,
+    subject,
+    applicationId,
+    title,
+    status,
+    message,
+    adminFirstName,
+    adminLastName,
+  }) {
+    try {
+      const html = `${message}`;
+      this.transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: user.username,
+        subject,
+        html,
+      });
+
+      const email = new this.emailModel({
+        to: user.username,
+        subject,
+        sentAt: new Date(),
+        read: false,
+        applicationId,
+        title,
+        first: user.firstName,
+        last: user.lastName,
+        status,
+        adminFirstName,
+        adminLastName,
+      });
+      await email.save();
+    } catch (error) {
+      console.error(`Error sending email to ${user.username}:`, error);
+    }
   }
 }

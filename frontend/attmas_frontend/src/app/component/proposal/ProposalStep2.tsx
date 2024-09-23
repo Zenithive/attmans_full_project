@@ -11,7 +11,11 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  FormHelperText,
 } from '@mui/material';
+import * as Yup from 'yup';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import { formValues } from './ProposalStep1';
 
@@ -93,9 +97,14 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
         briefProfile: initialValues?.briefProfile || '',
         proposalOwnerCredentials: initialValues?.proposalOwnerCredentials || '',
       }}
+      validationSchema={Yup.object({
+        pastCredentials: Yup.string().required('Past Credentials is required'),
+        briefProfile: Yup.string().required('Brief Profile/CV is required'),
+        proposalOwnerCredentials: Yup.string().required('Credentials of Proposal Owner is required'),
+      })}
       onSubmit={(values) => onNext(values as ProposalStep2Values)}
     >
-      {({ values, handleSubmit }) => (
+      {({ values, handleSubmit, touched, errors }) => (
         <Form onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, padding: 2 }}>
             <Field
@@ -161,10 +170,13 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                     name="budgetOutlay"
                     render={arrayHelpers => (
                       <>
-                        {Array.isArray(values.budgetOutlay) && values.budgetOutlay.map((row: BudgetOutlay, index: React.Key | null | undefined) => (
+                        {Array.isArray(values.budgetOutlay) && values.budgetOutlay.map((row: BudgetOutlay, index: number) => (
                           <TableRow key={index}>
-                            <TableCell>
-                              <Field name={`budgetOutlay[${index}].head`} as={TextField} disabled={true} />
+                            <TableCell sx={{ display: 'flex' }}>
+                              {!readOnlyHeads.includes(row?.head) ? <IconButton onClick={() => arrayHelpers.remove(index)} aria-label="delete" sx={{ ml: -3 }}>
+                                <DeleteIcon />
+                              </IconButton> : ''}
+                              <Field name={`budgetOutlay[${index}].head`} as={TextField} disabled={readOnlyHeads.includes(row?.head)} />
                             </TableCell>
                             <TableCell>
                               <Field name={`budgetOutlay[${index}].firstYear`} as={TextField} disabled={readOnly} />
@@ -222,9 +234,12 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                     name="manpowerDetails"
                     render={arrayHelpers => (
                       <>
-                        {Array.isArray(values.manpowerDetails) && values.manpowerDetails.map((row: ManpowerDetail, index: React.Key | null | undefined) => (
+                        {Array.isArray(values.manpowerDetails) && values.manpowerDetails.map((row: ManpowerDetail, index: number) => (
                           <TableRow key={index}>
-                            <TableCell>
+                            <TableCell sx={{display: 'flex'}}>
+                              {values.manpowerDetails.length > 1 ? <IconButton onClick={() => arrayHelpers.remove(index)} aria-label="delete" sx={{ ml: -3 }}>
+                                <DeleteIcon />
+                              </IconButton> : ''}
                               <Field name={`manpowerDetails[${index}].designation`} as={TextField} disabled={readOnly} />
                             </TableCell>
                             <TableCell>
@@ -262,36 +277,52 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                 </TableBody>
               </Table>
             </TableContainer>
-            <Field
-              color='secondary'
-              rows={4}
-              name="pastCredentials"
-              as={TextField}
-              label="Past Credentials in Similar Projects"
-              fullWidth
-              multiline
-              disabled={readOnly} // Apply readOnly
-            />
-            <Field
-              color='secondary'
-              rows={4}
-              name="briefProfile"
-              as={TextField}
-              label="Brief Profile/CV with Roles of Project Team"
-              fullWidth
-              multiline
-              disabled={readOnly} // Apply readOnly
-            />
-            <Field
-              color='secondary'
-              rows={4}
-              name="proposalOwnerCredentials"
-              as={TextField}
-              label="Credentials of Proposal Owner (e.g., patents, tech transfers)"
-              fullWidth
-              multiline
-              disabled={readOnly} // Apply readOnly
-            />
+            <Box>
+
+              <Field
+                color='secondary'
+                rows={4}
+                name="pastCredentials"
+                as={TextField}
+                label="Past Credentials in Similar Projects"
+                fullWidth
+                multiline
+                disabled={readOnly} // Apply readOnly
+              />
+              <FormHelperText error={touched.pastCredentials && Boolean(errors.pastCredentials)} sx={{ color: 'red' }}>
+                {errors.pastCredentials?.toString()}
+              </FormHelperText>
+            </Box>
+            <Box>
+              <Field
+                color='secondary'
+                rows={4}
+                name="briefProfile"
+                as={TextField}
+                label="Brief Profile/CV with Roles of Project Team"
+                fullWidth
+                multiline
+                disabled={readOnly} // Apply readOnly
+              />
+              <FormHelperText error={touched.briefProfile && Boolean(errors.briefProfile)} sx={{ color: 'red' }}>
+                {errors.briefProfile?.toString()}
+              </FormHelperText>
+            </Box>
+            <Box>
+              <Field
+                color='secondary'
+                rows={4}
+                name="proposalOwnerCredentials"
+                as={TextField}
+                label="Credentials of Proposal Owner (e.g., patents, tech transfers)"
+                fullWidth
+                multiline
+                disabled={readOnly} // Apply readOnly
+              />
+              <FormHelperText error={touched.proposalOwnerCredentials && Boolean(errors.proposalOwnerCredentials)} sx={{ color: 'red' }}>
+                {errors.proposalOwnerCredentials?.toString()}
+              </FormHelperText>
+            </Box>
 
             {/* Navigation Buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

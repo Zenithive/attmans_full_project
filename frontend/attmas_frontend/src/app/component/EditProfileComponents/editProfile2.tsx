@@ -158,7 +158,7 @@ const EditProfile2: React.FC = () => {
         const value = event.target.value as string;
         formik.handleChange(event);
         setIsInnovator(value === 'Innovator');
-
+        
         if (value !== 'Innovator') {
             setShowProductDetails(false);
             formik.setFieldValue('productToMarket', 'No');
@@ -466,6 +466,8 @@ const EditProfile2: React.FC = () => {
                                     onChange={(e) => {
                                         handleUserTypeChange(e);
                                         formik.handleChange(e);
+                                        formik.setFieldValue('hasPatent', 'No');
+                                        formik.setFieldValue('patentDetails', '');
                                     }}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.userType}
@@ -503,29 +505,45 @@ const EditProfile2: React.FC = () => {
                                             <MenuItem value="No">No</MenuItem>
                                         </TextField>
                                     </Grid>
-
-                                    {formik.values.productToMarket == "Yes" ? <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            select
-                                            style={{ background: "white", borderRadius: "25px" }}
-                                            id="hasPatent"
-                                            color='secondary'
-                                            label="Do you have a patent?"
-                                            name="hasPatent"
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            value={formik.values.hasPatent}
-                                            error={formik.touched.hasPatent && Boolean(formik.errors.hasPatent)}
-                                            helperText={formik.touched.hasPatent && formik.errors.hasPatent}
-                                        >
-                                            <MenuItem value="Yes">Yes</MenuItem>
-                                            <MenuItem value="No">No</MenuItem>
-                                        </TextField>
-                                    </Grid> : ""}
-
                                 </>
                             ) : ""}
+
+                            {(formik.values.productToMarket == "Yes" || formik.values.userType === 'Freelancer') ? <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    style={{ background: "white", borderRadius: "25px" }}
+                                    id="hasPatent"
+                                    color='secondary'
+                                    label="Do you have a patent?"
+                                    name="hasPatent"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.hasPatent}
+                                    error={formik.touched.hasPatent && Boolean(formik.errors.hasPatent)}
+                                    helperText={formik.touched.hasPatent && formik.errors.hasPatent}
+                                >
+                                    <MenuItem value="Yes">Yes</MenuItem>
+                                    <MenuItem value="No">No</MenuItem>
+                                </TextField>
+                            </Grid> : ""}
+
+                            {formik.values.hasPatent === 'Yes' &&
+                                <Grid item xs={12} sm={12}>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        color='secondary'
+                                        name="patentDetails"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        rows={4}
+                                        label={formik.values.userType === 'Freelancer' ? "Provide details about the research product or solution that you intend to commercialize" : "Patent Details"}
+                                        value={formik.values.patentDetails}
+                                        variant="outlined"
+                                    />
+                                </Grid>
+                            }
 
                             {isInnovator && showProductDetails && (
                                 <Grid item xs={12}>
@@ -565,7 +583,7 @@ const EditProfile2: React.FC = () => {
                             {/* *********** back and back *************** */}
 
                             <Grid item xs={12}>
-                                    <Box mt={3} display="flex" justifyContent="center">
+                                <Box mt={3} display="flex" justifyContent="center">
                                     <LoadingButton
                                         type="submit"
                                         variant="contained"

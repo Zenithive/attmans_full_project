@@ -105,8 +105,8 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext, initialValues, re
                                     disabled={readOnly} // Set disabled
                                 />
                             </RadioGroup>
-                            <FormHelperText error={touched.natureOfProject && !!errors.natureOfProject}>
-                                <ErrorMessage name="natureOfProject" />
+                            <FormHelperText error={touched.natureOfProject && Boolean(errors.natureOfProject)} sx={{color: 'red'}}>
+                                {errors.natureOfProject?.toString()}
                             </FormHelperText>
                         </Box>
 
@@ -152,8 +152,8 @@ const ProposalStep1: React.FC<ProposalStep1Props> = ({ onNext, initialValues, re
                                     disabled={readOnly} // Set disabled
                                 />
                             </RadioGroup>
-                            <FormHelperText error={touched.patentPreference && !!errors.patentPreference}>
-                                <ErrorMessage name="patentPreference" />
+                            <FormHelperText error={touched.patentPreference && !!errors.patentPreference}sx={{color: 'red'}}>
+                                {errors.patentPreference?.toString()}
                             </FormHelperText>
                         </Box>
 

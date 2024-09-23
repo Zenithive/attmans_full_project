@@ -168,12 +168,15 @@ export default function MainNavBar() {
   };
 
   const openProjectTab = (notificationObj: Email) => {
-    console.log(notificationObj)
     if (notificationObj.applicationId) {
       router.push(`/projects?applicationId=${notificationObj.applicationId}`);
     } else if (notificationObj.projectId || notificationObj.jobId) {
       router.push(`/projects?projectId=${notificationObj.projectId || notificationObj.jobId}`);
     }
+  }
+
+  const openProposalTab = (notificationObj: Email) => {
+    router.push(`/proposal`);
   }
 
   const handleProfileRedirect = () => {
@@ -191,6 +194,30 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             Your application "{notification.title}" has been {notification.status3} by "{notification.adminFirstName} {notification.adminLastName}". Click <a href="#" onClick={() => openProjectTab(notification)}>here</a> for more details.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('milestone')) {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.first} {notification.last} has {notification.status} a milestone.
+            <a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('proposal')) {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.first} {notification.last} has {notification.status} a proposal.
+            <a href="#" onClick={() => openProposalTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
       );
@@ -242,12 +269,12 @@ export default function MainNavBar() {
       );
     }
 
-    if (notification.notifType === 'Apply Create') {
+    if (notification.notifType === 'Apply Create' && userDetails.userType === 'Admin') {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            You have been notified for new apllication submitted for the Project: {notification.title}
+            You have been notified for new apllication submitted for the Project: {notification.title}.&nbsp;<a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects.
           </Typography>
         </>
       );

@@ -134,9 +134,7 @@ ProposalSchema.post('save', async function (doc: Proposal) {
     [PROPOSAL_STATUSES.approvedAndAwarded]: APPLY_STATUSES.awarded,
     [PROPOSAL_STATUSES.rejected]: APPLY_STATUSES.rejected,
   };
-  console.log('statusMatchObj', statusMatchObj);
 
-  console.log(this, 'doc.Status:', doc.Status);
   try {
     const result = await ApplyModel.updateOne(
       {

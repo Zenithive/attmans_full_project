@@ -144,11 +144,7 @@ const myproject = () => {
         };
       
         if (userType !== 'Admin') {
-          if (userType === 'Freelancer') {
             params.appUserId = userId;
-          } else {
-            params.userId = userId;
-          }
         }
       
         return params;

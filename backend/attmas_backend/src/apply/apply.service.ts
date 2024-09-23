@@ -57,7 +57,6 @@ export class ApplyService {
       jobId: jobId,
     }).exec();
 
-    console.log('existingApplication', existingApplication);
     if (existingApplication) {
       throw new ConflictException('User has already applied for this job');
     }
@@ -116,8 +115,6 @@ export class ApplyService {
   }
 
   async findAllMyProject(userId: string): Promise<any[]> {
-    console.log('UserId received:', userId); // Log the received userId
-
     // Check if userId is a valid ObjectId
     if (!Types.ObjectId.isValid(userId)) {
       throw new Error('Invalid userId format');
@@ -168,8 +165,6 @@ export class ApplyService {
       ]);
 
       // Log the results to see values of title and jobDetails
-      console.log('Aggregation Results:', JSON.stringify(results, null, 2));
-
       return results;
     } catch (error) {
       console.error('Aggregation error:', error);
@@ -436,7 +431,6 @@ export class ApplyService {
       { $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } },
     ]).exec();
 
-    console.log('result for Admin', result);
     return result;
   }
 
@@ -467,15 +461,12 @@ export class ApplyService {
     jobId: string,
     comment: string,
   ): Promise<Apply> {
-    // console.log(`Rewarding application with ID: ${id}`);
-
     const application = await this.ApplyModel.findById(id).exec();
 
     const validStatusesForAward = [
       APPLY_STATUSES.approvedPendingForProposalForInnovators,
       APPLY_STATUSES.proposalUnderReview,
     ];
-    console.log('application', application);
     if (
       !application?._id ||
       !validStatusesForAward.includes(application.status)
@@ -491,9 +482,7 @@ export class ApplyService {
       comment ||
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
-    console.log('application', application);
     this.updateAlltheApplications(application.jobId, id);
-    // console.log(`Application with ID: ${id} awarded.`);
     const proposals = await this.proposalModel
       .find({
         projectId: application.jobId,
@@ -534,8 +523,6 @@ export class ApplyService {
       userId: app.userId as Types.ObjectId,
       username: app.username.toString(),
     }));
-    console.log('updatedApplications', updatedApplications);
-    // console.log('Applications to be updated:', updatedApplications);
 
     await this.updateStatuses({ applications: updatedApplications });
     // Send notification emails
@@ -563,8 +550,6 @@ export class ApplyService {
   async updateStatuses(updateStatusesDto: UpdateStatusesDto): Promise<void> {
     const { applications } = updateStatusesDto;
 
-    // console.log('Updating statuses for applications:', applications);
-
     // Update the status of each application
     const bulkOperations = applications.map((app) => ({
       updateOne: {
@@ -576,9 +561,6 @@ export class ApplyService {
       },
     }));
 
-    // console.log('Bulk operations prepared:', bulkOperations);
-
     await this.ApplyModel.bulkWrite(bulkOperations);
-    // console.log('Bulk operations executed.');
   }
 }
