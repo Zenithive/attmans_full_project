@@ -14,6 +14,7 @@ import {
   CardContent,
   Card,
   CircularProgress,
+  Paper,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
@@ -97,6 +98,21 @@ interface ProjectDetailsDialogProps {
 
 }
 
+interface WorkExprience {
+  gender: string
+  qualification: string;
+  organization: string;
+  sector: string;
+  workAddress: string;
+  designation: string;
+  userType: string;
+  productToMarket: string;
+  products: Product[];
+  hasPatent: string;
+  patentDetails: string;
+  username: string;
+  userId: string;
+}
 
 const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose, apply, jobId, canAddComment, onCommentSubmitted }) => {
   const [jobDetailKey, setJobDetailKey] = useState<number>(0);
@@ -104,9 +120,12 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
   const [applications, setApplications] = useState<Apply[]>([]);
   const [isAwardButtonVisible, setIsAwardButtonVisible] = useState(true);
-
+  const [workExperience, setWorkExperience] = React.useState<WorkExprience | null>(null);
+  const [fetchError, setFetchError] = React.useState<string | null>(null);
   const [selectedUser, setSelectedUser] = React.useState<string>('');
   const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
+  const [subcategories, setSelectedValues] = React.useState<string[]>([]);
+  const [categories, setCategories] = React.useState([]);
 
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
 
@@ -118,31 +137,68 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [resubmitComment, setResubmitComment] = useState<string>('');
   const [isResubmitting, setIsResubmitting] = useState<boolean>(false);
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
-  const adminStatuses =[
-     'Admin Approved'
+
+  const adminStatuses = [
+    'Admin Approved'
     , 'Admin Rejected'
     , 'Project Owner Approved'
     , 'Project Owner Rejected'];
 
   useEffect(() => {
     const fetchMilestones = () => {
-        if (apply?._id) {
-            axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
-                .then(response => {
-                    setMilestones(response.data);
-                })
-                .catch(error => console.error('Error fetching milestones:', error));
-        }
+      if (apply?._id) {
+        axiosInstance.get(`${APIS.MILESTONES}/apply/${apply._id}`)
+          .then(response => {
+            setMilestones(response.data);
+          })
+          .catch(error => console.error('Error fetching milestones:', error));
+      }
     };
     fetchMilestones();
 
     pubsub.subscribe('MilstonRefetched', fetchMilestones);
 
     return () => {
-        pubsub.unsubscribe('MilstonRefetched', fetchMilestones);
+      pubsub.unsubscribe('MilstonRefetched', fetchMilestones);
     };
-}, [apply]);
+  }, [apply]);
+
+  React.useEffect(() => {
+    if (open && userDetails?.username) {
+      const fetchWorkExperience = async () => {
+        try {
+          const response = await axiosInstance.get(`/profile/profileByUsername2?username=${userDetails.username}`);
+          setWorkExperience(response.data);
+        } catch (error) {
+          console.error('Error fetching Work Experience:', error);
+          setFetchError('Failed to fetch work experience.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchWorkExperience();
+    }
+  }, [open, userDetails?.username]);
+
+  React.useEffect(() => {
+    if (userDetails?.username) {
+      const fetchUserProfile = async () => {
+        try {
+          const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
+          const userData = response.data;
+          setCategories(userData.categories || []);
+          setSelectedValues(userData.subcategories || []);
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+          setFetchError('Failed to fetch user profile');
+        }
+      };
+
+      fetchUserProfile();
+    }
+  }, [userDetails?.username]);
 
 
 
@@ -358,18 +414,147 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-                { userDetails.userType === 'Innovator' &&(
-                <NewProductTable
-                  products={apply?.products}
-                  hideActions={true}
-                  onEdit={() => {
-                    throw new Error('Function not implemented.');
-                  } }
-                  onDelete={() => {
-                    throw new Error('Function not implemented.');
-                  } } onView={function (product: Product): void {
-                    throw new Error('Function not implemented.');
-                  } }                />
+                {(userDetails.userType === 'Innovator' || userDetails.userType === 'Admin') && (
+                  <Box sx={{ marginBottom: '15px' }}>
+                    <NewProductTable
+                      products={apply?.products}
+                      hideActions={true}
+                      onEdit={() => {
+                        throw new Error('Function not implemented.');
+                      }}
+                      onDelete={() => {
+                        throw new Error('Function not implemented.');
+                      }} onView={function (product: Product): void {
+                        throw new Error('Function not implemented.');
+                      }}
+                    />
+                  </Box>
+                )}
+                {userDetails.userType === 'Project Owner' && (apply.status === 'Approved' || apply.status === 'Awarded' || apply.status === 'Not Awarded') && (
+                  <Box sx={{ marginBottom: '15px' }}>
+                    <NewProductTable
+                      products={apply?.products}
+                      hideActions={true}
+                      onEdit={() => {
+                        throw new Error('Function not implemented.');
+                      }}
+                      onDelete={() => {
+                        throw new Error('Function not implemented.');
+                      }}
+                      onView={(product: Product): void => {
+                        throw new Error('Function not implemented.');
+                      }}
+                    />
+                  </Box>
+                )}
+
+                {workExperience && (
+                  <Paper elevation={3} sx={{ padding: 3 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Qualification"
+                          value={workExperience.qualification}
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Organization"
+                          value={workExperience.organization}
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Sector"
+                          value={workExperience.sector}
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Work Address"
+                          value={workExperience.workAddress}
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} sx={{ marginBottom: '40px' }}>
+                        <TextField
+                          fullWidth
+                          label="Designation"
+                          value={workExperience.designation}
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                          color="secondary"
+                        />
+                      </Grid>
+
+
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Do you have a patent?"
+                          value={workExperience.hasPatent}
+                          InputProps={{ readOnly: true }}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      {workExperience.hasPatent === 'Yes' && (
+                        <Grid item xs={12} >
+                          <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            label="Patent Details"
+                            value={workExperience.patentDetails}
+                            InputProps={{ readOnly: true }}
+                            variant="outlined"
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={12}>
+                        <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                          Categories
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          sx={{ width: '100%' }}
+                          value={categories.join(', ')}
+                          variant="outlined"
+                          multiline
+                          disabled
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12}>
+                        <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                          Subject Matter Expertise
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          sx={{ width: '100%' }}
+                          value={subcategories.join(', ')}
+                          variant="outlined"
+                          multiline
+                          disabled
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
                 )}
                 <Grid item xs={12}>
                   {milestones.map((milestone, index) => (
@@ -421,17 +606,17 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                                 sx={{ mb: 2 }}
                                               />
                                             </Grid>
-                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator' || userDetails.userType === 'Project Owner') && m.status === 'Submitted' &&(
-                                            <Grid item xs={12} sm={5}>
-                                              <TextField
-                                                label="Admin Status"
-                                                value={m.adminStatus || 'No admin status available'}
-                                                fullWidth
-                                                color='secondary'
-                                                aria-readonly
-                                                sx={{ mb: 2 }}
-                                              />
-                                            </Grid>
+                                            {(userDetails.userType === 'Admin' || userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator' || userDetails.userType === 'Project Owner') && m.status === 'Submitted' && (
+                                              <Grid item xs={12} sm={5}>
+                                                <TextField
+                                                  label="Admin Status"
+                                                  value={m.adminStatus || 'No admin status available'}
+                                                  fullWidth
+                                                  color='secondary'
+                                                  aria-readonly
+                                                  sx={{ mb: 2 }}
+                                                />
+                                              </Grid>
                                             )}
                                             {userDetails.userType === 'Admin' && m.status === 'Submitted' && (
                                               <>
@@ -473,7 +658,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                             />
                                           </Grid>
                                         )}
-                                        {userDetails.userType === 'Freelancer' && (m.adminStatus === 'Admin Rejected' || m.adminStatus === 'Project Owner Rejected')  && (
+                                        {userDetails.userType === 'Freelancer' && (m.adminStatus === 'Admin Rejected' || m.adminStatus === 'Project Owner Rejected') && (
                                           <>
                                             <Grid item xs={12}>
                                               <TextField
