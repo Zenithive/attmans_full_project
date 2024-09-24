@@ -70,6 +70,9 @@ export class CreateBoothDto {
   @IsString()
   title: string;
 
+  @IsString()
+  _id?: string;
+
   @IsNotEmpty()
   @IsString()
   description: string;

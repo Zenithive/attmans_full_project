@@ -27,6 +27,7 @@ import { DATE_FORMAT } from '../constants/common.constants';
 import { PROJECT_STATUSES } from '../constants/status.constant';
 import axiosInstance from '../services/axios.service';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { GetProjectStatusChip } from '../myproject/page';
 
 
 
@@ -552,10 +553,11 @@ const Jobs = () => {
                                             </Box>
                                             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                 <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
-                                                    <CustomChip
+                                                    {GetProjectStatusChip(job)}
+                                                    {/* <CustomChip
                                                         label={job.status === PROJECT_STATUSES.approved ? PROJECT_STATUSES.approved : job.status === PROJECT_STATUSES.rejected ? PROJECT_STATUSES.rejected : PROJECT_STATUSES.pending}
                                                         color={job.status === PROJECT_STATUSES.approved ? 'success' : job.status === PROJECT_STATUSES.rejected ? 'error' : 'default'}
-                                                    />
+                                                    /> */}
                                                 </Box>
                                                 <Box sx={{ flexShrink: 0, mr: 2 }}>
                                                     <Chip

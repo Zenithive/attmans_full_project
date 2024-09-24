@@ -20,10 +20,10 @@ export class BoothController {
     return this.boothService.create(createBoothDto);
   }
 
-  // @Get('username/:username')
-  // async findBoothProducts(@Param('username') username: string): Promise<Product[]> {
-  //   return this.boothService.findBoothProduct(username);
-  // }
+  @Post('update')
+  async update(@Body() createBoothDto: CreateBoothDto): Promise<Booth> {
+    return this.boothService.update(createBoothDto);
+  }
 
   @Get()
   async findAll(

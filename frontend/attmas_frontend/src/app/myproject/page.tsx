@@ -20,6 +20,23 @@ import ConfirmationCancelDialog from '../component/ConfirmationCancelDialog';
 import axiosInstance from '../services/axios.service';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
+import { pubsub } from '../services/pubsub.service';
+
+export const GetProjectStatusChip = (job: Job) => {
+    let color = "default";
+    if (job.status === 'Approved') {
+        color = 'success';
+    } else if (job.status === 'Rejected') {
+        color = 'error';
+    }
+
+    return (
+        <CustomChip
+            label={job.status}
+            color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
+        />
+    )
+}
 
 
 const myproject = () => {
@@ -27,7 +44,7 @@ const myproject = () => {
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
     const [jobTitle, setJobTitle] = useState<string>('');
-    const [jobDescription ,setJobDescription] = useState<string>('');
+    const [jobDescription, setJobDescription] = useState<string>('');
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState<string[]>([]);
     const [selectedExpertis, setSelectedExpertis] = useState<string[]>([]);
@@ -137,65 +154,62 @@ const myproject = () => {
 
     const getParamsForJobs = (page: number, filter: Record<string, any>, userId: string, userType: string) => {
         const params: Record<string, any> = {
-          page,
-          limit: 10,
-          appstatus: APPLY_STATUSES.awarded,
-          ...filter, // Directly spread the filter object here
+            page,
+            limit: 10,
+            appstatus: APPLY_STATUSES.awarded,
+            ...filter, // Directly spread the filter object here
         };
-      
-        if (userType !== 'Admin') {
+
+        if (userType === 'Freelancer' || userType === 'Innovator') {
             params.appUserId = userId;
         }
-      
+
         return params;
-      };
-      
-      
+    };
 
 
-      const fetchJobs = useCallback(async (page: number) => {
+    const fetchJobs = useCallback(async (page: number) => {
         try {
-          // Construct params including filter
-          const params = getParamsForJobs(page, {}, userId, userType);
-      
-          // Create URLSearchParams instance
-          const searchParams = new URLSearchParams();
-      
-          // Append basic parameters
-          Object.keys(params).forEach(key => {
-            const value = params[key];
-            if (Array.isArray(value)) {
-              value.forEach(v => searchParams.append(key, v));
-            } else {
-              searchParams.append(key, value);
-            }
-          });
-      
-          // Convert URLSearchParams to string
-          const queryString = searchParams.toString() + '&'+ filter;
-          console.log('Query String:', queryString); // Debugging line to inspect the query string
-      
-          const response = await axiosInstance.get(`${APIS.JOBS}?${queryString}`);
-      
-          if (response.data.length === 0) {
-            setHasMore(false);
-          } else {
-            setJobs(prev => {
-              const newJobs = response.data.filter((newJob: Job) => !prev.some(existingJob => existingJob._id === newJob._id));
-              return [...prev, ...newJobs];
+            // Construct params including filter
+            const params = getParamsForJobs(page, {}, userId, userType);
+
+            // Create URLSearchParams instance
+            const searchParams = new URLSearchParams();
+
+            // Append basic parameters
+            Object.keys(params).forEach(key => {
+                const value = params[key];
+                if (Array.isArray(value)) {
+                    value.forEach(v => searchParams.append(key, v));
+                } else {
+                    searchParams.append(key, value);
+                }
             });
-            if (response.data.length < 10) {
-              setHasMore(false);
+
+            // Convert URLSearchParams to string
+            const queryString = searchParams.toString() + '&' + filter;
+
+            const response = await axiosInstance.get(`${APIS.JOBS}?${queryString}`);
+
+            if (response.data.length === 0) {
+                setHasMore(false);
+            } else {
+                setJobs(prev => {
+                    const newJobs = response.data.filter((newJob: Job) => !prev.some(existingJob => existingJob._id === newJob._id));
+                    return [...prev, ...newJobs];
+                });
+                if (response.data.length < 10) {
+                    setHasMore(false);
+                }
             }
-          }
         } catch (error) {
-          console.error('Error fetching jobs:', error);
+            console.error('Error fetching jobs:', error);
         }
-      }, [userId, userType, filter]);
-      
-      
-      
-      
+    }, [userId, userType, filter]);
+
+
+
+
 
 
 
@@ -255,13 +269,13 @@ const myproject = () => {
     };
 
     const handleViewJob = (job: Job) => {
-        setViewingJob(job);
+        setViewingJob({...job, firstName: job.userId.firstName, lastName: job.userId.lastName});
         setApplyOpen(false);
     };
 
     const filteredJobs = useMemo(() => {
         return jobs.filter(job => {
-            return userType === 'Admin' || job.status === 'Approved';
+            return userType === 'Admin' || job.status === 'Approved' || job.status.includes('close');
         });
     }, [jobs, userType]);
 
@@ -283,6 +297,13 @@ const myproject = () => {
         }
     };
 
+    useEffect(() => {
+        pubsub.subscribe('refectMyProject', refetch);
+        return () => {
+            pubsub.unsubscribe('refectMyProject', refetch);
+        };
+    }, [refetch]);
+
     const handleCancel = async (projectId: string, comment?: string) => {
         try {
             if (!projectId) return;
@@ -295,6 +316,8 @@ const myproject = () => {
                 status,
                 comment: finalComment,
             });
+
+            pubsub.publish('refectMyProject', {});
         } catch (error) {
             console.error('Error updating project:', error);
         }
@@ -303,13 +326,11 @@ const myproject = () => {
     const isProjectOwnerOrAdmin = userDetails.userType === 'Project Owner';
 
     const changeFilterOrPage = (newFilter: string) => {
-        setFilter(newFilter); 
+        setFilter(newFilter);
         setPage(1);
-        setJobs([]); 
+        setJobs([]);
         setHasMore(true);
     };
-
-
 
     return (
         <Box
@@ -397,10 +418,11 @@ const myproject = () => {
 
                                                 <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                     <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
-                                                        <CustomChip
+                                                        {GetProjectStatusChip(job)}
+                                                        {/* <CustomChip
                                                             label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                                             color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-                                                        />
+                                                        /> */}
                                                     </Box>
 
                                                     <Box sx={{ flexShrink: 0, mr: 2 }}>
@@ -420,7 +442,7 @@ const myproject = () => {
                                             <Box sx={{ marginTop: '10px' }}>
                                                 <Typography variant="body2">{job.currency === 'USD' ? '$' : '₹'}{job.Budget}</Typography>
                                                 <Typography variant="caption">{job.Category.join(', ')}, {job.Subcategorys.join(', ')}</Typography>
-                                                <Button
+                                                {job.status === PROJECT_STATUSES.approved ? <Button
                                                     onClick={() => handleOpenConfirmationDialog(job._id as string)}
                                                     sx={{
                                                         position: 'absolute',
@@ -444,7 +466,7 @@ const myproject = () => {
                                                     }}
                                                 >
                                                     Close
-                                                </Button>
+                                                </Button> : ''}
                                             </Box>
                                         </CardContent>
                                     </Card>
@@ -751,6 +773,13 @@ const myproject = () => {
                     message="Are you sure you want to close this application?"
                 />
             </Box> */}
+
+            <ConfirmationCancelDialog
+                open={confirmationDialogOpen}
+                onClose={handleCloseConfirmationDialog}
+                onConfirm={handleConfirm}
+                message="Are you sure you want to close this application?"
+            />
 
             <AddApply
                 open={applyOpen}

@@ -556,13 +556,14 @@ export class JobsService {
     id: string,
     status: string,
     comment: string,
+    userId: string,
   ): Promise<Jobs> {
     // Find the job by ID
     const job = await this.jobsModel.findById(id);
     if (!job) {
       throw new NotFoundException(`Job with id ${id} not found`);
     }
-
+    console.log('userId', userId);
     // Update the status and comment fields
     job.status = status;
     job.commentWhenProjectClose = comment;
