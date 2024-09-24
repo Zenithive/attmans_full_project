@@ -17,11 +17,13 @@ import { APIS } from "@/app/constants/api.constant";
 import LatestProductTableForBooth from "./LatestProductTableForBooth";
 import axiosInstance from "@/app/services/axios.service";
 import { Product } from "../ProductTable";
+import { Booth } from "@/app/view-exhibition/page";
 
 interface BoothDetailsModalProps {
   open: boolean;
   onClose: () => void;
   createBooth: (boothData: any) => Promise<void>;
+  BoothDetails?: Booth | null;
   exhibitionId: string | null;
 }
 
@@ -29,6 +31,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   open,
   onClose,
   createBooth,
+  BoothDetails,
   exhibitionId,
 }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
@@ -42,6 +45,9 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
           `${APIS.PRODUCTNAME}?username=${userDetails.username}`
         );
         setProducts(response.data || []);
+        if(BoothDetails?.products.length){
+          setSelectedProducts(BoothDetails?.products);
+        }
       } catch (error) {
         console.error("Error fetching product details:", error);
       }
@@ -52,10 +58,10 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   }, [userDetails._id, open]);
 
   const initialValues = {
-    title: "",
-    description: "",
-    videoUrl: "",
-    products: [] as Product[], // Updated type
+    title: BoothDetails?.title || "",
+    description: BoothDetails?.description || "",
+    videoUrl: BoothDetails?.videoUrl || "",
+    products: BoothDetails?.products || [] as Product[], // Updated type
     userId: userDetails._id,
     username: userDetails.username,
     exhibitionId: exhibitionId || "",
@@ -68,7 +74,6 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   });
 
   const handleSubmit = async (values: typeof initialValues, { resetForm }: any) => {
-    console.log("Submitting form with values:", values); // Debugging statement
 
     try {
       const payload = { ...values, products: values.products }; // Send full product details

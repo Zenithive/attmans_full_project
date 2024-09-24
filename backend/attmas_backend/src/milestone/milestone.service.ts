@@ -210,11 +210,7 @@ export class MilestonesService {
       selectedMilestone.approvalComments.push(comment);
     }
 
-    this.sendApproveMilestoneByNotifications(
-      selectedMilestone,
-      milestoneIndex,
-      user,
-    );
+    this.sendApproveMilestoneByNotifications(milestone, milestoneIndex, user);
 
     await milestone.save();
   }

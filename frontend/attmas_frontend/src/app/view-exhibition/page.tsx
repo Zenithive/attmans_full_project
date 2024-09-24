@@ -16,7 +16,7 @@ import { CommonAvatar } from '../component/common-ui/avatar.component';
 import StatusFilter from '../component/filter/filter';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
 import { Product } from '../component/all_Profile_component/AddProductModal2';
-import { EXHIBITION_STATUSES } from '../constants/status.constant';
+import { BOOTH_STATUSES, EXHIBITION_STATUSES } from '../constants/status.constant';
 import axiosInstance from '../services/axios.service';
 import { pubsub } from '../services/pubsub.service';
 import { PUB_SUB_ACTIONS } from '../constants/pubsub.constant';
@@ -51,8 +51,7 @@ interface Visitor {
   interestType: string;
 }
 
-
-interface Booth {
+export interface Booth {
   _id: string;
   title: string;
   description: string;
@@ -92,7 +91,8 @@ const ExhibitionsPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState<{ open: boolean; booth: Booth | null }>({ open: false, booth: null });
   const [rejectDialogOpen, setRejectDialogOpen] = useState<{ open: boolean; booth: Booth | null }>({ open: false, booth: null });
-  const [isParticipateButtonVisible, setParticipateButtonVisible] = useState(true);
+  const [isParticipateButtonVisible, setParticipateButtonVisible] = useState(false);
+  const [isReParticipateButtonVisible, setReParticipateButtonVisible] = useState(false);
   const [hasUserBooth, setHasUserBooth] = useState(false);
   const [view, setView] = useState('boothDetails');
   const [selectedExhibition, setSelectedExhibition] = useState<Exhibition | null>(null);
@@ -174,9 +174,14 @@ const ExhibitionsPage: React.FC = () => {
 
       setBooths(tmpBooths);
 
-      const userHasBooth = tmpBooths.some((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
-      setHasUserBooth(userHasBooth);
-      setParticipateButtonVisible(!userHasBooth);
+      const userHasBooth = tmpBooths.find((booth: Booth) => booth.exhibitionId === exhibitionId && booth.userId?._id === userDetails?._id);
+
+      //setHasUserBooth(userHasBooth);
+      if (userHasBooth?._id && userHasBooth.status === BOOTH_STATUSES.rejected) {
+        setReParticipateButtonVisible(true)
+      }
+
+      setParticipateButtonVisible(userHasBooth?._id ? false : true);
     }
 
     const fetchBooths = async () => {
@@ -251,11 +256,20 @@ const ExhibitionsPage: React.FC = () => {
       }
 
       boothData.exhibitionId = exhibitionId;
+      let newBooth = {};
+      let createUpdateBoothAPI = APIS.CREATE_BOOTH;
+      if (selectedBooth?._id) {
+        newBooth = { ...selectedBooth };
+        createUpdateBoothAPI = APIS.UPDATE_BOOTH;
+      }
 
-      const response = await axiosInstance.post(APIS.CREATE_BOOTH, boothData);
+      newBooth = { ...newBooth, ...boothData };
+
+      const response = await axiosInstance.post(createUpdateBoothAPI, newBooth);
       if (response.data.exhibitionId === exhibitionId) {
         setBooths(prevBooths => [...prevBooths, response.data]);
         setParticipateButtonVisible(false);
+        setSelectedBooth(null);
       } else {
         console.error('Booth created does not belong to the current exhibition');
       }
@@ -392,8 +406,8 @@ const ExhibitionsPage: React.FC = () => {
     return exhibitionDate.isSame(currentDate);
   };
 
-  const isExhibitionClosed = (exhibition: Exhibition) => { 
-    return exhibition.status === EXHIBITION_STATUSES.close && userType !== "Admin"; 
+  const isExhibitionClosed = (exhibition: Exhibition) => {
+    return exhibition.status === EXHIBITION_STATUSES.close && userType !== "Admin";
   }
 
   const handleDrawerClose = () => {
@@ -473,7 +487,7 @@ const ExhibitionsPage: React.FC = () => {
                 </Button>
               )}
             </Box>
-            <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} />
+            <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} BoothDetails={selectedBooth} />
             <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} exhibitionId={exhibitionId} interestType={'InterestedUserForExhibition'} />
           </Box>
           <div>
@@ -657,32 +671,6 @@ const ExhibitionsPage: React.FC = () => {
                               )
                             )}
 
-
-                            {/* {exhibitions.map((exhibition) => (
-                              <Box key={exhibition._id}>
-                                {!(userDetails && (userType === 'Admin' || userType === 'Innovator')) &&
-                                  dayjs(exhibition.dateTime).isSame(dayjs(exhibition.serverDate), 'day') && (
-                                    <a
-                                      href="#"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        setSelectedBooth(booth);
-                                        setDialogOpen(true);
-                                      }}
-                                      style={{
-                                        textDecoration: 'underline',
-                                        color: '#1976d2',
-                                        fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol" !importent',
-                                        position: 'relative', float: 'right', bottom: '55px'
-                                      }}
-                                    >
-                                      View Details
-                                    </a>
-                                  )}
-                              </Box>
-                            ))} */}
-
-
                             {userType === 'Admin' ? <Typography><a
                               href="javascript:void(0);"
                               onClick={(e) => {
@@ -739,6 +727,17 @@ const ExhibitionsPage: React.FC = () => {
                                   </Button>
                                 </>
                               )}
+
+                              {isReParticipateButtonVisible ? <Button
+                                onClick={() => {
+                                  openModal()
+                                  setSelectedBooth(booth);
+                                }}
+                                variant="contained"
+                                style={{ marginRight: '10px' }}
+                              >
+                                Re-Participate
+                              </Button> : ''}
                             </Box>
                             <Box>
                             </Box>

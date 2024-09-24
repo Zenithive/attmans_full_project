@@ -340,12 +340,6 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             edge="start"
                             color="inherit"
                             onClick={() => setViewingJob(null)}
-                            sx={{
-                                position: 'absolute',
-                                top: 16,
-                                right: 16,
-                                zIndex: 1,
-                            }}
                         >
                             <Close />
                         </IconButton>
@@ -357,7 +351,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right', mb: 2 }} />}
                             {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right', mb: 2 }} />}
 
-                            <Grid container spacing={2}>
+                            <Grid container spacing={2} sx={{mt: 0.5}}>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
                                         label="Title"

@@ -11,6 +11,7 @@ import {
 import { EmailService2 } from 'src/notificationEmail/Exebitionemail.service';
 import { WorkExprience } from 'src/profile/schemas/work.exprience.schema';
 import { BOOTH_STATUSES } from 'src/common/constant/status.constant';
+import { getObjectId } from 'src/common/service/common.service';
 
 @Injectable()
 export class BoothService {
@@ -25,8 +26,6 @@ export class BoothService {
   ) {}
 
   async create(createBoothDto: CreateBoothDto): Promise<Booth> {
-    console.log('Booth Products:', createBoothDto.products);
-
     let exhibitionId: Types.ObjectId;
 
     // Convert `exhibitionId` to ObjectId if it is a string
@@ -57,26 +56,64 @@ export class BoothService {
     });
     const booth = await createdBooth.save();
 
-    // const newProducts = createBoothDto.products.filter(
-    //   (product) => !product._id,
-    // );
+    this.sendEmailToExhibition(exhibitionId, booth, 'New Booth Created');
 
-    // Update WorkExperience if needed
-    // if (newProducts.length > 0) {
-    //   await this.workExperienceModel.updateOne(
-    //     { username: createBoothDto.username },
-    //     { $push: { products: { $each: newProducts } } },
-    //   );
-    // }
-
-    this.sendEmailToExhibition(exhibitionId, booth);
-
-    console.log('Booth created:', booth);
     return booth;
   }
 
+  async update(createBoothDto: CreateBoothDto): Promise<Booth> {
+    let exhibitionId: Types.ObjectId;
+
+    // Convert `exhibitionId` to ObjectId if it is a string
+    if (
+      typeof createBoothDto.exhibitionId === 'string' &&
+      Types.ObjectId.isValid(createBoothDto.exhibitionId)
+    ) {
+      exhibitionId = new Types.ObjectId(createBoothDto.exhibitionId);
+    } else if (createBoothDto.exhibitionId instanceof Types.ObjectId) {
+      exhibitionId = createBoothDto.exhibitionId;
+    } else {
+      throw new Error('Invalid exhibitionId');
+    }
+
+    createBoothDto.exhibitionId = getObjectId(
+      createBoothDto.exhibitionId.toString(),
+    );
+    createBoothDto.userId = getObjectId(createBoothDto.userId.toString());
+
+    createBoothDto.status = BOOTH_STATUSES.pending;
+
+    const updatedBooth = await this.boothModel.findOneAndUpdate(
+      { _id: createBoothDto._id },
+      { ...createBoothDto },
+    );
+
+    if (!updatedBooth) {
+      throw new Error('Booth is not found.');
+    }
+
+    // const createdBooth = new this.boothModel({
+    //   ...createBoothDto,
+    //   userId: new Types.ObjectId(createBoothDto.userId),
+    //   exhibitionId,
+    // });
+    // const booth = await createdBooth.save();
+
+    this.sendEmailToExhibition(
+      exhibitionId,
+      updatedBooth,
+      'A Booth is resubmitted',
+    );
+
+    return updatedBooth;
+  }
+
   // Email sending method remains the same
-  async sendEmailToExhibition(exhibitionId: Types.ObjectId, booth: Booth) {
+  async sendEmailToExhibition(
+    exhibitionId: Types.ObjectId,
+    booth: Booth,
+    subject: string,
+  ) {
     const exhibition = await this.exhibitionModel
       .findById(exhibitionId)
       .populate('userId', 'firstName lastName username', this.userModel)
@@ -86,7 +123,7 @@ export class BoothService {
       const { username } = exhibition;
       this.emailService.sendEmailtoExhibition(
         username,
-        'New Booth Created',
+        subject,
         exhibitionId.toHexString(),
         booth.username,
         exhibition.title,

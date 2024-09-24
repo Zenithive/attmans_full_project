@@ -586,7 +586,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         <DialogActions>
 
           {proposals
-            .filter((proposal) => proposal.Status === PROPOSAL_STATUSES.proposalUnderReview)
+            .filter((proposal) => apply?._id === proposal.applyId && proposal.Status === PROPOSAL_STATUSES.proposalUnderReview)
             .map((proposal) => (
               userDetails.userType === 'Project Owner' &&
               apply?._id && apply?.status === APPLY_STATUSES.proposalUnderReview &&
