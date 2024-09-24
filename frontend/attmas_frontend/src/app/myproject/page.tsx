@@ -21,22 +21,7 @@ import axiosInstance from '../services/axios.service';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { pubsub } from '../services/pubsub.service';
-
-export const GetProjectStatusChip = (job: Job) => {
-    let color = "default";
-    if (job.status === 'Approved') {
-        color = 'success';
-    } else if (job.status === 'Rejected') {
-        color = 'error';
-    }
-
-    return (
-        <CustomChip
-            label={job.status}
-            color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
-        />
-    )
-}
+import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProjectStatusChip';
 
 
 const myproject = () => {
@@ -418,7 +403,7 @@ const myproject = () => {
 
                                                 <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                     <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', mr: 2 }}>
-                                                        {GetProjectStatusChip(job)}
+                                                        <GetProjectStatusChip job={job} />
                                                         {/* <CustomChip
                                                             label={job.status === 'Approved' ? 'Approved' : job.status === 'Rejected' ? 'Rejected' : 'Pending'}
                                                             color={job.status === 'Approved' ? 'success' : job.status === 'Rejected' ? 'error' : 'default'}
