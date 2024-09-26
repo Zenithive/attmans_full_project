@@ -60,7 +60,7 @@ interface FormValues {
     TimeFrame: Dayjs | null;
     jobId: string;
     applyType: string;
-    products: Product[] 
+    products: Product[]
 }
 
 
@@ -74,7 +74,7 @@ const validationSchema = Yup.object().shape({
     products: Yup.array().min(1).max(1).required("Only One product is acceptable")
 });
 
-export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription, jobId, onCancel }: AddApplyProps) => {
+export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription, jobId, onCancel }: AddApplyProps) => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const [fetchError, setFetchError] = React.useState<string | null>(null);
     const [workExperience, setWorkExperience] = React.useState<WorkExprience | null>(null);
@@ -316,6 +316,7 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription,
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} sm={6}>
                                             <TextField
+                                                color='secondary'
                                                 fullWidth
                                                 label="Qualification"
                                                 value={workExperience.qualification}
@@ -379,13 +380,14 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle,jobDescription,
                                                     <Typography>No products available</Typography>
                                                 )}
 
-                                                {errors?.products ? <span style={{color: 'red'}}>{errors?.products.toString() || ''}</span> : ''}
+                                                {errors?.products ? <span style={{ color: 'red' }}>{errors?.products.toString() || ''}</span> : ''}
                                             </Box>
 
                                         </>
 
                                         <Grid item xs={12} sm={6}>
                                             <TextField
+                                                color='secondary'
                                                 fullWidth
                                                 label="Do you have a patent?"
                                                 value={workExperience.hasPatent}

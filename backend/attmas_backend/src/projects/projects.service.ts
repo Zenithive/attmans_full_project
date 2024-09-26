@@ -436,7 +436,7 @@ export class JobsService {
         }
       } else if (project.SelectService.includes('Innovative product')) {
         const innovators =
-          await this.usersService.findUsersByUserType1('Innovators');
+          await this.usersService.findUsersByUserType1('Innovator');
         if (innovators.length === 0) {
         }
         for (const innovator of innovators) {
