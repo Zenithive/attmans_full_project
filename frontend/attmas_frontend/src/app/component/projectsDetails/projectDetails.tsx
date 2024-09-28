@@ -84,7 +84,7 @@ interface Apply {
   availableSolution: string;
   SolutionUSP: string;
   userId?: UserSchema;
-  username?:UserSchema;
+  username:string;
   products?: ProductForBooth[];
   applyType?: "FreelancerApply" | "InnovatorsApply";
 }
@@ -449,7 +449,6 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     />
                   </Box>
                 )}
-
                 {workExperience && (
                   <Paper elevation={3} sx={{ padding: 3 }}>
                     <Grid container spacing={2}>
@@ -558,6 +557,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Grid>
                   </Paper>
                 )}
+          
                 <Grid item xs={12}>
                   {milestones.map((milestone, index) => (
                     <Card key={index} variant="outlined" sx={{ mb: 2 }}>
