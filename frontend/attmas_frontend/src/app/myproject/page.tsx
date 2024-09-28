@@ -293,7 +293,7 @@ const myproject = () => {
         try {
             if (!projectId) return;
 
-            const status = 'Project Finished and close';
+            const status = PROJECT_STATUSES.closed;
             const defaultComment = 'No comment provided When Project is closed';
             const finalComment = comment || defaultComment;
 

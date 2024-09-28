@@ -16,6 +16,7 @@ import {
   UpdateJobsDto,
 } from './create-projects.dto';
 import { Jobs } from './projects.schema';
+import { PROJECT_STATUSES } from 'src/common/constant/status.constant';
 
 @Controller('jobs')
 export class JobsController {
@@ -126,7 +127,7 @@ export class JobsController {
     const { comment, userId } = updateData;
 
     // Set status to "Closed"
-    const status = 'Project Finished and close';
+    const status = PROJECT_STATUSES.closed;
 
     // Pass the ID, status, and comment to the service method
     return this.jobsService.updateStatusAndComment(id, status, comment, userId);

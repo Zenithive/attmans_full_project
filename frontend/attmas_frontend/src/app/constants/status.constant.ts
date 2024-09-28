@@ -3,7 +3,7 @@ export const PROJECT_STATUSES = {
   approved: "Approved",
   rejected: "Rejected",
   inProgress: "In Progress",
-  closed: "Closed",
+  closed: "Project Finished and close",
   requestForClose: "Request for Close",
 };
 

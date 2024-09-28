@@ -416,7 +416,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   />
                 </Grid>
 
-                {(userDetails.userType === 'Innovator' || userDetails.userType === 'Admin') && (
+                {apply.applyType === 'InnovatorsApply' && (
                   <Box sx={{ marginBottom: '15px' }}>
                     <NewProductTable
                       products={apply?.products}
@@ -432,24 +432,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     />
                   </Box>
                 )}
-                {userDetails.userType === 'Project Owner' && (apply.status === 'Approved' || apply.status === 'Awarded' || apply.status === 'Not Awarded') && (
-                  <Box sx={{ marginBottom: '15px' }}>
-                    <NewProductTable
-                      products={apply?.products}
-                      hideActions={true}
-                      onEdit={() => {
-                        throw new Error('Function not implemented.');
-                      }}
-                      onDelete={() => {
-                        throw new Error('Function not implemented.');
-                      }}
-                      onView={(product: Product): void => {
-                        throw new Error('Function not implemented.');
-                      }}
-                    />
-                  </Box>
-                )}
-                {workExperience && (
+
+                {(apply.applyType === 'InnovatorsApply' && workExperience) && (
                   <Paper elevation={3} sx={{ padding: 3 }}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>

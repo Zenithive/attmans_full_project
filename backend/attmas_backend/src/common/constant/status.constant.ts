@@ -2,6 +2,7 @@ export const PROJECT_STATUSES = {
   pending: 'Pending',
   approved: 'Approved',
   rejected: 'Rejected',
+  closed: 'Project Finished and close',
 };
 
 export const APPLY_STATUSES = {
