@@ -84,6 +84,7 @@ interface Apply {
   availableSolution: string;
   SolutionUSP: string;
   userId?: UserSchema;
+  username?:UserSchema;
   products?: ProductForBooth[];
   applyType?: "FreelancerApply" | "InnovatorsApply";
 }
@@ -166,10 +167,10 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   }, [apply]);
 
   React.useEffect(() => {
-    if (open && userDetails?.username) {
+    if (open && apply?.username) {
       const fetchWorkExperience = async () => {
         try {
-          const response = await axiosInstance.get(`/profile/profileByUsername2?username=${userDetails.username}`);
+          const response = await axiosInstance.get(`/profile/profileByUsername2?username=${apply.username}`);
           setWorkExperience(response.data);
         } catch (error) {
           console.error('Error fetching Work Experience:', error);
@@ -180,13 +181,13 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
       };
       fetchWorkExperience();
     }
-  }, [open, userDetails?.username]);
+  }, [open, apply?.username]);
 
   React.useEffect(() => {
-    if (userDetails?.username) {
+    if (apply?.username) {
       const fetchUserProfile = async () => {
         try {
-          const response = await axiosInstance.get(`/profile/profileByUsername3?username=${userDetails.username}`);
+          const response = await axiosInstance.get(`/profile/profileByUsername3?username=${apply.username}`);
           const userData = response.data;
           setCategories(userData.categories || []);
           setSelectedValues(userData.subcategories || []);
@@ -198,7 +199,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
 
       fetchUserProfile();
     }
-  }, [userDetails?.username]);
+  }, [apply?.username]);
+  
 
 
 
