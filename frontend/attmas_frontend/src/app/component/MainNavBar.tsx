@@ -269,7 +269,7 @@ export default function MainNavBar() {
       );
     }
 
-    if (notification.notifType === 'Apply Create' && userDetails.userType === 'Admin') {
+    if (notification.notifType === 'Apply Create' && (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (notification.adminFirstName || notification.first) === userDetails.firstName) {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>

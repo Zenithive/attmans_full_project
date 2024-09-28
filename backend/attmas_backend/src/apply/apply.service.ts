@@ -22,6 +22,7 @@ import {
   PROPOSAL_STATUSES,
 } from 'src/common/constant/status.constant';
 import { getSameDateISOs } from 'src/services/util.services';
+import { JobsService } from 'src/projects/projects.service';
 
 @Injectable()
 export class ApplyService {
@@ -31,6 +32,7 @@ export class ApplyService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel('Proposal') private readonly proposalModel: Model<Proposal>,
     private usersService: UsersService,
+    private jobsService: JobsService,
     private readonly emailService: EmailService,
     private readonly emailService2: EmailService2,
   ) {}
@@ -68,32 +70,49 @@ export class ApplyService {
       jobId: jobId,
     });
     await createdApply.save();
-    this.applyNotification(createApplyDto);
+    this.applyNotification(createApplyDto, 'Admin');
     // Find user and send email notification
 
     return createdApply;
   }
 
-  async applyNotification(createApplyDto) {
+  async applyNotification(createApplyDto, userType) {
     const user = await this.userModel
       .findOne({ username: createApplyDto.username })
       .exec();
-    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
-    if (!adminUsers || adminUsers.length === 0) {
-      throw new NotFoundException('No Admin users found');
-    }
-    for (const admin of adminUsers) {
-      if (admin) {
-        this.emailService2.sendEmailApplyCreate(
-          admin.username,
-          `New Application Created for Project: ${createApplyDto.title}`,
-          createApplyDto.jobId,
-          createApplyDto.title,
-          admin.firstName,
-          admin.lastName,
-          createApplyDto,
-        );
+
+    if (userType === 'Admin') {
+      const adminUsers = await this.usersService.findUsersByUserType1('Admin');
+      if (!adminUsers || adminUsers.length === 0) {
+        throw new NotFoundException('No Admin users found');
       }
+      for (const admin of adminUsers) {
+        if (admin) {
+          this.emailService2.sendEmailApplyCreate(
+            admin.username,
+            `New Application Created for Project: ${createApplyDto.title}`,
+            createApplyDto.jobId,
+            createApplyDto.title,
+            admin.firstName,
+            admin.lastName,
+            createApplyDto,
+          );
+        }
+      }
+    } else if (userType === 'Project Owner') {
+      const job = await this.jobsService.findJobWithUser(createApplyDto.jobId);
+      if (!job) {
+        throw new NotFoundException('No job found');
+      }
+      this.emailService2.sendEmailApplyCreate(
+        job.username,
+        `New Application Created for Project: ${createApplyDto.title}`,
+        createApplyDto.jobId,
+        createApplyDto.title,
+        job.firstName,
+        job.lastName,
+        createApplyDto,
+      );
     }
     if (user) {
       this.emailService2.sendEmailApplyCreate(
@@ -214,6 +233,8 @@ export class ApplyService {
         );
       }
     }
+
+    this.applyNotification(application, 'Project Owner');
     return application;
   }
 

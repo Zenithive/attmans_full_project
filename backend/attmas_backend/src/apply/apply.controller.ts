@@ -83,7 +83,6 @@ export class ApplyController {
     try {
       const objectId = new Types.ObjectId(jobId);
       const applications = await this.applyService.findByJobId(objectId);
-      console.log('Applications:', applications);
       return applications;
     } catch (error) {
       console.error('Error in findByJobId:', error);
