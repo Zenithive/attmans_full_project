@@ -15,6 +15,7 @@ import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 import { Email } from 'src/notificationEmail/Exebitionemail.schema';
 import { User, UserDocument } from 'src/users/user.schema';
 import { UsersService } from 'src/users/users.service';
+import { Jobs, JobsDocument } from 'src/projects/projects.schema';
 
 interface ProposalFilter {
   projTitle: string;
@@ -32,6 +33,7 @@ export class ProposalService {
     private emailModel: Model<Email>,
     private usersService: UsersService,
     @InjectModel(Apply.name) private applyModel: Model<ApplyDocument>,
+    @InjectModel(Jobs.name) private readonly jobsModel: Model<JobsDocument>,
   ) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail', // or any other service
@@ -307,6 +309,9 @@ export class ProposalService {
     const user = await this.userModel
       .findOne({ _id: proposal.userID.toString() })
       .exec();
+    const projectOwner = await this.jobsModel
+      .findOne({ _id: proposal.projectId.toString() })
+      .exec();
 
     const title = proposal.projectTitle;
     const message = `
@@ -323,6 +328,26 @@ export class ProposalService {
       status: proposal.Status,
       title,
     });
+    console.log('projectOwner', projectOwner);
+
+    if (projectOwner) {
+      console.log('projectOwner', projectOwner);
+      const ownerMessage = `
+          Dear ${projectOwner.firstName} ${projectOwner.lastName},<br>
+          The Proposal for your project: "${title}" has been ${proposal.Status} so you can Approve or Reject the proposal.
+      `;
+
+      await this.sendEmailNotificationToUserProposalActivity({
+        user: projectOwner,
+        subject: `Proposal ${proposal.Status}`,
+        adminFirstName: appUser.firstName,
+        adminLastName: appUser.lastName,
+        applicationId: proposal.applyId,
+        message: ownerMessage,
+        status: proposal.Status,
+        title,
+      });
+    }
   }
 
   async sendEmailNotificationToUserProposalActivity({

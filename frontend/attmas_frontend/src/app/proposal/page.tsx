@@ -304,16 +304,23 @@ const proposal = () => {
         // setApplyOpen(true); // Optionally reuse this state for opening the drawer
     };
 
-
     const handleNextStep = (values: any) => {
-        setFormValues((prevValues) => ({ ...prevValues, ...values }));
+        console.log("New values:", {...values});
+        
+        setFormValues((prevValues) => {
+            console.log("Previous values:", {...prevValues});
+            return { ...prevValues, ...values };
+        });
+    
         setStep((prevStep) => prevStep + 1);
     };
+    
 
     const handlePreviousStep = () => {
         setStep((prevStep) => {
             // Repopulate the form fields with the existing form values
             const previousValues = formValues;
+            console.log('previousValues',previousValues);
             if (prevStep > 1) {
                 // Populate the previous step form with the values
                 setFormValues(previousValues);
@@ -856,7 +863,7 @@ const proposal = () => {
 
 
                     {step === 3 && <ProposalStep3
-                        initialValues={selectedProposal || null}
+                        initialValues={selectedProposal  || null}
                         readOnly={selectedProposal ? true : false}
                         onSubmit={handleSubmit}
                         onPrevious={handlePreviousStep}

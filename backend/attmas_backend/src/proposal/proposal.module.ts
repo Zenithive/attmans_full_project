@@ -9,6 +9,7 @@ import {
   EmailSchema,
 } from 'src/notificationEmail/Exebitionemail.schema';
 import { UsersModule } from 'src/users/users.module';
+import { Jobs, JobsSchema } from 'src/projects/projects.schema';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from 'src/users/users.module';
       { name: 'Proposal', schema: ProposalSchema },
       { name: Apply.name, schema: ApplySchema },
       { name: Email.name, schema: EmailSchema },
+      { name: Jobs.name, schema: JobsSchema },
     ]),
     UsersModule,
   ],

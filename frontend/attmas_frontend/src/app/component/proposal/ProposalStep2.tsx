@@ -62,8 +62,6 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
   readOnly = false,
 }) => {
   // Default initial values to match ProposalStep2Values
-
-
   const readOnlyHeads = [
     'Capital Equipment',
     'Consumable Stores',

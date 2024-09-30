@@ -8,9 +8,10 @@ import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { pubsub } from '@/app/services/pubsub.service';
 import * as Yup from 'yup';
 import { Proposal } from '@/app/proposal/page';
+import { formValues } from './ProposalStep1';
 
 interface ProposalStep3Props {
-  initialValues?: Proposal | null;
+  initialValues?: Proposal  | null;
   onSubmit: (values: any) => void;
   onPrevious: () => void;
   readOnly?: boolean; // Added prop for read-only mode

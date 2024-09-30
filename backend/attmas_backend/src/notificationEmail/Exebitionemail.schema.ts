@@ -81,6 +81,12 @@ export class Email extends Document {
 
   @Prop({ ref: 'exhibitions', required: false })
   first: string;
+
+  @Prop({ ref: 'applies', required: false })
+  applicationTitle: string;
+
+  @Prop({ ref: 'applies', required: false })
+  awardStatus: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);
