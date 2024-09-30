@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as nodemailer from 'nodemailer';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Apply, ApplyDocument } from 'src/apply/apply.schema';
 import { Jobs, JobsDocument } from 'src/projects/projects.schema';
 import { User, UserDocument } from 'src/users/user.schema';
@@ -199,7 +199,13 @@ export class MilestonesService {
 
     if (userType === 'Admin') {
       selectedMilestone.adminStatus = 'Admin Approved';
-      selectedMilestone.approvalComments.push(comment);
+      //selectedMilestone.approvalComments.push(comment);
+      selectedMilestone.comments.push({
+        comment,
+        commentType: 'Approval Comment',
+        userId: new Types.ObjectId(userId),
+        userType,
+      });
     } else if (userType === 'Project Owner') {
       if (selectedMilestone.adminStatus !== 'Admin Approved') {
         throw new BadRequestException(
@@ -207,7 +213,13 @@ export class MilestonesService {
         );
       }
       selectedMilestone.adminStatus = 'Project Owner Approved';
-      selectedMilestone.approvalComments.push(comment);
+      // selectedMilestone.approvalComments.push(comment);
+      selectedMilestone.comments.push({
+        comment,
+        commentType: 'Approval Comment',
+        userId: new Types.ObjectId(userId),
+        userType,
+      });
     }
 
     this.sendApproveMilestoneByNotifications(milestone, milestoneIndex, user);
@@ -276,7 +288,13 @@ export class MilestonesService {
       }
 
       selectedMilestone.adminStatus = 'Admin Rejected';
-      selectedMilestone.rejectionComments.push(comment);
+      //selectedMilestone.rejectionComments.push(comment);
+      selectedMilestone.comments.push({
+        comment,
+        commentType: 'Rejection Comment',
+        userId: new Types.ObjectId(userId),
+        userType,
+      });
     } else if (userType === 'Project Owner') {
       if (selectedMilestone.adminStatus !== 'Admin Approved') {
         throw new BadRequestException(
@@ -285,14 +303,16 @@ export class MilestonesService {
       }
 
       selectedMilestone.adminStatus = 'Project Owner Rejected';
-      selectedMilestone.rejectionComments.push(comment);
+      // selectedMilestone.rejectionComments.push(comment);
+      selectedMilestone.comments.push({
+        comment,
+        commentType: 'Rejection Comment',
+        userId: new Types.ObjectId(userId),
+        userType,
+      });
     }
 
-    this.sendRejectMilestoneByNotifications(
-      selectedMilestone,
-      milestoneIndex,
-      user,
-    );
+    this.sendRejectMilestoneByNotifications(milestone, milestoneIndex, user);
 
     await milestone.save();
   }
@@ -304,10 +324,6 @@ export class MilestonesService {
   ) {
     const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
 
-    const adminUsers = await this.usersService.findUsersByUserType1('Admin');
-    if (!adminUsers || adminUsers.length === 0) {
-      throw new NotFoundException('No Admin users found');
-    }
     const title = milestone.milestones[milestoneIndex].name.text;
     const message = `
       Dear ${user.firstName} ${user.lastName},<br>
@@ -328,10 +344,11 @@ export class MilestonesService {
   async resubmitMilestone(
     applyId: string,
     milestoneIndex: number,
-    resubmitComment: string,
+    comment: string,
   ): Promise<void> {
     const milestone = await this.milestoneModel.findOne({ applyId });
     const application = await this.appliesModel.findOne({ _id: applyId });
+    const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
     if (!milestone) {
       throw new NotFoundException(`Milestone not found for applyId ${applyId}`);
     }
@@ -345,9 +362,13 @@ export class MilestonesService {
     if (milestone.milestones[milestoneIndex]) {
       milestone.milestones[milestoneIndex].adminStatus = 'Pending';
       // milestone.milestones[milestoneIndex].projectOwnerStatus = 'Pending';
-      milestone.milestones[milestoneIndex].resubmissionComments.push(
-        resubmitComment,
-      );
+      //milestone.milestones[milestoneIndex].resubmissionComments.push(comment);
+      milestone.milestones[milestoneIndex].comments.push({
+        comment,
+        commentType: 'Resubmission Comment',
+        userId: new Types.ObjectId(milestone.userId),
+        userType: user.userType,
+      });
     } else {
       throw new BadRequestException(
         `Milestone index ${milestoneIndex} is out of bounds`,

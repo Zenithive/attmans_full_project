@@ -8,7 +8,7 @@ import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import JobDetail from '../projectCommentCard/projectCommentCard';
 import AddComment from '../projectComment/projectComment';
 import dayjs from 'dayjs';
-import ApplicationsForProject from '../applicationforproject/applicationforproject';
+import ApplicationsForProject, { MilestoneCommentType } from '../applicationforproject/applicationforproject';
 import { APPLY_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
@@ -55,9 +55,10 @@ export interface Milestone {
         | 'Admin Rejected'
         | 'Project Owner Approved'
         | 'Project Owner Rejected';
-        approvalComments: string[];
-        rejectionComments: string[];
-        resubmissionComments: string[];
+        // approvalComments: string[];
+        // rejectionComments: string[];
+        // resubmissionComments: string[];
+        comments: MilestoneCommentType[];
     }[];
     isCommentSubmitted?: boolean;
     status?: string;
@@ -221,7 +222,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
     const forceUpdate = () => setUpdateState(prev => !prev);
 
-    const handleMilestoneSubmit = async (applyId: string, milestoneIndex: number) => {
+    const handleMilestoneSubmit = async (applyId: string, milestoneIndex: number, submitType: 'submit' | 'Resubmit') => {
         const comment = milestoneComments[`${applyId}-${milestoneIndex}`] || '';
 
         if (!comment.trim()) {
@@ -239,7 +240,9 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
         }));
 
         try {
-            await axiosInstance.post(`${APIS.MILESTONES}/submit-comment`, { applyId, milestoneIndex, comment });
+            const submitUrl = submitType === 'submit' ? `${APIS.MILESTONES}/submit-comment` : `${APIS.MILESTONES}/resubmit`;
+            
+            await axiosInstance.post(submitUrl, { applyId, milestoneIndex, comment });
 
             setMilestones(prevState => {
                 const updatedMilestones = { ...prevState };

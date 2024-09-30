@@ -16,9 +16,16 @@ import { pubsub } from '@/app/services/pubsub.service';
 import { Message } from '@mui/icons-material';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
+import MyMilestones from './mymilestones.component';
+
+export interface MilestoneCommentType {
+    comment: string;
+    userId: string;
+    userType: string;
+    commentType: string;
+}
 
 export interface childMilestone {
-
     isCommentSubmitted: boolean;
     name: {
         text: string;
@@ -32,9 +39,10 @@ export interface childMilestone {
     | 'Admin Rejected'
     | 'Project Owner Approved'
     | 'Project Owner Rejected';
-    approvalComments: string[];
-    rejectionComments: string[];
-    resubmissionComments: string[];
+    comments: MilestoneCommentType[];
+    // approvalComments: string[];
+    // rejectionComments: string[];
+    // resubmissionComments: string[];
 
 }
 export interface Milestone {
@@ -81,7 +89,7 @@ interface ApplicationsForProjectProps {
     milestoneComments: Record<string, string>;
     setMilestoneComments: React.Dispatch<React.SetStateAction<Record<string, string>>>;
     commentErrors: Record<string, boolean>;
-    handleMilestoneSubmit: (applyId: string, milestoneIndex: number) => void;
+    handleMilestoneSubmit: (applyId: string, milestoneIndex: number, submitType: 'submit' | 'Resubmit') => void;
     handleCommentChange: (applyId: string, index: number, value: string) => void;
     isSubmitting: boolean;
 }
@@ -361,212 +369,16 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                             </Box>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12}>
-                                                    {milestones[app._id!]?.length > 0 ? (
-                                                        milestones[app._id!].map((milestoneGroup, groupIndex) => (
-                                                            <Grid container spacing={2} key={groupIndex}>
-                                                                {milestoneGroup.milestones.length > 0 ? (
-                                                                    milestoneGroup.milestones.map((milestone, milestoneIndex) => (
-                                                                        (userType === 'Project Owner' ? milestone.adminStatus === 'Admin Approved' ||
-                                                                            milestone.adminStatus === 'Project Owner Approved' ||
-                                                                            milestone.adminStatus === 'Project Owner Rejected' : true) && (
-                                                                            <Grid item xs={12} key={milestoneIndex}>
-                                                                                <Card variant="outlined" sx={{ mb: 1 }}>
-                                                                                    <CardContent>
-                                                                                        <Typography variant="h6" sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                                            <span>
-                                                                                                Milestone {milestoneIndex + 1}
-                                                                                                {milestone.submittedAt && (
-                                                                                                    <Typography component="span" sx={{ ml: 2, color: 'green', }}>
-                                                                                                        Submitted Date: ({dayjs(milestone.submittedAt).format(DATE_FORMAT)})
-                                                                                                    </Typography>
-                                                                                                )}
-                                                                                                <Box sx={{ position: 'relative', top: '5px' }}>
-                                                                                                    {milestone.name.timeFrame && (
-                                                                                                        <Typography variant="body2" sx={{ color: 'green', }}>
-                                                                                                            Deadline Date: ({dayjs(milestone.name.timeFrame).format(DATE_FORMAT)})
-                                                                                                        </Typography>
-                                                                                                    )}
-                                                                                                </Box>
-                                                                                            </span>
-
-                                                                                            {milestone.isCommentSubmitted && (
-                                                                                                <Chip
-                                                                                                    label="Milestone submitted"
-                                                                                                    variant="outlined"
-                                                                                                    sx={{
-                                                                                                        borderColor: 'green',
-                                                                                                        color: 'green',
-                                                                                                        borderRadius: '16px',
-                                                                                                        ml: 40,
-                                                                                                    }}
-                                                                                                />
-                                                                                            )}
-
-                                                                                            <Chip
-                                                                                                label={milestone.adminStatus}
-                                                                                                variant="outlined"
-                                                                                                color={
-                                                                                                    milestone.adminStatus === 'Admin Approved' || milestone.adminStatus === 'Project Owner Approved'
-                                                                                                        ? 'success'
-                                                                                                        : milestone.adminStatus === 'Admin Rejected' || milestone.adminStatus === 'Project Owner Rejected'
-                                                                                                            ? 'error'
-                                                                                                            : 'default'
-                                                                                                }
-                                                                                                sx={{ ml: 2 }}
-                                                                                            />
-
-
-
-                                                                                        </Typography>
-
-
-
-                                                                                        <TextField
-                                                                                            label={`Milestone ${milestoneIndex + 1}`}
-                                                                                            value={milestone.name ? milestone.name.text : 'No Name'}
-                                                                                            multiline
-                                                                                            fullWidth
-                                                                                            disabled
-                                                                                            sx={{ mb: 2 }}
-                                                                                        />
-
-                                                                                        {milestone.isCommentSubmitted ? (
-                                                                                            <>
-                                                                                                {(userType === 'Project Owner' || userType === 'Innovator' || userType === 'Freelancer' || userType === 'Admin') && (
-                                                                                                    <>
-                                                                                                        <TextField
-                                                                                                            label="Submitted Milestone"
-                                                                                                            value={milestoneGroup.milstonSubmitcomments && milestoneGroup.milstonSubmitcomments[milestoneIndex] ? milestoneGroup.milstonSubmitcomments[milestoneIndex] : 'No comment'}
-                                                                                                            multiline
-                                                                                                            rows={4}
-                                                                                                            fullWidth
-                                                                                                            disabled
-                                                                                                            sx={{ mb: 2, color: 'blue' }}
-                                                                                                        />
-                                                                                                        {milestone.resubmissionComments.length > 0 && (
-                                                                                                            <TextField
-                                                                                                                label="Resubmission Comments"
-                                                                                                                value={milestone.resubmissionComments.join('\n')}
-                                                                                                                multiline
-                                                                                                                rows={4}
-                                                                                                                fullWidth
-                                                                                                                disabled
-                                                                                                                sx={{ mb: 2 }}
-                                                                                                            />
-                                                                                                        )}
-
-
-                                                                                                    </>
-
-                                                                                                )}
-                                                                                                <>
-                                                                                                    {milestone.approvalComments.length > 0 && (
-                                                                                                        <TextField
-                                                                                                            label="Approval Comments"
-                                                                                                            value={milestone.approvalComments.join('\n')}
-                                                                                                            multiline
-                                                                                                            rows={4}
-                                                                                                            fullWidth
-                                                                                                            disabled
-                                                                                                            sx={{ mb: 2, color: 'success.main' }}
-                                                                                                        />
-                                                                                                    )}
-
-                                                                                                    {milestone.rejectionComments.length > 0 && (
-                                                                                                        <TextField
-                                                                                                            label="Rejection Comments"
-                                                                                                            value={milestone.rejectionComments.join('\n')}
-                                                                                                            multiline
-                                                                                                            rows={4}
-                                                                                                            fullWidth
-                                                                                                            disabled
-                                                                                                            sx={{ mb: 2, color: 'error.main' }}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                </>
-                                                                                            </>
-                                                                                        ) : (
-                                                                                            (userType === 'Freelancer') && (
-                                                                                                <>
-                                                                                                    <TextField
-                                                                                                        label="Submit Milestone"
-                                                                                                        color="secondary"
-                                                                                                        multiline
-                                                                                                        rows={4}
-                                                                                                        value={milestoneComments[`${app._id}-${milestoneIndex}`] || ''}
-                                                                                                        onChange={(e) => handleCommentChange(app._id!, milestoneIndex, e.target.value)}
-                                                                                                        error={commentErrors[`${app._id}-${milestoneIndex}`]}
-                                                                                                        helperText={commentErrors[`${app._id}-${milestoneIndex}`] ? "Comment is required" : ""}
-                                                                                                        fullWidth
-                                                                                                        sx={{ mb: 2 }}
-                                                                                                    />
-                                                                                                    <Button
-                                                                                                        onClick={() => handleMilestoneSubmit(app._id!, milestoneIndex)}
-                                                                                                        disabled={milestone.isCommentSubmitted || isSubmitting}
-                                                                                                        sx={{ marginBottom: '40px' }}
-                                                                                                    >
-                                                                                                        {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit Milestone'}
-                                                                                                    </Button>
-                                                                                                </>
-                                                                                            )
-                                                                                        )}
-                                                                                        {userType === 'Admin' && milestone.adminStatus === 'Pending' && (
-                                                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                                                {milestone.status === 'Submitted' && (
-                                                                                                    <>
-                                                                                                        <Button
-                                                                                                            variant="contained"
-                                                                                                            color="success"
-                                                                                                            onClick={() => handleOpenApproveDialog(milestoneGroup, app._id!, milestoneIndex)}
-                                                                                                            sx={{ marginRight: '10px' }}
-                                                                                                        >
-                                                                                                            Approve
-                                                                                                        </Button>
-                                                                                                        <Button
-                                                                                                            variant="contained"
-                                                                                                            color="error"
-                                                                                                            onClick={() => handleOpenRejectDialog(milestoneGroup, app._id!, milestoneIndex)}
-                                                                                                        >
-                                                                                                            Reject
-                                                                                                        </Button>
-                                                                                                    </>
-                                                                                                )}
-
-                                                                                            </Box>
-                                                                                        )}
-                                                                                        {userType === 'Project Owner' && milestone.adminStatus === 'Admin Approved' && (
-                                                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                                                <Button
-                                                                                                    variant="contained"
-                                                                                                    color="success"
-                                                                                                    onClick={() => handleOpenApproveDialog(milestoneGroup, app._id!, milestoneIndex)}
-                                                                                                    sx={{ marginRight: '10px' }}
-                                                                                                >
-                                                                                                    Approve
-                                                                                                </Button>
-                                                                                                <Button
-                                                                                                    variant="contained"
-                                                                                                    color="error"
-                                                                                                    onClick={() => handleOpenRejectDialog(milestoneGroup, app._id!, milestoneIndex)}
-                                                                                                >
-                                                                                                    Reject
-                                                                                                </Button>
-                                                                                            </Box>
-                                                                                        )}
-
-
-                                                                                    </CardContent>
-                                                                                </Card>
-                                                                            </Grid>
-                                                                        ))
-                                                                    )) : (
-                                                                    <Typography>No milestones available</Typography>
-                                                                )}
-                                                            </Grid>
-                                                        ))
-                                                    ) : (
-                                                        <Typography>No milestones available</Typography>
-                                                    )}
+                                                    <MyMilestones
+                                                        milestones={milestones}
+                                                        apply={app}
+                                                        milestoneComments={milestoneComments}
+                                                        commentErrors={commentErrors}
+                                                        handleMilestoneSubmit={handleMilestoneSubmit}
+                                                        handleCommentChange={handleCommentChange}
+                                                        isSubmitting={isSubmitting}
+                                                        handleOpenApproveDialog={handleOpenApproveDialog}
+                                                        handleOpenRejectDialog={handleOpenRejectDialog} />
                                                 </Grid>
                                             </Grid>
                                         </Box>

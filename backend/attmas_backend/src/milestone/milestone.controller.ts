@@ -84,12 +84,12 @@ export class MilestonesController {
   async resubmitMilestone(
     @Body('applyId') applyId: string,
     @Body('milestoneIndex') milestoneIndex: number,
-    @Body('resubmitComment') resubmitComment: string,
+    @Body('comment') comment: string,
   ): Promise<void> {
     return this.milestonesService.resubmitMilestone(
       applyId,
       milestoneIndex,
-      resubmitComment,
+      comment,
     );
   }
 }
