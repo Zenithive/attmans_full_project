@@ -305,10 +305,8 @@ const proposal = () => {
     };
 
     const handleNextStep = (values: any) => {
-        console.log("New values:", {...values});
         
         setFormValues((prevValues) => {
-            console.log("Previous values:", {...prevValues});
             return { ...prevValues, ...values };
         });
     
@@ -316,15 +314,12 @@ const proposal = () => {
     };
     
 
-    const handlePreviousStep = () => {
-        setStep((prevStep) => {
-            // Repopulate the form fields with the existing form values
-            const previousValues = formValues;
-            console.log('previousValues',previousValues);
-            if (prevStep > 1) {
-                // Populate the previous step form with the values
-                setFormValues(previousValues);
-            }
+    const handlePreviousStep = (values: any) => {
+        setFormValues((prevValues) => {
+            return { ...prevValues, ...values };
+        });
+
+        setStep((prevStep) => {            
             return prevStep - 1;
         });
     };
@@ -490,6 +485,8 @@ const proposal = () => {
 
     const OnCloseProposalDialog = () => {
         setOpen(false);
+        setFormValues({});
+        setSelectedProposal(null);
         setStep(1);
     }
 
@@ -863,7 +860,7 @@ const proposal = () => {
 
 
                     {step === 3 && <ProposalStep3
-                        initialValues={selectedProposal  || null}
+                        initialValues={selectedProposal || formValues || null}
                         readOnly={selectedProposal ? true : false}
                         onSubmit={handleSubmit}
                         onPrevious={handlePreviousStep}

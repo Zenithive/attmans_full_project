@@ -328,10 +328,8 @@ export class ProposalService {
       status: proposal.Status,
       title,
     });
-    console.log('projectOwner', projectOwner);
 
     if (projectOwner) {
-      console.log('projectOwner', projectOwner);
       const ownerMessage = `
           Dear ${projectOwner.firstName} ${projectOwner.lastName},<br>
           The Proposal for your project: "${title}" has been ${proposal.Status} so you can Approve or Reject the proposal.

@@ -11,9 +11,9 @@ import { Proposal } from '@/app/proposal/page';
 import { formValues } from './ProposalStep1';
 
 interface ProposalStep3Props {
-  initialValues?: Proposal  | null;
+  initialValues?: Proposal | formValues | null;
   onSubmit: (values: any) => void;
-  onPrevious: () => void;
+  onPrevious: (values: any) => void;
   readOnly?: boolean; // Added prop for read-only mode
 }
 
@@ -48,7 +48,7 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
       })}
       onSubmit={(values) => onSubmit(values)}
     >
-      {({ handleSubmit, touched, errors }) => (
+      {({ handleSubmit, touched, errors, values }) => (
         <Form onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 1 }}>
             <Box>
@@ -219,7 +219,7 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
             </Box>}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-              <Button variant="outlined" onClick={onPrevious}>Back</Button>
+              <Button variant="outlined" onClick={() => onPrevious(values)}>Back</Button>
               <Button type="submit" variant="contained" disabled={readOnly || !isChecked}>
                 Submit
               </Button>
