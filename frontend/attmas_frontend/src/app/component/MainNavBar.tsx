@@ -38,6 +38,7 @@ interface Email {
   jobId?: StaticRange;
   exhibitionUserFirstName?: string;
   exhibitionUserLastName?: string;
+  applicationTitle?: string;
   adminFirstName?: string;
   adminLastName?: string;
   applicationId?: string,
@@ -45,6 +46,7 @@ interface Email {
   last?: string,
   notifType: string;
   userType: string;
+  awardStatus: string;
 }
 
 function clearCookies() {
@@ -199,6 +201,7 @@ export default function MainNavBar() {
       );
     }
 
+
     if (notification.subject.toLowerCase().includes('milestone')) {
       return (
         <>
@@ -223,6 +226,19 @@ export default function MainNavBar() {
       );
     }
 
+
+    if (notification.subject.toLowerCase().includes('proposal') && notification.userType == "Project Owner" ) {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.first} {notification.last} has {notification.status} a proposal.
+            <a href="#" onClick={() => openProposalTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
     if (notification.subject === 'New Project Created') {
       return (
         <>
@@ -234,6 +250,8 @@ export default function MainNavBar() {
         </>
       );
     }
+
+    
 
     if (notification.status) {
       return (
@@ -287,6 +305,29 @@ export default function MainNavBar() {
             Dear Freelancers,<br />
             A project "{notification.title}" has been created for you.<br />
             Please check the details and proceed with the next steps.Click <a href="#" onClick={() => openProjectTab(notification)}>here</a>.
+          </Typography>
+        </>
+      );
+    }
+    if (notification.awardStatus === "Awarded" && notification.applicationTitle) {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear Applicant,<br />
+            Congratulations! Your application for the job titled "{notification.applicationTitle}" has been awarded.
+            <br />Thank you for your interest and effort. Click <a href="#" onClick={() => openProjectTab(notification)}>here</a> for more details.
+          </Typography>
+        </>
+      );
+    }
+  
+    if (notification.awardStatus === "Not Awarded" && notification.applicationTitle) {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear Applicant,<br />
+            Thank you for applying for the job titled "{notification.applicationTitle}". Unfortunately, your application was not selected for this opportunity.
+            <br />We encourage you to apply for other roles or opportunities with us in the future.
           </Typography>
         </>
       );
@@ -395,8 +436,8 @@ export default function MainNavBar() {
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example" indicatorColor='secondary' textColor='secondary'>
-              <Tab label="Read" value="1" sx={{ fontSize: 12 }} />
-              <Tab label="Unread" value="2" sx={{ fontSize: 12 }} />
+              <Tab label="Unread" value="1" sx={{ fontSize: 12 }} />
+              <Tab label="Read" value="2" sx={{ fontSize: 12 }} />
             </TabList>
           </Box>
           <TabPanel value="1">

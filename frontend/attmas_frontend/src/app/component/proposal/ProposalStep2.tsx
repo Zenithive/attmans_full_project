@@ -50,7 +50,7 @@ export interface ProposalStep2Values {
 interface ProposalStep2Props {
   initialValues?: ProposalStep2Values | formValues | null;
   onNext: (values: ProposalStep2Values) => void;
-  onPrevious: () => void;
+  onPrevious: (values: ProposalStep2Values) => void;
   readOnly?: boolean;
 }
 
@@ -62,8 +62,6 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
   readOnly = false,
 }) => {
   // Default initial values to match ProposalStep2Values
-
-
   const readOnlyHeads = [
     'Capital Equipment',
     'Consumable Stores',
@@ -326,7 +324,7 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
 
             {/* Navigation Buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Button variant="outlined" onClick={onPrevious}>
+              <Button variant="outlined" onClick={() => onPrevious(values as any)}>
                 Previous
               </Button>
               <Button type="submit" variant="contained" >

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Email } from 'src/notificationEmail/Exebitionemail.schema';
 
 dotenv.config();
 
@@ -16,6 +19,8 @@ export class EmailService {
       pass: process.env.EMAIL_PASS,
     },
   });
+
+  constructor(@InjectModel(Email.name) private emailModel: Model<Email>) {}
 
   async sendEmail({
     to,
@@ -58,6 +63,13 @@ Thank you for your interest and effort.
 Best regards,
 Your Team`;
     await this.sendEmail({ to, subject, text });
+
+    await this.saveEmail({
+      to,
+      subject,
+      applicationTitle,
+      awardStatus: 'Awarded',
+    });
   }
 
   async sendNotAwardedEmail({
@@ -77,5 +89,40 @@ We appreciate your interest, but unfortunately, your application was not selecte
 Best regards,
 Your Team`;
     await this.sendEmail({ to, subject, text });
+
+    await this.saveEmail({
+      to,
+      subject,
+      applicationTitle,
+      awardStatus: 'Not Awarded',
+    });
+  }
+
+  private async saveEmail({
+    to,
+    subject,
+    applicationTitle,
+    awardStatus,
+  }: {
+    to: string;
+    subject: string;
+    applicationTitle: string;
+    awardStatus: string;
+  }): Promise<void> {
+    try {
+      const email = new this.emailModel({
+        to,
+        subject,
+        applicationTitle,
+        awardStatus,
+
+        sentAt: new Date(),
+        read: false,
+      });
+      await email.save();
+      console.log('Email details saved to database');
+    } catch (error) {
+      console.error('Error saving email to database:', error);
+    }
   }
 }
