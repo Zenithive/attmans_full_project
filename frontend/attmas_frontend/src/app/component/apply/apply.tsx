@@ -41,7 +41,7 @@ interface Milestone {
 interface FormValues {
   title: string;
   description: string;
-  Budget: number;
+  Budget: number | null;
   currency: string;
   TimeFrame: Dayjs | null;
   jobId: string;
@@ -58,7 +58,7 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().required('Description is required'),
   Budget: Yup.number().required('Budget is required'),
   currency: Yup.string().required('Currency is required'),
-  TimeFrame: Yup.date().nullable('Date & Time is required'),
+  TimeFrame: Yup.date().required('Date & Time is required'),
   availableSolution: Yup.string().required('You have to give solution'),
   SolutionUSP: Yup.string().required('Solution USP is required'),
   milestones: Yup.array().of(
@@ -77,14 +77,14 @@ const validationSchema = Yup.object().shape({
 });
 
 
-export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescription}: AddApplyProps) => {
+export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescription }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const [fetchError, setFetchError] = React.useState<string | null>(null);
 
   const initialValues = {
     title: jobTitle,
     description: jobDescription,
-    Budget: 0,
+    Budget: null,
     currency: 'INR',
     TimeFrame: null as Dayjs | null,
     jobId: jobId,
@@ -205,7 +205,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescript
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
 
                 <TextField
-                  
+
                   name="Budget"
                   label="Budget"
                   type="number"
@@ -242,6 +242,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel ,jobDescript
                     slotProps={{
                       textField: {
                         color: 'secondary',
+                        helperText: errors?.TimeFrame,
                         placeholder: DATE_FORMAT
                       },
                     }}

@@ -9,6 +9,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import { MilestoneCommentType } from '../applicationforproject/applicationforproject';
 
 
 export interface Milestone {
@@ -27,9 +28,10 @@ export interface Milestone {
         | 'Admin Rejected'
         | 'Project Owner Approved'
         | 'Project Owner Rejected';
-        approvalComments: string[];
-        rejectionComments: string[];
-        resubmissionComments: string[];
+        // approvalComments: string[];
+        // rejectionComments: string[];
+        // resubmissionComments: string[];
+        comments: MilestoneCommentType[];
     }[];
     isCommentSubmitted?: boolean;
     status?: string;

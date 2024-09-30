@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectId } from 'mongodb';
 import { Document, Types } from 'mongoose';
 
 export type MilestoneDocument = Milestone & Document;
@@ -29,9 +30,20 @@ export class Milestone {
           ],
           default: 'Pending',
         },
-        approvalComments: { type: [String], default: [] },
-        rejectionComments: { type: [String], default: [] },
-        resubmissionComments: { type: [String], default: [] },
+        comments: {
+          type: [
+            {
+              comment: { type: String, default: '' },
+              date: { type: Date, default: Date.now() },
+              userId: { type: ObjectId },
+              commentType: { type: String, default: '' },
+              userType: { type: String, default: '' },
+            },
+          ],
+        },
+        // approvalComments: { type: [String], default: [] },
+        // rejectionComments: { type: [String], default: [] },
+        // resubmissionComments: { type: [String], default: [] },
       },
     ],
     required: true,
@@ -50,9 +62,18 @@ export class Milestone {
       | 'Admin Rejected'
       | 'Project Owner Approved'
       | 'Project Owner Rejected';
-    approvalComments: string[];
-    rejectionComments: string[];
-    resubmissionComments: string[];
+    // approvalComments: string[];
+    // rejectionComments: string[];
+    // resubmissionComments: string[];
+    comments: [
+      {
+        comment: string;
+        commentType: string;
+        date?: Date;
+        userId: ObjectId;
+        userType: string;
+      },
+    ];
   }[];
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })

@@ -20,6 +20,21 @@ class MilestoneNameDto {
   timeFrame: string;
 }
 
+class MilestonCommentDto {
+  @IsString()
+  comment: string;
+  //date: { type: Date, default: Date.now() },
+  @IsNotEmpty()
+  @IsMongoId()
+  userId: Types.ObjectId;
+
+  @IsString()
+  userType: string;
+
+  @IsString()
+  commentType: string;
+}
+
 class MilestoneItemDto {
   @IsNotEmpty()
   @ValidateNested()
@@ -53,18 +68,23 @@ class MilestoneItemDto {
     | 'Project Owner Rejected';
 
   @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  approvalComments?: string[];
+  @ValidateNested({ each: true })
+  @Type(() => MilestonCommentDto)
+  comments: [MilestonCommentDto];
 
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  rejectionComments?: string[];
+  // @IsArray()
+  // @IsString({ each: true })
+  // @IsOptional()
+  // approvalComments?: string[];
 
-  @IsArray()
-  @IsString({ each: true })
-  resubmissionComments: string[];
+  // @IsArray()
+  // @IsString({ each: true })
+  // @IsOptional()
+  // rejectionComments?: string[];
+
+  // @IsArray()
+  // @IsString({ each: true })
+  // resubmissionComments: string[];
 }
 
 export class CreateMilestoneDto {

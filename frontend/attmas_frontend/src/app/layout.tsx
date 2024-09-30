@@ -39,6 +39,13 @@ const theme = createTheme({
   },
 
   components: {
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          color: '#cc4800', // Custom helper text color
+        },
+      },
+    },
     MuiListItemButton: {
       styleOverrides: {
         root: {
