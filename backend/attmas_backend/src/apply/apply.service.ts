@@ -415,7 +415,6 @@ export class ApplyService {
           },
         },
       ]).exec();
-      console.log('result for Applied Jobs', results);
       return results;
     } catch (error) {
       console.error('Error during aggregation:', error);
@@ -462,20 +461,20 @@ export class ApplyService {
     return this.findAppliedJobs(null, null, null, null, jobId);
   }
 
-  async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {
-    try {
-      const updateQuery = {
-        jobId,
-        _id: { $ne: new Types.ObjectId(appId) },
-      };
-      const result = await this.ApplyModel.updateMany(updateQuery, {
-        status: APPLY_STATUSES.notAwarded,
-      });
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
+  // async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {
+  //   try {
+  //     const updateQuery = {
+  //       jobId,
+  //       _id: { $ne: new Types.ObjectId(appId) },
+  //     };
+  //     const result = await this.ApplyModel.updateMany(updateQuery, {
+  //       status: APPLY_STATUSES.notAwarded,
+  //     });
+  //     return result;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   async rewardApplication(
     id: string,
@@ -503,7 +502,7 @@ export class ApplyService {
       comment ||
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
-    this.updateAlltheApplications(application.jobId, id);
+    // this.updateAlltheApplications(application.jobId, id);
     const proposals = await this.proposalModel
       .find({
         projectId: application.jobId,
@@ -528,16 +527,19 @@ export class ApplyService {
       throw new Error('No matching proposal found to award.');
     }
 
-    // Get all other applications and set their status to 'Not Awarded'
     const otherApplications = await this.ApplyModel.find({
       _id: { $ne: id },
-      jobId: application.jobId,
-      status: { $in: ['Approved', 'Awarded'] },
+      jobId: new Types.ObjectId(application.jobId),
+      status: {
+        $in: [
+          APPLY_STATUSES.approvedPendingForProposalForInnovators,
+          APPLY_STATUSES.proposalUnderReview,
+        ],
+      },
     }).exec();
-
     const updatedApplications = otherApplications.map((app) => ({
       _id: app._id as Types.ObjectId,
-      status: 'Not Awarded',
+      status: APPLY_STATUSES.notAwarded,
       jobId: app.jobId as Types.ObjectId,
       comment_Reward_Nonreward:
         'Thank you for your application. Although we cannot award this application, we value your interest and encourage you to apply for other roles or opportunities with us in the future.', // Default comment
@@ -558,10 +560,16 @@ export class ApplyService {
     for (const app of updatedApplications) {
       const otherUser = await this.userModel.findById(app.userId).exec();
       if (otherUser) {
-        this.emailService.sendNotAwardedEmail({
-          to: otherUser.username,
-          applicationTitle: application.title,
-        });
+        try {
+          this.emailService.sendNotAwardedEmail({
+            to: otherUser.username,
+            applicationTitle: application.title,
+          });
+        } catch (error) {
+          console.error(`Failed to send email to ${otherUser.username}`, error);
+        }
+      } else {
+        console.log(`No user found with userId: ${app.userId}`);
       }
     }
 
