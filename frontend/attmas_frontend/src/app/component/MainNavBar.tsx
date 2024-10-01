@@ -309,7 +309,6 @@ export default function MainNavBar() {
         </>
       );
     }
-    console.log('mynoti',notification.awardStatus === "Awarded" && notification.applicationTitle);
     if (notification.awardStatus === "Awarded" && notification.applicationTitle) {
       return (
         <>
@@ -322,7 +321,6 @@ export default function MainNavBar() {
       );
     }
   
-    console.log('yournoti',notification.awardStatus === "Not Awarded" && notification.applicationTitle);
     if (notification.awardStatus === "Not Awarded" && notification.applicationTitle) {
       return (
         <>
