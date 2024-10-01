@@ -415,7 +415,6 @@ export class ApplyService {
           },
         },
       ]).exec();
-      console.log('result for Applied Jobs', results);
       return results;
     } catch (error) {
       console.error('Error during aggregation:', error);
@@ -548,8 +547,6 @@ export class ApplyService {
       username: app.username.toString(),
     }));
 
-    console.log('Updated applications:', updatedApplications);
-
     await this.updateStatuses({ applications: updatedApplications });
     // Send notification emails
     const user = await this.userModel.findById(application.userId).exec();
@@ -563,14 +560,11 @@ export class ApplyService {
     for (const app of updatedApplications) {
       const otherUser = await this.userModel.findById(app.userId).exec();
       if (otherUser) {
-        console.log(`Sending 'Not Awarded' email to: ${otherUser.username}`);
-
         try {
-          await this.emailService.sendNotAwardedEmail({
+          this.emailService.sendNotAwardedEmail({
             to: otherUser.username,
             applicationTitle: application.title,
           });
-          console.log(`Email successfully sent to ${otherUser.username}`);
         } catch (error) {
           console.error(`Failed to send email to ${otherUser.username}`, error);
         }
