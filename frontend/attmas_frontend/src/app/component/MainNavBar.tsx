@@ -47,6 +47,7 @@ interface Email {
   notifType: string;
   userType: string;
   awardStatus: string;
+  isShow?: boolean;
 }
 
 function clearCookies() {
@@ -98,6 +99,76 @@ export default function MainNavBar() {
     }
   }, [userDetails.username, profilePhoto]);
 
+  const isNotificationValid = (singleNotification: Email) => {
+
+    if (singleNotification.applicationId && singleNotification.status3) {
+      return true;
+    }
+
+
+    if (singleNotification.subject.toLowerCase().includes('milestone')) {
+      return true;
+    }
+
+    if (singleNotification.subject.toLowerCase().includes('proposal')) {
+      return true;
+    }
+
+
+    if (singleNotification.subject.toLowerCase().includes('proposal') && singleNotification.userType == "Project Owner" ) {
+      return true;
+    }
+
+    if (singleNotification.subject === 'New Project Created') {
+      return true;
+    }    
+
+    if (singleNotification.status) {
+      return true;
+    }
+
+    if (singleNotification.boothUsername) {
+      return true;
+    }
+
+    if (singleNotification.status2) {
+      return true;
+    }
+
+    if (singleNotification.notifType === 'Apply Create' && (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (singleNotification.adminFirstName || singleNotification.first) === userDetails.firstName) {
+      return true;
+    }
+
+    if (singleNotification.userType === 'Freelancer') {
+      return true
+    }
+    if (singleNotification.awardStatus === "Awarded" && singleNotification.applicationTitle) {
+      return true;
+    }
+  
+    if (singleNotification.awardStatus === "Not Awarded" && singleNotification.applicationTitle) {
+      return true;
+    }
+
+    if (singleNotification.userType === 'Innovator' && (singleNotification?.applicationId || singleNotification?.projectId || singleNotification?.jobId)) {
+      return true;
+    }
+
+    if (singleNotification.userType === 'Innovator'){
+      return true;
+    }
+
+    return false;
+  }
+
+  const AddHideShowFlagInNotification = (allNotification: Email[]) => {
+    for (let index = 0; index < allNotification.length; index++) {
+      allNotification[index].isShow = isNotificationValid(allNotification[index]);
+    }
+
+    setNotifications(allNotification)
+  }
+
   React.useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -106,7 +177,7 @@ export default function MainNavBar() {
           ...notification,
           sentAt: new Date(notification.sentAt),
         })).sort((a: { sentAt: { getTime: () => number; }; }, b: { sentAt: { getTime: () => number; }; }) => b.sentAt.getTime() - a.sentAt.getTime());
-        setNotifications(notificationsWithTimestamp);
+        AddHideShowFlagInNotification(notificationsWithTimestamp);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -333,7 +404,7 @@ export default function MainNavBar() {
       );
     }
 
-    if (notification.userType === 'Innovator') {
+    if (notification.userType === 'Innovator' && (notification?.applicationId || notification?.projectId || notification?.jobId)) {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
@@ -345,14 +416,16 @@ export default function MainNavBar() {
       );
     }
 
-    return (
-      <>
-        <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-          Dear {userName},<br />
-          You have been invited to participate in the exhibition "{notification.title}". Click <a href={viewExhibitionUrl} target="_blank">here</a> to participate.
-        </Typography>
-      </>
-    );
+    if (notification.userType === 'Innovator'){
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been invited to participate in the exhibition "{notification.title}". Click <a href={viewExhibitionUrl} target="_blank">here</a> to participate.
+          </Typography>
+        </>
+      );
+    }
   };
 
 
@@ -441,9 +514,9 @@ export default function MainNavBar() {
             </TabList>
           </Box>
           <TabPanel value="1">
-            {notifications.filter(notification => !notification.read).length > 0 && (
+            {notifications.filter(notification => !notification.read && notification.isShow).length > 0 && (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-                {notifications.filter(notification => !notification.read).map((notification, index) => (
+                {notifications.filter(notification => !notification.read && notification.isShow).map((notification, index) => (
                   <React.Fragment key={notification._id}>
                     <MenuItem
                       onClick={() => handleNotificationClick(notification)}
@@ -461,7 +534,7 @@ export default function MainNavBar() {
                         <CircleIcon fontSize="inherit" sx={{ fontSize: '0.6rem' }} />
                       </IconButton>
                     </MenuItem>
-                    {index < notifications.filter(notification => !notification.read).length - 1 && <Divider />}
+                    {index < notifications.filter(notification => !notification.read && notification.isShow).length - 1 && <Divider />}
                   </React.Fragment>
                 ))}
               </Box>
@@ -469,9 +542,9 @@ export default function MainNavBar() {
           </TabPanel>
           <TabPanel value="2">
 
-            {notifications.filter(notification => notification.read).length > 0 && (
+            {notifications.filter(notification => notification.read && notification.isShow).length > 0 && (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
-                {notifications.filter(notification => notification.read).map((notification, index) => (
+                {notifications.filter(notification => notification.read && notification.isShow).map((notification, index) => (
                   <React.Fragment key={notification._id}>
                     <MenuItem
                       onClick={() => handleNotificationClick(notification)}
@@ -488,7 +561,7 @@ export default function MainNavBar() {
                         <DoneAllIcon fontSize="small" />
                       </IconButton>
                     </MenuItem>
-                    {index < notifications.filter(notification => notification.read).length - 1 && <Divider />}
+                    {index < notifications.filter(notification => notification.read && notification.isShow).length - 1 && <Divider />}
                   </React.Fragment>
                 ))}
               </Box>
@@ -529,7 +602,7 @@ export default function MainNavBar() {
     >
       <MenuItem onClick={handleNotificationMenuOpen}>
         <IconButton size="large" aria-label="show notifications" color="inherit">
-          <Badge badgeContent={notifications.filter(notification => !notification.read).length} color="error">
+          <Badge badgeContent={notifications.filter(notification => !notification.read && notification.isShow).length} color="error">
             <NotificationsIcon />
           </Badge>
         </IconButton>
@@ -573,7 +646,7 @@ export default function MainNavBar() {
               color="inherit"
               onClick={handleNotificationMenuOpen}
             >
-              <Badge badgeContent={notifications.filter(notification => !notification.read).length} color="error">
+              <Badge badgeContent={notifications.filter(notification => !notification.read && notification.isShow).length} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
