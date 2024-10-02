@@ -135,7 +135,7 @@ export default function MainNavBar() {
       return true;
     }
 
-    if (singleNotification.notifType === 'Apply Create' && (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (singleNotification.adminFirstName || singleNotification.first) === userDetails.firstName) {
+    if (singleNotification.notifType === 'Apply Create' && (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (singleNotification.adminFirstName || singleNotification.first) === userDetails.firstName?.trim()) {
       return true;
     }
 
@@ -358,7 +358,7 @@ export default function MainNavBar() {
       );
     }
 
-    if (notification.notifType === 'Apply Create' && (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (notification.adminFirstName || notification.first) === userDetails.firstName) {
+    if (notification.notifType === 'Apply Create' && (userDetails.userType === 'Admin' || userDetails.userType === 'Project Owner') && (notification.adminFirstName || notification.first) === userDetails.firstName.trim()) {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
