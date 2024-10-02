@@ -363,7 +363,7 @@ export default function MainNavBar() {
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            You have been notified for new apllication submitted for the Project: {notification.title}.&nbsp;<a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects.
+            You have been notified for new application submitted for the Project: {notification.title}.&nbsp;<a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view projects.
           </Typography>
         </>
       );
