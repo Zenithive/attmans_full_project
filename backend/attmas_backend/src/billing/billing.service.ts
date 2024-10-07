@@ -33,27 +33,33 @@ export class BillingService {
       throw new NotFoundException('Application not found');
     }
 
-    // Check if milestone exists
-    const milestone = await this.milestoneModel.findOne({
-      'milestones.name.text': milestoneText,
-    });
+    const { applyType } = apply;
 
-    if (!milestone) {
-      throw new NotFoundException('Milestone not found');
-    }
+    let finalMilestoneText = milestoneText;
 
-    // Find milestoneData with the provided milestoneText
-    const milestoneData = milestone.milestones.find(
-      (m) => m.name.text === milestoneText && m.status === 'Submitted',
-    );
-    if (!milestoneData) {
-      throw new Error('Milestone is not submitted or text does not match');
+    if (applyType !== 'InnovatorsApply') {
+      const milestone = await this.milestoneModel.findOne({
+        'milestones.name.text': milestoneText,
+      });
+
+      if (!milestone) {
+        throw new NotFoundException('Milestone not found');
+      }
+      const milestoneData = milestone.milestones.find(
+        (m) => m.name.text === milestoneText && m.status === 'Submitted',
+      );
+      if (!milestoneData) {
+        throw new Error('Milestone is not submitted or text does not match');
+      }
+
+      finalMilestoneText = milestoneData.name.text;
     }
 
     // Create and save the billing record
     const createdBilling = new this.billingModel({
       ...createBillingDto,
-      milestoneText: milestoneData.name.text,
+      milestoneText: finalMilestoneText,
+      applyType,
     });
     return createdBilling.save();
   }

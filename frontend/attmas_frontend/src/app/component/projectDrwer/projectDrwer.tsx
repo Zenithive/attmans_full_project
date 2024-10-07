@@ -19,6 +19,7 @@ import UserDrawer from '../UserNameSeperate/UserDrawer';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
+import { pubsub } from '@/app/services/pubsub.service';
 
 
 
@@ -152,6 +153,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     fetchApplications();
   }, [fetchApplications]);
 
+  useEffect(() => {
+    pubsub.subscribe('AwardRefetch', fetchApplications);
+
+    return () => {
+        pubsub.unsubscribe('AwardRefetch', fetchApplications);
+    };
+}, [fetchApplications]);
+
   const handleUserClick = (username: string) => {
     setSelectedUser(username);
     setDrawerOpen(true);
@@ -242,13 +251,13 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
       setApplications(updatedApplications);
-
       // Hide all the buttons
       setButtonsHidden((prev) => {
         const updated = { ...prev };
         Object.keys(updated).forEach((key) => {
           updated[key] = true;
         });
+        pubsub.publish('AwardRefetch', { Message: 'Award Refetched' });
         return updated;
       });
     } catch (error) {

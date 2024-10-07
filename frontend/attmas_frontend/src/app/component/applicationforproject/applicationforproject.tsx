@@ -62,6 +62,7 @@ interface Billing {
     category: string;
     currency: string;
     createdAt?: string;
+    applyType:string;
 }
 
 export interface Apply {
@@ -80,6 +81,7 @@ export interface Apply {
     jobId: string;
     availableSolution: string;
     SolutionUSP: string;
+    applyType: string;
 }
 
 interface ApplicationsForProjectProps {
@@ -421,6 +423,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                 paymentDetails={paymentDetails}
                 submittedMilestones={submittedMilestones}
                 onPaymentDetailsChange={handlePaymentDetailsChange}
+                applyType={filteredApplications.find(app => app._id === paymentDetails.applyId)?.applyType || ''} 
                 onTextFieldChange={handleTextFieldChange}
                 onDateChange={handleDateChange}
                 onAddPayment={handleAddPayment}

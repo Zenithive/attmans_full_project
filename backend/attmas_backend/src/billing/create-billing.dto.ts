@@ -1,8 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString, IsDateString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsDateString,
+  IsEmpty,
+} from 'class-validator';
 
 export class CreateBillingDto {
-  @IsNotEmpty()
-  @IsString()
+  @IsEmpty()
   @IsString()
   milestoneText: string;
 

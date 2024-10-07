@@ -467,7 +467,7 @@ const myproject = () => {
                                                         }
                                                     }}
                                                 >
-                                                    Close
+                                                    Finish
                                                 </Button> : ''}
                                             </Box>
                                         </CardContent>

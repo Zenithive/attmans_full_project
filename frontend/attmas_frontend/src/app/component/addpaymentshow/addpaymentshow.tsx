@@ -35,6 +35,7 @@ export interface Apply {
     jobId: string;
     availableSolution: string;
     SolutionUSP: string;
+    applyType:string;
 }
 
 interface BillingDataProps {
@@ -79,7 +80,9 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
     const filteredBillingData = billingData.filter((payment) => {
         if (
             (payment.category === 'received from Project Owner' && (userDetails.userType === 'Project Owner' || userDetails.userType === 'Admin')) ||
-            (payment.category === 'Paid to Innovator/Freelancer' && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Admin'))
+            (payment.category === 'Paid to Innovator/Freelancer' && (userDetails.userType === 'Freelancer' || userDetails.userType === 'Admin')) ||
+            (payment.category === 'Paid to Innovator/Freelancer' && (userDetails.userType === 'Innovator' || userDetails.userType === 'Admin'))
+
         ) {
             return true;
         }
@@ -93,7 +96,7 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Milestone</TableCell>
+                        {apply.applyType === 'FreelancerApply' && <TableCell>Milestone</TableCell>}
                             <TableCell>Amount</TableCell>
                             <TableCell>Currency</TableCell>
                             <TableCell>Payment Date</TableCell>
@@ -104,7 +107,9 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
                         {filteredBillingData.length > 0 ? (
                             filteredBillingData.map((payment, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{payment.milestoneText}</TableCell>
+                                  {apply.applyType === 'FreelancerApply' && (
+                                        <TableCell>{payment.milestoneText}</TableCell>
+                                    )}
                                     <TableCell>{payment.amount}</TableCell>
                                     <TableCell>{payment.currency}</TableCell>
                                     <TableCell>  {dayjs(payment.paymentDate).format(DATE_FORMAT)}</TableCell>

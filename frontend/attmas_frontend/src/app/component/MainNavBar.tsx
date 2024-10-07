@@ -400,7 +400,7 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             You have been notified that {notification.first} {notification.last} has {notification.status} a proposal.
-            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+            <a href="#" onClick={() => openProposalTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
       );

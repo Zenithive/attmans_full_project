@@ -83,6 +83,7 @@ export interface Apply {
     SolutionUSP: string;
     userId?: UserSchema;
     userDetails: any;
+    applyType: string;
 }
 
 export interface ProjectDrawerProps {

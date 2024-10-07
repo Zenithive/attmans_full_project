@@ -5,7 +5,7 @@ export type BillingDocument = Billing & Document;
 
 @Schema()
 export class Billing {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   milestoneText: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Apply', required: true })
