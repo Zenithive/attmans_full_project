@@ -87,6 +87,12 @@ export class Email extends Document {
 
   @Prop({ ref: 'applies', required: false })
   awardStatus: string;
+
+  @Prop({ ref: 'milestones', required: false })
+  adminStatus: string;
+
+  @Prop({ ref: 'milestones', required: false })
+  projectOwner: string;
 }
 
 export const EmailSchema = SchemaFactory.createForClass(Email);

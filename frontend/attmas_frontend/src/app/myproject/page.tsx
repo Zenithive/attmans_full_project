@@ -22,6 +22,7 @@ import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { pubsub } from '../services/pubsub.service';
 import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProjectStatusChip';
+import { useSearchParams } from 'next/navigation';
 
 
 const myproject = () => {
@@ -152,6 +153,21 @@ const myproject = () => {
         return params;
     };
 
+    const searchParams = useSearchParams();
+
+    const showProjectModal = (resJob: Array<Job>) => {
+        const applicationId = searchParams.get('applicationId');
+        const projectId = searchParams.get('projectId');
+        if (applicationId) {
+            const currentProjectObj = resJob.find(a => a.applies?.find(b => b._id === applicationId))
+            currentProjectObj && handleViewJob(currentProjectObj);
+        }else if(projectId){
+            const currentProjectObj = resJob.find(a => a._id === projectId);
+            console.log("currentProjectObj", currentProjectObj)
+            currentProjectObj && handleViewJob(currentProjectObj);
+        }
+    }
+
 
     const fetchJobs = useCallback(async (page: number) => {
         try {
@@ -179,6 +195,7 @@ const myproject = () => {
             if (response.data.length === 0) {
                 setHasMore(false);
             } else {
+                showProjectModal(response.data);
                 setJobs(prev => {
                     const newJobs = response.data.filter((newJob: Job) => !prev.some(existingJob => existingJob._id === newJob._id));
                     return [...prev, ...newJobs];

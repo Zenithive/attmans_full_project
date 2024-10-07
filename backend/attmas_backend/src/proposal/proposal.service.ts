@@ -67,7 +67,7 @@ export class ProposalService {
   }
 
   async sendProposalSubmitNotifications(proposal) {
-    const user = await this.userModel
+    const freelancer = await this.userModel
       .findOne({ _id: proposal.userID.toString() })
       .exec();
 
@@ -80,7 +80,7 @@ export class ProposalService {
     for (const admin of adminUsers) {
       const message = `
       Dear ${admin.firstName} ${admin.lastName},<br>
-      Your Proposal for project:"${title}" has been submitted by ${user.firstName} ${user.lastName}.
+      Your Proposal for project:"${title}" has been submitted by ${freelancer.firstName} ${freelancer.lastName}.
     `;
       this.sendEmailNotificationToUserProposalActivity({
         user: admin,
@@ -91,6 +91,8 @@ export class ProposalService {
         message,
         status: 'submitted',
         title,
+        freelancerFirstName: freelancer.firstName,
+        freelancerLastName: freelancer.lastName,
       });
     }
   }
@@ -327,6 +329,8 @@ export class ProposalService {
       message,
       status: proposal.Status,
       title,
+      freelancerFirstName: user.firstName,
+      freelancerLastName: user.lastName,
     });
 
     if (projectOwner) {
@@ -344,6 +348,8 @@ export class ProposalService {
         message: ownerMessage,
         status: proposal.Status,
         title,
+        freelancerFirstName: user.firstName,
+        freelancerLastName: user.lastName,
       });
     }
   }
@@ -357,6 +363,8 @@ export class ProposalService {
     message,
     adminFirstName,
     adminLastName,
+    freelancerFirstName,
+    freelancerLastName,
   }) {
     try {
       const html = `${message}`;
@@ -374,8 +382,8 @@ export class ProposalService {
         read: false,
         applicationId,
         title,
-        first: user.firstName,
-        last: user.lastName,
+        first: freelancerFirstName,
+        last: freelancerLastName,
         status,
         adminFirstName,
         adminLastName,

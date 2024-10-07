@@ -41,6 +41,7 @@ interface Email {
   applicationTitle?: string;
   adminFirstName?: string;
   adminLastName?: string;
+  adminStatus?:string;
   applicationId?: string,
   first?: string,
   last?: string,
@@ -123,7 +124,7 @@ export default function MainNavBar() {
       return true;
     }    
 
-    if (singleNotification.status) {
+    if (singleNotification.status && singleNotification.to == userDetails.username) {
       return true;
     }
 
@@ -248,6 +249,15 @@ export default function MainNavBar() {
     }
   }
 
+
+  const openMyProjectTab = (notificationObj: Email) => {
+    if (notificationObj.applicationId) {
+      router.push(`/myproject?applicationId=${notificationObj.applicationId}`);
+    } else if (notificationObj.projectId || notificationObj.jobId) {
+      router.push(`/myproject?projectId=${notificationObj.projectId || notificationObj.jobId}`);
+    }
+  }
+
   const openProposalTab = (notificationObj: Email) => {
     router.push(`/proposal`);
   }
@@ -273,24 +283,123 @@ export default function MainNavBar() {
     }
 
 
-    if (notification.subject.toLowerCase().includes('milestone')) {
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Admin" && notification.subject === "Milestone submitted") {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             You have been notified that {notification.first} {notification.last} has {notification.status} a milestone.
-            <a href="#" onClick={() => openProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
       );
     }
 
-    if (notification.subject.toLowerCase().includes('proposal')) {
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Admin" && notification.subject === "Milestone resubmitted") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.first} {notification.last} has {notification.status} a milestone.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Freelancer" && notification.adminStatus === "Admin Approved") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+    
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Project Owner" && notification.adminStatus === "Admin Approved") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Freelancer" && notification.adminStatus === "Project Owner Approved") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Freelancer" && notification.adminStatus === "Admin Rejected") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('milestone') && userDetails.userType === "Freelancer" && notification.adminStatus === "Project Owner Rejected") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+
+
+    if (notification.subject.toLowerCase().includes('proposal') && notification.subject == "Proposal submitted"){
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             You have been notified that {notification.first} {notification.last} has {notification.status} a proposal.
+            <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    console.log("f1",notification.subject.toLowerCase().includes('proposal') && notification.status == "Proposal Under Review" && userDetails.userType === "Freelancer")
+    if (notification.subject.toLowerCase().includes('proposal') && notification.status == "Proposal Under Review" && userDetails.userType === "Freelancer") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            You have been notified that your proposal has been approved by the Admin.
+            <a href="#" onClick={() => openProposalTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.subject.toLowerCase().includes('proposal') && notification.status == "Rejected" &&  userDetails.userType === "Freelancer") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            "You have been notified that your proposal has been Rejected by the Admin."
             <a href="#" onClick={() => openProposalTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
@@ -298,12 +407,12 @@ export default function MainNavBar() {
     }
 
 
-    if (notification.subject.toLowerCase().includes('proposal') && notification.userType == "Project Owner" ) {
+    if (notification.subject.toLowerCase().includes('proposal') && userDetails.userType == "Project Owner" && notification.status == "Proposal Under Review" ) {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            You have been notified that {notification.first} {notification.last} has {notification.status} a proposal.
+            You have been notified that a proposal has been submitted .
             <a href="#" onClick={() => openProposalTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
@@ -323,8 +432,7 @@ export default function MainNavBar() {
     }
 
     
-
-    if (notification.status) {
+    if (notification.status && userDetails.userType == "Innovator") {
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
@@ -368,7 +476,7 @@ export default function MainNavBar() {
         </>
       );
     }
-
+    console.log("freelancer",notification.userType === 'Freelancer')
     if (notification.userType === 'Freelancer') {
       return (
         <>

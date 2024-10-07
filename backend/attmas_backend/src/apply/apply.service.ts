@@ -77,9 +77,9 @@ export class ApplyService {
   }
 
   async applyNotification(createApplyDto, userType) {
-    const user = await this.userModel
-      .findOne({ username: createApplyDto.username })
-      .exec();
+    // const user = await this.userModel
+    //   .findOne({ username: createApplyDto.username })
+    //   .exec();
 
     if (userType === 'Admin') {
       const adminUsers = await this.usersService.findUsersByUserType1('Admin');
@@ -100,6 +100,7 @@ export class ApplyService {
         }
       }
     } else if (userType === 'Project Owner') {
+      console.log("userType === 'Project Owner'", userType === 'Project Owner');
       const job = await this.jobsService.findJobWithUser(createApplyDto.jobId);
       if (!job) {
         throw new NotFoundException('No job found');
@@ -114,17 +115,17 @@ export class ApplyService {
         createApplyDto,
       );
     }
-    if (user) {
-      this.emailService2.sendEmailApplyCreate(
-        user.username,
-        `New Application Created for Project: ${createApplyDto.title}`,
-        createApplyDto.jobId,
-        createApplyDto.title,
-        user.firstName,
-        user.lastName,
-        createApplyDto,
-      );
-    }
+    // if (user) {
+    //   this.emailService2.sendEmailApplyCreate(
+    //     user.username,
+    //     `New Application Created for Project: ${createApplyDto.title}`,
+    //     createApplyDto.jobId,
+    //     createApplyDto.title,
+    //     user.firstName,
+    //     user.lastName,
+    //     createApplyDto,
+    //   );
+    // }
   }
 
   async findAll(): Promise<Apply[]> {
