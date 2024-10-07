@@ -263,7 +263,7 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                     <strong>Description: </strong>{booth.description}
                   </Typography>
                 </Grid>
-                {booth.rejectComment && (
+                {booth.rejectComment && booth.userId.username === userDetails.username &&(
                   <Grid item xs={12}>
                     <Box sx={{ borderRadius: '5px', backgroundColor: 'error.light', p: 2 }}>
                       <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'white' }}>

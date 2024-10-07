@@ -49,6 +49,8 @@ interface Email {
   userType: string;
   awardStatus: string;
   isShow?: boolean;
+  boothTitle?:string;
+  exhibitionName?: string;
 }
 
 function clearCookies() {
@@ -155,7 +157,7 @@ export default function MainNavBar() {
       return true;
     }
 
-    if (singleNotification.userType === 'Innovator'){
+    if (singleNotification.to === userDetails.username && userDetails.userType === "Innovator"){
       return true;
     }
 
@@ -277,6 +279,29 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
             Your application "{notification.title}" has been {notification.status3} by "{notification.adminFirstName} {notification.adminLastName}". Click <a href="#" onClick={() => openProjectTab(notification)}>here</a> for more details.
+          </Typography >
+        </>
+      );
+    }
+
+
+    if (notification.to === userDetails.username && userDetails.userType === "Admin" && notification.subject === "New Exhibition Interest") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            , A new user has shown interest in The Exhibition {notification.exhibitionName}. Please review their details in the system. Best regards, Team Attmans". Click <a href={viewExhibitionUrl} target="_blank">here</a> for more details.
+          </Typography >
+        </>
+      );
+    }
+
+    if (notification.to === userDetails.username && userDetails.userType === "Admin" && notification.subject === "New Booth Interest") {
+      return (
+        <>
+          <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
+            Dear {userName},<br />
+            ,A new user has shown interest in The booth {notification.boothTitle}. Please review their details in the system. Best regards, Team Attmans. Click <a href={viewExhibitionUrl} target="_blank">here</a> for more details.
           </Typography >
         </>
       );
@@ -431,7 +456,7 @@ export default function MainNavBar() {
       );
     }
 
-    
+    console.log("wwe",notification.status && userDetails.userType == "Innovator");
     if (notification.status && userDetails.userType == "Innovator") {
       return (
         <>
@@ -443,6 +468,7 @@ export default function MainNavBar() {
       );
     }
 
+    console.log('booth',notification.boothUsername)
     if (notification.boothUsername) {
       return (
         <>
@@ -523,8 +549,9 @@ export default function MainNavBar() {
         </>
       );
     }
-
-    if (notification.userType === 'Innovator'){
+    console.log('inno',notification.to === userDetails.username && userDetails.userType === "Innovator")
+    if (notification.to === userDetails.username && userDetails.userType === "Innovator"){
+      console.log('inno',notification.to === userDetails.username && userDetails.userType === "Innovator")
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
