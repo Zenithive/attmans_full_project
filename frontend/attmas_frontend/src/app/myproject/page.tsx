@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Box, colors, Card, CardContent, IconButton, Autocomplete, TextField, Chip, ToggleButton, ToggleButtonGroup, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, Menu, MenuItem, ListItemIcon, ListItemText, Grid, Button, Link } from '@mui/material';
 import { AddApply } from '../component/apply/apply';
 import { APIS } from '@/app/constants/api.constant';
@@ -25,7 +25,7 @@ import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProje
 import { useSearchParams, useRouter } from 'next/navigation';
 
 
-const myproject = () => {
+const MyProject = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -814,4 +814,12 @@ const myproject = () => {
     );
 };
 
-export default myproject;
+const SuspenseMyProjectPage: React.FC = () => {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <MyProject />
+      </Suspense>
+    );
+  };
+
+export default SuspenseMyProjectPage;

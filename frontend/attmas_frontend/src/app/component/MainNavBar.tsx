@@ -350,7 +350,7 @@ export default function MainNavBar() {
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            You have been notified that a milestone submitted. &nbsp;
             <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
@@ -362,7 +362,7 @@ export default function MainNavBar() {
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            You have been notified that Project Owner has {notification.status} a milestone. &nbsp;
             <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
@@ -386,7 +386,7 @@ export default function MainNavBar() {
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear {userName},<br />
-            You have been notified that {notification.adminFirstName} {notification.adminLastName} has {notification.status} a milestone.
+            You have been notified that project owner has {notification.status} a milestone. &nbsp;
             <a href="#" onClick={() => openMyProjectTab(notification)} style={{ color: 'blue', cursor: 'pointer' }}>Click here</a> to view.
           </Typography >
         </>
