@@ -163,7 +163,7 @@ const myproject = () => {
             currentProjectObj && handleViewJob(currentProjectObj);
         }else if(projectId){
             const currentProjectObj = resJob.find(a => a._id === projectId);
-            console.log("currentProjectObj", currentProjectObj)
+    
             currentProjectObj && handleViewJob(currentProjectObj);
         }
     }
@@ -220,10 +220,10 @@ const myproject = () => {
         const fetchAppliedJobsForAdmin = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-                console.log("fetchAppliedJobsForAdmin", response.data);
+                
                 setApplicationsBasedOnUser(response.data);
                 const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
-                console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
+               
                 setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);

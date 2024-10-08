@@ -74,8 +74,6 @@ export class InterestedUserService {
 
       const adminEmail = exhibition.username;
       const exhibitionName = exhibition.title;
-      console.log('Exhibition Admin Email:', adminEmail);
-      console.log('Exhibition Name:', exhibitionName);
 
       let boothTitle: string | undefined;
       if (newBoothId) {
@@ -177,7 +175,6 @@ export class InterestedUserService {
       exhibitionName,
     });
 
-    console.log('email', email);
     await email.save();
   }
 

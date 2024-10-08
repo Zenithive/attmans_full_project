@@ -110,7 +110,6 @@ export class MilestonesService {
       Dear ${admin.firstName} ${admin.lastName},<br>
       Your Milestone "${title}" has been submitted by ${user.firstName} ${user.lastName}.
     `;
-      console.log('milstonst', adminStatus);
       this.sendEmailNotificationToUserMilestoneActivity({
         user: admin,
         subject: 'Milestone submitted',
@@ -212,9 +211,7 @@ export class MilestonesService {
         userType,
       });
 
-      console.log('Milestone Job ID:', milestone.jobId);
       const projectOwner = await this.jobsModel.findById(milestone.jobId);
-      console.log('projectOwner', projectOwner);
       if (!projectOwner) {
         throw new NotFoundException(
           `Project owner not found for jobId ${milestone.jobId}`,
@@ -274,7 +271,6 @@ export class MilestonesService {
     Dear ${projectOwner.firstName} ${projectOwner.lastName},<br>
     The Milestone "${title}" has been approved.
   `;
-    console.log('milstonst', adminStatus);
     if (approvedByuser._id.toString() !== user._id.toString()) {
       this.sendEmailNotificationToUserMilestoneActivity({
         user,
@@ -382,7 +378,6 @@ export class MilestonesService {
       Dear ${user.firstName} ${user.lastName},<br>
       Your Milestone "${title}" has been rejected by ${rejectedByuser.firstName} ${rejectedByuser.lastName}(${rejectedByuser.userType}).
     `;
-    console.log('milstonst', adminStatus);
     this.sendEmailNotificationToUserMilestoneActivity({
       user,
       subject: 'Milestone Rejected',
@@ -452,7 +447,6 @@ export class MilestonesService {
       Dear ${admin.firstName} ${admin.lastName},<br>
       Your Milestone "${title}" has been Resubmitted by ${user.firstName} ${user.lastName}.
     `;
-      console.log('adminStatus', adminStatus);
       this.sendEmailNotificationToUserMilestoneActivity({
         user: admin,
         subject: 'Milestone resubmitted',

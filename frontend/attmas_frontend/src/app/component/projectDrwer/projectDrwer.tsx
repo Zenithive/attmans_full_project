@@ -233,7 +233,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const handleReward = async (applicationId: string, Comment: string) => {
     try {
       if (!applicationId) return;
-      console.log("applicationId", applicationId);
 
 
       // First, award the selected application
@@ -249,15 +248,14 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
           : { ...app, status: APPLY_STATUSES.notAwarded }
       );
 
-
       setApplications(updatedApplications);
+      fetchApplications();
       // Hide all the buttons
       setButtonsHidden((prev) => {
         const updated = { ...prev };
         Object.keys(updated).forEach((key) => {
           updated[key] = true;
         });
-        pubsub.publish('AwardRefetch', { Message: 'Award Refetched' });
         return updated;
       });
     } catch (error) {
@@ -266,7 +264,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   };
 
   const handleOpenConfirmationDialog = (applicationId: string) => {
-    console.log("applicationId", applicationId);
 
     setCurrentApplicationId(applicationId);
     setConfirmationDialogOpen(true);
@@ -280,7 +277,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const handleConfirm = (comment: string) => {
     if (currentApplicationId) {
       // Perform the action with currentApplicationId
-      console.log(`Awarding application with ID: ${currentApplicationId}`);
       handleReward(currentApplicationId, comment)
       // Close the dialog after confirming
       handleCloseConfirmationDialog();
@@ -304,7 +300,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       });
 
       // Optionally handle the response or update UI
-      console.log('Project successfully closed');
     } catch (error) {
       // Handle error (e.g., display an error message)
       console.error('Error closing the project:', error);
@@ -321,9 +316,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
   const handleCancelClick2: () => void = () => {
-    console.log('Cancel button clicked');
     setIsDialogOpen(true);
-    console.log('isDialogOpen:', isDialogOpen);
   };
 
   const getFilterLists = (SelectService: string) => {
@@ -337,7 +330,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
   const handleConfirmDialog2 = async (id: string, comment: string) => {
-    console.log('User comment:', comment);
     // Add your logic here, e.g., cancel an operation, submit the comment, etc.
     setIsDialogOpen(false);
 
@@ -349,7 +341,6 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       });
 
       // Optionally handle the response or update UI
-      console.log('Project successfully closed');
     } catch (error) {
       // Handle error (e.g., display an error message)
       console.error('Error closing the project:', error);

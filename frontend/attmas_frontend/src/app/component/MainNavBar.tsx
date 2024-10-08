@@ -406,7 +406,7 @@ export default function MainNavBar() {
       );
     }
 
-    console.log("f1",notification.subject.toLowerCase().includes('proposal') && notification.status == "Proposal Under Review" && userDetails.userType === "Freelancer")
+
     if (notification.subject.toLowerCase().includes('proposal') && notification.status == "Proposal Under Review" && userDetails.userType === "Freelancer") {
       return (
         <>
@@ -456,7 +456,6 @@ export default function MainNavBar() {
       );
     }
 
-    console.log("wwe",notification.status && userDetails.userType == "Innovator");
     if (notification.status && userDetails.userType == "Innovator") {
       return (
         <>
@@ -468,7 +467,6 @@ export default function MainNavBar() {
       );
     }
 
-    console.log('booth',notification.boothUsername)
     if (notification.boothUsername) {
       return (
         <>
@@ -502,7 +500,7 @@ export default function MainNavBar() {
         </>
       );
     }
-    console.log("freelancer",notification.userType === 'Freelancer')
+   
     if (notification.userType === 'Freelancer') {
       return (
         <>
@@ -549,9 +547,9 @@ export default function MainNavBar() {
         </>
       );
     }
-    console.log('inno',notification.to === userDetails.username && userDetails.userType === "Innovator")
+    
     if (notification.to === userDetails.username && userDetails.userType === "Innovator"){
-      console.log('inno',notification.to === userDetails.username && userDetails.userType === "Innovator")
+
       return (
         <>
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>

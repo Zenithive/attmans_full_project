@@ -174,7 +174,6 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
   };
 
   const handleUserClick = (username: string) => {
-    console.log("username", username)
     setSelectedUser(username || '');
     setDrawerOpen(true);
   };

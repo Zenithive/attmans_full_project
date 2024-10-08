@@ -105,7 +105,6 @@ const ExhibitionsPage: React.FC = () => {
     try {
       const exhibitionId = searchParams.get('exhibitionId');
       const boothId = searchParams.get('boothId');
-      console.log('boothId', boothId);
 
       if (!exhibitionId) {
         console.error('Exhibition ID not found');
@@ -209,7 +208,6 @@ const ExhibitionsPage: React.FC = () => {
 
     fetchExhibitions();
     fetchBooths();
-    console.log("view", view);
     if (view === 'boothDetails') {
       fetchVisitorsforExhibition();
     }
@@ -416,7 +414,6 @@ const ExhibitionsPage: React.FC = () => {
   };
 
   const handleUserClick = (username: string) => {
-    console.log("username", username)
     setSelectedUser(username || '');
     setDrawerOpen(true);
   };
