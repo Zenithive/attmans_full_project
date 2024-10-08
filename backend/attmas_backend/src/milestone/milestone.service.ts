@@ -122,6 +122,7 @@ export class MilestonesService {
         userFirstName: user.firstName,
         userLastName: user.lastName,
         adminStatus,
+        projectId: milestone.jobId,
       });
     }
   }
@@ -284,6 +285,7 @@ export class MilestonesService {
         userFirstName: user.firstName,
         userLastName: user.lastName,
         adminStatus,
+        projectId: milestone.jobId,
       });
     }
     if (approvedByuser._id.toString() !== projectOwner._id.toString()) {
@@ -299,6 +301,7 @@ export class MilestonesService {
         userFirstName: projectOwner.firstName,
         userLastName: projectOwner.lastName,
         adminStatus,
+        projectId: milestone.jobId,
       });
     }
   }
@@ -390,6 +393,7 @@ export class MilestonesService {
       userFirstName: user.firstName,
       userLastName: user.lastName,
       adminStatus,
+      projectId: milestone.jobId,
     });
   }
 
@@ -459,6 +463,7 @@ export class MilestonesService {
         userFirstName: user.firstName,
         userLastName: user.lastName,
         adminStatus,
+        projectId: milestone.jobId,
       });
     }
   }
@@ -475,6 +480,7 @@ export class MilestonesService {
     userFirstName,
     userLastName,
     adminStatus,
+    projectId,
   }) {
     try {
       const html = `${message}`;
@@ -498,6 +504,7 @@ export class MilestonesService {
         status,
         adminFirstName,
         adminLastName,
+        projectId,
       });
       await email.save();
     } catch (error) {

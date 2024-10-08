@@ -496,6 +496,8 @@ export class ApplyService {
             this.emailService.sendNotAwardedEmail({
               to: otherUser.username,
               applicationTitle: application.title,
+              applicationId: application.id,
+              jobId: application.jobId.toString(),
             });
           } catch (error) {
             console.error(
@@ -596,6 +598,8 @@ export class ApplyService {
       this.emailService.sendAwardedEmail({
         to: user.username,
         applicationTitle: application.title,
+        applicationId: application.id,
+        jobId: application.jobId.toString(),
       });
     }
 
@@ -606,6 +610,8 @@ export class ApplyService {
           this.emailService.sendNotAwardedEmail({
             to: otherUser.username,
             applicationTitle: application.title,
+            applicationId: application.id,
+            jobId: application.jobId.toString(),
           });
         } catch (error) {
           console.error(`Failed to send email to ${otherUser.username}`, error);

@@ -47,9 +47,13 @@ export class EmailService {
   async sendAwardedEmail({
     to,
     applicationTitle,
+    applicationId,
+    jobId,
   }: {
     to: string;
     applicationTitle: string;
+    applicationId: string;
+    jobId: string;
   }): Promise<void> {
     const subject = 'Congratulations! Your Application Has Been Awarded';
     const text = `Dear Applicant,
@@ -69,15 +73,21 @@ Your Team`;
       subject,
       applicationTitle,
       awardStatus: 'Awarded',
+      applicationId,
+      jobId,
     });
   }
 
   async sendNotAwardedEmail({
     to,
     applicationTitle,
+    applicationId,
+    jobId,
   }: {
     to: string;
     applicationTitle: string;
+    applicationId: string;
+    jobId: string;
   }): Promise<void> {
     const subject = 'Application Update: Not Awarded';
     const text = `Dear Applicant,
@@ -95,6 +105,8 @@ Your Team`;
       subject,
       applicationTitle,
       awardStatus: 'Not Awarded',
+      applicationId,
+      jobId,
     });
   }
 
@@ -103,11 +115,15 @@ Your Team`;
     subject,
     applicationTitle,
     awardStatus,
+    applicationId,
+    jobId,
   }: {
     to: string;
     subject: string;
     applicationTitle: string;
     awardStatus: string;
+    applicationId: string;
+    jobId: string;
   }): Promise<void> {
     try {
       const email = new this.emailModel({
@@ -115,7 +131,8 @@ Your Team`;
         subject,
         applicationTitle,
         awardStatus,
-
+        applicationId,
+        jobId,
         sentAt: new Date(),
         read: false,
       });

@@ -39,15 +39,19 @@ export class BillingService {
 
     if (applyType !== 'InnovatorsApply') {
       const milestone = await this.milestoneModel.findOne({
-        'milestones.name.text': milestoneText,
+        applyId: applyId,
       });
-
+      console.log('milestoneText', milestoneText);
+      // console.log('milestone', milestone);
       if (!milestone) {
         throw new NotFoundException('Milestone not found');
       }
+
       const milestoneData = milestone.milestones.find(
         (m) => m.name.text === milestoneText && m.status === 'Submitted',
       );
+      console.log(milestoneText, 'milestone.milestones', milestone.milestones);
+      console.log('milestoneData', milestoneData);
       if (!milestoneData) {
         throw new Error('Milestone is not submitted or text does not match');
       }

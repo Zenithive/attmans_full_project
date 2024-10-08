@@ -22,10 +22,13 @@ import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { pubsub } from '../services/pubsub.service';
 import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProjectStatusChip';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 
 const myproject = () => {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
     const [jobs, setJobs] = useState<Job[]>([]);
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
@@ -153,17 +156,14 @@ const myproject = () => {
         return params;
     };
 
-    const searchParams = useSearchParams();
-
     const showProjectModal = (resJob: Array<Job>) => {
-        const applicationId = searchParams.get('applicationId');
         const projectId = searchParams.get('projectId');
+        const applicationId = searchParams.get('applicationId');
         if (applicationId) {
             const currentProjectObj = resJob.find(a => a.applies?.find(b => b._id === applicationId))
             currentProjectObj && handleViewJob(currentProjectObj);
         }else if(projectId){
             const currentProjectObj = resJob.find(a => a._id === projectId);
-    
             currentProjectObj && handleViewJob(currentProjectObj);
         }
     }
@@ -207,7 +207,7 @@ const myproject = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, userType, filter]);
+    }, [userId, userType, filter, searchParams]);
 
 
 
@@ -245,15 +245,15 @@ const myproject = () => {
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs]);
+    }, [fetchJobs, searchParams]);
 
     useEffect(() => {
         refetch();
-    }, [refetch]);
+    }, [refetch, searchParams]);
 
     useEffect(() => {
         if (page > 1) fetchJobs(page);
-    }, [page, fetchJobs]);
+    }, [page, fetchJobs, searchParams]);
 
     const currentUser = userDetails.username;
     const currentUserType = userDetails.userType;
@@ -298,6 +298,12 @@ const myproject = () => {
             handleCloseConfirmationDialog();
         }
     };
+
+    useEffect(() => {
+        if (!viewingJob) {
+            router.replace('/myproject');
+        }
+    }, [viewingJob]);
 
     useEffect(() => {
         pubsub.subscribe('refectMyProject', refetch);

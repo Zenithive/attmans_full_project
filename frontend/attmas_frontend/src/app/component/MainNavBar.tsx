@@ -253,6 +253,7 @@ export default function MainNavBar() {
 
 
   const openMyProjectTab = (notificationObj: Email) => {
+    console.log("notificationObj",notificationObj);
     if (notificationObj.applicationId) {
       router.push(`/myproject?applicationId=${notificationObj.applicationId}`);
     } else if (notificationObj.projectId || notificationObj.jobId) {
@@ -530,7 +531,8 @@ export default function MainNavBar() {
           <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
             Dear Applicant,<br />
             Thank you for applying for the job titled "{notification.applicationTitle}". Unfortunately, your application was not selected for this opportunity.
-            <br />We encourage you to apply for other roles or opportunities with us in the future.
+            <br />We encourage you to apply for other roles or opportunities with us in the future.Click <a href="#" onClick={() => openProjectTab(notification)}>here</a> for more details.
+       
           </Typography>
         </>
       );
