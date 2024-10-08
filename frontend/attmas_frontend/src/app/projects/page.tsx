@@ -180,12 +180,15 @@ const Jobs = () => {
     const showProjectModal = (resJob: Array<Job>) => {
         const applicationId = searchParams.get('applicationId');
         const projectId = searchParams.get('projectId');
+        console.log('applicationId',applicationId);
+        console.log('projectId',projectId);
         if (applicationId) {
             const currentProjectObj = resJob.find(a => a.applies?.find(b => b._id === applicationId))
+            console.log("currentProjectObj", currentProjectObj)
             currentProjectObj && handleViewJob(currentProjectObj);
         }else if(projectId){
             const currentProjectObj = resJob.find(a => a._id === projectId);
-            console.log("currentProjectObj", currentProjectObj)
+            // console.log("currentProjectObj", currentProjectObj)
             currentProjectObj && handleViewJob(currentProjectObj);
         }
     }

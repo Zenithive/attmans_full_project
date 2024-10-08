@@ -77,9 +77,9 @@ export class ApplyService {
   }
 
   async applyNotification(createApplyDto, userType) {
-    const user = await this.userModel
-      .findOne({ username: createApplyDto.username })
-      .exec();
+    // const user = await this.userModel
+    //   .findOne({ username: createApplyDto.username })
+    //   .exec();
 
     if (userType === 'Admin') {
       const adminUsers = await this.usersService.findUsersByUserType1('Admin');
@@ -114,17 +114,17 @@ export class ApplyService {
         createApplyDto,
       );
     }
-    if (user) {
-      this.emailService2.sendEmailApplyCreate(
-        user.username,
-        `New Application Created for Project: ${createApplyDto.title}`,
-        createApplyDto.jobId,
-        createApplyDto.title,
-        user.firstName,
-        user.lastName,
-        createApplyDto,
-      );
-    }
+    // if (user) {
+    //   this.emailService2.sendEmailApplyCreate(
+    //     user.username,
+    //     `New Application Created for Project: ${createApplyDto.title}`,
+    //     createApplyDto.jobId,
+    //     createApplyDto.title,
+    //     user.firstName,
+    //     user.lastName,
+    //     createApplyDto,
+    //   );
+    // }
   }
 
   async findAll(): Promise<Apply[]> {
@@ -461,20 +461,60 @@ export class ApplyService {
     return this.findAppliedJobs(null, null, null, null, jobId);
   }
 
-  // async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {
-  //   try {
-  //     const updateQuery = {
-  //       jobId,
-  //       _id: { $ne: new Types.ObjectId(appId) },
-  //     };
-  //     const result = await this.ApplyModel.updateMany(updateQuery, {
-  //       status: APPLY_STATUSES.notAwarded,
-  //     });
-  //     return result;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  async updateAlltheApplications(jobId: Types.ObjectId, appId: string) {
+    try {
+      const updateQuery = {
+        jobId,
+        _id: { $ne: new Types.ObjectId(appId) },
+      };
+      // Find the applications that are not awarded and update their statuses
+      const applicationsToUpdate =
+        await this.ApplyModel.find(updateQuery).exec();
+
+      const application = await this.ApplyModel.findById(appId).exec();
+
+      const updatedApplications = applicationsToUpdate.map((app) => ({
+        _id: app._id as Types.ObjectId,
+        status: APPLY_STATUSES.notAwarded,
+        jobId: app.jobId as Types.ObjectId,
+        comment_Reward_Nonreward:
+          'Thank you for your application. Although we cannot award this application, we value your interest and encourage you to apply for other roles or opportunities with us in the future.',
+        userId: app.userId as Types.ObjectId,
+        username: app.username.toString(),
+      }));
+
+      // Update the status of the applications
+      const result = await this.ApplyModel.updateMany(updateQuery, {
+        status: APPLY_STATUSES.notAwarded,
+      });
+
+      // Send notification emails to users whose applications were not awarded
+      for (const app of updatedApplications) {
+        const otherUser = await this.userModel.findById(app.userId).exec();
+        if (otherUser) {
+          try {
+            this.emailService.sendNotAwardedEmail({
+              to: otherUser.username,
+              applicationTitle: application.title,
+              applicationId: application.id,
+              jobId: application.jobId.toString(),
+            });
+          } catch (error) {
+            console.error(
+              `Failed to send email to ${otherUser.username}`,
+              error,
+            );
+          }
+        } else {
+          console.log(`No user found with userId: ${app.userId}`);
+        }
+      }
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async rewardApplication(
     id: string,
@@ -502,31 +542,35 @@ export class ApplyService {
       comment ||
       'congratulation , you are the 100% confirm person for the Project who is awarded';
     await application.save();
-    // this.updateAlltheApplications(application.jobId, id);
-    const proposals = await this.proposalModel
-      .find({
-        projectId: application.jobId,
-      })
-      .exec();
+    if (application.applyType === 'InnovatorsApply') {
+      await this.updateAlltheApplications(application.jobId, id);
+    }
 
-    let awardedProposalFound = false;
+    if (application.applyType === 'FreelancerApply') {
+      const proposals = await this.proposalModel
+        .find({
+          projectId: application.jobId,
+        })
+        .exec();
 
-    for (const proposal of proposals) {
-      if (proposal.applyId.toString() === application._id.toString()) {
-        proposal.Status = PROPOSAL_STATUSES.approvedAndAwarded;
-        await proposal.save();
-        awardedProposalFound = true;
-      } else {
-        proposal.Status = PROPOSAL_STATUSES.notAwarded;
+      let awardedProposalFound = false;
+
+      for (const proposal of proposals) {
+        if (proposal.applyId.toString() === application._id.toString()) {
+          proposal.Status = PROPOSAL_STATUSES.approvedAndAwarded;
+          await proposal.save();
+          awardedProposalFound = true;
+        } else {
+          proposal.Status = PROPOSAL_STATUSES.notAwarded;
+        }
         await proposal.save();
       }
-    }
 
-    // Ensure that one proposal is awarded
-    if (!awardedProposalFound) {
-      throw new Error('No matching proposal found to award.');
+      // Ensure that one proposal is awarded
+      if (!awardedProposalFound) {
+        throw new Error('No matching proposal found to award.');
+      }
     }
-
     const otherApplications = await this.ApplyModel.find({
       _id: { $ne: id },
       jobId: new Types.ObjectId(application.jobId),
@@ -554,6 +598,8 @@ export class ApplyService {
       this.emailService.sendAwardedEmail({
         to: user.username,
         applicationTitle: application.title,
+        applicationId: application.id,
+        jobId: application.jobId.toString(),
       });
     }
 
@@ -564,6 +610,8 @@ export class ApplyService {
           this.emailService.sendNotAwardedEmail({
             to: otherUser.username,
             applicationTitle: application.title,
+            applicationId: application.id,
+            jobId: application.jobId.toString(),
           });
         } catch (error) {
           console.error(`Failed to send email to ${otherUser.username}`, error);

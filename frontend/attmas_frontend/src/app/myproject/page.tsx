@@ -22,9 +22,13 @@ import { APPLY_STATUSES, PROJECT_STATUSES } from '../constants/status.constant';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { pubsub } from '../services/pubsub.service';
 import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProjectStatusChip';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 
 const myproject = () => {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
     const [jobs, setJobs] = useState<Job[]>([]);
     const [applyOpen, setApplyOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<string>('');
@@ -152,6 +156,18 @@ const myproject = () => {
         return params;
     };
 
+    const showProjectModal = (resJob: Array<Job>) => {
+        const projectId = searchParams.get('projectId');
+        const applicationId = searchParams.get('applicationId');
+        if (applicationId) {
+            const currentProjectObj = resJob.find(a => a.applies?.find(b => b._id === applicationId))
+            currentProjectObj && handleViewJob(currentProjectObj);
+        }else if(projectId){
+            const currentProjectObj = resJob.find(a => a._id === projectId);
+            currentProjectObj && handleViewJob(currentProjectObj);
+        }
+    }
+
 
     const fetchJobs = useCallback(async (page: number) => {
         try {
@@ -179,6 +195,7 @@ const myproject = () => {
             if (response.data.length === 0) {
                 setHasMore(false);
             } else {
+                showProjectModal(response.data);
                 setJobs(prev => {
                     const newJobs = response.data.filter((newJob: Job) => !prev.some(existingJob => existingJob._id === newJob._id));
                     return [...prev, ...newJobs];
@@ -190,7 +207,7 @@ const myproject = () => {
         } catch (error) {
             console.error('Error fetching jobs:', error);
         }
-    }, [userId, userType, filter]);
+    }, [userId, userType, filter, searchParams]);
 
 
 
@@ -203,10 +220,10 @@ const myproject = () => {
         const fetchAppliedJobsForAdmin = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-                console.log("fetchAppliedJobsForAdmin", response.data);
+                
                 setApplicationsBasedOnUser(response.data);
                 const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
-                console.log('fetchedAppliedJobsForAdmin', fetchedAppliedJobsForAdmin);
+               
                 setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);
@@ -228,15 +245,15 @@ const myproject = () => {
         } catch (error) {
             console.error('Error refetching jobs:', error);
         }
-    }, [fetchJobs]);
+    }, [fetchJobs, searchParams]);
 
     useEffect(() => {
         refetch();
-    }, [refetch]);
+    }, [refetch, searchParams]);
 
     useEffect(() => {
         if (page > 1) fetchJobs(page);
-    }, [page, fetchJobs]);
+    }, [page, fetchJobs, searchParams]);
 
     const currentUser = userDetails.username;
     const currentUserType = userDetails.userType;
@@ -281,6 +298,12 @@ const myproject = () => {
             handleCloseConfirmationDialog();
         }
     };
+
+    useEffect(() => {
+        if (!viewingJob) {
+            router.replace('/myproject');
+        }
+    }, [viewingJob]);
 
     useEffect(() => {
         pubsub.subscribe('refectMyProject', refetch);
@@ -450,7 +473,7 @@ const myproject = () => {
                                                         }
                                                     }}
                                                 >
-                                                    Close
+                                                    Finish
                                                 </Button> : ''}
                                             </Box>
                                         </CardContent>

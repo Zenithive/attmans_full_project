@@ -8,12 +8,17 @@ import { UsersModule } from 'src/users/users.module';
 import { ExhibitionModule } from 'src/exhibition/exhibition.module';
 import { BoothModule } from 'src/booth/booth.module';
 import { Booth, BoothSchema } from 'src/booth/booth.schema';
+import {
+  Email,
+  EmailSchema,
+} from 'src/notificationEmail/Exebitionemail.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'InterestedUser', schema: InterestedUserSchema },
       { name: Booth.name, schema: BoothSchema },
+      { name: Email.name, schema: EmailSchema },
     ]),
     UsersModule, // Import UsersModule
     ExhibitionModule,

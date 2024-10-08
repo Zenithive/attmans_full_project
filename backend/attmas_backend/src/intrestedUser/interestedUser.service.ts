@@ -6,6 +6,7 @@ import { User } from 'src/users/user.schema'; // Assuming User schema is in src/
 import { MailerService } from 'src/common/service/UserEmailSend'; // Assuming MailerService is in src/common/service
 import { Exhibition } from 'src/exhibition/schema/exhibition.schema';
 import { Booth } from 'src/booth/booth.schema';
+import { Email } from 'src/notificationEmail/Exebitionemail.schema';
 
 @Injectable()
 export class InterestedUserService {
@@ -18,6 +19,8 @@ export class InterestedUserService {
     private readonly exhibitionModel: Model<Exhibition>,
     @InjectModel('Booth')
     private readonly boothModel: Model<Booth>,
+    @InjectModel(Email.name)
+    private emailModel: Model<Email>,
   ) {}
 
   async create(createInterestedUserDto: any): Promise<InterestedUser> {
@@ -70,7 +73,7 @@ export class InterestedUserService {
       }
 
       const adminEmail = exhibition.username;
-      console.log('Exhibition Admin Email:', adminEmail);
+      const exhibitionName = exhibition.title;
 
       let boothTitle: string | undefined;
       if (newBoothId) {
@@ -100,11 +103,30 @@ export class InterestedUserService {
           boothTitle,
           interestType,
           adminEmail,
+          exhibitionName,
         });
 
         // Send email to the admin about the new booth interest if applicable
         if (interestType === 'InterestedUserForBooth') {
           this.sendInterestNotificationEmail(adminEmail, boothTitle || '');
+          await this.saveEmailData(
+            adminEmail,
+            'New Booth Interest',
+            exhibitionId,
+            username,
+            boothTitle || '',
+            exhibitionName || '',
+          );
+        } else if (interestType === 'InterestedUserForExhibition') {
+          this.sendInterestNotificationEmailtoAdmin(adminEmail, exhibitionName);
+          await this.saveEmailData(
+            adminEmail,
+            'New Exhibition Interest',
+            exhibitionId,
+            username,
+            exhibitionName,
+            exhibitionName || '',
+          );
         }
 
         return await createdUser.save();
@@ -134,10 +156,41 @@ export class InterestedUserService {
     }
   }
 
+  async saveEmailData(
+    to: string,
+    subject: string,
+    exhibitionId: string,
+    boothUsername: string,
+    boothTitle: string | undefined,
+    exhibitionName: string | undefined,
+  ) {
+    const email = new this.emailModel({
+      to,
+      subject,
+      exhibitionId,
+      boothUsername,
+      read: false,
+      sentAt: new Date(),
+      boothTitle,
+      exhibitionName,
+    });
+
+    await email.save();
+  }
+
   // Define methods for sending different types of emails
   async sendInterestNotificationEmail(adminEmail: string, boothTitle: string) {
     const subject = 'New Booth Interest';
     const body = `Hello,\n\nA new user has shown interest in The booth "${boothTitle}". Please review their details in the system.\n\nBest regards,\nTeam Attmans`;
+    await this.mailerService.sendEmail(adminEmail, subject, body);
+  }
+
+  async sendInterestNotificationEmailtoAdmin(
+    adminEmail: string,
+    exhibitionName: string,
+  ) {
+    const subject = 'New Exhibition Interest';
+    const body = `Hello,\n\nA new user has shown interest in The Exhibition "${exhibitionName}". Please review their details in the system.\n\nBest regards,\nTeam Attmans`;
     await this.mailerService.sendEmail(adminEmail, subject, body);
   }
 

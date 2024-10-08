@@ -105,7 +105,6 @@ const ExhibitionsPage: React.FC = () => {
     try {
       const exhibitionId = searchParams.get('exhibitionId');
       const boothId = searchParams.get('boothId');
-      console.log('boothId', boothId);
 
       if (!exhibitionId) {
         console.error('Exhibition ID not found');
@@ -209,7 +208,6 @@ const ExhibitionsPage: React.FC = () => {
 
     fetchExhibitions();
     fetchBooths();
-    console.log("view", view);
     if (view === 'boothDetails') {
       fetchVisitorsforExhibition();
     }
@@ -416,7 +414,6 @@ const ExhibitionsPage: React.FC = () => {
   };
 
   const handleUserClick = (username: string) => {
-    console.log("username", username)
     setSelectedUser(username || '');
     setDrawerOpen(true);
   };
@@ -651,7 +648,7 @@ const ExhibitionsPage: React.FC = () => {
                             {userDetails && (
                               (userType === 'Admin' || booth.userId?._id === userDetails._id ||
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
-                                  (userType === 'Innovator' || userType === 'Visitors' || !userType))) && (
+                                  (userType === 'Innovator' || userType === 'Visitors' && interestType === "InterestedUserForExhibition"))) &&(
                                 <a
                                   href="#"
                                   onClick={(e) => {

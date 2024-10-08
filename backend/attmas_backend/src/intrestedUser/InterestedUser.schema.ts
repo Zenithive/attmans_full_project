@@ -7,6 +7,7 @@ export interface InterestedUser extends Document {
   mobileNumber: string;
   userId: Types.ObjectId; // Change type to ObjectId
   exhibitionId: Types.ObjectId; // Change type to ObjectId
+  exhibitionName: string;
   boothId?: Types.ObjectId;
   boothTitle?: string;
   userType: string;
@@ -22,6 +23,7 @@ export const InterestedUserSchema = new Schema(
     userId: { type: Schema.Types.ObjectId, required: false }, // Use Schema.Types.ObjectId
     username: { type: String, required: false },
     exhibitionId: { type: Schema.Types.ObjectId, required: false }, // Use Schema.Types.ObjectId
+    exhibitionName: { type: String, required: false },
     boothTitle: { type: String, required: false },
     boothId: { type: Types.ObjectId, required: false },
     userType: { type: String, required: false },

@@ -55,6 +55,7 @@ interface BillingModalProps {
     onDateChange: (newValue: dayjs.Dayjs | null) => void;
     onAddPayment: () => void;
     isSubmitting: boolean;
+    applyType: string;
 }
 
 const BillingModal: React.FC<BillingModalProps> = ({
@@ -62,16 +63,26 @@ const BillingModal: React.FC<BillingModalProps> = ({
     onClose,
     paymentDetails,
     submittedMilestones,
+    applyType,
     onPaymentDetailsChange,
     onTextFieldChange,
     onDateChange,
     onAddPayment,
-    isSubmitting
+    isSubmitting,
 }) => {
     const milestoneLabel = "Approved Milestone";
 
     const isFormValid = () => {
-        return paymentDetails.milestoneText && paymentDetails.amount && paymentDetails.currency && paymentDetails.paymentDate && paymentDetails.category;
+        
+        const isMilestoneValid = applyType === 'FreelancerApply' ? paymentDetails.milestoneText : true;
+        
+        return (
+            isMilestoneValid &&
+            paymentDetails.amount && 
+            paymentDetails.currency && 
+            paymentDetails.paymentDate && 
+            paymentDetails.category
+        );
     };
 
     return (
@@ -91,7 +102,8 @@ const BillingModal: React.FC<BillingModalProps> = ({
                         <CloseIcon />
                     </IconButton>
                 </Typography>
-                <FormControl fullWidth sx={{ mb: 2 }}>
+                {applyType === 'FreelancerApply' && (
+                 <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel color="secondary">
                         {milestoneLabel}
                     </InputLabel>
@@ -110,7 +122,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                         ))}
                     </Select>
                 </FormControl>
-
+                )}
                 <TextField
                     label="Amount"
                     name="amount"

@@ -90,7 +90,7 @@ export class MilestonesService {
     // Update comments array if needed
     milestone.milstonSubmitcomments[milestoneIndex] = comment;
 
-    this.sendMilestoneResubmitNotifications(milestone, milestoneIndex);
+    this.sendMilestonesubmitNotifications(milestone, milestoneIndex);
 
     await milestone.save();
   }
@@ -104,6 +104,7 @@ export class MilestonesService {
     }
 
     const title = milestone.milestones[milestoneIndex].name.text;
+    const adminStatus = milestone.milestones[milestoneIndex].adminStatus;
     for (const admin of adminUsers) {
       const message = `
       Dear ${admin.firstName} ${admin.lastName},<br>
@@ -118,6 +119,10 @@ export class MilestonesService {
         message,
         status: 'Submitted',
         title,
+        userFirstName: user.firstName,
+        userLastName: user.lastName,
+        adminStatus,
+        projectId: milestone.jobId,
       });
     }
   }
@@ -206,6 +211,19 @@ export class MilestonesService {
         userId: new Types.ObjectId(userId),
         userType,
       });
+
+      const projectOwner = await this.jobsModel.findById(milestone.jobId);
+      if (!projectOwner) {
+        throw new NotFoundException(
+          `Project owner not found for jobId ${milestone.jobId}`,
+        );
+      }
+      this.sendApproveMilestoneByNotifications(
+        milestone,
+        milestoneIndex,
+        user,
+        projectOwner,
+      );
     } else if (userType === 'Project Owner') {
       if (selectedMilestone.adminStatus !== 'Admin Approved') {
         throw new BadRequestException(
@@ -222,7 +240,12 @@ export class MilestonesService {
       });
     }
 
-    this.sendApproveMilestoneByNotifications(milestone, milestoneIndex, user);
+    this.sendApproveMilestoneByNotifications(
+      milestone,
+      milestoneIndex,
+      user,
+      user,
+    );
 
     await milestone.save();
   }
@@ -231,6 +254,7 @@ export class MilestonesService {
     milestone,
     milestoneIndex,
     approvedByuser,
+    projectOwner,
   ) {
     const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
 
@@ -239,20 +263,47 @@ export class MilestonesService {
       throw new NotFoundException('No Admin users found');
     }
     const title = milestone.milestones[milestoneIndex].name.text;
+    const adminStatus = milestone.milestones[milestoneIndex].adminStatus;
     const message = `
       Dear ${user.firstName} ${user.lastName},<br>
       Your Milestone "${title}" has been approved by ${approvedByuser.firstName} ${approvedByuser.lastName}(${approvedByuser.userType}).
     `;
-    this.sendEmailNotificationToUserMilestoneActivity({
-      user,
-      subject: 'Milestone Approved',
-      adminFirstName: approvedByuser.firstName,
-      adminLastName: approvedByuser.lastName,
-      applicationId: milestone.applyId,
-      message,
-      status: 'Approved',
-      title,
-    });
+    const projectOwnerMessage = `
+    Dear ${projectOwner.firstName} ${projectOwner.lastName},<br>
+    The Milestone "${title}" has been approved.
+  `;
+    if (approvedByuser._id.toString() !== user._id.toString()) {
+      this.sendEmailNotificationToUserMilestoneActivity({
+        user,
+        subject: 'Milestone Approved',
+        adminFirstName: approvedByuser.firstName,
+        adminLastName: approvedByuser.lastName,
+        applicationId: milestone.applyId,
+        message,
+        status: 'Approved',
+        title,
+        userFirstName: user.firstName,
+        userLastName: user.lastName,
+        adminStatus,
+        projectId: milestone.jobId,
+      });
+    }
+    if (approvedByuser._id.toString() !== projectOwner._id.toString()) {
+      await this.sendEmailNotificationToUserMilestoneActivity({
+        user: projectOwner,
+        subject: 'Milestone Approved',
+        adminFirstName: approvedByuser.firstName,
+        adminLastName: approvedByuser.lastName,
+        applicationId: milestone.applyId,
+        message: projectOwnerMessage,
+        status: 'Approved',
+        title,
+        userFirstName: projectOwner.firstName,
+        userLastName: projectOwner.lastName,
+        adminStatus,
+        projectId: milestone.jobId,
+      });
+    }
   }
 
   async rejectMilestone(
@@ -325,6 +376,7 @@ export class MilestonesService {
     const user = await this.userModel.findOne({ _id: milestone.userId }).exec();
 
     const title = milestone.milestones[milestoneIndex].name.text;
+    const adminStatus = milestone.milestones[milestoneIndex].adminStatus;
     const message = `
       Dear ${user.firstName} ${user.lastName},<br>
       Your Milestone "${title}" has been rejected by ${rejectedByuser.firstName} ${rejectedByuser.lastName}(${rejectedByuser.userType}).
@@ -338,6 +390,10 @@ export class MilestonesService {
       message,
       status: 'Rejected',
       title,
+      userFirstName: user.firstName,
+      userLastName: user.lastName,
+      adminStatus,
+      projectId: milestone.jobId,
     });
   }
 
@@ -389,6 +445,7 @@ export class MilestonesService {
     }
 
     const title = milestone.milestones[milestoneIndex].name.text;
+    const adminStatus = milestone.milestones[milestoneIndex].adminStatus;
     for (const admin of adminUsers) {
       const message = `
       Dear ${admin.firstName} ${admin.lastName},<br>
@@ -403,6 +460,10 @@ export class MilestonesService {
         message,
         status: 'Resubmitted',
         title,
+        userFirstName: user.firstName,
+        userLastName: user.lastName,
+        adminStatus,
+        projectId: milestone.jobId,
       });
     }
   }
@@ -416,6 +477,10 @@ export class MilestonesService {
     message,
     adminFirstName,
     adminLastName,
+    userFirstName,
+    userLastName,
+    adminStatus,
+    projectId,
   }) {
     try {
       const html = `${message}`;
@@ -433,11 +498,13 @@ export class MilestonesService {
         read: false,
         applicationId,
         title,
-        first: user.firstName,
-        last: user.lastName,
+        first: userFirstName,
+        last: userLastName,
+        adminStatus,
         status,
         adminFirstName,
         adminLastName,
+        projectId,
       });
       await email.save();
     } catch (error) {
