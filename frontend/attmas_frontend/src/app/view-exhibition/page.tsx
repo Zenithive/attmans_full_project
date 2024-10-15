@@ -485,7 +485,7 @@ const ExhibitionsPage: React.FC = () => {
                   Re-Participate
                 </Button> : ''}
 
-              {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && (
+              {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && userDetails._id && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -660,7 +660,7 @@ const ExhibitionsPage: React.FC = () => {
                             {userDetails && (
                               (userType === 'Admin' || booth.userId?._id === userDetails._id ||
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
-                                  (userType === 'Innovator' || userType === 'Visitors' && interestType === "InterestedUserForExhibition"))) &&(
+                                  (userType === 'Innovator' || userType === 'Visitors' && interestType === "InterestedUserForExhibition"))) && (
                                 <a
                                   href="#"
                                   onClick={(e) => {
