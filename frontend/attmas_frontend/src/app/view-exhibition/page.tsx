@@ -473,6 +473,18 @@ const ExhibitionsPage: React.FC = () => {
                 </Button>
               )}
 
+              {(isReParticipateButtonVisible) ?
+                <Button
+                  onClick={() => {
+                    openModal()
+                    // setSelectedBooth(booth);
+                  }}
+                  variant="contained"
+                  style={{ marginRight: '10px' }}
+                >
+                  Re-Participate
+                </Button> : ''}
+
               {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && (
                 <Button
                   variant="contained"
@@ -725,16 +737,17 @@ const ExhibitionsPage: React.FC = () => {
                                 </>
                               )}
 
-                              {isReParticipateButtonVisible ? <Button
-                                onClick={() => {
-                                  openModal()
-                                  setSelectedBooth(booth);
-                                }}
-                                variant="contained"
-                                style={{ marginRight: '10px' }}
-                              >
-                                Re-Participate
-                              </Button> : ''}
+                              {(isReParticipateButtonVisible && userDetails._id === booth.userId._id) ?
+                                <Button
+                                  onClick={() => {
+                                    openModal()
+                                    setSelectedBooth(booth);
+                                  }}
+                                  variant="contained"
+                                  style={{ marginRight: '10px' }}
+                                >
+                                  Re-Participate
+                                </Button> : ''}
                             </Box>
                             <Box>
                             </Box>
