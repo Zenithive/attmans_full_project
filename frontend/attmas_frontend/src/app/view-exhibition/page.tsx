@@ -473,7 +473,19 @@ const ExhibitionsPage: React.FC = () => {
                 </Button>
               )}
 
-              {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && (
+              {(isReParticipateButtonVisible) ?
+                <Button
+                  onClick={() => {
+                    openModal()
+                    // setSelectedBooth(booth);
+                  }}
+                  variant="contained"
+                  style={{ marginRight: '10px' }}
+                >
+                  Re-Participate
+                </Button> : ''}
+
+              {selectedExhibition && isJoinLiveButtonVisible(selectedExhibition.dateTime) && userDetails._id && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -648,7 +660,7 @@ const ExhibitionsPage: React.FC = () => {
                             {userDetails && (
                               (userType === 'Admin' || booth.userId?._id === userDetails._id ||
                                 (dayjs(selectedExhibition.dateTime).isSame(dayjs(), 'day') &&
-                                  (userType === 'Innovator' || userType === 'Visitors' && interestType === "InterestedUserForExhibition"))) &&(
+                                  (userType === 'Innovator' || userType === 'Visitors' && interestType === "InterestedUserForExhibition"))) && (
                                 <a
                                   href="#"
                                   onClick={(e) => {
@@ -725,16 +737,17 @@ const ExhibitionsPage: React.FC = () => {
                                 </>
                               )}
 
-                              {isReParticipateButtonVisible ? <Button
-                                onClick={() => {
-                                  openModal()
-                                  setSelectedBooth(booth);
-                                }}
-                                variant="contained"
-                                style={{ marginRight: '10px' }}
-                              >
-                                Re-Participate
-                              </Button> : ''}
+                              {(isReParticipateButtonVisible && userDetails._id === booth.userId._id) ?
+                                <Button
+                                  onClick={() => {
+                                    openModal()
+                                    setSelectedBooth(booth);
+                                  }}
+                                  variant="contained"
+                                  style={{ marginRight: '10px' }}
+                                >
+                                  Re-Participate
+                                </Button> : ''}
                             </Box>
                             <Box>
                             </Box>

@@ -47,20 +47,17 @@ export class InterestedUserService {
     } else if (boothId) {
       newBoothId = new Types.ObjectId(boothId as string);
     }
-
-    // Check if the user already has an interest in the booth
-    if (newBoothId) {
-      const existingInterest = await this.interestedUserModel
-        .findOne({
-          userId: userObjectId,
-          boothId: newBoothId,
-          interestType: 'InterestedUserForBooth',
-        })
-        .exec();
-
-      if (existingInterest) {
-        throw new Error('User has already shown interest in this booth');
-      }
+  
+    // Modify query to check both booth-specific and exhibition-wide interests
+    const existingInterest = await this.interestedUserModel.findOne({
+      userId: userObjectId,
+      exhibitionId: exhibitionObjectId,
+      interestType,
+      boothId: newBoothId ? newBoothId : null, // Check against null if boothId is for exhibition
+    }).exec();
+  
+    if (existingInterest) {
+      throw new Error('User has already shown interest in this exhibition/booth');
     }
 
     try {
@@ -147,8 +144,8 @@ export class InterestedUserService {
           userType,
           adminEmail,
         });
-
-        return createdUser.save();
+        
+        return await createdUser.save();
       }
     } catch (error) {
       console.error('Error handling create interested user:', error);
