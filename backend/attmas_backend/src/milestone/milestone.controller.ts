@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { MilestonesService } from './milestone.service';
 import { CreateMilestoneDto } from './create-milestone.dto';
 import { Milestone } from './milestone.schema';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('milestones')
+@UseGuards(JwtAuthGuard)
 export class MilestonesController {
   constructor(private readonly milestonesService: MilestonesService) {}
 

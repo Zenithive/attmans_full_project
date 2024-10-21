@@ -14,7 +14,7 @@ import { APIS } from '../../constants/api.constant';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CircularProgress } from '@mui/material';
-import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { addUser, removeUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
 import { AxiosError } from 'axios';
 import axiosInstance from '@/app/services/axios.service';
@@ -91,10 +91,12 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           mobileNumber: res.mobileNumber,
           userType: res.userType,
           _id: res._id,
+          sessionId: res.sessionId,
         };
 
         dispatch(addUser(user));
-        document.cookie = `access_token=${response.data.access_token}`;
+        document.cookie = `access_token=${response.data.access_token};`;
+        document.cookie = `sessionId=${res.sessionId};`;
 
         formik.setStatus({ success: 'Successfully signed in!' });
 

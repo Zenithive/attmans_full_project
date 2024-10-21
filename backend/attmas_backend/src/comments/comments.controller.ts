@@ -5,12 +5,15 @@ import {
   Body,
   NotFoundException,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { AddCommentDto } from './create-comments.dto';
 import { Comment } from './comments.schema';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('comments')
+@UseGuards(JwtAuthGuard)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 

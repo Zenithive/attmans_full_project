@@ -61,6 +61,10 @@ export class UpdateUserDto {
   mobileNumber?: string;
 
   @IsOptional()
+  @IsString()
+  sessionId?: string;
+
+  @IsOptional()
   @IsEnum(UserType, {
     message: 'userType must be one of the following values: admin, user, guest',
   })

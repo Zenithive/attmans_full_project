@@ -8,6 +8,7 @@ import {
   Query,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 
 import { ApplyService } from './apply.service';
@@ -15,8 +16,10 @@ import { CreateApplyDto } from './apply.dto';
 import { Apply } from './apply.schema';
 import { UpdateStatusesDto } from './update-statuses.dto'; // Import the DTO
 import { Types } from 'mongoose';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('Apply')
+@UseGuards(JwtAuthGuard)
 export class ApplyController {
   constructor(private readonly applyService: ApplyService) {}
 

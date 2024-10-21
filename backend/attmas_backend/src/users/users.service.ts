@@ -14,13 +14,15 @@ import {
   encryptWithCrypto,
   getMinutesElapsed,
 } from 'src/common/service/crypto.service';
+import { AuthService } from 'src/auth1/auths.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private mailerService: MailerService, // Inject MailerService
-  ) {}
+    // private authService: AuthService, 
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...rest } = createUserDto;
@@ -71,6 +73,44 @@ export class UsersService {
 
     return createdUser;
   }
+
+  async updateSessionId(username: string, newSessionId: string, req?: unknown, res?: unknown): Promise<User> {
+    const user = await this.userModel.findOne({ username });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    console.log(`user.sessionId`, user.sessionId);
+    console.log(`newSessionId`, newSessionId);
+
+    if (user.sessionId && user.sessionId !== newSessionId) {
+      // Invalidate the previous session by logging out the past session
+      console.log(`Invalidating old session for user: ${username}`);
+      
+      
+      // await this.authService.logout({ sessionId: user.sessionId }, {});
+    }
+
+    user.sessionId = newSessionId; // Update with the new session ID
+    return await user.save();
+  }
+
+
+  // Method to invalidate the session (this can be called when the user logs out or needs forced logout)
+  async invalidateSession(username: string): Promise<void> {
+    const user = await this.userModel.findOne({ username });
+
+    // console.log("444444");
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+
+    user.sessionId = null; // Invalidate the session
+    await user.save();
+  }
+
 
   async findByUsername(username: string): Promise<User> {
     const user = await this.userModel.findOne({ username }).exec();

@@ -7,10 +7,13 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProposalService } from './proposal.service';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('proposals')
+@UseGuards(JwtAuthGuard)
 export class ProposalController {
   constructor(private readonly proposalService: ProposalService) {}
 

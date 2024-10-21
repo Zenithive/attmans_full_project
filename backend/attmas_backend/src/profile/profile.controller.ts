@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
@@ -17,8 +18,10 @@ import { Categories } from './schemas/category.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('profile')
+@UseGuards(JwtAuthGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) { }
 

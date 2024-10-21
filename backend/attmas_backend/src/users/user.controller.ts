@@ -16,8 +16,10 @@ import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
 import { LocalGuard } from 'src/auth/guards/local.guard';
 import { AuthenticateGuard } from 'src/auth/guards/auth.guard';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('users')
+// @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 

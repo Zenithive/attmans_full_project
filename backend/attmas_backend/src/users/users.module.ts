@@ -9,6 +9,7 @@ import {
 } from 'src/profile/schemas/category.schema';
 import { MailerService } from 'src/common/service/UserEmailSend';
 import { JwtService } from '@nestjs/jwt';
+import { AuthService } from 'src/auth1/auths.service';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { JwtService } from '@nestjs/jwt';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, MailerService, JwtService],
+  providers: [UsersService, MailerService, JwtService,AuthService],
   exports: [UsersService, MongooseModule],
 })
 export class UsersModule {}

@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { JobsService } from './projects.service';
 import {
@@ -17,8 +18,10 @@ import {
 } from './create-projects.dto';
 import { Jobs } from './projects.schema';
 import { PROJECT_STATUSES } from 'src/common/constant/status.constant';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('jobs')
+@UseGuards(JwtAuthGuard)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 

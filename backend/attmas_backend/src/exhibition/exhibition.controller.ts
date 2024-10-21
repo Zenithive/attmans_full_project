@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ExhibitionService } from './exhibition.service';
 import {
@@ -17,12 +18,15 @@ import {
 import { Exhibition } from './schema/exhibition.schema';
 import { SendToInnovatorsDto } from './dto/send-to-innovators.dto';
 import { SendToInnovators } from './schema/sendToInnovators.schema';
+import { JwtAuthGuard } from 'src/auth1/guards/jwt-auths.guard';
 
 @Controller('exhibitions')
+// @UseGuards(JwtAuthGuard)
 export class ExhibitionController {
   constructor(private readonly exhibitionService: ExhibitionService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async create(
     @Body() createExhibitionDto: CreateExhibitionDto,
   ): Promise<Exhibition> {
@@ -32,6 +36,7 @@ export class ExhibitionController {
   }
 
   @Post('sendinovators')
+  @UseGuards(JwtAuthGuard)
   async createSendInnovators(
     @Body() sendToInnovatorsDto: SendToInnovatorsDto,
   ): Promise<SendToInnovators> {
@@ -81,6 +86,7 @@ export class ExhibitionController {
   // }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id') id: string,
     @Body() updateExhibitionDto: UpdateExhibitionDto,
@@ -96,6 +102,7 @@ export class ExhibitionController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async delete(@Param('id') id: string): Promise<Exhibition> {
     const deletedExhibition = await this.exhibitionService.delete(id);
     if (!deletedExhibition) {

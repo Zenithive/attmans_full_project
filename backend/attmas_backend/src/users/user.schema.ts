@@ -57,6 +57,9 @@ export class User {
 
   @Prop()
   workAddress?: string;
+  
+  @Prop()
+  sessionId?: string;
 
   @Prop()
   designation?: string;
