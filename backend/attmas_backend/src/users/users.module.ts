@@ -10,6 +10,7 @@ import {
 import { MailerService } from 'src/common/service/UserEmailSend';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from 'src/auth1/auths.service';
+import { MyService } from 'src/redis/redis.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AuthService } from 'src/auth1/auths.service';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, MailerService, JwtService,AuthService],
+  providers: [UsersService, MailerService, JwtService,AuthService, MyService],
   exports: [UsersService, MongooseModule],
 })
 export class UsersModule {}

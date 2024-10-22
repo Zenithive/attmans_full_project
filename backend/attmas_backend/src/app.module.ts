@@ -17,6 +17,7 @@ import { CommentsModule } from './comments/comments.module';
 import { MilestonesModule } from './milestone/milestone.module';
 import { ProposalModule } from './proposal/proposal.module';
 import { BillingModule } from './billing/billing.module';
+import { MyRedisModule } from './redis/redis.module';
 
 dotenv.config();
 console.log('process.env.MONGO_URL', process.env.URI);
@@ -40,6 +41,7 @@ console.log('process.env.MONGO_URL', process.env.URI);
     MilestonesModule,
     ProposalModule,
     BillingModule,
+    MyRedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
