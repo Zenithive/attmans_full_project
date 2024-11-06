@@ -557,7 +557,8 @@ const ExhibitionsPage: React.FC = () => {
                         ({!exhibition.exhbTime ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT) : exhibition.dateTime} {exhibition.exhbTime || ''})
                       </Box>
                     </Typography>
-                    <Typography variant="h5" sx={{ fontSize: 'medium', marginBottom: '10px' }}>{exhibition.description}</Typography>
+                    <Typography variant="h5" sx={{ fontSize: 'medium', marginBottom: '10px' , wordBreak: 'break-word',
+                          whiteSpace: 'normal',}}>{exhibition.description}</Typography>
                     <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.industries}</Typography>
                     <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.subjects}</Typography>
                   </CardContent>
