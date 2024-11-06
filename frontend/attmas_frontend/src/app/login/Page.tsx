@@ -20,4 +20,4 @@ const Page = () => {
 
 // srt 
 
-export default Page;
+export default Page; 
