@@ -9,7 +9,7 @@ import * as dotenv from 'dotenv';
 import { ProfileModule } from './profile/profile.module';
 import { ExhibitionModule } from './exhibition/exhibition.module';
 import { JobsModule } from './projects/projects.module';
-import { ApplyModule } from './apply/apply.module'; 
+import { ApplyModule } from './apply/apply.module';
 import { BoothModule } from './booth/booth.module';
 import { EmailModule } from 'src/notificationEmail/Exebitionemail.module';
 import { InterestedUserModule } from './intrestedUser/interestedUser.module';
