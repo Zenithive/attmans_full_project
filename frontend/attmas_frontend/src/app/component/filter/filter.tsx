@@ -21,8 +21,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({ value, onChange, options })
         bottom: '63px',
         '@media (max-width: 767px)': {
           position: 'relative',
-          top: '10px',
-          left: '-24px'
+          left: '88px'
         }
       }}
     >
