@@ -251,7 +251,7 @@ const Exhibition = () => {
   }}
 >
   <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
-    Exhibition
+    Exhibitions
   </Typography>
 
   <Box
