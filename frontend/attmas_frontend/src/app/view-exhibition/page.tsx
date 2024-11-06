@@ -586,7 +586,7 @@ const ExhibitionsPage: React.FC = () => {
               {!isExhibitionClosed(selectedExhibition) && (
 
 
-                <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px' } }}>
+                <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px',left:"-45px" } }}>
                   {userType !== 'Visitors' && (
                     <ToggleButtonGroup
                       value={view}

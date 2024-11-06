@@ -258,7 +258,8 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="body1" sx={{ mb: 2, fontSize: '1.25rem', '@media (max-width: 767px)': { position: 'relative', fontSize: '1.25rem' } }}>
+                  <Typography variant="body1" sx={{ mb: 2, fontSize: '1.25rem',wordBreak: 'break-word',
+                    whiteSpace: 'normal', '@media (max-width: 767px)': { position: 'relative', fontSize: '1.25rem' } }}>
                     <strong>Description: </strong>{booth.description}
                   </Typography>
                 </Grid>
