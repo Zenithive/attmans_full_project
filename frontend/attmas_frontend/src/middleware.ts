@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const isAuthenticated = checkAuth(request);
 
   // Define the routes where authenticated users should be redirected
-  const authRoutes = ['/', '/signup'];
+  const authRoutes = ['/', '/signup']; 
 
   // If the request is for the sign-in or sign-up route and the user is authenticated
   if (authRoutes.includes(request.nextUrl.pathname)) {
