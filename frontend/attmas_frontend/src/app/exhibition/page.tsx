@@ -239,32 +239,50 @@ const Exhibition = () => {
         },
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          '@media (max-width: 767px)': {
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-          },
-        }}
-      >
-        <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
-          Exhibitions
-        </Typography>
+     <Box
+  sx={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    '@media (max-width: 767px)': {
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    },
+  }}
+>
+  <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
+    Exhibitions
+  </Typography>
 
-        <Box sx={{ mr: 2, display: "flex", gap: 2 }}> 
-          <Box sx={{ flex: '0 1 auto' }}> 
-            <Filters column={column} onFilter={changeFilterOrPage} />
-          </Box>
-          <Box sx={{ flex: '0 1 auto' }}>
-            <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
-          </Box>
-        </Box>
+  <Box
+    sx={{
+      display: 'flex',
+      gap: 2,
+      '@media (max-width: 767px)': {
+        flexDirection: 'column',
+        width: '100%',     
+        alignItems: 'flex-start',
+        gap: 1,
+      },
+    }}
+  >
+    <Box sx={{ flex: '0 1 auto', '@media (max-width: 767px)':{
+      width:'fit-content',
+      position:'relative',
+      right:'21%',
+      bottom:'35px'
+    }}}>
+      <Filters column={column} onFilter={changeFilterOrPage} />
+    </Box>
+    <Box sx={{ flex: '0 1 auto','@media (max-width: 767px)':{
+      position:'relative',
+      bottom:'20px'
+    } }}>
+      <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+    </Box>
+  </Box>
+</Box>
 
-
-      </Box>
       {userType === "Admin" && <Box
         sx={{
           display: 'flex',
@@ -275,8 +293,7 @@ const Exhibition = () => {
           top: "8px",
           '@media (max-width: 767px)': {
             position: 'relative',
-            right: '-106px',
-            top: '-27px',
+            left:'52px'
           },
         }}
       >

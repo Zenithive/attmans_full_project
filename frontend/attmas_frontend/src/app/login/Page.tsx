@@ -18,6 +18,6 @@ const Page = () => {
   );
 };
 
+// srt 1 
 
-
-export default Page;
+export default Page; 

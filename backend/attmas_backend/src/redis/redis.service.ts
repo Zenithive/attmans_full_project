@@ -7,8 +7,8 @@ export class MyService {
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   // Store session ID in Redis
-  async setMessage(key: string, value: string): Promise<void> {
-    await this.redis.set(key, value);
+  async setMessage(key: string, value1: string): Promise<void> {
+    await this.redis.set(key, value1);
   }
 
   // Retrieve session ID from Redis
