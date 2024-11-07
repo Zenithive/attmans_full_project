@@ -340,6 +340,8 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                           <Typography variant="body1" sx={{ marginBottom: '15px', fontSize: '1.25rem' }}><strong>Name:</strong> {product.productName}</Typography>
                           <Typography variant="body1" sx={{ marginBottom: '15px', fontSize: '1.25rem' }}><strong>Description:</strong> {product.productDescription}</Typography>
                           <Typography variant="body1" sx={{ fontSize: '1.25rem' }}><strong>Price:</strong> {product.currency === 'USD' ? '$' : '₹'}{product.productPrice}</Typography>
+            
+                      
                           <Box sx={{
                             mt: 1, '@media (max-width: 767px)': {
                               position: 'relative',
@@ -366,6 +368,13 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                                 <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
                               </IconButton>
                             </Tooltip>
+                            <TableCell sx={{display:'flex',float:'left',paddingTop:'6px'}}>
+                                <Tooltip title="View Details" placement="top" arrow>
+                                  <IconButton>
+                                    <VisibilityIcon onClick={() => handleViewProduct(product)} />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
                           </Box>
                         </CardContent>
                       </Card>
