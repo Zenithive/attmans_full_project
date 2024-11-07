@@ -366,6 +366,13 @@ const BoothDetailsDialog: React.FC<BoothDetailsDialogProps> = ({ open, onClose, 
                                 <YouTubeIcon style={{ fontSize: '40px', position: 'relative' }} />
                               </IconButton>
                             </Tooltip>
+                            <TableCell sx={{display:'flex',float:'left',paddingTop:'6px'}}>
+                                <Tooltip title="View Details" placement="top" arrow>
+                                  <IconButton>
+                                    <VisibilityIcon onClick={() => handleViewProduct(product)} />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
                           </Box>
                         </CardContent>
                       </Card>

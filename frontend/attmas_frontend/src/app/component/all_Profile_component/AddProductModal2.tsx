@@ -150,6 +150,10 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     border: '1px solid #000',
                     boxShadow: 24,
                     p: 4,
+                    '@media (max-width: 754px)': {
+                        width: '80%', 
+                        p: 2, 
+                        },
                 }}
             >
                 <Typography variant="h6" component="h2" mb={2}>
