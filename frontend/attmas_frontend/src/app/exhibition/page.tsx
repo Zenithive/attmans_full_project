@@ -20,6 +20,7 @@ import { categories } from '../constants/categories';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { DATE_TIME_FORMAT } from '../constants/common.constants';
 import axiosInstance from '../services/axios.service';
+import { translationsforMyProjectPage } from '../../../public/trancation';
 
 interface Exhibition {
   _id?: string;
@@ -59,6 +60,10 @@ const Exhibition = () => {
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; exhibition: Exhibition | null }>({ open: false, exhibition: null });
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforMyProjectPage[language as keyof typeof translationsforMyProjectPage] || translationsforMyProjectPage.english;
+
   const { userType, _id: userId, username } = userDetails;
 
   const column: Array<FilterColumn> = [
@@ -239,49 +244,53 @@ const Exhibition = () => {
         },
       }}
     >
-     <Box
-  sx={{
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    '@media (max-width: 767px)': {
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-    },
-  }}
->
-  <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
-    Exhibitions
-  </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          '@media (max-width: 767px)': {
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+          },
+        }}
+      >
+        <Typography component="h2" sx={{ marginY: 0, fontSize: "20px" }}>
+          {t.exhibition}
+        </Typography>
 
-  <Box
-    sx={{
-      display: 'flex',
-      gap: 2,
-      '@media (max-width: 767px)': {
-        flexDirection: 'column',
-        width: '100%',     
-        alignItems: 'flex-start',
-        gap: 1,
-      },
-    }}
-  >
-    <Box sx={{ flex: '0 1 auto', '@media (max-width: 767px)':{
-      width:'fit-content',
-      position:'relative',
-      right:'21%',
-      bottom:'35px'
-    }}}>
-      <Filters column={column} onFilter={changeFilterOrPage} />
-    </Box>
-    <Box sx={{ flex: '0 1 auto','@media (max-width: 767px)':{
-      position:'relative',
-      bottom:'20px'
-    } }}>
-      <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
-    </Box>
-  </Box>
-</Box>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            '@media (max-width: 767px)': {
+              flexDirection: 'column',
+              width: '100%',
+              alignItems: 'flex-start',
+              gap: 1,
+            },
+          }}
+        >
+          <Box sx={{
+            flex: '0 1 auto', '@media (max-width: 767px)': {
+              width: 'fit-content',
+              position: 'relative',
+              right: '21%',
+              bottom: '35px'
+            }
+          }}>
+            <Filters column={column} onFilter={changeFilterOrPage} />
+          </Box>
+          <Box sx={{
+            flex: '0 1 auto', '@media (max-width: 767px)': {
+              position: 'relative',
+              bottom: '20px'
+            }
+          }}>
+            <AddExhibition editingExhibition={editingExhibition} onCancelEdit={handleCancelEdit} />
+          </Box>
+        </Box>
+      </Box>
 
       {userType === "Admin" && <Box
         sx={{
@@ -293,7 +302,7 @@ const Exhibition = () => {
           top: "8px",
           '@media (max-width: 767px)': {
             position: 'relative',
-            left:'52px'
+            left: '52px'
           },
         }}
       >
@@ -316,7 +325,7 @@ const Exhibition = () => {
         next={() => setPage(prev => prev + 1)}
         hasMore={hasMore}
         loader={<Typography>Loading...</Typography>}
-        endMessage={<Typography>No more Exhibitions</Typography>}
+        endMessage={<Typography>{t.nomoreexhibitions}</Typography>}
       >
         <Box sx={{ mt: 2 }}>
           {/* {exhibitions.map((exhibition) => (

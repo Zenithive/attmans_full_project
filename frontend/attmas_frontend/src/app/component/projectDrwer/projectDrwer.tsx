@@ -20,6 +20,7 @@ import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { APPLY_STATUSES, PROJECT_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
+import { translationsforProjectDrawer } from '../../../../public/trancation';
 
 
 
@@ -106,6 +107,10 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   const [currentApplicationId, setCurrentApplicationId] = useState<string | null>(null);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforProjectDrawer[language as keyof typeof translationsforProjectDrawer] || translationsforProjectDrawer.english;
+
   const currentUser = userDetails.username;
   const currentUserId = userDetails._id;
   const currentUserType = userDetails.userType;
@@ -371,7 +376,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
       >
         <DialogTitle>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '25px' }}>
-            Project Details Information
+            {/* Project Details Information */}
+            {t.ProjectDetailsInformation}
             <IconButton
               edge="start"
               color="inherit"
@@ -396,7 +402,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={userType === "Admin" ? 6 : 12}>
                   <TextField
-                    label="Title"
+                    label={t.title}
                     value={viewingJob.title}
                     fullWidth
                     color='secondary'
@@ -406,7 +412,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 {userType === "Admin" ? <Grid item xs={12} sm={6}>
                   <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                    <b>Project Owner: &nbsp;</b>
+                    <b>{t.projectOwner}: &nbsp;</b>
                     <a
                       href="javascript:void(0);"
                       onClick={(e) => {
@@ -423,7 +429,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid> : ''}
                 <Grid item xs={12} sm={5}>
                   <TextField
-                    label="Select Service"
+                    label={t.selectService}
                     value={viewingJob.SelectService}
                     fullWidth
                     color='secondary'
@@ -433,7 +439,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={3}>
                   <TextField
-                    label="Created Date"
+                    label={t.createdDate}
                     value={dayjs(viewingJob.createdAt).format(DATE_FORMAT)}
                     fullWidth
                     color='secondary'
@@ -444,7 +450,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
                 <Grid item xs={12} sm={3}>
                   <TextField
-                    label="Timeframe"
+                    label={t.timeframe}
                     value={dayjs(viewingJob.TimeFrame).format(DATE_FORMAT)}
                     fullWidth
                     color='secondary'
@@ -454,7 +460,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
-                    label="Description"
+                    label={t.description}
                     value={viewingJob.description}
                     fullWidth
                     multiline
@@ -465,7 +471,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 {viewingJob.SelectService[0] !== 'Innovative product' && <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Expertise Level"
+                   label={t.expertiseLevel}
                     value={viewingJob.Expertiselevel}
                     fullWidth
                     color='secondary'
@@ -477,7 +483,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   <>
                     <Grid item xs={12}>
                       <TextField
-                        label="Details Of Innovation Challenge"
+                        label={t.detailsOfInnovationChallenge}
                         value={viewingJob.DetailsOfInnovationChallenge}
                         fullWidth
                         multiline
@@ -488,7 +494,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Sector"
+                        label={t.sector}
                         value={viewingJob.Sector}
                         fullWidth
                         color='secondary'
@@ -498,7 +504,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Quantity"
+                        label={t.quantity}
                         value={viewingJob.Quantity}
                         fullWidth
                         color='secondary'
@@ -508,7 +514,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
-                        label="Product Description"
+                        label={t.productDescription}
                         value={viewingJob.ProductDescription}
                         fullWidth
                         multiline
@@ -521,7 +527,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 )}
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Budget"
+                   label={t.budget}
                     value={`${viewingJob.currency === 'USD' ? '$' : '₹'} ${viewingJob.Budget}`}
                     fullWidth
                     color='secondary'
@@ -531,7 +537,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Preferred Category"
+                    label={t.preferredCategory}
                     value={viewingJob.Category.join(', ')}
                     fullWidth
                     multiline
@@ -542,7 +548,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Subject Matter Expertise "
+                    label={t.subjectMatterExpertise}
                     value={viewingJob.Subcategorys.join(', ')}
                     fullWidth
                     multiline
@@ -553,7 +559,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Objective"
+                    label={t.objective}
                     value={viewingJob.Objective}
                     fullWidth
                     multiline
@@ -564,7 +570,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Expected Outcomes"
+                    label={t.expectedOutcomes}
                     value={viewingJob.Expectedoutcomes}
                     fullWidth
                     multiline
@@ -575,7 +581,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label="IPR Ownership"
+                   label={t.iprOwnership}
                     value={viewingJob.IPRownership}
                     fullWidth
                     multiline
@@ -640,7 +646,7 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
               <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
                 <DialogTitle sx={{ fontSize: '25px' }}>
-                  Applications for Project
+                {t.applicationsForProject}
                 </DialogTitle>
               </Box>
 

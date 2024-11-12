@@ -23,6 +23,7 @@ import Filters, { FilterColumn } from '../component/filter/filter.component';
 import { pubsub } from '../services/pubsub.service';
 import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProjectStatusChip';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { translationsforMyProjectPage } from '../../../public/trancation';
 
 
 const MyProject = () => {
@@ -57,6 +58,9 @@ const MyProject = () => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { userType, _id: userId } = userDetails;
+
+    const language = userDetails.language || 'english';
+    const t = translationsforMyProjectPage[language as keyof typeof translationsforMyProjectPage] || translationsforMyProjectPage.english;
 
     const column: Array<FilterColumn> = [
         {
@@ -162,7 +166,7 @@ const MyProject = () => {
         if (applicationId) {
             const currentProjectObj = resJob.find(a => a.applies?.find(b => b._id === applicationId))
             currentProjectObj && handleViewJob(currentProjectObj);
-        }else if(projectId){
+        } else if (projectId) {
             const currentProjectObj = resJob.find(a => a._id === projectId);
             currentProjectObj && handleViewJob(currentProjectObj);
         }
@@ -220,10 +224,10 @@ const MyProject = () => {
         const fetchAppliedJobsForAdmin = async () => {
             try {
                 const response = await axiosInstance.get(`${APIS.APPLIED_JOBSFORADMIN}/status/Awarded`);
-                
+
                 setApplicationsBasedOnUser(response.data);
                 const fetchedAppliedJobsForAdmin = response.data.map((application: Apply) => application.jobId);
-               
+
                 setAppliedJobsForAdmin(fetchedAppliedJobsForAdmin);
             } catch (error) {
                 console.error('Error fetching applied jobs:', error);
@@ -271,7 +275,7 @@ const MyProject = () => {
     };
 
     const handleViewJob = (job: Job) => {
-        setViewingJob({...job, firstName: job.userId.firstName, lastName: job.userId.lastName});
+        setViewingJob({ ...job, firstName: job.userId.firstName, lastName: job.userId.lastName });
         setApplyOpen(false);
     };
 
@@ -364,7 +368,7 @@ const MyProject = () => {
                     },
                 }}
             >
-                <Typography component="h2" sx={{ marginY: 0 }}>My Projects</Typography>
+                <Typography component="h2" sx={{ marginY: 0 }}>{t.myproject}</Typography>
                 <Filters
                     column={column}
                     onFilter={changeFilterOrPage}                // onFilter={changeFilterOrPage}
@@ -406,7 +410,7 @@ const MyProject = () => {
                             next={() => setPage(prev => prev + 1)}
                             hasMore={hasMore}
                             loader={<Typography>Loading...</Typography>}
-                            endMessage={<Typography>No more Projects</Typography>}
+                            endMessage={<Typography>{t.nomoreproject}</Typography>}
                         >
 
                             <Box sx={{ mt: 2 }}>
@@ -816,10 +820,10 @@ const MyProject = () => {
 
 const SuspenseMyProjectPage: React.FC = () => {
     return (
-      <Suspense fallback={<div>Loading...</div>}>
-        <MyProject />
-      </Suspense>
+        <Suspense fallback={<div>Loading...</div>}>
+            <MyProject />
+        </Suspense>
     );
-  };
+};
 
 export default SuspenseMyProjectPage;

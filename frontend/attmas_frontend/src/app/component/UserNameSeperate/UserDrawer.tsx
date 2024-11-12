@@ -7,9 +7,12 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ProductTable, { Product } from '../ProductTable';
 import { ProductForBooth } from '../ProductTableForBooth';
-import { APIS, SERVER_URL } from '@/app/constants/api.constant';
+import { APIS } from '@/app/constants/api.constant';
 import axiosInstance from '@/app/services/axios.service';
 import NewProductTable from '../all_Profile_component/NewProductTable';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { translationsforDetails } from '../../../../public/trancation';
 
 interface User {
   _id: string;
@@ -42,6 +45,10 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
   const [productDetails, setProductDetails] = useState<ProductForBooth[]>([]);
   const [user, setUser] = useState<User>({} as User);
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const language = userDetails.language || 'english';
+  const t = translationsforDetails[language as keyof typeof translationsforDetails] || translationsforDetails.english;
 
   const convertToProductForBooth = (product: Product): ProductForBooth => {
     return {
@@ -132,13 +139,13 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
         </IconButton>
         <>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
-            Detailed Information
+            {t.detailedInformation}
           </Typography>
 
 
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
-              label="User Name"
+              label={t.userName}
               value={`${user.firstName} ${user.lastName}`}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -150,7 +157,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
 
             <TextField
-              label="Email"
+              label={t.email}
               value={user.username}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -164,7 +171,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
-              label="Mobile Number"
+              label={t.mobileNumber}
               value={user.mobileNumber}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -176,7 +183,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
 
             <TextField
-              label="User Type"
+              label={t.userType}
               value={user.userType}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -189,7 +196,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
-              label="Sector"
+              label={t.sector}
               value={user.sector}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -201,7 +208,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
 
             <TextField
-              label="Organization"
+              label={t.organization}
               value={user.organization}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -215,7 +222,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
 
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
-              label="Preferred Category"
+              label={t.preferredCategory}
               value={user?.categories?.join(', ')}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -227,7 +234,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
             />
 
             <TextField
-              label="Subject Matter Expertise "
+              label={t.subjectMatterExpertise}
               value={user?.subcategories?.join(', ')}
               InputProps={{ readOnly: true }}
               InputLabelProps={{ shrink: true }}
@@ -240,7 +247,7 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
           </Box>
           <Box sx={{ marginBottom: '20px' }}>
             <TextField
-              label="Headline"
+              label={t.headline}
               multiline
               value={user?.Headline}
               InputProps={{ readOnly: true }}
@@ -259,7 +266,8 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
                   style={{ background: "white", borderRadius: "25px" }}
                   id="productToMarket"
                   color='secondary'
-                  label="Product to Market"
+                  // label="Product to Market"
+                  label={t.producttomarket1}
                   name="productToMarket"
                   InputProps={{ readOnly: true }}
                   InputLabelProps={{ shrink: true }}
@@ -275,7 +283,8 @@ const UserDrawer: React.FC<UserDrawerProps> = ({ open, onClose, username }) => {
               style={{ background: "white", borderRadius: "25px" }}
               id="hasPatent"
               color='secondary'
-              label="Do you have a patent?"
+              // label="Do you have a patent?"
+              label={t.doyouhavepatent}
               name="hasPatent"
               value={user.hasPatent}
               InputProps={{ readOnly: true }}

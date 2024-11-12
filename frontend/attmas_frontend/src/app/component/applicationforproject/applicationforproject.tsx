@@ -17,6 +17,7 @@ import { Message } from '@mui/icons-material';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import MyMilestones from './mymilestones.component';
+import { translationsforApplicationsForProject } from '../../../../public/trancation';
 
 export interface MilestoneCommentType {
     comment: string;
@@ -110,6 +111,10 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     const [view, setView] = useState<'applications' | 'billing'>('applications');
     const [submittedMilestones, setSubmittedMilestones] = useState<Milestone[]>([]);
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const language = userDetails.language || 'english';
+const t = translationsforApplicationsForProject[language as keyof typeof translationsforApplicationsForProject] || translationsforApplicationsForProject.english;
+
     const [openModal, setOpenModal] = useState(false);
     const [paymentDetails, setPaymentDetails] = useState({
         milestoneText: '',
@@ -322,7 +327,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
     return (
         <Box>
             <Box sx={{ position: 'relative', top: '30px', marginBottom: '20px' }}>
-                <Typography variant="h5" sx={{ marginBottom: '15px' }}>Applications for Project</Typography>
+                <Typography variant="h5" sx={{ marginBottom: '15px' }}>{t.applicationsForProject}</Typography>
                 <ToggleButtonGroup
                     value={view}
                     exclusive
@@ -350,7 +355,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
                                                 <Box sx={{ flex: 1 }}>
                                                     <TextField
-                                                        label="Title"
+                                                        label={t.title}
                                                         value={app.title}
                                                         fullWidth
                                                         multiline
@@ -360,7 +365,7 @@ const ApplicationsForProject: React.FC<ApplicationsForProjectProps> = ({
                                                 </Box>
                                                 {userType == 'Admin' && <Box sx={{ flex: 1 }}>
                                                     <TextField
-                                                        label="Applied User"
+                                                        label={t.appliedUser}
                                                         value={`${app.firstName} ${app.lastName}`}
                                                         fullWidth
                                                         multiline

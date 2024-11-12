@@ -25,6 +25,7 @@ import axiosInstance from '../services/axios.service';
 import { pubsub } from '../services/pubsub.service';
 import ProjectDrawer from '../component/projectDrwer/projectDrwer';
 import Filters, { FilterColumn } from '../component/filter/filter.component';
+import { translationsforMyProjectPage } from '../../../public/trancation';
 
 export interface Proposal {
     _id: string;
@@ -128,7 +129,8 @@ interface JobDetails {
 
 const proposal = () => {
 
-    const { userType } = useAppSelector(selectUserSession);;
+    const { userType } = useAppSelector(selectUserSession);
+
 
     const column: Array<FilterColumn> = [
         {
@@ -206,6 +208,9 @@ const proposal = () => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
     const { _id: userId } = userDetails;
+
+    const language = userDetails.language || 'english';
+    const t = translationsforMyProjectPage[language as keyof typeof translationsforMyProjectPage] || translationsforMyProjectPage.english;
 
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -297,7 +302,7 @@ const proposal = () => {
     }, [fetchAppliedJobs]);
     // Function to handle viewing job details
     const handleViewJob = (job: Job, isOpenProjectModal?: boolean) => {
-        isOpenProjectModal && setViewingJob({...job, userId: {...job.userId, username: job.username}});
+        isOpenProjectModal && setViewingJob({ ...job, userId: { ...job.userId, username: job.username } });
         // setViewingJob(job);
         setSelectedProject(job);
         setApplyOpen(false);
@@ -305,21 +310,21 @@ const proposal = () => {
     };
 
     const handleNextStep = (values: any) => {
-        
+
         setFormValues((prevValues) => {
             return { ...prevValues, ...values };
         });
-    
+
         setStep((prevStep) => prevStep + 1);
     };
-    
+
 
     const handlePreviousStep = (values: any) => {
         setFormValues((prevValues) => {
             return { ...prevValues, ...values };
         });
 
-        setStep((prevStep) => {            
+        setStep((prevStep) => {
             return prevStep - 1;
         });
     };
@@ -520,7 +525,7 @@ const proposal = () => {
                     </Typography>
                 )}
                 {userDetails.userType === 'Admin' && (
-                    <Typography variant="h4">All Proposals</Typography>
+                    <Typography variant="h4">{t.allproposal}</Typography>
                 )}
 
                 {userDetails.userType === 'Project Owner' && (
@@ -572,7 +577,7 @@ const proposal = () => {
                                                 </Typography>
                                             )}
 
-                                            {(proposal.Status === PROPOSAL_STATUSES.notAwarded || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded || proposal.Status === PROPOSAL_STATUSES.pending || proposal.Status === PROPOSAL_STATUSES.proposalUnderReview)  && <Link
+                                            {(proposal.Status === PROPOSAL_STATUSES.notAwarded || proposal.Status === PROPOSAL_STATUSES.approvedAndAwarded || proposal.Status === PROPOSAL_STATUSES.pending || proposal.Status === PROPOSAL_STATUSES.proposalUnderReview) && <Link
                                                 component="button"
                                                 // variant="contained"
                                                 color="primary"
