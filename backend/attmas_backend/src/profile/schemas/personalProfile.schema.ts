@@ -68,6 +68,9 @@ export class PersonalProfile extends Document {
 
   @Prop({ required: false })
   username: string;
+
+  @Prop({ required: false, enum: ['english', 'gujarati'] })
+  language: string; // Added language field
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(PersonalProfile);

@@ -31,11 +31,13 @@ const EditProfile1: React.FC = () => {
     country: '',
     linkedIn: '',
     billingAddress: '',
+    language:'',
     username: userDetails.username,
   };
 
   const validationSchema = Yup.object({
     gender: Yup.string().required('Required'),
+    language: Yup.string().required('Required'),
     address: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
     state: Yup.string().required('Required'),

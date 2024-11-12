@@ -2,12 +2,24 @@
 import React from 'react';
 import { Grid, TextField, MenuItem } from '@mui/material';
 import { useFormikContext } from 'formik';
+import { translations } from '../../../../public/trancation';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 
 const ProfileFormFields: React.FC = () => {
   const { values, handleChange, handleBlur, touched, errors } = useFormikContext<any>();
 
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const dispatch = useAppDispatch();
+
+  const language = userDetails.language || 'english';
+  const t = translations[language as keyof typeof translations] || translations.english;
+
   const getHelperText = (field: string) => {
-    return touched[field] && typeof errors[field] === 'string' ? errors[field] : undefined;
+    const translation = t as { [key: string]: string }; // Type assertion
+    return touched[field] && typeof errors[field] === 'string' 
+      ? errors[field] || translation[field] 
+      : undefined;
   };
 
   return (
@@ -20,7 +32,7 @@ const ProfileFormFields: React.FC = () => {
           multiline
           rows={6}
           id="address"
-          label="Address"
+          label={t.address} // Use translated label
           color="secondary"
           name="address"
           onChange={handleChange}
@@ -44,9 +56,29 @@ const ProfileFormFields: React.FC = () => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
+          select
+          style={{ background: 'white', borderRadius: '25px' }}
+          id="language"
+          label= {t.language}// Use translated label
+          color="secondary"
+          name="language"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          value={values.language}
+          error={touched.language && Boolean(errors.language)}
+        >
+          <MenuItem value="english">English</MenuItem>
+          <MenuItem value="gujarati">Gujarati</MenuItem>
+          {/* Add more languages as needed */}
+        </TextField>
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
           style={{ background: 'white', borderRadius: '25px' }}
           id="city"
-          label="City"
+          label={t.city} // Use translated label
           color="secondary"
           name="city"
           onChange={handleChange}
@@ -62,7 +94,7 @@ const ProfileFormFields: React.FC = () => {
           fullWidth
           style={{ background: 'white', borderRadius: '25px' }}
           id="state"
-          label="State"
+          label={t.state} // Use translated label
           color="secondary"
           name="state"
           onChange={handleChange}
@@ -78,7 +110,7 @@ const ProfileFormFields: React.FC = () => {
           fullWidth
           style={{ background: 'white', borderRadius: '25px' }}
           id="pinCode"
-          label="Pin Code"
+          label={t.pinCode} // Use translated label
           color="secondary"
           name="pinCode"
           onChange={handleChange}
@@ -94,7 +126,7 @@ const ProfileFormFields: React.FC = () => {
           fullWidth
           style={{ background: 'white', borderRadius: '25px' }}
           id="country"
-          label="Country"
+          label={t.country} // Use translated label
           color="secondary"
           name="country"
           onChange={handleChange}
@@ -110,7 +142,7 @@ const ProfileFormFields: React.FC = () => {
           fullWidth
           style={{ background: 'white', borderRadius: '25px' }}
           id="linkedIn"
-          label="LinkedIn"
+          label={t.linkedIn} // Use translated label
           color="secondary"
           name="linkedIn"
           onChange={handleChange}
@@ -127,7 +159,7 @@ const ProfileFormFields: React.FC = () => {
           select
           style={{ background: 'white', borderRadius: '25px' }}
           id="gender"
-          label="Gender"
+          label={t.gender} // Use translated label
           color="secondary"
           name="gender"
           onChange={handleChange}
@@ -149,7 +181,7 @@ const ProfileFormFields: React.FC = () => {
           rows={6}
           style={{ background: 'white', borderRadius: '25px' }}
           id="billingAddress"
-          label="Billing Address"
+          label={t.billingAddress} // Use translated label
           color="secondary"
           name="billingAddress"
           onChange={handleChange}

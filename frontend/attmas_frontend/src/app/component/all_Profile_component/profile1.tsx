@@ -7,11 +7,12 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { APIS } from '@/app/constants/api.constant';
 import ProfileFormFields from '../ProfileSeprateComponent/ProfileFormFields1';
-import { useAppSelector } from '@/app/reducers/hooks.redux';
-import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '@/app/reducers/hooks.redux';
+import { addUser, selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { pubsub } from '@/app/services/pubsub.service';
 import defaultProfileImg from '../../assets/Zenithithive Logo Black PNG  (1).png'
 import axiosInstance from '@/app/services/axios.service';
+import { translations } from '../../../../public/trancation';
 
 
 const defaultProfileImgSrc = defaultProfileImg || defaultProfileImg;
@@ -26,6 +27,14 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
   const [loading, setLoading] = React.useState(false);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  const dispatch = useAppDispatch();
+
+  // Type for language keys
+type LanguageKeys = keyof typeof translations;
+const language: LanguageKeys = userDetails.language as LanguageKeys || 'english';
+
+// Example usage:
+const t = translations[language] || translations.english;
 
   const initialValues = {
     gender: '',
@@ -37,25 +46,25 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
     linkedIn: '',
     billingAddress: '',
     username: userDetails.username,
+    language: userDetails.language || '', // Assuming language is available in userDetails
   };
 
   const validationSchema = Yup.object({
-    gender: Yup.string().required('Required'),
-    address: Yup.string().required('Required'),
-    city: Yup.string().required('Required'),
-    state: Yup.string().required('Required'),
-    // pinCode: Yup.string().required('Required'),
-    pinCode: Yup.string()
-      .required('Required')
-      .matches(/^[0-9]+$/, 'Must be only digits'),
-    country: Yup.string().required('Required'),
-    linkedIn: Yup.string().url('Invalid URL').required('Required'),
-    billingAddress: Yup.string().required('Required'),
+    gender: Yup.string().required(t.required || 'Required'),
+    address: Yup.string().required(t.required|| 'Required'),
+    city: Yup.string().required(t.required|| 'Required'),
+    state: Yup.string().required(t.required|| 'Required'),
+    // pinCode: Yup.string()
+    //   .required(t.required)
+    //   .matches(/^[0-9]+$/, 'Must be only digits'),
+    country: Yup.string().required(t.required|| 'Required'),
+    linkedIn: Yup.string().url('Invalid URL').required(t.required|| 'Required'),
+    billingAddress: Yup.string().required(t.required|| 'Required'),
   });
 
   const handleSubmit = async (values: typeof initialValues) => {
     if (!profilePhoto) {
-      alert('Profile photo is required');
+      alert(t.profilePhotoRequired);
       return;
     }
     setLoading(true);
@@ -71,15 +80,23 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      const updatedUser = {
+        ...userDetails,
+        language: values.language,
+      };
+
+      dispatch(addUser(updatedUser));
+
       pubsub.publish('toast', {
-        message: 'Profile updated successfully!',
+        message: t.profileUpdated,
         severity: 'success',
       });
-      onNext(); // Call onNext when the form is submitted
+      onNext();
     } catch (error) {
       console.error('Error submitting form:', error);
       pubsub.publish('toast', {
-        message: 'Failed to update profile. Please try again.',
+        message: t.profileUpdateFailed,
         severity: 'error',
       });
     } finally {
@@ -110,13 +127,10 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
         }}
       >
         <Typography component="h1" variant="h5" align="center">
-          Personal Details
+          {t.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-          {/* <h1>  */}
-
-          View and Change your personal details here
-          {/* </h1> */}
+          {t.description}
         </Typography>
 
         <Formik
@@ -180,7 +194,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
                   position: { xs: 'relative', md: 'static' }, 
                 }}
               >
-                Save & Next
+                {t.saveNext}
               </LoadingButton>
 
             </Form>

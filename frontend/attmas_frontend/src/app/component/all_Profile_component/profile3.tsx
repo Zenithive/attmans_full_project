@@ -16,6 +16,30 @@ interface ProfileForm3Props {
   onPrevious: () => void;
 }
 
+// Translations object
+export const translationsforCategory = {
+  english: {
+    title: 'Subject matter expertise',
+    description: 'View and Change your Subject matter expertise here',
+    saveButtonText: 'Save',
+    backButtonText: 'Back',
+    profileUpdated: 'Profile updated successfully!',
+    profileUpdateFailed: 'Failed to update profile. Please try again later.',
+    preferredCategory: 'Preferred Category',
+    updatebutton: 'Update Subject matter expertise'
+  },
+  gujarati: {
+    title: 'વિષય વિષય નિષ્ણાત',
+    description: 'અહીં તમારી વિષય વિષય નિષ્ણાતને જુઓ અને બદલો',
+    saveButtonText: 'સાચવો',
+    backButtonText: 'પાછા',
+    profileUpdated: 'પ્રોફાઇલ સફળતાપૂર્વક સુધારવામાં આવી!',
+    profileUpdateFailed: 'પ્રોફાઇલ સુધારવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.',
+    preferredCategory : 'પસંદગીની શ્રેણી',
+    updatebutton:'વિષયની કુશળતાને અપડેટ કરો'
+  },
+};
+
 const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -23,6 +47,10 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control the modal
   const router = useRouter();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  // Determine the preferred language
+  const language = userDetails.language || 'english';
+  const t = translationsforCategory[language as keyof typeof translationsforCategory] || translationsforCategory.english;  // Get the translation based on preferredLanguage
 
   const formik = useFormik({
     initialValues: {
@@ -36,7 +64,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
       try {
         await axiosInstance.post(`${APIS.FORM3}?username=${userDetails.username}`, values);
         pubsub.publish('toast', {
-          message: 'Profile updated successfully!',
+          message: t.profileUpdated,
           severity: 'success',
         });
         setTimeout(() => {
@@ -45,7 +73,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
       } catch (error) {
         console.error('Error updating profile:', error);
         pubsub.publish('toast', {
-          message: 'Failed to update profile. Please try again later.',
+          message: t.profileUpdateFailed,
           severity: 'error',
         });
       } finally {
@@ -122,10 +150,10 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
         }}
       >
         <Typography component="h1" variant="h5" align="center">
-          Subject matter expertise
+          {t.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-          View and Change your Subject matter expertise here
+          {t.description}
         </Typography>
 
         {fetchError && (
@@ -155,7 +183,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
                 <TextField
                   {...params}
                   variant="outlined"
-                  label="Preferred Category"
+                  label={t.preferredCategory || 'Preferred Category'}
                   placeholder="Select categories"
                   color="secondary"
                   sx={{ width: '100%' }}
@@ -198,7 +226,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               sx={{ px: 3, py: 1 }}
               onClick={onPrevious}
             >
-              Back
+              {t.backButtonText}
             </Button>
 
             <LoadingButton
@@ -210,7 +238,7 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
               sx={{ px: 3, py: 1 }}
               color="primary"
             >
-              Save
+              {t.saveButtonText}
             </LoadingButton>
           </Box>
         </Box>
