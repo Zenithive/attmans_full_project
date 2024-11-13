@@ -19,11 +19,17 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
 import { useMediaQuery, Theme } from '@mui/material';
 import { getRoleBasedAccess } from '../services/user.access.service';
+import { translationsforSidebar } from '../../../public/trancation';
 
 export const drawerWidth = 240;
 
 export default function MainSideBar() {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforSidebar[language as keyof typeof translationsforSidebar] || translationsforSidebar.english;
+
+
 
   const [isClient, setIsClient] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
@@ -52,7 +58,7 @@ export default function MainSideBar() {
       icon: () => (
         <DashboardCustomizeIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Dashboard",
+      Name: t.dashboard,
       isVisible: (isAdmin || isFreelancer || isProjectOwner || isInnovator)
     },
     {
@@ -60,23 +66,23 @@ export default function MainSideBar() {
       icon: () => (
         <GroupIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Innovators",
-      isVisible: (isAdmin )
+      Name: t.innovators,
+      isVisible: (isAdmin)
     },
     {
       path: '/freelancers',
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Freelancers",
-      isVisible: (isAdmin )
+      Name: t.freelancers,
+      isVisible: (isAdmin)
     },
     {
       path: '/projectowner',
       icon: () => (
         <BusinessIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Project Owner",
+      Name: t.projectOwner,
       isVisible: isAdmin
     },
     {
@@ -84,7 +90,7 @@ export default function MainSideBar() {
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Projects",
+      Name: t.projects,
       isVisible: (isAdmin || isFreelancer || isProjectOwner || isInnovator)
     },
 
@@ -93,15 +99,15 @@ export default function MainSideBar() {
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "My Project",
-      isVisible: (isAdmin ||isFreelancer || isProjectOwner || isInnovator)
+      Name: t.myProjects,
+      isVisible: (isAdmin || isFreelancer || isProjectOwner || isInnovator)
     },
     {
       path: '/proposal',
       icon: () => (
         <WorkIcon sx={{ fontSize: 22 }} />
       ),
-      Name: "Proposal",
+      Name: t.proposal,
       isVisible: (isFreelancer || isAdmin || isProjectOwner)
     },
     {
@@ -109,7 +115,7 @@ export default function MainSideBar() {
       icon: () => (
         <Diversity1Icon sx={{ fontSize: 22 }} />
       ),
-      Name: "Exhibition",
+      Name: t.exhibition,
       isVisible: (isAdmin || isProjectOwner || isInnovator || isVisitor)
     },
   ];

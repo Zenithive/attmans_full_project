@@ -9,6 +9,7 @@ import { pubsub } from '@/app/services/pubsub.service';
 import * as Yup from 'yup';
 import { Proposal } from '@/app/proposal/page';
 import { formValues } from './ProposalStep1';
+import { translationsforProposal } from '../../../../public/trancation';
 
 interface ProposalStep3Props {
   initialValues?: Proposal | formValues | null;
@@ -20,6 +21,11 @@ interface ProposalStep3Props {
 const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, onPrevious, readOnly = false }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
   const [isChecked, setIsChecked] = useState(false); // State to manage checkbox
+
+
+    const language = userDetails.language || 'english';
+    const t = translationsforProposal[language as keyof typeof translationsforProposal] || translationsforProposal.english;
+
 
   // Get current date
   const currentDate = dayjs(new Date()).format(DATE_FORMAT);
@@ -57,7 +63,9 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 color='secondary'
                 rows={4}
                 as={TextField}
-                label="Other Commitments of the Proposal Owner and Time Share on the Project"
+                // label="Other Commitments of the Proposal Owner and Time Share on the Project"
+                label={t.otherCommitments}
+
                 multiline
                 fullWidth
                 disabled={readOnly}
@@ -73,7 +81,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 rows={4}
                 name="progressReportTemplate"
                 as={TextField}
-                label="Progress Report Template and Periodicity"
+                // label="Progress Report Template and Periodicity"
+                label={t.progressReport}
                 multiline
                 fullWidth
                 disabled={readOnly}
@@ -87,7 +96,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
               <Field
                 name="milestones"
                 as={TextField}
-                label="Milestones"
+                // label="Milestones"
+                label={t.milestones}
                 color='secondary'
                 rows={4}
                 multiline
@@ -106,7 +116,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 rows={4}
                 as={TextField}
                 multiline
-                label="Expected Total Number of Days for R&D Project Completion"
+                // label="Expected Total Number of Days for R&D Project Completion"
+                label={t.totalDaysR}
                 fullWidth
                 disabled={readOnly}
               />
@@ -121,7 +132,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 color='secondary'
                 rows={4}
                 as={TextField}
-                label="Strengths of the Lab, Equipment, and Infrastructure (Equipment Number/ID)"
+                // label="Strengths of the Lab, Equipment, and Infrastructure (Equipment Number/ID)"
+                label={t.strengthsLab }
                 multiline
                 fullWidth
                 disabled={readOnly}
@@ -137,7 +149,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 color='secondary'
                 rows={4}
                 as={TextField}
-                label="External Equipment Needed from Other Institutes or National Facilities"
+                // label="External Equipment Needed from Other Institutes or National Facilities"
+                label={t.externalEquipment}
                 multiline
                 fullWidth
                 disabled={readOnly}
@@ -153,7 +166,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 color='secondary'
                 rows={4}
                 as={TextField}
-                label="Pilot Production and Testing - Facilities Available or Support Needed"
+                // label="Pilot Production and Testing - Facilities Available or Support Needed"
+                label={t.pilotProductionTesting}
                 multiline
                 fullWidth
                 disabled={readOnly}
@@ -169,7 +183,8 @@ const ProposalStep3: React.FC<ProposalStep3Props> = ({ initialValues, onSubmit, 
                 color='secondary'
                 rows={4}
                 as={TextField}
-                label="Specific Mentoring by Industry Partner Required?"
+                // label="Specific Mentoring by Industry Partner Required?"
+                label={t.mentoringRequired}
                 multiline
                 fullWidth
                 disabled={readOnly}

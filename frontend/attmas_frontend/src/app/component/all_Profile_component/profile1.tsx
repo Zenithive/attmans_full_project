@@ -54,9 +54,9 @@ const t = translations[language] || translations.english;
     address: Yup.string().required(t.required|| 'Required'),
     city: Yup.string().required(t.required|| 'Required'),
     state: Yup.string().required(t.required|| 'Required'),
-    // pinCode: Yup.string()
-    //   .required(t.required)
-    //   .matches(/^[0-9]+$/, 'Must be only digits'),
+    pinCode: Yup.string()
+      .required(t.required)
+      .matches(/^[0-9]+$/, 'Must be only digits'),
     country: Yup.string().required(t.required|| 'Required'),
     linkedIn: Yup.string().url('Invalid URL').required(t.required|| 'Required'),
     billingAddress: Yup.string().required(t.required|| 'Required'),

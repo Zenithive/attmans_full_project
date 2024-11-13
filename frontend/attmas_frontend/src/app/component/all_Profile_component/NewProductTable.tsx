@@ -6,6 +6,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import AddProductModal2 from './AddProductModal2'; // Import your AddProductModal2 component
 import { Product } from '../ProductTable'; // Assuming Product interface includes productPrice and currency
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { translationsforNewProductTable } from '../../../../public/trancation';
 
 interface NewProductTableProps {
     products?: Product[];
@@ -31,6 +34,11 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onEdit, onD
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforNewProductTable[language as keyof typeof translationsforNewProductTable] || translationsforNewProductTable.english;
+
     const handleView = (product: Product) => {
         setSelectedProduct(product); // Set the selected product
         setIsModalOpen(true); // Open the modal
@@ -47,12 +55,12 @@ const NewProductTable: React.FC<NewProductTableProps> = ({ products, onEdit, onD
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Product Name</TableCell>
-                            <TableCell>Price</TableCell>
-                            <TableCell>Quantity</TableCell>
-                            <TableCell>Stage of Development</TableCell> {/* New column */}
-                            <TableCell>Video</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>{t.productName}</TableCell>
+                            <TableCell>{t.price}</TableCell>
+                            <TableCell>{t.quantity}</TableCell>
+                            <TableCell>{t.stageOfDevelopment}</TableCell> {/* New column */}
+                            <TableCell>{t.video}</TableCell>
+                            <TableCell>{t.actions}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

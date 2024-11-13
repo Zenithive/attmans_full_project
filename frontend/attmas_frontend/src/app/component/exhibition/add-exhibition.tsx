@@ -23,6 +23,7 @@ import { formatToLocal, formatToUTC } from '@/app/services/date.service';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { EXHIBITION_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforCreateExhibition } from '../../../../public/trancation';
 interface Exhibition {
     _id?: string;
     title: string;
@@ -61,6 +62,10 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
     const [usernames, setUsernames] = React.useState<string[]>([]);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
+  const language = userDetails.language || 'english';
+  const t = translationsforCreateExhibition[language as keyof typeof translationsforCreateExhibition] || translationsforCreateExhibition.english;
     const { userType } = userDetails;
 
     const initialValues = React.useMemo(() => ({
@@ -162,7 +167,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                 }
             }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
-                    <h2>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
+                    <h2>{editingExhibition ? t.editExhibition : t.createExhibition}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
@@ -188,7 +193,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                         <Form onSubmit={handleSubmit}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: "relative", left: "15px" }}>
                                 <TextField
-                                    label="Title"
+                                    label={t.title}
                                     name="title"
                                     variant="outlined"
                                     color='secondary'
@@ -200,7 +205,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     helperText={<ErrorMessage name="title" />}
                                 />
                                 <TextField
-                                    label="Description"
+                                    label={t.description}
                                     name="description"
                                     variant="outlined"
                                     color='secondary'
@@ -214,7 +219,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     helperText={<ErrorMessage name="description" />}
                                 />
                                 <TextField
-                                    label="Video Url"
+                                    label={t.videoUrl}
                                     name="videoUrl"
                                     variant="outlined"
                                     color='secondary'
@@ -228,7 +233,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                 />
 
                                 <TextField
-                                    label="Meeting Url"
+                                    label={t.meetingUrl}
                                     name="meetingUrl"
                                     variant="outlined"
                                     color='secondary'
@@ -245,6 +250,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     <InputLabel id="status-label" color='secondary'>Status</InputLabel>
                                     <Select
                                         labelId="status-label"
+                                        // label={t.status}
                                         id="status"
                                         name="status"
                                         color='secondary'
@@ -281,7 +287,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            label="Preferred Industries"
+                                            label={t.preferredIndustries}
                                             color='secondary'
                                             placeholder="Select industries"
                                             error={!!(errors.categoryforIndustries && touched.categoryforIndustries)}

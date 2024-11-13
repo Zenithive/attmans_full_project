@@ -32,6 +32,8 @@ import { ProductForBooth } from '../ProductTableForBooth';
 import NewProductTable from '../all_Profile_component/NewProductTable';
 import { Product } from '../ProductTable';
 import { pubsub } from '@/app/services/pubsub.service';
+import { translationsforApplyDetails } from '../../../../public/trancation';
+
 
 
 
@@ -84,7 +86,7 @@ interface Apply {
   availableSolution: string;
   SolutionUSP: string;
   userId?: UserSchema;
-  username:string;
+  username: string;
   products?: ProductForBooth[];
   applyType?: "FreelancerApply" | "InnovatorsApply";
 }
@@ -131,6 +133,11 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
   const [buttonsHidden, setButtonsHidden] = useState<{ [key: string]: boolean }>({});
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+  
+
+  const language = userDetails.language || 'english';
+  const t = translationsforApplyDetails[language as keyof typeof translationsforApplyDetails] || translationsforApplyDetails.english;
+
 
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [checkedProducts, setCheckedProducts] = useState<ProductForBooth[]>([]);
@@ -200,7 +207,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
       fetchUserProfile();
     }
   }, [apply?.username]);
-  
+
 
 
 
@@ -332,7 +339,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
         }}
       >
         <DialogTitle sx={{ m: 0, p: 2 }}>
-          Apply Details
+          {/* Apply Details */}
+          {t.applyDetails}
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -386,7 +394,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
               <Grid container spacing={2} flexDirection={'column'}>
                 <Grid item xs={12} sm={5}>
                   <TextField
-                    label="Title"
+                    label={t.title}
                     value={apply.title}
                     fullWidth
                     color='secondary'
@@ -396,7 +404,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
-                    label="Description"
+                    label={t.description}
                     value={apply.description}
                     multiline
                     fullWidth
@@ -407,7 +415,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    label="Budget"
+                    label={t.budget}
                     value={`${apply.currency === 'USD' ? '$' : '₹'}${apply.Budget}`}
                     fullWidth
                     color='secondary'
@@ -541,7 +549,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                     </Grid>
                   </Paper>
                 )}
-          
+
                 <Grid item xs={12}>
                   {milestones.map((milestone, index) => (
                     <Card key={index} variant="outlined" sx={{ mb: 2 }}>
@@ -552,7 +560,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                         <Grid container spacing={2}>
                           <Grid item xs={12}>
                             <TextField
-                              label="Scope of Work"
+                              label={t.scopeOfWork}
                               value={milestone.scopeOfWork}
                               multiline
                               fullWidth
@@ -570,7 +578,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                       <Grid container spacing={2}>
                                         <Grid item xs={12}>
                                           <TextField
-                                            label="Milestone"
+                                            label={t.milestone}
                                             value={m.name.text || 'No text available'}
                                             multiline
                                             fullWidth
@@ -584,7 +592,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                                           <Grid container spacing={3}>
                                             <Grid item xs={12} sm={5}>
                                               <TextField
-                                                label="Milestone Deadline Date"
+                                                label={t.milestoneDeadline}
                                                 value={m.name.timeFrame ? dayjs(m.name.timeFrame).format(DATE_FORMAT) : 'No time frame available'}
                                                 fullWidth
                                                 color='secondary'
@@ -692,7 +700,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                 {apply.applyType === 'FreelancerApply' && (<>
                   <Grid item xs={12}>
                     <TextField
-                      label="Other available solutions"
+                      label={t.otherSolutions}
                       value={apply.availableSolution}
                       fullWidth
                       multiline
@@ -703,7 +711,7 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Solution USP"
+                      label={t.solutionUSP}
                       value={apply.SolutionUSP}
                       fullWidth
                       multiline

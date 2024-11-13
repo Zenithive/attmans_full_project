@@ -21,6 +21,8 @@ import CircleIcon from '@mui/icons-material/Circle';
 import { CommonAvatar } from './common-ui/avatar.component';
 import axiosInstance from '../services/axios.service';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { translationsforNotification } from '../../../public/trancation';
+
 
 interface Email {
   _id: string;
@@ -72,6 +74,11 @@ export default function MainNavBar() {
   const [notifications, setNotifications] = React.useState<Email[]>([]);
 
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+const t = translationsforNotification[language as keyof typeof translationsforNotification] || translationsforNotification.english;
+
+
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -610,10 +617,10 @@ export default function MainNavBar() {
       </Box>
       <Divider />
       <MenuItem onClick={handleProfileRedirect}>
-        <Typography variant="body2">Profile</Typography>
+        <Typography variant="body2">{t.profile}</Typography>
       </MenuItem>
       <MenuItem onClick={handleLogout}>
-        <Typography variant="body2">Log out</Typography>
+        <Typography variant="body2">{t.logout}</Typography>
       </MenuItem>
     </Menu>
   );
@@ -638,14 +645,14 @@ export default function MainNavBar() {
     >
       <Box sx={{ width: 400 }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold', px: 2, py: 1 }}>
-          Notifications
+          {t.notifications}
         </Typography>
 
         <TabContext value={value}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example" indicatorColor='secondary' textColor='secondary'>
-              <Tab label="Unread" value="1" sx={{ fontSize: 12 }} />
-              <Tab label="Read" value="2" sx={{ fontSize: 12 }} />
+              <Tab label={t.read} value="1" sx={{ fontSize: 12 }} />
+              <Tab label={t.unread} value="2" sx={{ fontSize: 12 }} />
             </TabList>
           </Box>
           <TabPanel value="1">
@@ -710,7 +717,8 @@ export default function MainNavBar() {
         {notifications.length === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', px: 2 }}>
             <Typography variant="body2" sx={{ fontSize: '0.875rem', py: 1 }}>
-              No new notifications.
+              {/* No new notifications. */}
+              {t.Nonewnotifications}
             </Typography>
           </Box>
         )}

@@ -521,7 +521,8 @@ const proposal = () => {
             >
                 {userDetails.userType === 'Freelancer' && (
                     <Typography component="h4" sx={{ marginY: 0 }}>
-                        My Projects Proposals
+                        {/* My Projects Proposals ///////// */}
+                        {t.MyProjectsProposals}
                     </Typography>
                 )}
                 {userDetails.userType === 'Admin' && (
@@ -804,7 +805,7 @@ const proposal = () => {
                                 ))}
                             </Box>
                         ) : (
-                            <Typography>No projects available</Typography>
+                            <Typography>{t.Noprojectsavailable}</Typography>
                         )}
                     </>
                 )}

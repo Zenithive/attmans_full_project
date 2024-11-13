@@ -8,6 +8,9 @@ import {
     Typography,
     MenuItem
 } from '@mui/material';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { translationsforAddProductModal2 } from '../../../../public/trancation';
 
 export interface Product {
     id: string;
@@ -54,6 +57,14 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
     const [challengesorrisks, setChallengesorrisks] = React.useState('');
     const [productPrice, setProductPrice] = React.useState(0);
     const [currency, setCurrency] = React.useState('INR');
+
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const language = userDetails.language || 'english';
+    const t = translationsforAddProductModal2[language as keyof typeof translationsforAddProductModal2] || translationsforAddProductModal2.english;
+  
+
+
 
     useEffect(() => {
         if (product) {
@@ -158,7 +169,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                 }}
             >
                 <Typography variant="h6" component="h2" mb={2}>
-                    {viewOnly ? 'View Product Details' : (product ? 'Edit Product Details' : 'Add Product Details')}
+                    {viewOnly ? t.viewProductDetails : (product ? t.editProductDetails : t.addProductDetails)}
                 </Typography>
 
                 <Grid container spacing={2}>
@@ -166,7 +177,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
-                            label="Product Name"
+                            label={t.productName}
                             color="secondary"
                             value={productName}
                             onChange={(e) => !viewOnly && setProductName(e.target.value)}
@@ -178,7 +189,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                         <TextField
                             fullWidth
                             rows={4}
-                            label="Product Description"
+                            label={t.productDescription}
                             multiline
                             color="secondary"
                             value={productDescription}
@@ -191,7 +202,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                         <TextField
                             fullWidth
                             rows={4}
-                            label="How Does the Solution Work?"
+                            label={t.howDoesSolutionWork}
                             multiline
                             color="secondary"
                             value={howdoesthesolutionwork}
@@ -203,7 +214,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
-                            label="Product Quantity"
+                            label={t.productQuantity}
                             color="secondary"
                             type="number"
                             value={productQuantity}
@@ -215,7 +226,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
-                            label="Video URL"
+                            label={t.videoURL}
                             color="secondary"
                             value={videourlForproduct}
                             onChange={(e) => !viewOnly && setVideourlForproduct(e.target.value)}
@@ -226,7 +237,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
-                            label="Product Price"
+                            label={t.productPrice}
                             color="secondary"
                             type="number"
                             value={productPrice}
@@ -239,7 +250,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                         <TextField
                             select
                             fullWidth
-                            label="Currency"
+                            label={t.currency}
                             color="secondary"
                             value={currency}
                             onChange={(e) => !viewOnly && setCurrency(e.target.value)}
@@ -254,7 +265,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                         <TextField
                             select
                             fullWidth
-                            label="Stage of Development"
+                            label={t.stageOfDevelopment}
                             color="secondary"
                             value={stageofdevelopmentdropdown}
                             onChange={(e) => !viewOnly && setStageofdevelopmentdropdown(e.target.value)}
@@ -284,7 +295,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
-                            label="Target Audience"
+                            label={t.targetAudience}
                             color="secondary"
                             value={targetaudience}
                             onChange={(e) => !viewOnly && setTargetaudience(e.target.value)}
@@ -295,7 +306,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                     <Grid item xs={6}>
                         <TextField
                             fullWidth
-                            label="Technology Used"
+                            label={t.technologyUsed}
                             color="secondary"
                             value={technologyused}
                             onChange={(e) => !viewOnly && setTechnologyused(e.target.value)}
@@ -308,7 +319,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             fullWidth
                             multiline
                             rows={4}
-                            label="Problem Addressed"
+                            label={t.problemAddressed}
                             color="secondary"
                             value={problemaddressed}
                             onChange={(e) => !viewOnly && setProblemaddressed(e.target.value)}
@@ -321,7 +332,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             fullWidth
                             multiline
                             rows={4}
-                            label="Competitive Advantages"
+                            label={t.competitiveAdvantages}
                             color="secondary"
                             value={CompetitiveAdvantages}
                             onChange={(e) => !viewOnly && setCompetitiveAdvantages(e.target.value)}
@@ -334,7 +345,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             fullWidth
                             multiline
                             rows={4}
-                            label="Feasibility of the Solution"
+                            label={t.feasibilityOfSolution}
                             color="secondary"
                             value={feasibilityofthesolution}
                             onChange={(e) => !viewOnly && setFeasibilityofthesolution(e.target.value)}
@@ -347,7 +358,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             fullWidth
                             multiline
                             rows={4}
-                            label="Potential Benefits"
+                            label={t.potentialBenefits}
                             color="secondary"
                             value={potentialbenefits}
                             onChange={(e) => !viewOnly && setPotentialbenefits(e.target.value)}
@@ -360,7 +371,7 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                             fullWidth
                             multiline
                             rows={4}
-                            label="Challenges or Risks"
+                            label={t.challengesOrRisks}
                             color="secondary"
                             value={challengesorrisks}
                             onChange={(e) => !viewOnly && setChallengesorrisks(e.target.value)}
@@ -373,11 +384,11 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                 <Box mt={2} display="flex" justifyContent="flex-end">
                     {!viewOnly && (
                         <Button onClick={handleSave} variant="contained" color="primary">
-                            Save
+                            {t.save}
                         </Button>
                     )}
                     <Button onClick={handleClose} variant="outlined" color="secondary" sx={{ ml: 2 }}>
-                        Close
+                        {t.close}
                     </Button>
                 </Box>
             </Box>

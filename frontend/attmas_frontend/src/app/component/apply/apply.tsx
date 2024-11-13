@@ -18,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforCreateApply } from '../../../../public/trancation';
 
 interface AddApplyProps {
   open: boolean;
@@ -79,6 +80,13 @@ const validationSchema = Yup.object().shape({
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescription }: AddApplyProps) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforCreateApply[language as keyof typeof translationsforCreateApply] || translationsforCreateApply.english;
+
+
+
+
   const [fetchError, setFetchError] = React.useState<string | null>(null);
 
   const initialValues = {
@@ -164,7 +172,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
       onClose={() => handleCancel}
     >
       <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
-        <h2>Apply</h2>
+        <h2>{t.apply}</h2>
         <IconButton aria-label="close" onClick={handleCancel} sx={{ p: 0, right: 0 }}>
           <CloseIcon />
         </IconButton>
@@ -175,7 +183,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
           <Form onSubmit={handleSubmit}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: 'relative', left: '15px' }}>
               <TextField
-                label="Title"
+                label={t.title}
                 name="title"
                 color='secondary'
                 value={values.title}
@@ -187,7 +195,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
                 helperText={<ErrorMessage name="title" />}
               />
               <TextField
-                label="Description"
+                label={t.description}
                 name="description"
                 color='secondary'
                 variant="outlined"
@@ -207,7 +215,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
                 <TextField
 
                   name="Budget"
-                  label="Budget"
+                  label={t.budget}
                   type="number"
                   color='secondary'
                   value={values.Budget}
@@ -258,14 +266,16 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
                     {values.milestones.map((milestoneGroup, index) => (
                       <Paper key={index} elevation={2} sx={{ p: 2, mt: 1 }}>
                         <Typography variant="h5" gutterBottom sx={{ marginBottom: '40px' }}>
-                          Scope of Work
+                          {/* Scope of Work */}
+                          {t.scopeOfWork}
                         </Typography>
 
                         <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'medium' }}>
-                          Add Specific activities, deliverables, timelines, and/or quality guidelines to ensure successful execution of the project.
+                          {t.scopeDetails}
+                          {/* Add Specific activities, deliverables, timelines, and/or quality guidelines to ensure successful execution of the project. */}
                         </Typography>
                         <TextField
-                          label="Scope of Work"
+                          label={t.scopeOfWork}
                           name={`milestones[${index}].scopeOfWork`}
                           value={milestoneGroup.scopeOfWork}
                           onChange={handleChange}
@@ -280,7 +290,8 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
                         />
 
                         <Typography variant="h6" sx={{ marginBottom: '20px', fontSize: 'medium' }}>
-                          Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client.
+                        {t.milestonesDescription}
+                          {/* Add milestones to help you break up the scope of work into smaller deliverables to track the project's progress. These can be viewed and modified by the client. */}
                         </Typography>
                         <FieldArray
                           name={`milestones[${index}].milestones`}
@@ -295,7 +306,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
                                 >
                                   <Grid item xs={12} sm={6}>
                                     <TextField
-                                      placeholder="Milestone..."
+                                      placeholder={t.milestone}
                                       name={`milestones[${index}].milestones[${milestoneIndex}].name.text`}
                                       value={milestone.name.text}
                                       onChange={handleChange}
@@ -311,7 +322,7 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                       <DatePicker
                                         format={DATE_FORMAT}
-                                        label="Milestone Deadline Date"
+                                        label={t.milestoneDeadlineDate}
                                         value={milestone.name.timeFrame ? dayjs(milestone.name.timeFrame) : null}
                                         onChange={(newValue) =>
                                           setFieldValue(`milestones[${index}].milestones[${milestoneIndex}].name.timeFrame`, newValue)
@@ -359,10 +370,11 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
 
 
               <Typography variant="h6" sx={{ fontSize: 'medium' }}>
-                What have been the flaws in current solution?*
+                {/* What have been the flaws in current solution?* */}
+                {t.flawsInSolution}
               </Typography >
               <TextField
-                placeholder="Write about other available solutions"
+                placeholder={t.otherSolutions}
                 name='availableSolution'
                 value={values.availableSolution}
                 onChange={handleChange}
@@ -377,10 +389,11 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
 
 
               <Typography variant="h6" sx={{ fontSize: 'medium' }}>
-                Positive and unique results do we expect to see from your solution?*
+                {/* Positive and unique results do we expect to see from your solution?* */}
+              {t.uniqueResults}
               </Typography >
               <TextField
-                placeholder="Write your solution USP here"
+                placeholder={t.solutionUSP}
                 name='SolutionUSP'
                 value={values.SolutionUSP}
                 onChange={handleChange}
