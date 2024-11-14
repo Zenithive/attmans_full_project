@@ -1,3 +1,4 @@
+
 export const innovatorTerms = `
 Terms and Conditions for Innovator
 Welcome! Thank you for your interest in our platform. These Terms and Conditions
@@ -65,11 +66,12 @@ Ahmedabad shall have the sole jurisdiction in this regard.
 <b>12. Contact Us</b>
     ● If you have any questions about these Terms, please contact us at
       info@attmans.in
+
   `;
 
 
-
 export const freelancerTerms = `
+
    Terms and Conditions for PhD Scholar Research Collaborators/Supply side user
 These Terms and Conditions ("Terms") govern the use of the ATTMANS by PhD
 scholars acting as research collaborators ("Collaborators''). By registering and using the
@@ -130,10 +132,12 @@ Ahmedabad shall have the sole jurisdiction in this regard.
    ● The ATTMANS reserves the right to update these Terms at any time.
    ● Continued use of the ATTMANS after the update constitutes your agreement to
      the revised Terms.
+   
   `;
 
 
 export const projectOwnerTerms = `
+
 Welcome! These Terms and Conditions ("Terms") govern your access to and use of
 our platform (the "Platform") where you can connect with PhD scholars for research
 collaboration and purchase innovative products from independent innovators

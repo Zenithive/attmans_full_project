@@ -46,19 +46,22 @@ const TermsAndConditionsModal: React.FC<TermsAndConditionsModalProps> = ({ open,
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 800, // Increased width for a bigger modal
+          width: { xs: '90%', sm: '80%', md: '60%' },
           bgcolor: 'background.paper',
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
           maxHeight: '80vh', // to handle large text by scrolling
           overflowY: 'auto',
+         
         }}
       >
         <Typography id="terms-conditions-title" variant="h6" component="h2">
           Terms and Conditions
         </Typography>
-        <pre dangerouslySetInnerHTML={{ __html: termsToShow }}        ></pre>
+        <pre style={{
+            whiteSpace: 'pre-wrap',
+        }}  dangerouslySetInnerHTML={{ __html: termsToShow }}       ></pre>
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
           <Button variant="outlined" onClick={onClose} sx={{ mr: 2 }}>
             Cancel
