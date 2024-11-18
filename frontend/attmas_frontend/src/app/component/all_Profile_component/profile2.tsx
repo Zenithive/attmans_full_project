@@ -548,7 +548,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
 
                             <Grid item xs={12}>
-                                <Button
+                                {/* <Button
                                     type="button"
                                     variant="contained"
                                     size="small"
@@ -561,7 +561,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     onClick={onPrevious}
                                 >
                                     Back
-                                </Button>
+                                </Button> */}
 
                                 <LoadingButton
                                     type="submit"
