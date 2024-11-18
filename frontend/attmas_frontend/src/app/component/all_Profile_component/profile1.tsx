@@ -52,6 +52,7 @@ const ProfileForm1: React.FC<ProfileForm1Props> = ({ onNext }) => {
     linkedIn: Yup.string().url('Invalid URL').required('Required'),
     billingAddress: Yup.string().required('Required'),
   });
+  
 
   const handleSubmit = async (values: typeof initialValues) => {
     if (!profilePhoto) {
