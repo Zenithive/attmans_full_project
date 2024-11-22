@@ -218,16 +218,16 @@ const ProfileForm3: React.FC<ProfileForm3Props> = ({ onPrevious }) => {
             </Box>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-            <Button
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            {/* <Button
               type="button"
               variant="contained"
               size="small"
               sx={{ px: 3, py: 1 }}
               onClick={onPrevious}
             >
-              {t.backButtonText}
-            </Button>
+              Back
+            </Button> */} 
 
             <LoadingButton
               loading={loading}

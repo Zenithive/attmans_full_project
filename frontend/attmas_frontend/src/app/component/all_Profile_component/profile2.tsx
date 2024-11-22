@@ -313,7 +313,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                     '@media (max-width: 767px)': {
                         width: '105%',
                         position: 'relative',
-                        left: '7%'
+                        left: '-2%'
                     }
                 }}
             >
@@ -564,7 +564,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
 
                             <Grid item xs={12}>
-                                <Button
+                                {/* <Button
                                     type="button"
                                     variant="contained"
                                     size="small"
@@ -576,8 +576,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     }}
                                     onClick={onPrevious}
                                 >
-                                    {t.back}
-                                </Button>
+                                    Back
+                                </Button> */}
 
                                 <LoadingButton
                                     type="submit"
@@ -589,7 +589,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         mt: 2,
                                         mb: 2,
                                         ml: { xs: 'auto', md: '90%' },
-                                        width: { xs: '40%', md: '10%' },
+                                        width: { xs: '35%', md: '10%' },
                                         height: '40px',
                                         position: { xs: 'relative', md: 'static' },
                                         left: '40%'

@@ -75,6 +75,7 @@ const t = translations[language] || translations.english;
     linkedIn: Yup.string().url('Invalid URL').required('Required'),
     billingAddress: Yup.string().required('Required'),
   });
+  
 
   const handleSubmit = async (values: typeof initialValues) => {
     if (!profilePhoto) {
