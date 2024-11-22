@@ -231,7 +231,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
 
             {/* Manpower Details Table */}
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Manpower Details
+              {/* Manpower Details */}
+              {t.ManpowerDetails}
             </Typography>
             <TableContainer component={Paper}>
               <Table>

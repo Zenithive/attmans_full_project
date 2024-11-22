@@ -44,7 +44,7 @@ export const translations: { [key: string]: Translations } = {
     profileUpdateFailed: 'Failed to update profile. Please try again.',
     required: 'Required',
     profilePhotoRequired: 'Profile photo is required',
-    updatepersonal:'Update Personal Details',
+    updatepersonal: 'Update Personal Details',
   },
   gujarati: {
     title: 'વ્યક્તિગત વિગતો',
@@ -63,7 +63,7 @@ export const translations: { [key: string]: Translations } = {
     profileUpdateFailed: 'પ્રોફાઇલ સુધારવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.',
     required: 'જરૂરી',
     profilePhotoRequired: 'પ્રોફાઇલ ફોટો જરૂરી છે',
-    updatepersonal:'વ્યક્તિગત વિગતો અપડેટ કરો',
+    updatepersonal: 'વ્યક્તિગત વિગતો અપડેટ કરો',
 
   },
 };
@@ -75,12 +75,14 @@ export const translationsforProjectPage = {
   english: {
 
     projects: 'Projects',
-    nomoreproject: 'No more Projects'
+    nomoreproject: 'No more Projects',
+    viewproject: 'View Project',
   },
   gujarati: {
 
     projects: 'પ્રોજેક્ટ્સ',
-    nomoreproject: 'કોઈ વધુ પ્રોજેક્ટ્સ નથી'
+    nomoreproject: 'કોઈ વધુ પ્રોજેક્ટ્સ નથી',
+    viewproject: 'પ્રોજેક્ટ જુઓ',
   },
 };
 
@@ -91,6 +93,14 @@ export const translationsforProjectPage = {
 export const translationsforMyProjectPage = {
   english: {
 
+
+    projectOwnersName:'Project Owner Name:',
+    freelancerName:'Freelancer Name:',
+    viewproposal:'View Proposal',
+    viewproject:'View Project',
+    approve:'View Project',
+    reject:'View Project',
+    viewexhibition: 'View Exhibition',
     myproject: 'My Projects',
     nomoreproject: 'No more Projects',
     allproposal: 'All Proposals',
@@ -102,12 +112,21 @@ export const translationsforMyProjectPage = {
     Nomorefreelancers: 'No more freelancers',
     Innovators: 'Innovators',
     Nomoreinnovators: 'No more innovators',
-    MyProjectsProposals:'My Projects Proposals',
+    MyProjectsProposals: 'My Projects Proposals',
     Noprojectsavailable: 'No projects available'
 
   },
   gujarati: {
 
+
+    projectOwnersName:'પ્રોજેક્ટ માલિકનું નામ:',
+    freelancerName:'ફ્રીલાન્સર નામ:',
+    viewproposal:'દરખાસ્ત જુઓ',
+    viewproject:'પ્રોજેક્ટ જુઓ',
+    approve:'પ્રોજેક્ટ જુઓ',
+    reject:'પ્રોજેક્ટ જુઓ',
+
+    viewexhibition: 'પ્રદર્શન જુઓ',
     myproject: 'મારા પ્રોજેક્ટ્સ',
     nomoreproject: 'કોઈ વધુ પ્રોજેક્ટ્સ નથી',
     allproposal: 'તમામ દરખાસ્તો',
@@ -119,7 +138,7 @@ export const translationsforMyProjectPage = {
     Nomorefreelancers: 'કોઈ વધુ ફ્રીલાન્સર્સ નથી',
     Innovators: 'ઈનોવેટર્સ',
     Nomoreinnovators: 'કોઈ વધુ ઈનોવેટર્સ નથી',
-    MyProjectsProposals:'મારા પ્રોજેક્ટ્સ દરખાસ્તો',
+    MyProjectsProposals: 'મારા પ્રોજેક્ટ્સ દરખાસ્તો',
     Noprojectsavailable: 'કોઈ પ્રોજેક્ટ ઉપલબ્ધ નથી'
 
 
@@ -146,7 +165,7 @@ export const translationsforDetails = {
     productToMarket: 'Product to Market',
     hasPatent: 'Do you have a patent?',
     patentDetails: 'Patent Details',
-    
+
     researchProductDetails: 'Provide details about the research product or solution that you intend to commercialize',
     producttomarket1: 'Product to Market',
     doyouhavepatent: 'Do you have a patent?',
@@ -168,8 +187,8 @@ export const translationsforDetails = {
     hasPatent: 'શું તમારા પાસે પેટન્ટ છે?',
     patentDetails: 'પેટન્ટની વિગતો',
     researchProductDetails: 'તમે જે સંશોધન ઉત્પાદન અથવા ઉકેલને વ્યાપારીકરણ કરવા ઈચ્છો છો તેની વિગતો પૂરી પાડો',
-    producttomarket1:'પ્રોડક્ટ ટૂ માર્કેટ',
-    doyouhavepatent:'શું તમારી પાસે પેટન્ટ છે?'
+    producttomarket1: 'પ્રોડક્ટ ટૂ માર્કેટ',
+    doyouhavepatent: 'શું તમારી પાસે પેટન્ટ છે?'
   },
 };
 
@@ -181,8 +200,11 @@ export const translationsforDetails = {
 export const translationsforProjectDrawer = {
   english: {
 
+    viewDetails: 'View Details',
+    appliedUser: 'Applied User:',
+    noapplicationsfound: 'No application found',
     ProjectDetailsInformation: 'Project Details Information',
-    projectOwner:'Project Owner',
+    projectOwner: 'Project Owner',
     title: 'Title',
     selectService: 'Select Service',
     createdDate: 'Created Date',
@@ -203,6 +225,11 @@ export const translationsforProjectDrawer = {
   },
   gujarati: {
 
+    viewDetails: 'વિગતો જુઓ',
+
+    appliedUser: 'અરજી કરનાર વપરાશકર્તા:',
+
+    noapplicationsfound: 'કોઈ એપ્લિકેશન મળી નથી.',
     ProjectDetailsInformation: 'પ્રોજેક્ટ વિગતો માહિતી ',
     projectOwner: 'પ્રોજેક્ટ માલિક',
     title: 'શીર્ષક',
@@ -244,6 +271,59 @@ export const translationsforProjectDetailsInformation = {
     viewDetailsOfProject: 'પ્રોજેક્ટની વિગતો જુઓ'
   },
 };
+export const translationsforProjectCommentCard = {
+  english: {
+    projectDetailsInformation: 'Project Details Information',
+    comments: 'Comments',
+    nocommentsyet: 'No comments yet.',
+    ownerName: 'Owner Name',
+    viewDetailsOfProject: 'View Details of Project',
+    addacomment:'Add a comment',
+    commentneedtofill: 'Comment needs to be Filled',
+    SubmitComment : 'Submit Comment',
+    Submitting :'Submitting',
+    nopaymentavailable:'No payments available',
+    paymentDate:'Payment Date',
+    addpayment:'Add Payment',
+    approvedmilestone:'Approved Milestone',
+    currency:'Currency',
+    ammount: 'Amount',
+    // paymentDate: '',
+    category: 'Category',
+    submit: 'Submit',
+  
+
+
+
+  },
+  gujarati: {
+    projectDetailsInformation: 'પ્રોજેક્ટ વિગતો માહિતી',
+    comments: 'ટિપ્પણીઓ',
+    nocommentsyet: 'હજુ સુધી કોઈ ટિપ્પણીઓ નથી.',
+    ownerName: 'માલિકનું નામ',
+    viewDetailsOfProject: 'પ્રોજેક્ટની વિગતો જુઓ',
+    addacomment:'ટિપ્પણી ઉમેરો',
+    commentneedtofill: 'ટિપ્પણી ભરવાની જરૂર છે',
+    SubmitComment : 'ટિપ્પણી સબમિટ કરો',
+    Submitting :'સબમિટટીન્ગ',
+    nopaymentavailable:'નો પેમેન્ટ્સ અવાઇલાબલે',
+    paymentDate:'ચુકવણીની તારીખ',
+    addpayment:'ચુકવણી ઉમેરો',
+    approvedmilestone:'મંજૂર માઇલસ્ટોન્સ',
+    currency:'કરરએનસી',
+    ammount: 'રકમ',
+    category: 'શ્રેણી',
+    submit: 'સબમિટ',
+
+
+
+
+
+
+    
+
+  },
+};
 
 
 
@@ -255,12 +335,15 @@ export const translationsforApplicationsForProject = {
   english: {
     applicationsForProject: 'Applications for Project',
     title: 'Title',
-    appliedUser: 'Applied User'
+    appliedUser: 'Applied User',
+    addpayment:'Add Payment'
   },
   gujarati: {
     applicationsForProject: 'પ્રોજેક્ટ માટેની અરજી',
     title: 'શીર્ષક',
-    appliedUser: 'અરજી કરનાર વપરાશકર્તા'
+    appliedUser: 'અરજી કરનાર વપરાશકર્તા',
+    addpayment:'ચુકવણી ઉમેરો'
+
   },
 };
 
@@ -270,11 +353,16 @@ export const translationsforApplicationsForProject = {
 export const translationsforViewExhibition = {
   english: {
     exhibition: 'Exhibition',
-    boothDetails: 'Booth Details'
+    boothDetails: 'Booth Details',
+    viewDetails:'View Details',
+    noboothtodisplay:'No booths to display'
   },
   gujarati: {
     exhibition: 'પ્રદર્શન',
-    boothDetails: 'બૂથ વિગતો'
+    boothDetails: 'બૂથ વિગતો',
+    viewDetails:'વિગતો જુઓ',
+    noboothtodisplay:'પ્રદર્શિત કરવા માટે કોઈ બૂથ નથી'
+
   },
 };
 
@@ -311,17 +399,91 @@ export const translationsforNotification = {
     notifications: 'Notifications',
     unread: 'Unread',
     read: 'Read',
-    profile:'Profile',
-    logout:'Logout',
-    Nonewnotifications:'No new notifications.',
+    profile: 'Profile',
+    logout: 'Logout',
+    Nonewnotifications: 'No new notifications.',
+    commentneedtofill: 'Comment needs to be Filled'
   },
   gujarati: {
     notifications: 'સૂચનાઓ',
     unread: 'Unread',
     read: 'વાંચો',
-    profile:'પ્રોફાઇલ',
-    logout:'લોગઆઉટ',
-    Nonewnotifications:'કોઈ નવી સૂચનાઓ નથી.',
+    profile: 'પ્રોફાઇલ',
+    logout: 'લોગઆઉટ',
+    Nonewnotifications: 'કોઈ નવી સૂચનાઓ નથી.',
+    commentneedtofill: 'ટિપ્પણી ભરવાની જરૂર છે'
+
+
+  },
+};
+
+
+export const translationsforInnovatorApply = {
+  english: {
+    titleRequired: 'Title is required',
+    descriptionRequired: 'Description is required',
+    budgetRequired: 'Budget is required',
+    currencyRequired: 'Currency is required',
+    timeFrameRequired: 'Date & Time is required',
+    productsRequired: 'Only one product is acceptable',
+
+    apply: 'Apply',
+    cancel: 'Cancel',
+    title: 'Title',
+    budget: 'Budget',
+    currency: 'Currency',
+    description: 'Description',
+    timeFrame: 'Time Frame',
+    qualification: 'Qualification',
+    organization: 'Organization',
+    sector: 'Sector',
+    workAddress: 'Work Address',
+    designation: 'Designation',
+    doYouHavePatent: 'Do you have a patent?',
+    patentDetails: 'Patent Details',
+    noProducts: 'No products available',
+    categories: 'Categories',
+    subjectMatterExpertise: 'Subject Matter Expertise',
+    workaddress: 'Work Address',
+    noproductavailabe: 'No products available',
+    doyouhaveapatient: 'Do you have a patent?',
+    patientdetails: 'Patent Details',
+    categoriess: 'Categories',
+    subjectmatterexpertisess: 'Subject Matter Expertise'
+
+  },
+  gujarati: {
+    titleRequired: 'શીર્ષક જરૂરી છે',
+    descriptionRequired: 'વર્ણન જરૂરી છે',
+    budgetRequired: 'બજેટ જરૂરી છે',
+    currencyRequired: 'ચલણ જરૂરી છે',
+    timeFrameRequired: 'તારીખ અને સમય જરૂરી છે',
+    productsRequired: 'માત્ર એક જ ઉત્પાદન સ્વીકાર્ય છે',
+
+    apply: 'અરજી કરો',
+    cancel: 'રદ કરો',
+    title: 'શીર્ષક',
+    budget: 'બજેટ',
+    currency: 'ચલણ',
+    description: 'વર્ણન',
+    timeFrame: 'સમયચક્ર',
+    qualification: 'લાયકાત',
+    organization: 'સંસ્થા',
+    sector: 'સેક્ટર',
+    workAddress: 'કામનું સરનામું',
+    designation: 'હોદ્દો',
+    doYouHavePatent: 'શું તમારું પેટન્ટ છે?',
+    patentDetails: 'પેટન્ટ વિગતો',
+    noProducts: 'કોઈ ઉત્પાદનો ઉપલબ્ધ નથી',
+    categories: 'શ્રેણીઓ',
+    subjectMatterExpertise: 'વિષય વિશેષજ્ઞતા',
+    workaddress: 'કામનું સરનામું',
+    noproductavailabe: 'કોઈ ઉત્પાદનો ઉપલબ્ધ નથી',
+    doyouhaveapatient: 'શું તમારી પાસે પેટન્ટ છે?',
+    patientdetails: 'પેટન્ટ વિગતો',
+    categoriess: 'શ્રેણીઓ',
+    subjectmatterexpertisess: 'વિષયની નિપુણતા'
+
 
   },
 };
@@ -344,6 +506,69 @@ export const translationsforNewProductTable = {
     stageOfDevelopment: 'વિકાસનો ચરણ',
     video: 'વિડિયો',
     actions: 'ક્રિયાઓ'
+  },
+};
+
+
+export const translationsforProject = {
+  english: {
+    titleRequired: "Title is required",
+    descriptionRequired: "Description is required",
+    objectiveRequired: "Objective is required",
+    iprOwnershipRequired: "IPR ownership is required",
+    expectedOutcomesRequired: "Expected outcomes are required",
+    budgetRequired: "Budget is required",
+    timeFrameRequired: "Date & Time are required",
+    currencyRequired: "Currency is required",
+    title: 'Title',
+    description: 'Description',
+    detailsOfInnovationChallenge: 'Details of Innovation Challenge',
+    sector: 'Sector',
+    quantity: 'Quantity',
+    productDescription: 'Product Description',
+    expertiseLevel: 'Expertise Level',
+    budget: 'Budget',
+    preferredCategory: 'Preferred Category',
+    objective: 'Objective',
+    expectedOutcomes: 'Expected outcomes',
+    iprOwnership: 'IPR ownership',
+    timeFrame: 'Time Frame',
+    cancel: 'Cancel',
+    edit: 'Edit',
+    create: 'Create',
+    selectservice:'Select Service',
+    cancelButton: 'Cancel',
+
+  },
+  gujarati: {
+    titleRequired: "શીર્ષક જરૂરી છે",
+    descriptionRequired: "વર્ણન જરૂરી છે",
+    objectiveRequired: "ઉદ્દેશ્ય જરૂરી છે",
+    iprOwnershipRequired: "IPR માલિકી જરૂરી છે",
+    expectedOutcomesRequired: "અંદાજિત પરિણામો જરૂરી છે",
+    budgetRequired: "બજેટ જરૂરી છે",
+    timeFrameRequired: "તારીખ અને સમય જરૂરી છે",
+    currencyRequired: "કરન્સી જરૂરી છે",
+    title: 'શીર્ષક',
+    description: 'વર્ણન',
+    detailsOfInnovationChallenge: 'નવીનીકરણ પડકારનો વિસતૃત વિસેીષ',
+    sector: 'વિભાગ',
+    quantity: 'જથ્થો',
+    productDescription: 'ઉત્પાદન વર્ણન',
+    expertiseLevel: 'વિશેષજ્ઞતા સ્તર',
+    budget: 'બજેટ',
+    preferredCategory: 'પસંદગીની શ્રેણી',
+    objective: 'ઉદ્દેશ્ય',
+    expectedOutcomes: 'પ્રતિક્ષિત પરિણામો',
+    iprOwnership: 'IPR માલિકી',
+    timeFrame: 'સમય સીમા',
+    cancel: 'રદ કરો',
+    edit: 'સંપાદિત કરો',
+    create: 'બનાવો',
+    selectservice:'સેવા પસંદ કરો',
+    cancelButton: 'રદ કરો',
+
+
   },
 };
 
@@ -402,6 +627,13 @@ export const translationsforAddProductModal2 = {
 
 export const translationsforCreateExhibition = {
   english: {
+
+    titleRequired: 'Title is required',
+    descriptionRequired: 'Description is required',
+    videoUrlRequired: 'Video URL is required',
+    meetingUrlRequired: 'Meeting URL is required',
+    dateTimeRequired: 'Date is required',
+    exhbTimeRequired: 'Time is required',
     createExhibition: 'Create Exhibition',
     editExhibition: 'Edit Exhibition',
     title: 'Title',
@@ -412,6 +644,12 @@ export const translationsforCreateExhibition = {
     status: 'Status',
   },
   gujarati: {
+    titleRequired: 'શીર્ષક જરૂરી છે',
+    descriptionRequired: 'વર્ણન જરૂરી છે',
+    videoUrlRequired: 'વિડિયો URL જરૂરી છે',
+    meetingUrlRequired: 'મીટિંગ URL જરૂરી છે',
+    dateTimeRequired: 'તારીખ જરૂરી છે',
+    exhbTimeRequired: 'સમય જરૂરી છે',
     createExhibition: 'પ્રદર્શન બનાવો',
     editExhibition: 'પ્રદર્શન સંપાદિત કરો',
     title: 'શીર્ષક',
@@ -428,6 +666,9 @@ export const translationsforCreateExhibition = {
 
 export const translationsforProposal = {
   english: {
+
+    ManpowerDetails:'Manpower Details Table',
+
     submitProposal: 'Submit Proposal',
     industryProblemAim: 'Industry problem, aim and brief project summary',
     impactProductOutput: 'Impact/Product output envisaged with potential benefits',
@@ -467,6 +708,10 @@ export const translationsforProposal = {
     declaration: 'By checking the checkbox, I declare that, to the best of my knowledge, the information provided in this form is correct. I understand that if any false information is provided, it may result in the disqualification of the proposal.',
   },
   gujarati: {
+
+    ManpowerDetails:'માનવશક્તિ વિગતો કોષ્ટક',
+
+
     submitProposal: 'પ્રસ્તાવ સબમિટ કરો',
     industryProblemAim: 'ઉદ્યોગ સમસ્યા, હેતુ અને સંક્ષિપ્ત પ્રોજેક્ટ સંક્ષેપ',
     impactProductOutput: 'પ્રભાવ/ઉત્પાદન આઉટપુટ જેના સાથે સંભવિત ફાયદા',
@@ -519,6 +764,7 @@ export const translationsforApplyDetails = {
     milestoneDeadline: 'Milestone Deadline Date',
     otherSolutions: 'Other available solutions',
     solutionUSP: 'Solution USP',
+    appliedUser:'Applied User:',
   },
   gujarati: {
     applyDetails: 'લાગુ વિગતો',
@@ -530,6 +776,8 @@ export const translationsforApplyDetails = {
     milestoneDeadline: 'માઇલસ્ટોનની સમય મર્યાદા તારીખ',
     otherSolutions: 'અન્ય ઉપલબ્ધ ઉકેલો',
     solutionUSP: 'ઉકેલની અનોખી વિશેષતા',
+    appliedUser:'લાગુ વપરાશકર્તા:',
+
   },
 };
 
@@ -537,6 +785,18 @@ export const translationsforApplyDetails = {
 
 export const translationsforPROFILE2 = {
   english: {
+
+    // ********* yup
+
+    enterheadlineff:'Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.',
+    enterheadlinepp:'Provide details about the research product or solution that you intend to commercialize',
+    headline: 'Headline is required',
+    headlineOriginal: 'Headline',
+    provideDetails:'Provide details about the research product or solution that you intend to commercialize',
+    addProduct: 'Add Product',
+    qualificationr: 'Qualification is required',
+    required: 'Required',
+    currencyRequired: 'Currency is required',
     workExperience: 'Work Experience',
     workExperienceDescription: 'View and change your work experience here',
     qualification: 'Qualification',
@@ -552,10 +812,22 @@ export const translationsforPROFILE2 = {
         ? 'Provide details about the research product or solution that you intend to commercialize'
         : 'Patent Details',
     saveAndNext: 'Save & Next',
-    updateworkex:'Update Work Experience',
-    back:'Back'
+    updateworkex: 'Update Work Experience',
+    back: 'Back'
   },
   gujarati: {
+
+    enterheadlineff:'સંક્ષિપ્ત વાક્યો દાખલ કરો જે તમારી મુખ્ય કુશળતા અને કૌશલ્યોનો શ્રેષ્ઠ સારાંશ આપે છે, જેમ કે તમે તમારા LinkedIn પ્રોફાઇલના રેઝ્યૂમે પર કરશો.',
+    enterheadlinepp:'તમે જે રિસર્ચ પ્રોડક્ટ અથવા સોલ્યુશનનું વ્યાપારીકરણ કરવા માગો છો તેની વિગતો આપો.',
+    headline: 'હેડલાઇન જરૂરી છે',
+    headlineOriginal: 'હેડલાઇન',
+    provideDetails:'તમે જે રિસર્ચ પ્રોડક્ટ અથવા સોલ્યુશનનું વ્યાપારીકરણ કરવા માગો છો તેની વિગતો આપો', //////////
+
+    qualificationr: 'લાયકાત જરૂરી છે',
+    addProduct: 'ઉત્પાદન ઉમેરો',
+
+    required: 'જરૂરી',
+    currencyRequired: 'ચલણ જરૂરી છે',
     workExperience: 'કામનો અનુભવ',
     workExperienceDescription: 'તમારો કામનો અનુભવ અહીં જુઓ અને બદલો',
     qualification: 'લાયકાત',
@@ -565,14 +837,14 @@ export const translationsforPROFILE2 = {
     designation: 'હોદ્દો',
     userType: 'વપરાશકર્તા પ્રકાર',
     productToMarket: 'માર્કેટમાં પ્રોડક્ટ',
-    hasPatent: 'શું તમને પેટન્ટ છે?',
+    hasPatent: 'શું તમારી પાસે પેટન્ટ છે?',
     patentDetailsOrResearch: (userType: string) =>
       userType === 'Freelancer'
         ? 'તમે જે પ્રોડક્ટ અથવા ઉકેલનું વ્યાપારીકરણ કરવાનું વિચારતા હો તે વિશે વિગતો આપો'
         : 'પેટન્ટ વિગતો',
     saveAndNext: 'સાચવો અને આગળ વધો',
-    updateworkex:'કામનો અનુભવ અપડેટ કરો',
-    back:'પાછળ'
+    updateworkex: 'કામનો અનુભવ અપડેટ કરો',
+    back: 'પાછળ'
 
 
   },
@@ -587,9 +859,9 @@ export const translationsforEditstartingProfile = {
     lastName: 'Last Name',
     emailAddress: 'Email Address',
     mobileNumber: 'Mobile Number',
-    password:'Password',
-    savechanges:'Save Changes',
-    ChangePassword:'Change Password'
+    password: 'Password',
+    savechanges: 'Save Changes',
+    ChangePassword: 'Change Password'
   },
   gujarati: {
     editProfile: 'પ્રોફાઇલ સંપાદિત કરો',
@@ -597,10 +869,10 @@ export const translationsforEditstartingProfile = {
     lastName: 'અંતિમ નામ',
     emailAddress: 'ઇમેઇલ સરનામું',
     mobileNumber: 'મોબાઇલ નંબર',
-    password:'પાસવર્ડ',
-    savechanges:'ફેરફારો સાચવો',
-    ChangePassword:'પાસવર્ડ બદલો',
-    
+    password: 'પાસવર્ડ',
+    savechanges: 'ફેરફારો સાચવો',
+    ChangePassword: 'પાસવર્ડ બદલો',
+
 
 
   },
@@ -610,6 +882,22 @@ export const translationsforEditstartingProfile = {
 
 export const translationsforCreateApply = {
   english: {
+
+    productsRequired: 'At least one product is required to select.',
+    titleRequired: 'Title is required',
+    descriptionRequired: 'Description is required',
+    budgetRequired: 'Budget is required',
+    currencyRequired: 'Currency is required',
+    timeFrameRequired: 'Date & Time is required',
+    availableSolutionRequired: 'You have to give a solution',
+    solutionUSPRequired: 'Solution USP is required',
+    scopeOfWorkRequired: 'Scope of work is required',
+    milestoneTextRequired: 'Milestone text is required',
+    milestoneTimeFrameRequired: 'Milestone time frame is required',
+    atLeastOneMilestoneRequired: 'At least one milestone is required',
+    atLeastOneMilestoneGroupRequired: 'At least one milestone group is required',
+
+
     apply: 'Apply',
     title: 'Title',
     description: 'Description',
@@ -630,6 +918,21 @@ export const translationsforCreateApply = {
     applyButton: 'Apply',
   },
   gujarati: {
+
+
+    productsRequired: 'ઓછામાં ઓછા એક ઉત્પાદન પસંદ કરવું જરૂરી છે.',
+    titleRequired: 'શીર્ષક જરૂરી છે',
+    descriptionRequired: 'વર્ણન જરૂરી છે',
+    budgetRequired: 'બજેટ જરૂરી છે',
+    currencyRequired: 'કરન્સી જરૂરી છે',
+    timeFrameRequired: 'તારીખ અને સમય જરૂરી છે',
+    availableSolutionRequired: 'તમારે ઉકેલ આપવો પડશે',
+    solutionUSPRequired: 'ઉકેલનું યુએસપી જરૂરી છે',
+    scopeOfWorkRequired: 'કાર્યક્ષેત્ર જરૂરી છે',
+    milestoneTextRequired: 'માઇલસ્ટોન લખાણ જરૂરી છે',
+    milestoneTimeFrameRequired: 'માઇલસ્ટોન સમયગાળો જરૂરી છે',
+    atLeastOneMilestoneRequired: 'ઓછામાં ઓછા એક માઇલસ્ટોન જરૂરી છે',
+    atLeastOneMilestoneGroupRequired: 'ઓછામાં ઓછા એક માઇલસ્ટોન જૂથ જરૂરી છે',
     apply: 'અરજી કરો',
     title: 'શીર્ષક',
     description: 'વર્ણન',

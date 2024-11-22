@@ -376,7 +376,8 @@ const ApplyDetailsDialog: React.FC<ProjectDetailsDialogProps> = ({ open, onClose
                   Timeframe: {dayjs(apply.TimeFrame).format(DATE_FORMAT)}
                 </Typography>
                 {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1, ml: 2, textAlign: 'right', fontSize: 14 }}>
-                  <b>Applied User: &nbsp;</b>
+                  {/* <b>Applied User: &nbsp;</b> */}
+                  <b>{t.appliedUser} &nbsp;</b>
                   <a
                     href="javascript:void(0);"
                     onClick={(e) => {

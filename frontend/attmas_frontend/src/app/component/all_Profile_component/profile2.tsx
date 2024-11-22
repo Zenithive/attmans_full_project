@@ -53,8 +53,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
-    const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
-    const [labels, setLabels] = useState("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+    
 
 
     const [showAddProductModal, setShowAddProductModal] = useState(false);
@@ -72,16 +71,22 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
   const t = translationsforPROFILE2[language as keyof typeof translationsforPROFILE2] || translationsforPROFILE2.english;
 
 
+  const [label, setLabel] = useState(t.enterheadlinepp);
+    const [labels, setLabels] = useState(t.enterheadlineff);
+
     const dispatch = useAppDispatch();
 
     const validationSchema = Yup.object({
-        Headline: Yup.string().required('Headline is required'),
-        qualification: Yup.string().required('Qualification is required'),
+        // Headline: Yup.string().required('Headline is required'),
+        Headline: Yup.string().required(t.headline),
+        // qualification: Yup.string().required('Qualification is required'),
+        qualification: Yup.string().required(t.qualificationr),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
         workAddress: Yup.string().nullable(),
         designation: Yup.string().nullable(),
-        userType: Yup.string().required('Required'),
+        // userType: Yup.string().required('Required'),
+        userType: Yup.string().required(t.required),
         productToMarket: Yup.string().nullable(),
         products: Yup.array().of(
             Yup.object().shape({
@@ -100,7 +105,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 howdoesthesolutionwork: Yup.string().nullable(),
                 challengesorrisks: Yup.string().nullable(),
                 potentialbenefits: Yup.string().nullable(),
-                currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+                currency: Yup.string().oneOf(['INR', 'USD']).required(t.currencyRequired),
             })
         ),
         hasPatent: Yup.string().nullable(),
@@ -112,16 +117,17 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const handleFocus = () => {
         setLabel("Share Solution");
-        setLabels("HeadLine");
+        setLabels(t.headlineOriginal);
     };
 
 
     const handleBlur = () => {
         if (!formik.values.patentDetails) {
-            setLabel("Provide details about the research product or solution that you intend to commercialize");
+            // setLabel("Provide details about the research product or solution that you intend to commercialize");
+            setLabel(t.enterheadlinepp);
         }
         if (!formik.values.Headline) {
-            setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+            setLabels(t.enterheadlineff);
         }
     };
 
@@ -521,7 +527,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             {isInnovator && showProductDetails && (
                                 <Grid item xs={12}>
                                     <Button variant="contained" onClick={handleAddProduct}>
-                                        Add Product
+                                        {/* Add Product */}
+                                        {t.addProduct}
                                     </Button>
 
                                 </Grid>

@@ -560,7 +560,8 @@ const proposal = () => {
 
                                                     handleUserClick(proposal?.jobDetails?.username);
                                                 }}>
-                                                    Project Owner Name:
+                                                    {/* Project Owner Name: */}
+                                                    {t.projectOwnersName}
                                                 </span>
                                                 {` ${proposal?.jobDetails?.firstName} ${proposal?.jobDetails?.lastName}`}
                                             </Typography>
@@ -572,7 +573,8 @@ const proposal = () => {
                                                             handleUserClick(proposal?.userName);
                                                         }}
                                                     >
-                                                        Freelancer Name:
+                                                        {/* Freelancer Name: */}
+                                                        {t.freelancerName}
                                                     </span>
                                                     {` ${proposal.firstname} ${proposal.lastname}`}
                                                 </Typography>
@@ -590,7 +592,8 @@ const proposal = () => {
                                                     mr: 2
                                                 }} // Style to ensure link is blue with underline
                                             >
-                                                View Proposal
+                                                {/* View Proposal */}
+                                                {t.viewproposal}
                                             </Link>}
 
                                             <Link
@@ -605,7 +608,8 @@ const proposal = () => {
                                                     mr: 2
                                                 }} // Style to ensure link is blue with underline
                                             >
-                                                View Project
+                                                {/* View Project */}
+                                                {t.viewproject}
                                             </Link>
 
                                             <Box
@@ -632,14 +636,15 @@ const proposal = () => {
                                                                 color="success"
                                                                 onClick={() => handleApprove(proposal._id)}
                                                             >
-                                                                Approve
+                                                                {/* Approve */}
+                                                                {t.approve}
                                                             </Button>
                                                             <Button
                                                                 variant="contained"
                                                                 color="error"
                                                                 onClick={() => handleReject(proposal._id)}
                                                             >
-                                                                Reject
+                                                                {t.reject}
                                                             </Button>
                                                         </>
                                                     )}

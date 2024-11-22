@@ -281,7 +281,9 @@ const AddProductModal2: React.FC<AddProductModalProps2> = ({ open, onClose, onSa
                         <TextField
                             select
                             fullWidth
-                            label="Intellectual Property Considerations"
+                            // label="Intellectual Property Considerations"
+                            label={t.intellectualPropertyConsiderations}
+
                             color="secondary"
                             value={intellectualpropertyconsiderations}
                             onChange={(e) => !viewOnly && setIntellectualpropertyconsiderations(e.target.value)}

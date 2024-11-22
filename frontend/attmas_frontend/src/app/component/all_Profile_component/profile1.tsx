@@ -49,17 +49,31 @@ const t = translations[language] || translations.english;
     language: userDetails.language || '', // Assuming language is available in userDetails
   };
 
+  // const validationSchema = Yup.object({
+  //   gender: Yup.string().required(t.required || 'Required'),
+  //   address: Yup.string().required(t.required|| 'Required'),
+  //   city: Yup.string().required(t.required|| 'Required'),
+  //   state: Yup.string().required(t.required|| 'Required'),
+  //   pinCode: Yup.string()
+  //     .required(t.required)
+  //     .matches(/^[0-9]+$/, 'Must be only digits'),
+  //   country: Yup.string().required(t.required|| 'Required'),
+  //   linkedIn: Yup.string().url('Invalid URL').required(t.required|| 'Required'),
+  //   billingAddress: Yup.string().required(t.required|| 'Required'),
+  // });
+
   const validationSchema = Yup.object({
-    gender: Yup.string().required(t.required || 'Required'),
-    address: Yup.string().required(t.required|| 'Required'),
-    city: Yup.string().required(t.required|| 'Required'),
-    state: Yup.string().required(t.required|| 'Required'),
+    gender: Yup.string().required('Required'),
+    address: Yup.string().required('Required'),
+    city: Yup.string().required('Required'),
+    state: Yup.string().required('Required'),
+    // pinCode: Yup.string().required('Required'),
     pinCode: Yup.string()
-      .required(t.required)
+      .required('Required')
       .matches(/^[0-9]+$/, 'Must be only digits'),
-    country: Yup.string().required(t.required|| 'Required'),
-    linkedIn: Yup.string().url('Invalid URL').required(t.required|| 'Required'),
-    billingAddress: Yup.string().required(t.required|| 'Required'),
+    country: Yup.string().required('Required'),
+    linkedIn: Yup.string().url('Invalid URL').required('Required'),
+    billingAddress: Yup.string().required('Required'),
   });
 
   const handleSubmit = async (values: typeof initialValues) => {

@@ -18,6 +18,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
 import LatestProductTableForBooth from '../booth/LatestProductTableForBooth';
+import { translationsforInnovatorApply } from '../../../../public/trancation';
 
 
 
@@ -65,17 +66,22 @@ interface FormValues {
 
 
 
-const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Description is required'),
-    Budget: Yup.number().required('Budget is required'),
-    currency: Yup.string().required('Currency is required'),
-    TimeFrame: Yup.date().nullable('Date & Time is required'),
-    products: Yup.array().min(1).max(1).required("Only One product is acceptable")
-});
+// const validationSchema = Yup.object().shape({
+//     title: Yup.string().required('Title is required'),
+//     description: Yup.string().required('Description is required'),
+//     Budget: Yup.number().required('Budget is required'),
+//     currency: Yup.string().required('Currency is required'),
+//     TimeFrame: Yup.date().nullable('Date & Time is required'),
+//     products: Yup.array().min(1).max(1).required("Only One product is acceptable")
+// });
 
 export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription, jobId, onCancel }: AddApplyProps) => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
+    const language = userDetails.language || 'english';
+    const t = translationsforInnovatorApply[language as keyof typeof translationsforInnovatorApply] || translationsforInnovatorApply.english;
+  
     const [fetchError, setFetchError] = React.useState<string | null>(null);
     const [workExperience, setWorkExperience] = React.useState<WorkExprience | null>(null);
     const [loading, setLoading] = React.useState<boolean>(true);
@@ -97,6 +103,18 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
         subcategories: []
     };
 
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required(t.titleRequired),
+        description: Yup.string().required(t.descriptionRequired),
+        Budget: Yup.number().required(t.budgetRequired),
+        currency: Yup.string().required(t.currencyRequired),
+        TimeFrame: Yup.date().nullable().required(t.timeFrameRequired),
+        products: Yup.array()
+          .min(1, t.productsRequired)
+          .max(1, t.productsRequired)
+          .required(t.productsRequired),
+      });
 
     React.useEffect(() => {
         if (open && userDetails?.username) {
@@ -211,7 +229,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
             onClose={handleCancel}
         >
             <Box component="div" sx={{ display: 'flex', justifyContent: 'space-between', pl: 4 }}>
-                <h2>Apply</h2>
+                {/* <h2>Apply</h2> */}
+                <h2>{t.apply}</h2>
                 <IconButton aria-label="close" onClick={handleCancel} sx={{ p: 0, right: 0 }}>
                     <CloseIcon />
                 </IconButton>
@@ -225,7 +244,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 1 }}>
                                 <Box sx={{ flex: '1 1 70%' }}>
                                     <TextField
-                                        label="Title"
+                                        // label="Title"
+                                        label={t.title}
                                         name="title"
                                         color='secondary'
                                         value={values.title}
@@ -241,7 +261,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                     <TextField
                                         fullWidth
                                         name="Budget"
-                                        label="Budget"
+                                        // label="Budget"
+                                        label={t.budget}
                                         type="number"
                                         color='secondary'
                                         value={values.Budget}
@@ -273,7 +294,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                                 <Box sx={{ flex: '1 1 70%' }}>
                                     <TextField
-                                        label="Description"
+                                        // label="Description"
+                                        label={t.description}
                                         name="description"
                                         color='secondary'
                                         variant="outlined"
@@ -318,7 +340,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                             <TextField
                                                 color='secondary'
                                                 fullWidth
-                                                label="Qualification"
+                                                // label="Qualification"
+                                                label={t.qualification}
                                                 value={workExperience.qualification}
                                                 InputProps={{ readOnly: true }}
                                                 variant="outlined"
@@ -327,7 +350,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                         <Grid item xs={12} sm={6}>
                                             <TextField
                                                 fullWidth
-                                                label="Organization"
+                                                // label="Organization"
+                                                label={t.organization}
                                                 value={workExperience.organization}
                                                 InputProps={{ readOnly: true }}
                                                 variant="outlined"
@@ -337,7 +361,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                         <Grid item xs={12} sm={6}>
                                             <TextField
                                                 fullWidth
-                                                label="Sector"
+                                                // label="Sector"
+                                                label={t.sector}
                                                 value={workExperience.sector}
                                                 InputProps={{ readOnly: true }}
                                                 variant="outlined"
@@ -347,7 +372,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                         <Grid item xs={12} sm={6}>
                                             <TextField
                                                 fullWidth
-                                                label="Work Address"
+                                                // label="Work Address"
+                                                label={t.workaddress}
                                                 value={workExperience.workAddress}
                                                 InputProps={{ readOnly: true }}
                                                 variant="outlined"
@@ -357,7 +383,9 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                         <Grid item xs={12} sm={6} sx={{ marginBottom: '40px' }}>
                                             <TextField
                                                 fullWidth
-                                                label="Designation"
+                                                // label="Designation"
+                                                label={t.designation}
+                                            
                                                 value={workExperience.designation}
                                                 InputProps={{ readOnly: true }}
                                                 variant="outlined"
@@ -377,7 +405,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                                         }
                                                     />
                                                 ) : (
-                                                    <Typography>No products available</Typography>
+                                                    // <Typography>No products available</Typography>
+                                                    <Typography>{t.noproductavailabe}</Typography>
                                                 )}
 
                                                 {errors?.products ? <span style={{ color: 'red' }}>{errors?.products.toString() || ''}</span> : ''}
@@ -389,7 +418,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                             <TextField
                                                 color='secondary'
                                                 fullWidth
-                                                label="Do you have a patent?"
+                                                // label="Do you have a patent?"
+                                                label={t.doyouhaveapatient}
                                                 value={workExperience.hasPatent}
                                                 InputProps={{ readOnly: true }}
                                                 variant="outlined"
@@ -401,7 +431,8 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                                     fullWidth
                                                     multiline
                                                     rows={4}
-                                                    label="Patent Details"
+                                                    // label="Patent Details"
+                                                    label={t.patientdetails}
                                                     value={workExperience.patentDetails}
                                                     InputProps={{ readOnly: true }}
                                                     variant="outlined"
@@ -411,8 +442,11 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                     </Grid>
                                     <Grid container spacing={3}>
                                         <Grid item xs={12} sm={12}>
-                                            <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                            {/* <Typography variant="h6" sx={{ marginBottom: 1 }}>
                                                 Categories
+                                            </Typography> */}
+                                            <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                                {t.categoriess}
                                             </Typography>
                                             <TextField
                                                 fullWidth
@@ -424,8 +458,11 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={12}>
-                                            <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                            {/* <Typography variant="h6" sx={{ marginBottom: 1 }}>
                                                 Subject Matter Expertise
+                                            </Typography> */}
+                                            <Typography variant="h6" sx={{ marginBottom: 1 }}>
+                                                {t.subjectmatterexpertisess}
                                             </Typography>
                                             <TextField
                                                 fullWidth
@@ -449,14 +486,16 @@ export const AddApplyForInnovatores = ({ open, setOpen, jobTitle, jobDescription
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                             <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={handleCancel}>
-                                Cancel
+                                {/* Cancel */}
+                                {t.cancel}
                             </Button>
                             <Button
                                 variant="contained"
                                 type="submit"
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Apply'}
+                                {/* {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Apply'} */}
+                                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : t.apply}
                             </Button>
                         </Box>
                         {/* </Box> */}

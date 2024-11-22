@@ -73,13 +73,15 @@ const EditProfile2: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const validationSchema = Yup.object({
-        Headline: Yup.string().required('Headline is required'),
-        qualification: Yup.string().required('Qualification is required'),
+        // Headline: Yup.string().required('Headline is required'),
+        Headline: Yup.string().required(t.headline),
+        // qualification: Yup.string().required('Qualification is required'),
+        qualification: Yup.string().required(t.qualification),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
         workAddress: Yup.string().nullable(),
         designation: Yup.string().nullable(),
-        userType: Yup.string().required('Required'),
+        userType: Yup.string().required(t.required),
         productToMarket: Yup.string().nullable(),
         products: Yup.array().of(
             Yup.object().shape({
@@ -98,7 +100,7 @@ const EditProfile2: React.FC = () => {
                 howdoesthesolutionwork: Yup.string().nullable(),
                 challengesorrisks: Yup.string().nullable(),
                 potentialbenefits: Yup.string().nullable(),
-                currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+                currency: Yup.string().oneOf(['INR', 'USD']).required(t.currencyRequired),
             })
         ),
         hasPatent: Yup.string().nullable(),

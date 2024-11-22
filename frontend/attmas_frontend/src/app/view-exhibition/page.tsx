@@ -681,7 +681,8 @@ const t = translationsforViewExhibition[language as keyof typeof translationsfor
                                     position: 'relative', float: 'right', bottom: '55px'
                                   }}
                                 >
-                                  View Details
+                                  {/* View Details */}
+                                  {t.viewDetails}
                                 </a>
                               )
                             )}
@@ -764,7 +765,7 @@ const t = translationsforViewExhibition[language as keyof typeof translationsfor
                 </Grid>
                 <Box sx={{ textAlign: 'center', position: 'relative' }}>
                   {booths.filter(booth => booth.exhibitionId === exhibitionId).length === 0 && (
-                    <Typography variant="h6" style={{ marginTop: '20px' }}>No booths to display</Typography>
+                    <Typography variant="h6" style={{ marginTop: '20px' }}>{t.noboothtodisplay}</Typography>
                   )}
                 </Box>
               </>

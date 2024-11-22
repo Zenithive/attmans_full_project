@@ -415,7 +415,8 @@ const Exhibition = () => {
                     style={{ color: 'blue', textDecoration: 'underline', fontSize: 'medium' }}
                   >
                     <Typography variant="h6" component="span" sx={{ fontSize: 'inherit', color: 'inherit', textDecoration: 'inherit' }}>
-                      View Exhibition
+                      {/* View Exhibition */}
+                      {t.viewexhibition}
                     </Typography>
                   </a>
                 </Box>

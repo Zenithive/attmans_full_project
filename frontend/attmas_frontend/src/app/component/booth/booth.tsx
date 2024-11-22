@@ -18,6 +18,7 @@ import LatestProductTableForBooth from "./LatestProductTableForBooth";
 import axiosInstance from "@/app/services/axios.service";
 import { Product } from "../ProductTable";
 import { Booth } from "@/app/view-exhibition/page";
+import { translationsforCreateApply } from "../../../../public/trancation";
 
 interface BoothDetailsModalProps {
   open: boolean;
@@ -35,6 +36,11 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   exhibitionId,
 }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforCreateApply[language as keyof typeof translationsforCreateApply] || translationsforCreateApply.english;
+
+
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
@@ -67,10 +73,18 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
     exhibitionId: exhibitionId || "",
   };
 
+  // const validationSchema = Yup.object().shape({
+  //   title: Yup.string().required("Title is required"),
+  //   description: Yup.string().required("Description is required"),
+  //   products: Yup.array().min(1).required("Atleast One product is requied to select.")
+  // });
+
   const validationSchema = Yup.object().shape({
-    title: Yup.string().required("Title is required"),
-    description: Yup.string().required("Description is required"),
-    products: Yup.array().min(1).required("Atleast One product is requied to select.")
+    title: Yup.string().required(t.titleRequired),
+    description: Yup.string().required(t.descriptionRequired),
+    products: Yup.array()
+      .min(1, t.productsRequired)
+      .required(t.productsRequired),
   });
 
   const handleSubmit = async (values: typeof initialValues, { resetForm }: any) => {

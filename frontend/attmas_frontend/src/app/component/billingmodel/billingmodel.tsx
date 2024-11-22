@@ -10,6 +10,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import { MilestoneCommentType } from '../applicationforproject/applicationforproject';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { translationsforProjectCommentCard } from '../../../../public/trancation';
 
 
 export interface Milestone {
@@ -70,7 +73,13 @@ const BillingModal: React.FC<BillingModalProps> = ({
     onAddPayment,
     isSubmitting,
 }) => {
-    const milestoneLabel = "Approved Milestone";
+    const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
+    const language = userDetails.language || 'english';
+  const t = translationsforProjectCommentCard[language as keyof typeof translationsforProjectCommentCard] || translationsforProjectCommentCard.english;
+  const milestoneLabel = t.approvedmilestone;
+
 
     const isFormValid = () => {
         
@@ -94,7 +103,8 @@ const BillingModal: React.FC<BillingModalProps> = ({
         >
             <Box sx={{ width: 400, margin: 'auto', padding: 4, backgroundColor: 'white', marginTop: '10%', borderRadius: 2 }}>
                 <Typography id="payment-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-                    Add Payment
+                    {/* Add Payment */}
+                    {t.addpayment}
                     <IconButton
                         onClick={onClose}
                         sx={{ position: 'relative', float: 'right' }}
@@ -124,7 +134,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                 </FormControl>
                 )}
                 <TextField
-                    label="Amount"
+                    label={t.ammount}
                     name="amount"
                     color="secondary"
                     value={paymentDetails.amount}
@@ -141,7 +151,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                         value={paymentDetails.currency}
                         onChange={onPaymentDetailsChange}
                         color="secondary"
-                        label="Currency"
+                        label={t.currency}
                     >
                         <MenuItem value="USD">USD</MenuItem>
                         <MenuItem value="INR">INR</MenuItem>
@@ -149,7 +159,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                 </FormControl>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateTimePicker
-                        label="Payment Date"
+                        label={t.paymentDate}
                         format={DATE_FORMAT}
                         sx={{ marginBottom: '15px' }}
                         value={paymentDetails.paymentDate}
@@ -180,7 +190,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                     variant="contained"
                     disabled={isSubmitting || !isFormValid()}
                 >
-                    {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
+                    {isSubmitting ? <CircularProgress size={24} color="inherit" /> : t.submit}
                 </Button>
             </Box>
         </Modal>

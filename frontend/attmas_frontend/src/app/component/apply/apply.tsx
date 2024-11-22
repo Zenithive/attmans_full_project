@@ -54,28 +54,28 @@ interface FormValues {
 
 
 
-const validationSchema = Yup.object().shape({
-  title: Yup.string().required('Title is required'),
-  description: Yup.string().required('Description is required'),
-  Budget: Yup.number().required('Budget is required'),
-  currency: Yup.string().required('Currency is required'),
-  TimeFrame: Yup.date().required('Date & Time is required'),
-  availableSolution: Yup.string().required('You have to give solution'),
-  SolutionUSP: Yup.string().required('Solution USP is required'),
-  milestones: Yup.array().of(
-    Yup.object().shape({
-      scopeOfWork: Yup.string().required('Scope of work is required'),
-      milestones: Yup.array().of(
-        Yup.object().shape({
-          name: Yup.object().shape({
-            text: Yup.string().required('Milestone text is required'),
-            timeFrame: Yup.date().nullable().required('Milestone time frame is required'),
-          }),
-        })
-      ).min(1, 'At least one milestone is required')
-    })
-  ).min(1, 'At least one milestone group is required'),
-});
+// const validationSchema = Yup.object().shape({
+//   title: Yup.string().required('Title is required'),
+//   description: Yup.string().required('Description is required'),
+//   Budget: Yup.number().required('Budget is required'),
+//   currency: Yup.string().required('Currency is required'),
+//   TimeFrame: Yup.date().required('Date & Time is required'),
+//   availableSolution: Yup.string().required('You have to give solution'),
+//   SolutionUSP: Yup.string().required('Solution USP is required'),
+//   milestones: Yup.array().of(
+//     Yup.object().shape({
+//       scopeOfWork: Yup.string().required('Scope of work is required'),
+//       milestones: Yup.array().of(
+//         Yup.object().shape({
+//           name: Yup.object().shape({
+//             text: Yup.string().required('Milestone text is required'),
+//             timeFrame: Yup.date().nullable().required('Milestone time frame is required'),
+//           }),
+//         })
+//       ).min(1, 'At least one milestone is required')
+//     })
+//   ).min(1, 'At least one milestone group is required'),
+// });
 
 
 export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescription }: AddApplyProps) => {
@@ -105,6 +105,33 @@ export const AddApply = ({ open, setOpen, jobTitle, jobId, onCancel, jobDescript
     SolutionUSP: '',
     applyType: 'freelancerApply',
   };
+
+  const validationSchema = Yup.object().shape({
+    title: Yup.string().required(t.titleRequired),
+    description: Yup.string().required(t.descriptionRequired),
+    Budget: Yup.number().required(t.budgetRequired),
+    currency: Yup.string().required(t.currencyRequired),
+    TimeFrame: Yup.date().required(t.timeFrameRequired),
+    availableSolution: Yup.string().required(t.availableSolutionRequired),
+    SolutionUSP: Yup.string().required(t.solutionUSPRequired),
+    milestones: Yup.array()
+      .of(
+        Yup.object().shape({
+          scopeOfWork: Yup.string().required(t.scopeOfWorkRequired),
+          milestones: Yup.array()
+            .of(
+              Yup.object().shape({
+                name: Yup.object().shape({
+                  text: Yup.string().required(t.milestoneTextRequired),
+                  timeFrame: Yup.date().nullable().required(t.milestoneTimeFrameRequired),
+                }),
+              })
+            )
+            .min(1, t.atLeastOneMilestoneRequired),
+        })
+      )
+      .min(1, t.atLeastOneMilestoneGroupRequired),
+  });
 
   const handleSubmit = async (
     values: FormValues,

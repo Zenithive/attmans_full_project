@@ -612,7 +612,8 @@ const Jobs = () => {
                                                         fontSize: 'medium',
                                                     }}
                                                 >
-                                                    View Project
+                                                    {/* View Project */}
+                                                    {t.viewproject}
                                                 </a>
                                             </Box>
 

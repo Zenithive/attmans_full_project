@@ -45,17 +45,19 @@ interface AddExhibitionProps {
 }
 
 
-const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Description is required'),
-    status: Yup.string(),
-    videoUrl: Yup.string().required('Video URL is required'),
-    meetingUrl: Yup.string().required('Meeting URL is required'),
-    dateTime: Yup.date().nullable('Date is required'),
-    exhbTime: Yup.date().nullable('Time is required'),
-    categoryforIndustries: Yup.array().of(Yup.string()),
-    subject: Yup.array().of(Yup.string())
-});
+// const validationSchema = Yup.object().shape({
+//     title: Yup.string().required('Title is required'),
+//     description: Yup.string().required('Description is required'),
+//     status: Yup.string(),
+//     videoUrl: Yup.string().required('Video URL is required'),
+//     meetingUrl: Yup.string().required('Meeting URL is required'),
+//     dateTime: Yup.date().nullable('Date is required'),
+//     exhbTime: Yup.date().nullable('Time is required'),
+//     categoryforIndustries: Yup.array().of(Yup.string()),
+//     subject: Yup.array().of(Yup.string())
+// });
+
+
 
 export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
@@ -64,8 +66,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
 
-  const language = userDetails.language || 'english';
-  const t = translationsforCreateExhibition[language as keyof typeof translationsforCreateExhibition] || translationsforCreateExhibition.english;
+    const language = userDetails.language || 'english';
+    const t = translationsforCreateExhibition[language as keyof typeof translationsforCreateExhibition] || translationsforCreateExhibition.english;
     const { userType } = userDetails;
 
     const initialValues = React.useMemo(() => ({
@@ -79,6 +81,18 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         categoryforIndustries: [],
         subject: []
     }), []);
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required(t.titleRequired),
+        description: Yup.string().required(t.descriptionRequired),
+        status: Yup.string(),
+        videoUrl: Yup.string().required(t.videoUrlRequired),
+        meetingUrl: Yup.string().required(t.meetingUrlRequired),
+        dateTime: Yup.date().nullable(t.dateTimeRequired),
+        exhbTime: Yup.date().nullable(t.exhbTimeRequired),
+        categoryforIndustries: Yup.array().of(Yup.string()),
+        subject: Yup.array().of(Yup.string()),
+    });
 
     React.useEffect(() => {
         if (editingExhibition) {
@@ -154,10 +168,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
             {userType === "Admin" && (
                 <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
                     ml: 3, minWidth: 150, py: 0,
-                    borderRadius: 3, backgroundColor: '#CC4800',minHeight:'40px', color: "white", '@media (max-width: 767px)': {
+                    borderRadius: 3, backgroundColor: '#CC4800', minHeight: '40px', color: "white", '@media (max-width: 767px)': {
                         position: 'relative', width: '157%'
                     }
-                }}>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+                }}>{editingExhibition ? t.editExhibition : t.createExhibition}
+                </Button>
             )}
             <Drawer sx={{
                 '& .MuiDrawer-paper': {
@@ -247,7 +262,8 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                 />
 
                                 <FormControl fullWidth>
-                                    <InputLabel id="status-label" color='secondary'>Status</InputLabel>
+                                    {/* <InputLabel id="status-label" color='secondary'>Status</InputLabel> */}
+                                    <InputLabel id="status-label" color='secondary'>{t.status}</InputLabel>
                                     <Select
                                         labelId="status-label"
                                         // label={t.status}
@@ -313,7 +329,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
 
 
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <DatePicker
                                             format={DATE_FORMAT}
                                             label="Date"
@@ -325,7 +341,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                             format={TIME_FORMAT}
                                             label="Select Time"
                                             value={values.exhbTime}
-                                            onChange={(newValue) => setFieldValue('exhbTime', newValue)}    
+                                            onChange={(newValue) => setFieldValue('exhbTime', newValue)}
                                         />
                                     </Box>
                                 </LocalizationProvider>

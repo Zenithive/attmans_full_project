@@ -410,7 +410,7 @@ const t = translationsforApplicationsForProject[language as keyof typeof transla
                             <Box sx={{ mb: 2 }}>
                                 {filteredApplications.map((app) => (
                                     userType === 'Admin' && (
-                                        <Button key={app._id} onClick={handleOpenModal(app._id!)} variant="contained">Add Payment</Button>
+                                        <Button key={app._id} onClick={handleOpenModal(app._id!)} variant="contained">{t.addpayment}</Button>
                                     )
                                 ))}
                             </Box>

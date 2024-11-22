@@ -717,7 +717,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           />
                         </Box>
                         {userDetails.userType === 'Admin' && <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          <b>Applied User: </b>
+                          {/* <b>Applied User: </b> */}
+                          <b>{t.appliedUser}</b>
                           <a
                             href="javascript:void(0);"
                             onClick={(e) => {
@@ -734,10 +735,11 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                            <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
+                            {/* <b>Budget:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget} */}
+                            <b>{t.budget}:</b> {app.currency === 'USD' ? '$' : '₹'} {app.Budget}
                           </Typography>
                           <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                            <b>Time Frame:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format(DATE_FORMAT) : 'N/A'}
+                            <b>{t.timeframe}:</b> {app.TimeFrame ? dayjs(app.TimeFrame).format(DATE_FORMAT) : 'N/A'}
                           </Typography>
                         </Box>
 
@@ -761,7 +763,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                   fontFamily: '"Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol"',
                                 }}
                               >
-                                View Details
+                                {/* View Details   */}
+                                {t.viewDetails}
                               </a>
                               {app.status === APPLY_STATUSES.pendingForApproval &&
                                 userType === 'Admin' && (
@@ -802,7 +805,8 @@ const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     </Card>
                   ))
                 ) : (
-                  <Typography>No applications found.</Typography>
+                  // <Typography>No applications found.</Typography>
+                  <Typography>{t.noapplicationsfound}</Typography>
                 )}
               </Box>
             </Box>
