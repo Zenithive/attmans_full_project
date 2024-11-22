@@ -12,6 +12,7 @@ import { addUser, selectUserSession, UserSchema, updateProfilePhoto } from '@/ap
 import { pubsub } from '@/app/services/pubsub.service';
 import router from 'next/router';
 import axiosInstance from '@/app/services/axios.service';
+import { translations } from '../../../../public/trancation';
 
 const EditProfile1: React.FC = () => {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -22,6 +23,11 @@ const EditProfile1: React.FC = () => {
   const dispatch = useAppDispatch();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+  const language = userDetails.language || 'english';
+  const t = translations[language as keyof typeof translations] || translations.english;
+
+
+
   const initialValues = {
     gender: '',
     address: '',
@@ -31,11 +37,13 @@ const EditProfile1: React.FC = () => {
     country: '',
     linkedIn: '',
     billingAddress: '',
+    language: '',
     username: userDetails.username,
   };
 
   const validationSchema = Yup.object({
     gender: Yup.string().required('Required'),
+    language: Yup.string().required('Required'),
     address: Yup.string().required('Required'),
     city: Yup.string().required('Required'),
     state: Yup.string().required('Required'),
@@ -132,10 +140,12 @@ const EditProfile1: React.FC = () => {
         }}
       >
         <Typography component="h1" variant="h5" align="center">
-          Personal Details
+          {/* {Personal Details} */}
+          {t.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-          View and Change your personal details here
+          {/* View and Change your personal details here */}
+          {t.description}
         </Typography>
 
         {fetchError && (
@@ -172,7 +182,7 @@ const EditProfile1: React.FC = () => {
                   }}
                 />
 
-                <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <label htmlFor="profile-photo">
                     <IconButton component="span" sx={{ width: 100, height: 100, mb: 2 }}>
                       <Avatar
@@ -204,7 +214,8 @@ const EditProfile1: React.FC = () => {
                     loading={loading}
                     loadingIndicator={<CircularProgress size={24} />}
                   >
-                    Update Personal Details
+                    {/* Update Personal Details */}
+                    {t.updatepersonal}
                   </LoadingButton>
                 </Box>
               </Form>

@@ -23,6 +23,7 @@ import { formatToLocal, formatToUTC } from '@/app/services/date.service';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { EXHIBITION_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforCreateExhibition } from '../../../../public/trancation';
 interface Exhibition {
     _id?: string;
     title: string;
@@ -44,23 +45,29 @@ interface AddExhibitionProps {
 }
 
 
-const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Description is required'),
-    status: Yup.string(),
-    videoUrl: Yup.string().required('Video URL is required'),
-    meetingUrl: Yup.string().required('Meeting URL is required'),
-    dateTime: Yup.date().nullable('Date is required'),
-    exhbTime: Yup.date().nullable('Time is required'),
-    categoryforIndustries: Yup.array().of(Yup.string()),
-    subject: Yup.array().of(Yup.string())
-});
+// const validationSchema = Yup.object().shape({
+//     title: Yup.string().required('Title is required'),
+//     description: Yup.string().required('Description is required'),
+//     status: Yup.string(),
+//     videoUrl: Yup.string().required('Video URL is required'),
+//     meetingUrl: Yup.string().required('Meeting URL is required'),
+//     dateTime: Yup.date().nullable('Date is required'),
+//     exhbTime: Yup.date().nullable('Time is required'),
+//     categoryforIndustries: Yup.array().of(Yup.string()),
+//     subject: Yup.array().of(Yup.string())
+// });
+
+
 
 export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibitionProps) => {
     const [open, toggleDrawer] = React.useState(false);
     const [usernames, setUsernames] = React.useState<string[]>([]);
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
+    const language = userDetails.language || 'english';
+    const t = translationsforCreateExhibition[language as keyof typeof translationsforCreateExhibition] || translationsforCreateExhibition.english;
     const { userType } = userDetails;
 
     const initialValues = React.useMemo(() => ({
@@ -74,6 +81,18 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
         categoryforIndustries: [],
         subject: []
     }), []);
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required(t.titleRequired),
+        description: Yup.string().required(t.descriptionRequired),
+        status: Yup.string(),
+        videoUrl: Yup.string().required(t.videoUrlRequired),
+        meetingUrl: Yup.string().required(t.meetingUrlRequired),
+        dateTime: Yup.date().nullable(t.dateTimeRequired),
+        exhbTime: Yup.date().nullable(t.exhbTimeRequired),
+        categoryforIndustries: Yup.array().of(Yup.string()),
+        subject: Yup.array().of(Yup.string()),
+    });
 
     React.useEffect(() => {
         if (editingExhibition) {
@@ -149,10 +168,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
             {userType === "Admin" && (
                 <Button onClick={() => toggleDrawer(true)} type='button' size='small' variant='contained' sx={{
                     ml: 3, minWidth: 150, py: 0,
-                    borderRadius: 3, backgroundColor: '#CC4800',minHeight:'40px', color: "white", '@media (max-width: 767px)': {
+                    borderRadius: 3, backgroundColor: '#CC4800', minHeight: '40px', color: "white", '@media (max-width: 767px)': {
                         position: 'relative', width: '157%'
                     }
-                }}>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</Button>
+                }}>{editingExhibition ? t.editExhibition : t.createExhibition}
+                </Button>
             )}
             <Drawer sx={{
                 '& .MuiDrawer-paper': {
@@ -162,7 +182,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                 }
             }} anchor="right" open={open} onClose={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>
                 <Box component="div" sx={{ display: "flex", justifyContent: "space-between", pl: 4 }}>
-                    <h2>{editingExhibition ? 'Edit Exhibition' : 'Create Exhibition'}</h2>
+                    <h2>{editingExhibition ? t.editExhibition : t.createExhibition}</h2>
                     <IconButton aria-describedby="id" onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }} sx={{ p: 0, right: 0 }}>
                         <CloseIcon />
                     </IconButton>
@@ -188,7 +208,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                         <Form onSubmit={handleSubmit}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: "relative", left: "15px" }}>
                                 <TextField
-                                    label="Title"
+                                    label={t.title}
                                     name="title"
                                     variant="outlined"
                                     color='secondary'
@@ -200,7 +220,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     helperText={<ErrorMessage name="title" />}
                                 />
                                 <TextField
-                                    label="Description"
+                                    label={t.description}
                                     name="description"
                                     variant="outlined"
                                     color='secondary'
@@ -214,7 +234,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                     helperText={<ErrorMessage name="description" />}
                                 />
                                 <TextField
-                                    label="Video Url"
+                                    label={t.videoUrl}
                                     name="videoUrl"
                                     variant="outlined"
                                     color='secondary'
@@ -228,7 +248,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                 />
 
                                 <TextField
-                                    label="Meeting Url"
+                                    label={t.meetingUrl}
                                     name="meetingUrl"
                                     variant="outlined"
                                     color='secondary'
@@ -242,9 +262,11 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                 />
 
                                 <FormControl fullWidth>
-                                    <InputLabel id="status-label" color='secondary'>Status</InputLabel>
+                                    {/* <InputLabel id="status-label" color='secondary'>Status</InputLabel> */}
+                                    <InputLabel id="status-label" color='secondary'>{t.status}</InputLabel>
                                     <Select
                                         labelId="status-label"
+                                        // label={t.status}
                                         id="status"
                                         name="status"
                                         color='secondary'
@@ -281,7 +303,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            label="Preferred Industries"
+                                            label={t.preferredIndustries}
                                             color='secondary'
                                             placeholder="Select industries"
                                             error={!!(errors.categoryforIndustries && touched.categoryforIndustries)}
@@ -307,7 +329,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
 
 
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <DatePicker
                                             format={DATE_FORMAT}
                                             label="Date"
@@ -319,7 +341,7 @@ export const AddExhibition = ({ editingExhibition, onCancelEdit }: AddExhibition
                                             format={TIME_FORMAT}
                                             label="Select Time"
                                             value={values.exhbTime}
-                                            onChange={(newValue) => setFieldValue('exhbTime', newValue)}    
+                                            onChange={(newValue) => setFieldValue('exhbTime', newValue)}
                                         />
                                     </Box>
                                 </LocalizationProvider>

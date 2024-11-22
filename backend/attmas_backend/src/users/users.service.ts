@@ -15,11 +15,13 @@ import {
   getMinutesElapsed,
 } from 'src/common/service/crypto.service';
 import { AuthService } from 'src/auth1/auths.service';
+import { PersonalProfile } from 'src/profile/schemas/personalProfile.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(PersonalProfile.name) private personalProfileModel: Model<PersonalProfile>,
     private mailerService: MailerService, // Inject MailerService
     // private authService: AuthService, 
   ) { }
@@ -115,6 +117,11 @@ export class UsersService {
   async findByUsername(username: string): Promise<User> {
     const user = await this.userModel.findOne({ username }).exec();
     return user;
+  }
+
+  async getUserLanguage(username: string): Promise<string | null> {
+    const profile = await this.personalProfileModel.findOne({ username }).exec();
+    return profile ? profile.language : null;
   }
 
   async findUserWithJobsAndExhibitions(username: string): Promise<User> {

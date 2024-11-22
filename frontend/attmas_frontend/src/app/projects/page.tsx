@@ -28,6 +28,8 @@ import { PROJECT_STATUSES } from '../constants/status.constant';
 import axiosInstance from '../services/axios.service';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GetProjectStatusChip } from '../component/GetProjectStatusChip/GetProjectStatusChip';
+import { translationsforProjectPage } from '../../../public/trancation';
+
 
 
 
@@ -37,7 +39,20 @@ const Jobs = () => {
     const router = useRouter();
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    // Determine the preferred language
+  const language = userDetails.language || 'english';  // Default to English if not set
+  const t = translationsforProjectPage[language as keyof typeof translationsforProjectPage] || translationsforProjectPage.english;
+
+
+
+
+
+
+
+
     const { userType, _id: userId } = userDetails;
+
 
     const column: Array<FilterColumn> = [
         {
@@ -491,7 +506,7 @@ const Jobs = () => {
                     },
                 }}
             >
-                <Typography component="h2" sx={{ marginY: 0 }}>Projects</Typography>
+                <Typography component="h2" sx={{ marginY: 0 }}>{t.projects}</Typography>
 
 
                 <Box sx={{ mr: 2, display: "flex", gap: 2 }}>
@@ -537,7 +552,7 @@ const Jobs = () => {
                         next={() => setPage(prev => prev + 1)}
                         hasMore={hasMore}
                         loader={<Typography>Loading...</Typography>}
-                        endMessage={<Typography>No more Projects</Typography>}
+                        endMessage={<Typography>{t.nomoreproject} </Typography>}
                     >
                         <Box sx={{ mt: 2 }}>
                             {jobs.map((job) => (
@@ -597,7 +612,8 @@ const Jobs = () => {
                                                         fontSize: 'medium',
                                                     }}
                                                 >
-                                                    View Project
+                                                    {/* View Project */}
+                                                    {t.viewproject}
                                                 </a>
                                             </Box>
 

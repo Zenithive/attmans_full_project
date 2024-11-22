@@ -92,6 +92,7 @@ export const SignIn = ({ toggleForm, showLinks = true, onSignInSuccess, exhibiti
           userType: res.userType,
           _id: res._id,
           sessionId: res.sessionId,
+          language: response.data.language
         };
 
         dispatch(addUser(user));

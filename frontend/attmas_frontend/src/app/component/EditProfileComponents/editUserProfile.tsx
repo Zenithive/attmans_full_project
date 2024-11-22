@@ -20,9 +20,14 @@ import { SERVER_URL } from '@/app/constants/api.constant';
 import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforEditstartingProfile } from '../../../../public/trancation';
 
 const EditProfile: React.FC = () => {
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const language = userDetails.language || 'english';
+const t = translationsforEditstartingProfile[language as keyof typeof translationsforEditstartingProfile] || translationsforEditstartingProfile.english;
+
     const [loading, setLoading] = useState(true);
     const [changePassword, setChangePassword] = useState(false);
     const [initialValues, setInitialValues] = useState({
@@ -102,7 +107,8 @@ const EditProfile: React.FC = () => {
                 }}
             >
                 <Typography component="h1" variant="h5" gutterBottom sx={{marginBottom:'35px'}}>
-                    Edit Profile
+                    {/* Edit Profile */}
+                    {t.editProfile}
                 </Typography>
                 <Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ width: '100%' }}>
                     <Grid container spacing={2}>
@@ -114,7 +120,7 @@ const EditProfile: React.FC = () => {
                                 fullWidth
                                 color="secondary"
                                 id="firstName"
-                                label="First Name"
+                                label={t.firstName}
                                 value={formik.values.firstName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -128,7 +134,7 @@ const EditProfile: React.FC = () => {
                                 fullWidth
                                 id="lastName"
                                 color="secondary"
-                                label="Last Name"
+                                label={t.lastName}
                                 name="lastName"
                                 autoComplete="family-name"
                                 value={formik.values.lastName}
@@ -144,7 +150,7 @@ const EditProfile: React.FC = () => {
                                 fullWidth
                                 id="email"
                                 color="secondary"
-                                label="Email Address"
+                                label={t.emailAddress}
                                 name="email"
                                 autoComplete="email"
                                 value={formik.values.email}
@@ -160,7 +166,7 @@ const EditProfile: React.FC = () => {
                                 fullWidth
                                 color="secondary"
                                 name="mobileNumber"
-                                label="Mobile Number"
+                                label={t.mobileNumber}
                                 type="tel"
                                 id="mobileNumber"
                                 autoComplete="tel"
@@ -180,7 +186,7 @@ const EditProfile: React.FC = () => {
                                         onChange={(e) => setChangePassword(e.target.checked)}
                                     />
                                 }
-                                label="Change Password"
+                                label={t.ChangePassword}
                             />
                         </Grid>
                         {changePassword && (
@@ -190,7 +196,7 @@ const EditProfile: React.FC = () => {
                                     fullWidth
                                     color="secondary"
                                     name="password"
-                                    label="Password"
+                                    label={t.password}
                                     type="password"
                                     id="password"
                                     autoComplete="new-password"
@@ -213,7 +219,7 @@ const EditProfile: React.FC = () => {
                         }}}
                         disabled={formik.isSubmitting}
                     >
-                        {formik.isSubmitting ? <CircularProgress size={24} /> : 'Save Changes'}
+                        {formik.isSubmitting ? <CircularProgress size={24} /> : t.savechanges}
                     </Button>
                     {formik.status?.error && (
                         <Alert severity="error" sx={{ mt: 2 }}>

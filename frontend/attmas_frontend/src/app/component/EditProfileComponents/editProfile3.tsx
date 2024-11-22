@@ -10,6 +10,7 @@ import { APIS, SERVER_URL } from '@/app/constants/api.constant';
 import { pubsub } from '@/app/services/pubsub.service';
 import { categories, options } from '@/app/constants/categories';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforCategory } from '../all_Profile_component/profile3';
 
 type Option = {
   label: string;
@@ -27,6 +28,9 @@ const EditProfile3: React.FC = () => {
   const router = useRouter();
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+  const language = userDetails.language || 'english';
+  const t = translationsforCategory[language as keyof typeof translationsforCategory] || translationsforCategory.english;
+
   const formik = useFormik({
     initialValues: {
       username: userDetails.username,
@@ -39,7 +43,7 @@ const EditProfile3: React.FC = () => {
       try {
         await axiosInstance.post(APIS.FORM3, values);
         pubsub.publish('toast', {
-          message: 'Profile updated successfully!',
+          message: t.profileUpdated,
           severity: 'success',
         });
         setTimeout(() => {
@@ -48,7 +52,7 @@ const EditProfile3: React.FC = () => {
       } catch (error) {
         console.error('Error updating profile:', error);
         pubsub.publish('toast', {
-          message: 'Failed to update profile. Please try again later.',
+          message: t.profileUpdateFailed,
           severity: 'error',
         });
       } finally {
@@ -179,10 +183,10 @@ const EditProfile3: React.FC = () => {
         }}
       >
         <Typography component="h1" variant="h5" align="center">
-          Subject matter expertise
+        {t.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-          View and Change your Subject matter expertise here
+        {t.description}
         </Typography>
 
         {fetchError && (
@@ -208,7 +212,7 @@ const EditProfile3: React.FC = () => {
                 <TextField
                   {...params}
                   variant="outlined"
-                  label="Preferred Category"
+                  label={t.preferredCategory || 'Preferred Category'}
                   placeholder="Select categories"
                   color="secondary"
                 />
@@ -267,7 +271,7 @@ const EditProfile3: React.FC = () => {
               loading={loading}
               loadingIndicator={<CircularProgress size={24} />}
             >
-              Update Subject matter expertise
+              {t.updatebutton}
             </LoadingButton>
           </Box>
         </Box>

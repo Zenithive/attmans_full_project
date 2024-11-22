@@ -4,6 +4,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { APIS } from '@/app/constants/api.constant';
 import axiosInstance from '@/app/services/axios.service';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { translationsforProjectCommentCard } from '../../../../public/trancation';
 
 interface JobDetailProps {
   jobId: string;
@@ -13,6 +16,12 @@ interface JobDetailProps {
 
 const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitted }) => {
   const [job, setJob] = useState<any>(null);
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+  const t = translationsforProjectCommentCard[language as keyof typeof translationsforProjectCommentCard] || translationsforProjectCommentCard.english;
+
   const [expanded, setExpanded] = useState(true);
 
   const fetchJobDetails = async () => {
@@ -72,7 +81,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-          Comments
+          {t.comments}
         </Typography>
         <IconButton onClick={toggleComments}>
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -138,7 +147,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ jobId, applyId, onCommentSubmitte
               </Paper>
             ))
           ) : (
-            <Typography>No comments yet.</Typography>
+            <Typography>{t.nocommentsyet}</Typography>
           )}
         </Box>
       )}

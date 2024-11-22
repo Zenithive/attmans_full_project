@@ -7,6 +7,7 @@ import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
 import dayjs from 'dayjs';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
+import { translationsforProjectCommentCard } from '../../../../public/trancation';
 
 interface Billing {
     _id?: string;
@@ -47,6 +48,12 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+
+
+  const language = userDetails.language || 'english';
+  const t = translationsforProjectCommentCard[language as keyof typeof translationsforProjectCommentCard] || translationsforProjectCommentCard.english;
+
 
     useEffect(() => {
         const fetchBillingData = async () => {
@@ -119,7 +126,8 @@ const BillingData: React.FC<BillingDataProps> = ({ apply }) => {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={5}>
-                                    <Typography align="center">No payments available</Typography>
+                                    {/* <Typography align="center">No payments available</Typography> */}
+                                    <Typography align="center">{t.nopaymentavailable}</Typography>
                                 </TableCell>
                             </TableRow>
                         )}

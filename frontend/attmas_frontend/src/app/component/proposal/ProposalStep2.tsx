@@ -18,6 +18,9 @@ import * as Yup from 'yup';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import { formValues } from './ProposalStep1';
+import { selectUserSession, UserSchema } from '@/app/reducers/userReducer';
+import { useAppSelector } from '@/app/reducers/hooks.redux';
+import { translationsforProposal } from '../../../../public/trancation';
 
 export interface BudgetOutlay {
   head: string;
@@ -72,6 +75,13 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
     'Overheads',
   ];
 
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const language = userDetails.language || 'english';
+    const t = translationsforProposal[language as keyof typeof translationsforProposal] || translationsforProposal.english;
+
+
   return (
     <Formik
       initialValues={{
@@ -110,7 +120,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
               color='secondary'
               name="isPeerReviewed"
               as={TextField}
-              label="Is this proposal peer reviewed?"
+              // label="Is this proposal peer reviewed?"
+              label={t.peerReviewed}
               fullWidth
               multiline
               disabled={readOnly} // Apply readOnly
@@ -121,7 +132,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
               color='secondary'
               name="expectedOutcome"
               as={TextField}
-              label="Expected Outcome in Physical Terms"
+              // label="Expected Outcome in Physical Terms"
+              label={t.expectedOutcomePhysical}
               fullWidth
               multiline
               disabled={readOnly} // Apply readOnly
@@ -131,7 +143,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
               color='secondary'
               name="detailedMethodology"
               as={TextField}
-              label="Detailed Methodology and Duration of Project"
+              // label="Detailed Methodology and Duration of Project"
+              label={t.methodologyDuration}
               fullWidth
               multiline
               disabled={readOnly} // Apply readOnly
@@ -141,7 +154,9 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
               color='secondary'
               name="physicalAchievements"
               as={TextField}
-              label="Year-wise Break-up of Physical Achievements"
+              // label="Year-wise Break-up of Physical Achievements"
+              label={t.yearwiseBreakup}
+              // "Year-wise Break-up of Physical Achievements"
               fullWidth
               multiline
               disabled={readOnly} // Apply readOnly
@@ -149,7 +164,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
 
 
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Budget Outlay
+              {/* Budget Outlay */}
+              {t.budgetOutlay}
             </Typography>
             <TableContainer component={Paper}>
               <Table>
@@ -202,7 +218,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                               })
                             }
                           >
-                            Add Row
+                            {/* Add Row */}
+                            {t.addRow}
                           </Button>
                         )}
                       </>
@@ -214,7 +231,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
 
             {/* Manpower Details Table */}
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Manpower Details
+              {/* Manpower Details */}
+              {t.ManpowerDetails}
             </Typography>
             <TableContainer component={Paper}>
               <Table>
@@ -282,7 +300,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                 rows={4}
                 name="pastCredentials"
                 as={TextField}
-                label="Past Credentials in Similar Projects"
+                // label="Past Credentials in Similar Projects"
+                label={t.pastCredentials}
                 fullWidth
                 multiline
                 disabled={readOnly} // Apply readOnly
@@ -297,7 +316,9 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                 rows={4}
                 name="briefProfile"
                 as={TextField}
-                label="Brief Profile/CV with Roles of Project Team"
+                // label="Brief Profile/CV with Roles of Project Team"
+                label={t.profileCVRoles}
+                // "Brief Profile/CV with Roles of Project Team"
                 fullWidth
                 multiline
                 disabled={readOnly} // Apply readOnly
@@ -312,7 +333,8 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
                 rows={4}
                 name="proposalOwnerCredentials"
                 as={TextField}
-                label="Credentials of Proposal Owner (e.g., patents, tech transfers)"
+                // label="Credentials of Proposal Owner (e.g., patents, tech transfers)"
+                label={t.proposalOwnerCredentials}
                 fullWidth
                 multiline
                 disabled={readOnly} // Apply readOnly
@@ -325,10 +347,12 @@ const ProposalStep2: React.FC<ProposalStep2Props> = ({
             {/* Navigation Buttons */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Button variant="outlined" onClick={() => onPrevious(values as any)}>
-                Previous
+                {/* Previous */}
+                {t.previous}
               </Button>
               <Button type="submit" variant="contained" >
-                Next
+                {/* Next */}
+                {t.next}
               </Button>
             </Box>
           </Box>

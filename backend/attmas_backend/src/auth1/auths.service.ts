@@ -49,18 +49,16 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user._id };
-    // Generate a unique session ID
-    const sessionId = uuidv4(); // Generate a new session ID
+    const payload = { username: user._doc.username, sub: user._id };
 
-    // Store the session ID in the user's document
-    // this.usersService.updateSessionId(user.username, sessionId); // You will implement this method in UsersService
+    // Fetch the user's language
+    const language = await this.usersService.getUserLanguage(user._doc.username);
 
     return {
       access_token: this.jwtService.sign(payload),
-      // sessionId: sessionId, // Return the session ID along with the access token
+      language: language,
     };
-  }
+  } 
 
   async logout(req: any, res: any): Promise<any> {
     res.clearCookie('token'); // Clear the token cookie

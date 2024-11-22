@@ -14,6 +14,7 @@ export interface UserSchema {
   userType,
   profilePhoto?: string;
   sessionId?: string;
+  language?:string;
 }
 export interface UserState {
   user: UserSchema;
@@ -29,6 +30,8 @@ const initialState: UserState = {
     _id: "",
     userType: "",
     sessionId: "",
+    language: "",
+
 
   }
 }

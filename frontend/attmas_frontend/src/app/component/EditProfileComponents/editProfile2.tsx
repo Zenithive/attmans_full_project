@@ -23,6 +23,7 @@ import { userType } from '@/app/services/user.access.service';
 import AddProductModal2 from '../all_Profile_component/AddProductModal2';
 import NewProductTable from '../all_Profile_component/NewProductTable';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforPROFILE2 } from '../../../../public/trancation';
 
 interface FormValues {
     qualification: string;
@@ -45,6 +46,12 @@ interface FormValues {
 const EditProfile2: React.FC = () => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+    const language = userDetails.language || 'english';
+
+
+  const t = translationsforPROFILE2[language as keyof typeof translationsforPROFILE2] || translationsforPROFILE2.english;
+
+
     const [isFreelancer, setIsFreelancer] = useState(userDetails.userType === 'Freelancer' || false);
 
     const [isInnovator, setIsInnovator] = useState(userDetails.userType === 'Innovator' || false);
@@ -66,13 +73,15 @@ const EditProfile2: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const validationSchema = Yup.object({
-        Headline: Yup.string().required('Headline is required'),
-        qualification: Yup.string().required('Qualification is required'),
+        // Headline: Yup.string().required('Headline is required'),
+        Headline: Yup.string().required(t.headline),
+        // qualification: Yup.string().required('Qualification is required'),
+        qualification: Yup.string().required(t.qualification),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
         workAddress: Yup.string().nullable(),
         designation: Yup.string().nullable(),
-        userType: Yup.string().required('Required'),
+        userType: Yup.string().required(t.required),
         productToMarket: Yup.string().nullable(),
         products: Yup.array().of(
             Yup.object().shape({
@@ -91,7 +100,7 @@ const EditProfile2: React.FC = () => {
                 howdoesthesolutionwork: Yup.string().nullable(),
                 challengesorrisks: Yup.string().nullable(),
                 potentialbenefits: Yup.string().nullable(),
-                currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+                currency: Yup.string().oneOf(['INR', 'USD']).required(t.currencyRequired),
             })
         ),
         hasPatent: Yup.string().nullable(),
@@ -339,10 +348,12 @@ const EditProfile2: React.FC = () => {
                 }}
             >
                 <Typography component="h1" variant="h5" align="center">
-                    Work Experience
+                    {/* Work Experience */}
+                    {t.workExperience}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-                    View and change your work experience here
+                    {/* View and change your work experience here */}
+                    {t.workExperienceDescription}
                 </Typography>
 
                 <FormikProvider value={formik}>
@@ -380,7 +391,7 @@ const EditProfile2: React.FC = () => {
                                     select
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="qualification"
-                                    label="Qualification"
+                                    label={t.qualification}
                                     color='secondary'
                                     name="qualification"
                                     onChange={formik.handleChange}
@@ -400,7 +411,7 @@ const EditProfile2: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     id="organization"
-                                    label="Organization"
+                                    label={t.organization}
                                     color='secondary'
                                     name="organization"
                                     onChange={formik.handleChange}
@@ -414,7 +425,7 @@ const EditProfile2: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     id="sector"
-                                    label="Sector"
+                                    label={t.sector}
                                     color='secondary'
                                     name="sector"
                                     onChange={formik.handleChange}
@@ -431,7 +442,7 @@ const EditProfile2: React.FC = () => {
                                     fullWidth
                                     id="workAddress"
                                     color='secondary'
-                                    label="Work Address"
+                                    label={t.workAddress}
                                     name="workAddress"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -445,7 +456,7 @@ const EditProfile2: React.FC = () => {
                                     fullWidth
                                     id="designation"
                                     color='secondary'
-                                    label="Designation"
+                                    label={t.designation}
                                     name="designation"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -460,7 +471,7 @@ const EditProfile2: React.FC = () => {
                                     select
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="userType"
-                                    label="User Type"
+                                    label={t.userType}
                                     color='secondary'
                                     name="userType"
                                     onChange={(e) => {
@@ -490,7 +501,7 @@ const EditProfile2: React.FC = () => {
                                             style={{ background: "white", borderRadius: "25px" }}
                                             id="productToMarket"
                                             color='secondary'
-                                            label="Product to Market"
+                                            label={t.productToMarket}
                                             name="productToMarket"
                                             onChange={(e) => {
                                                 handleProductToMarketChange(e);
@@ -515,7 +526,7 @@ const EditProfile2: React.FC = () => {
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="hasPatent"
                                     color='secondary'
-                                    label="Do you have a patent?"
+                                    label={t.hasPatent}
                                     name="hasPatent"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -591,7 +602,8 @@ const EditProfile2: React.FC = () => {
                                         loading={loading}
                                         loadingIndicator={<CircularProgress size={24} />}
                                     >
-                                        Update Work Experience
+                                        {/* {Update Work Experience} */}
+                                        {t.updateworkex}
                                     </LoadingButton>
                                 </Box>
                             </Grid>

@@ -25,6 +25,9 @@ export class User {
   @Prop({ required: true })
   mobileNumber: string;
 
+  @Prop({ required: false })
+  language: string;
+
   @Prop()
   gender?: string;
 

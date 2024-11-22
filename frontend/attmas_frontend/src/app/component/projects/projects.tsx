@@ -20,6 +20,7 @@ import SubjectMatterExpertise from '../SubjectMatterExpertise';
 import { DatePicker } from '@mui/x-date-pickers';
 import { DATE_FORMAT } from '@/app/constants/common.constants';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforProject } from '../../../../public/trancation';
 
 
 
@@ -50,24 +51,24 @@ interface AddJobsProps {
 }
 
 
-const validationSchema = Yup.object().shape({
-    title: Yup.string().required('Title is required'),
-    description: Yup.string().required('Description is required'),
-    // SelectService: Yup.array().of(Yup.string()).required('Select Service is required'),
-    DetailsOfInnovationChallenge: Yup.string(),
-    ProductDescription: Yup.string(),
-    Quantity: Yup.number(),
-    Sector: Yup.string(),
-    Expertiselevel: Yup.string(),
-    Objective: Yup.string().required('Objective is required'),
-    IPRownership: Yup.string().required('IPR ownership is required'),
-    Expectedoutcomes: Yup.string().required('Expected outcomes are required'),
-    Budget: Yup.number().required('Budget is required'),
-    TimeFrame: Yup.date().nullable().required('Date & Time are required'),
-    categoryforCategory: Yup.array().of(Yup.string()),
-    Subcategory: Yup.array().of(Yup.string()),
-    currency: Yup.string().required('Currency is required')
-});
+// const validationSchema = Yup.object().shape({
+//     title: Yup.string().required('Title is required'),
+//     description: Yup.string().required('Description is required'),
+//     // SelectService: Yup.array().of(Yup.string()).required('Select Service is required'),
+//     DetailsOfInnovationChallenge: Yup.string(),
+//     ProductDescription: Yup.string(),
+//     Quantity: Yup.number(),
+//     Sector: Yup.string(),
+//     Expertiselevel: Yup.string(),
+//     Objective: Yup.string().required('Objective is required'),
+//     IPRownership: Yup.string().required('IPR ownership is required'),
+//     Expectedoutcomes: Yup.string().required('Expected outcomes are required'),
+//     Budget: Yup.number().required('Budget is required'),
+//     TimeFrame: Yup.date().nullable().required('Date & Time are required'),
+//     categoryforCategory: Yup.array().of(Yup.string()),
+//     Subcategory: Yup.array().of(Yup.string()),
+//     currency: Yup.string().required('Currency is required')
+// });
 
 export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
     const [open, toggleDrawer] = React.useState(false);
@@ -76,6 +77,10 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const language = userDetails.language || 'english';
+    const t = translationsforProject[language as keyof typeof translationsforProject] || translationsforProject.english;
+  
 
     const initialValues = React.useMemo(() => ({
         title: '',
@@ -105,6 +110,25 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
             toggleDrawer(true);
         }
     }, [editingJobs]);
+
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required(t.titleRequired),
+        description: Yup.string().required(t.descriptionRequired),
+        DetailsOfInnovationChallenge: Yup.string(),
+        ProductDescription: Yup.string(),
+        Quantity: Yup.number(),
+        Sector: Yup.string(),
+        Expertiselevel: Yup.string(),
+        Objective: Yup.string().required(t.objectiveRequired),
+        IPRownership: Yup.string().required(t.iprOwnershipRequired),
+        Expectedoutcomes: Yup.string().required(t.expectedOutcomesRequired),
+        Budget: Yup.number().required(t.budgetRequired),
+        TimeFrame: Yup.date().nullable().required(t.timeFrameRequired),
+        categoryforCategory: Yup.array().of(Yup.string()),
+        Subcategory: Yup.array().of(Yup.string()),
+        currency: Yup.string().required(t.currencyRequired)
+      });
+      
 
     const handleSubmit = React.useCallback(async (values: { title: string; description: string; SelectService: string; DetailsOfInnovationChallenge: string; Sector: string; ProductDescription: string; Quantity: number; Expertiselevel: string; Budget: number, TimeFrame: Dayjs | null; categoryforCategory: string[]; Subcategory: string[]; Objective: string; Expectedoutcomes: string, IPRownership: string; currency: string; }, { setSubmitting, resetForm }: any) => {
         const jobsData = {
@@ -200,7 +224,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                         <Form onSubmit={handleSubmit}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2, position: "relative", left: "15px" }}>
                                 <TextField
-                                    label="Title"
+                                    label={t.title}
                                     color='secondary'
                                     name="title"
                                     variant="outlined"
@@ -212,7 +236,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={<ErrorMessage name="title" />}
                                 />
                                 <TextField
-                                    label="Description"
+                                    label={t.description}
                                     name="description"
                                     color='secondary'
                                     variant="outlined"
@@ -235,7 +259,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         value={values.SelectService}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        label="Select Service"
+                                        label={t.selectservice}
                                     >
                                         <MenuItem value="Outsource Research and Development ">Outsource Research and Development  </MenuItem>
                                         <MenuItem value="Innovative product">Innovative product</MenuItem>
@@ -248,7 +272,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                                 <Box sx={{ mb: 2 }}>
 
                                                     <TextField
-                                                        label="Details of Innovation Challenge"
+                                                        label={t.detailsOfInnovationChallenge}
                                                         name="DetailsOfInnovationChallenge"
                                                         color='secondary'
                                                         multiline
@@ -264,7 +288,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
                                                 <Box sx={{ mb: 2 }}>
                                                     <TextField
-                                                        label="Sector"
+                                                        label={t.sector}
                                                         name="Sector"
                                                         color='secondary'
                                                         variant="outlined"
@@ -281,7 +305,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
                                                    
                                                     <TextField
-                                                        label="Quantity" // Changed from "Area of Product" to "Quantity"
+                                                        label={t.quantity} // Changed from "Area of Product" to "Quantity"
                                                         name="Quantity"
                                                         color="secondary"
                                                         type="number" // Ensures the input is a number
@@ -297,7 +321,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
 
                                                 <Box sx={{ mb: 2 }}>
                                                     <TextField
-                                                        label="Product Description"
+                                                        label={t.productDescription}
                                                         name="ProductDescription"
                                                         multiline
                                                         color='secondary'
@@ -328,7 +352,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                             value={values.Expertiselevel}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            label="Expertise Level"
+                                            label={t.expertiseLevel}
                                         >
                                             <MenuItem value="Beginner">Beginner </MenuItem>
                                             <MenuItem value="Intermediate">Intermediate</MenuItem>
@@ -343,7 +367,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         fullWidth
                                         id="Budget"
                                         name="Budget"
-                                        label="Budget"
+                                        label={t.budget}
                                         type="number"
                                         color='secondary'
                                         value={values.Budget}
@@ -396,7 +420,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            label="Preferred Category"
+                                            label={t.preferredCategory}
                                             color='secondary'
                                             placeholder="Select Category"
                                             error={!!(errors.categoryforCategory && touched.categoryforCategory)}
@@ -421,7 +445,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     }} />
 
                                 <TextField
-                                    label="Objective"
+                                    label={t.objective}
                                     name="Objective"
                                     color='secondary'
                                     variant="outlined"
@@ -434,7 +458,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={<ErrorMessage name="Objective" />}
                                 />
                                 <TextField
-                                    label="Expected outcomes"
+                                    label={t.expectedOutcomes}
                                     name="Expectedoutcomes"
                                     color='secondary'
                                     variant="outlined"
@@ -448,7 +472,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     helperText={<ErrorMessage name="Expectedoutcomes" />}
                                 />
                                 <TextField
-                                    label="IPR ownership"
+                                    label={t.iprOwnership}
                                     name="IPRownership"
                                     color='secondary'
                                     variant="outlined"
@@ -467,7 +491,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                         format={DATE_FORMAT}
-                                        label="Time Frame"
+                                        label={t.timeFrame}
                                         // color='secondary'
                                         value={values.TimeFrame}
                                         onChange={(newValue) => setFieldValue('TimeFrame', newValue)}
@@ -480,7 +504,7 @@ export const AddProjects = ({ editingJobs, onCancelEdit }: AddJobsProps) => {
                                     />
                                 </LocalizationProvider>
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                                    <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>Cancel</Button>
+                                    <Button variant="contained" sx={{ bgcolor: '#616161', ':hover': { bgcolor: '#616161' } }} onClick={() => { toggleDrawer(false); onCancelEdit && onCancelEdit(); }}>{t.cancelButton}</Button>
                                     <Button variant="contained" type="submit" disabled={isSubmitting}>  {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (editingJobs ? 'Edit' : 'Create')}</Button>
                                 </Box>
                             </Box>

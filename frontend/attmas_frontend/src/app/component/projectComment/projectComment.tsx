@@ -6,6 +6,7 @@ import { useAppSelector } from '@/app/reducers/hooks.redux';
 import { UserSchema, selectUserSession } from '@/app/reducers/userReducer';
 import * as Yup from 'yup';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforProjectCommentCard } from '../../../../public/trancation';
 
 interface AddCommentProps {
   jobId: string;
@@ -13,13 +14,22 @@ interface AddCommentProps {
   onCommentSubmitted: () => void;
 }
 
-const validationSchema = Yup.object({
-  comment: Yup.string().required('Comment needs to be Filled'),
-});
+// const validationSchema = Yup.object({
+//   // comment: Yup.string().required('Comment needs to be Filled'),
+//   comment: Yup.string().required(t.commentneedtofill),
+// });
 
 const AddComment: React.FC<AddCommentProps> = ({ jobId,applyId,onCommentSubmitted }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+
+  const language = userDetails.language || 'english';
+  const t = translationsforProjectCommentCard[language as keyof typeof translationsforProjectCommentCard] || translationsforProjectCommentCard.english;
+
+  const validationSchema = Yup.object({
+    // comment: Yup.string().required('Comment needs to be Filled'),
+    comment: Yup.string().required(t.commentneedtofill),
+  });
   const handleSubmit = async (
     values: { comment: string },
     { setSubmitting, resetForm }: any
@@ -52,7 +62,7 @@ const AddComment: React.FC<AddCommentProps> = ({ jobId,applyId,onCommentSubmitte
             <Field
               name="comment"
               as={TextField}
-              label="Add a Comment"
+              label={t.addacomment}
               color='secondary'
               fullWidth
               multiline
@@ -71,7 +81,7 @@ const AddComment: React.FC<AddCommentProps> = ({ jobId,applyId,onCommentSubmitte
               }
               sx={{ position: 'relative' }}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Comment'}
+              {isSubmitting ? t.Submitting : t.SubmitComment}
             </Button>
           </Box>
         </Form>

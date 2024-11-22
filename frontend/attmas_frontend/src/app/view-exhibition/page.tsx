@@ -22,6 +22,7 @@ import { pubsub } from '../services/pubsub.service';
 import { PUB_SUB_ACTIONS } from '../constants/pubsub.constant';
 import UserDrawer from '../component/UserNameSeperate/UserDrawer';
 import { User } from '../component/Freelancer&InnovatorsCard';
+import { translationsforViewExhibition } from '../../../public/trancation';
 
 interface Exhibition {
   _id?: string;
@@ -84,6 +85,10 @@ const ExhibitionsPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showInterestedModal, setShowInterestedModal] = useState(false);
   const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+  const language = userDetails.language || 'english';
+const t = translationsforViewExhibition[language as keyof typeof translationsforViewExhibition] || translationsforViewExhibition.english;
+
   const searchParams = useSearchParams();
   const { userType } = userDetails;
   const [selectedBooth, setSelectedBooth] = useState<Booth | null>(null);
@@ -435,7 +440,7 @@ const ExhibitionsPage: React.FC = () => {
         }}>
 
           <Box sx={{ color: 'black', textAlign: "left", background: "#f5f5f5", right: "8px", width: "100%", bottom: "15px", height: '6%', padding: '10px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-            <Box sx={{ '@media (max-width: 767px)': { position: 'relative', right: '34px' } }}><h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>Exhibition</h1></Box>
+            <Box sx={{ '@media (max-width: 767px)': { position: 'relative', right: '34px' } }}><h1 style={{ position: 'relative', top: "15%", left: '30px', margin: 0 }}>{t.exhibition}</h1></Box>
             <Box sx={{
               mx: 2,
               '@media (max-width: 767px)': {
@@ -579,7 +584,7 @@ const ExhibitionsPage: React.FC = () => {
             }}>
 
               {!isExhibitionClosed(selectedExhibition) && (
-                <h1>Booth Details</h1>
+                <h1>{t.boothDetails}</h1>
 
               )}
 
@@ -676,7 +681,8 @@ const ExhibitionsPage: React.FC = () => {
                                     position: 'relative', float: 'right', bottom: '55px'
                                   }}
                                 >
-                                  View Details
+                                  {/* View Details */}
+                                  {t.viewDetails}
                                 </a>
                               )
                             )}
@@ -759,7 +765,7 @@ const ExhibitionsPage: React.FC = () => {
                 </Grid>
                 <Box sx={{ textAlign: 'center', position: 'relative' }}>
                   {booths.filter(booth => booth.exhibitionId === exhibitionId).length === 0 && (
-                    <Typography variant="h6" style={{ marginTop: '20px' }}>No booths to display</Typography>
+                    <Typography variant="h6" style={{ marginTop: '20px' }}>{t.noboothtodisplay}</Typography>
                   )}
                 </Box>
               </>

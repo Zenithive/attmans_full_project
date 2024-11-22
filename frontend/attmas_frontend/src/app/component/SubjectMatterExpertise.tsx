@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Chip, Checkbox, TextField, Button } from '@mui/material';
 import { options } from '@/app/constants/categories';
+import { selectUserSession, UserSchema } from '../reducers/userReducer';
+import { useAppSelector } from '../reducers/hooks.redux';
+import { translationsforDetails } from '../../../public/trancation';
 
 interface options {
   label: string;
@@ -22,6 +25,13 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
   const [searchTerm, setSearchTerm] = useState<string>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [buttonClicked, setButtonClicked] = useState(false);
+
+  const userDetails: UserSchema = useAppSelector(selectUserSession);
+  
+
+  const language = userDetails.language || 'english';
+  const t = translationsforDetails[language as keyof typeof translationsforDetails] || translationsforDetails.english;
+
 
   const handleCheckboxChange = (value: string, isChecked: boolean) => {
     let updatedSelectedValues = [...selectedValues];
@@ -98,7 +108,8 @@ const SubjectMatterExpertise: React.FC<SubjectMatterExpertiseProps> = ({ selecte
         style={{ minHeight: '57.5px', borderWidth: isOpen ? '2px' : '1px' }}
       >
         {(isOpen || selectedValues.length > 0) && (
-          <span className="button-label">Subject Matter Expertise</span>
+          // <span className="button-label">Subject Matter Expertise</span>
+          <span className="button-label">{t.subjectMatterExpertise}</span>
         )}
 
         {selectedValues.length > 0 ? (

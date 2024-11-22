@@ -12,6 +12,7 @@ import ApplicationsForProject, { MilestoneCommentType } from '../applicationforp
 import { APPLY_STATUSES } from '@/app/constants/status.constant';
 import axiosInstance from '@/app/services/axios.service';
 import { pubsub } from '@/app/services/pubsub.service';
+import { translationsforProjectDetailsInformation } from '../../../../public/trancation';
 
 export interface Job {
     _id?: string;
@@ -121,6 +122,10 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
+
+    const language = userDetails.language || 'english';
+    const t = translationsforProjectDetailsInformation[language as keyof typeof translationsforProjectDetailsInformation] || translationsforProjectDetailsInformation.english;
+
     const currentUser = userDetails.username;
     const currentUserType = userDetails.userType;
     const currentUserId = userDetails._id;
@@ -242,7 +247,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
         try {
             const submitUrl = submitType === 'submit' ? `${APIS.MILESTONES}/submit-comment` : `${APIS.MILESTONES}/resubmit`;
-            
+
             await axiosInstance.post(submitUrl, { applyId, milestoneIndex, comment });
 
             setMilestones(prevState => {
@@ -339,7 +344,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
             >
                 <DialogTitle>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '25px' }}>
-                        Project Details Information
+                        {t.projectDetailsInformation}
                         <IconButton
                             edge="start"
                             color="inherit"
@@ -355,10 +360,10 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                             {isApproved && <Chip label="Approved" variant="outlined" sx={{ borderColor: 'green', color: 'green', borderRadius: '16px', float: 'right', mb: 2 }} />}
                             {isRejected && <Chip label="Rejected" variant="outlined" sx={{ borderColor: 'red', color: 'red', borderRadius: '16px', float: 'right', mb: 2 }} />}
 
-                            <Grid container spacing={2} sx={{mt: 0.5}}>
+                            <Grid container spacing={2} sx={{ mt: 0.5 }}>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                        label="Title"
+                                        label={t.title}
                                         value={viewingJob.title}
                                         fullWidth
                                         disabled
@@ -367,7 +372,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                        label="Budget"
+                                        label={t.budget}
                                         value={`${viewingJob.currency === 'USD' ? '$' : '₹'} ${viewingJob.Budget}`}
                                         fullWidth
                                         disabled
@@ -377,7 +382,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                 {!(userDetails.userType === 'Freelancer' || userDetails.userType === 'Innovator') && (
                                     <Grid item xs={12} sm={6}>
                                         <TextField
-                                            label="Owner Name"
+                                            label={t.ownerName}
                                             value={`${viewingJob.firstName} ${viewingJob.lastName}`}
                                             fullWidth
                                             disabled
@@ -400,7 +405,7 @@ const MyProjectDrawer: React.FC<ProjectDrawerProps> = ({
                                                 }}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                View Details of Project
+                                                {t.viewDetailsOfProject}
                                             </a>
                                         </Box>
                                     )}

@@ -23,6 +23,7 @@ import { userType } from '@/app/services/user.access.service';
 import AddProductModal2 from './AddProductModal2';
 import NewProductTable from './NewProductTable';
 import axiosInstance from '@/app/services/axios.service';
+import { translationsforPROFILE2 } from '../../../../public/trancation';
 
 interface FormValues {
     qualification: string;
@@ -52,8 +53,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
     const [showProductDetails, setShowProductDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
-    const [label, setLabel] = useState("Provide details about the research product or solution that you intend to commercialize");
-    const [labels, setLabels] = useState("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+    
 
 
     const [showAddProductModal, setShowAddProductModal] = useState(false);
@@ -65,16 +65,28 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const userDetails: UserSchema = useAppSelector(selectUserSession);
 
+  const language = userDetails.language || 'english';
+
+
+  const t = translationsforPROFILE2[language as keyof typeof translationsforPROFILE2] || translationsforPROFILE2.english;
+
+
+  const [label, setLabel] = useState(t.enterheadlinepp);
+    const [labels, setLabels] = useState(t.enterheadlineff);
+
     const dispatch = useAppDispatch();
 
     const validationSchema = Yup.object({
-        Headline: Yup.string().required('Headline is required'),
-        qualification: Yup.string().required('Qualification is required'),
+        // Headline: Yup.string().required('Headline is required'),
+        Headline: Yup.string().required(t.headline),
+        // qualification: Yup.string().required('Qualification is required'),
+        qualification: Yup.string().required(t.qualificationr),
         organization: Yup.string().nullable(),
         sector: Yup.string().nullable(),
         workAddress: Yup.string().nullable(),
         designation: Yup.string().nullable(),
-        userType: Yup.string().required('Required'),
+        // userType: Yup.string().required('Required'),
+        userType: Yup.string().required(t.required),
         productToMarket: Yup.string().nullable(),
         products: Yup.array().of(
             Yup.object().shape({
@@ -93,7 +105,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 howdoesthesolutionwork: Yup.string().nullable(),
                 challengesorrisks: Yup.string().nullable(),
                 potentialbenefits: Yup.string().nullable(),
-                currency: Yup.string().oneOf(['INR', 'USD']).required('Currency is required'),
+                currency: Yup.string().oneOf(['INR', 'USD']).required(t.currencyRequired),
             })
         ),
         hasPatent: Yup.string().nullable(),
@@ -105,16 +117,17 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
 
     const handleFocus = () => {
         setLabel("Share Solution");
-        setLabels("HeadLine");
+        setLabels(t.headlineOriginal);
     };
 
 
     const handleBlur = () => {
         if (!formik.values.patentDetails) {
-            setLabel("Provide details about the research product or solution that you intend to commercialize");
+            // setLabel("Provide details about the research product or solution that you intend to commercialize");
+            setLabel(t.enterheadlinepp);
         }
         if (!formik.values.Headline) {
-            setLabels("Enter a brief sentences that best summarizes your core expertise and skills, like you would on your resume of LinkedIn profile.");
+            setLabels(t.enterheadlineff);
         }
     };
 
@@ -305,10 +318,12 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                 }}
             >
                 <Typography component="h1" variant="h5" align="center">
-                    Work Experience
+                    {/* Work Experience */}
+                    {t.workExperience}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" align="center" mb={4}>
-                    View and change your work experience here
+                    {/* View and change your work experience here */}
+                    {t.workExperienceDescription}
                 </Typography>
 
                 <FormikProvider value={formik}>
@@ -346,7 +361,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     select
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="qualification"
-                                    label="Qualification"
+                                    label={t.qualification}
                                     color='secondary'
                                     name="qualification"
                                     onChange={formik.handleChange}
@@ -366,7 +381,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 <TextField
                                     fullWidth
                                     id="organization"
-                                    label="Organization"
+                                    label={t.organization}
                                     color='secondary'
                                     name="organization"
                                     onChange={formik.handleChange}
@@ -380,7 +395,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                 <TextField
                                     fullWidth
                                     id="sector"
-                                    label="Sector"
+                                    label={t.sector}
                                     color='secondary'
                                     name="sector"
                                     onChange={formik.handleChange}
@@ -395,7 +410,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     fullWidth
                                     id="workAddress"
                                     color='secondary'
-                                    label="Work Address"
+                                    label={t.workAddress}
                                     name="workAddress"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -409,7 +424,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     fullWidth
                                     id="designation"
                                     color='secondary'
-                                    label="Designation"
+                                    label={t.designation}
                                     name="designation"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -424,7 +439,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     select
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="userType"
-                                    label="User Type"
+                                    label={t.userType}
                                     color='secondary'
                                     name="userType"
                                     onChange={(e) => {
@@ -454,7 +469,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                             style={{ background: "white", borderRadius: "25px" }}
                                             id="productToMarket"
                                             color='secondary'
-                                            label="Product to Market"
+                                            label={t.productToMarket}
                                             name="productToMarket"
                                             onChange={(e) => {
                                                 handleProductToMarketChange(e);
@@ -479,7 +494,7 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                     style={{ background: "white", borderRadius: "25px" }}
                                     id="hasPatent"
                                     color='secondary'
-                                    label="Do you have a patent?"
+                                    label={t.hasPatent}
                                     name="hasPatent"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
@@ -512,7 +527,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                             {isInnovator && showProductDetails && (
                                 <Grid item xs={12}>
                                     <Button variant="contained" onClick={handleAddProduct}>
-                                        Add Product
+                                        {/* Add Product */}
+                                        {t.addProduct}
                                     </Button>
 
                                 </Grid>
@@ -579,7 +595,8 @@ const ProfileForm2: React.FC<ProfileForm2Props> = ({ onNext, onPrevious }) => {
                                         left: '40%'
                                     }}
                                 >
-                                    Save & Next
+                                    {/* Save & Next */}
+                                    {t.saveAndNext}
                                 </LoadingButton>
                             </Grid>
 
