@@ -26,6 +26,7 @@ interface BoothDetailsModalProps {
   createBooth: (boothData: any) => Promise<void>;
   BoothDetails?: Booth | null;
   exhibitionId: string | null;
+  onBoothSubmitted?: () => void; // Add this prop
 }
 
 const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
@@ -34,6 +35,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
   createBooth,
   BoothDetails,
   exhibitionId,
+  onBoothSubmitted, // Add this prop
 }) => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
@@ -96,6 +98,7 @@ const BoothDetailsModal: React.FC<BoothDetailsModalProps> = ({
       resetForm();
       setSelectedProducts([] as Product[]);
       onClose();
+      onBoothSubmitted?.(); // Call onBoothSubmitted to hide the button
     } catch (error) {
       console.error("Error creating booth:", error); // To capture and log errors
     }

@@ -87,7 +87,7 @@ const ExhibitionsPage: React.FC = () => {
   const userDetails: UserSchema = useAppSelector(selectUserSession);
 
   const language = userDetails.language || 'english';
-const t = translationsforViewExhibition[language as keyof typeof translationsforViewExhibition] || translationsforViewExhibition.english;
+  const t = translationsforViewExhibition[language as keyof typeof translationsforViewExhibition] || translationsforViewExhibition.english;
 
   const searchParams = useSearchParams();
   const { userType } = userDetails;
@@ -501,7 +501,14 @@ const t = translationsforViewExhibition[language as keyof typeof translationsfor
                 </Button>
               )}
             </Box>
-            <BoothDetailsModal open={showModal} onClose={closeModal} createBooth={handleCreateBooth} exhibitionId={exhibitionId} BoothDetails={selectedBooth} />
+            <BoothDetailsModal
+              open={showModal}
+              onClose={closeModal}
+              createBooth={handleCreateBooth}
+              exhibitionId={exhibitionId}
+              BoothDetails={selectedBooth}
+              onBoothSubmitted={() => setReParticipateButtonVisible(false)} // Hide button on submit
+            />
             <IntrestedModal open={showInterestedModal} onClose={closeInterestedModal} exhibitionId={exhibitionId} interestType={'InterestedUserForExhibition'} />
           </Box>
           <div>
@@ -562,8 +569,10 @@ const t = translationsforViewExhibition[language as keyof typeof translationsfor
                         ({!exhibition.exhbTime ? dayjs(exhibition.dateTime).format(DATE_TIME_FORMAT) : exhibition.dateTime} {exhibition.exhbTime || ''})
                       </Box>
                     </Typography>
-                    <Typography variant="h5" sx={{ fontSize: 'medium', marginBottom: '10px' , wordBreak: 'break-word',
-                          whiteSpace: 'normal',}}>{exhibition.description}</Typography>
+                    <Typography variant="h5" sx={{
+                      fontSize: 'medium', marginBottom: '10px', wordBreak: 'break-word',
+                      whiteSpace: 'normal',
+                    }}>{exhibition.description}</Typography>
                     <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.industries}</Typography>
                     <Typography variant="h5" sx={{ fontSize: 'medium' }}>{exhibition.subjects}</Typography>
                   </CardContent>
@@ -592,7 +601,7 @@ const t = translationsforViewExhibition[language as keyof typeof translationsfor
               {!isExhibitionClosed(selectedExhibition) && (
 
 
-                <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px',left:"-45px" } }}>
+                <Box display="flex" justifyContent="center" marginTop="20px" sx={{ position: 'relative', bottom: '62px', left: '40px', '@media (max-width: 767px)': { position: 'relative', bottom: '0px', marginBottom: '20px', left: "-45px" } }}>
                   {userType !== 'Visitors' && (
                     <ToggleButtonGroup
                       value={view}
@@ -744,17 +753,18 @@ const t = translationsforViewExhibition[language as keyof typeof translationsfor
                                 </>
                               )}
 
-                              {(isReParticipateButtonVisible && userDetails._id === booth.userId._id) ?
+                              {(isReParticipateButtonVisible && userDetails._id === booth.userId._id) ? (
                                 <Button
                                   onClick={() => {
-                                    openModal()
+                                    openModal();
                                     setSelectedBooth(booth);
                                   }}
                                   variant="contained"
                                   style={{ marginRight: '10px' }}
                                 >
                                   Re-Participate
-                                </Button> : ''}
+                                </Button>
+                              ) : null}
                             </Box>
                             <Box>
                             </Box>
