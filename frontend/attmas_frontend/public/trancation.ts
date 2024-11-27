@@ -397,8 +397,8 @@ export const translationsforSidebar = {
 export const translationsforNotification = {
   english: {
     notifications: 'Notifications',
-    unread: 'Unread',
-    read: 'Read',
+    unread: 'read',
+    read: 'UnRead',
     profile: 'Profile',
     logout: 'Logout',
     Nonewnotifications: 'No new notifications.',
@@ -406,8 +406,8 @@ export const translationsforNotification = {
   },
   gujarati: {
     notifications: 'સૂચનાઓ',
-    unread: 'Unread',
-    read: 'વાંચો',
+    unread: 'વાંચો',
+    read: 'UnRead',
     profile: 'પ્રોફાઇલ',
     logout: 'લોગઆઉટ',
     Nonewnotifications: 'કોઈ નવી સૂચનાઓ નથી.',
